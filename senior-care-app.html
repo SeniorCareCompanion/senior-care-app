@@ -2559,7 +2559,7 @@
             // Check if deleting a bill
             if (pendingDeleteBillId !== null) {
                 console.log('Deleting bill with id:', pendingDeleteBillId);
-                const users = loadData('users');
+                users = loadData('users');
                 const bill = users[currentUser].bills.find(b => b.id === pendingDeleteBillId);
                 if (!bill) {
                     console.error('Bill not found');
@@ -2586,7 +2586,7 @@
             if (pendingDeleteCategory !== null && pendingDeleteIndex !== null) {
                 // Deleting a task
                 console.log('Deleting task');
-                const users = loadData('users');
+                users = loadData('users');
                 const task = users[currentUser].tasks[pendingDeleteCategory][pendingDeleteIndex];
                 const taskName = task.name;
                 
@@ -3677,7 +3677,7 @@
             URL.revokeObjectURL(url);
             
             // Save last backup date
-            const users = loadData('users');
+            users = loadData('users');
             users[currentUser].lastBackupDate = new Date().toISOString();
             saveData('users', users);
             updateLastBackupDisplay();
