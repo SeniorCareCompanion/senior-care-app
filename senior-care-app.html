@@ -1,0 +1,4013 @@
+<!DOCTYPE html>
+<!--
+    ═══════════════════════════════════════════════════════════════════
+    SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
+    ═══════════════════════════════════════════════════════════════════
+    
+    ✅ THIS IS A SINGLE-FILE VERSION!
+    ✅ No other files needed (no manifest.json, no service-worker.js)
+    ✅ Perfect for iPhone installation from Files app
+    
+    HOW TO INSTALL ON IPHONE:
+    1. Save this file to your iPhone (Downloads folder is fine)
+    2. Open it with Safari (tap the file, it should open in Safari)
+    3. Tap the Share button (⬆️) at the bottom of Safari
+    4. Tap "Add to Home Screen"
+    5. Tap "Add"
+    6. Done! The app icon appears on your home screen!
+    
+    IMPORTANT: Must use Safari browser (not Chrome)
+    
+    ═══════════════════════════════════════════════════════════════════
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Senior Care">
+    <title>Senior Care Companion</title>
+    
+    <!-- STANDALONE VERSION - No external files needed! -->
+    <!-- This single file can be installed directly to your iPhone home screen -->
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23667eea'/><text x='50' y='65' font-size='60' text-anchor='middle' fill='white'>🏥</text></svg>">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+            overflow-x: hidden;
+            touch-action: pan-y;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            min-height: calc(100vh - 20px);
+        }
+
+        /* Login Screen */
+        .login-screen, .register-screen {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .login-screen h1, .register-screen h1 {
+            font-size: 28px;
+            color: #667eea;
+            margin-bottom: 30px;
+        }
+
+        .logo-emoji {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 16px;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 16px 30px;
+            font-size: 20px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            margin: 8px;
+            font-weight: 600;
+            width: calc(100% - 16px);
+            max-width: 400px;
+            transition: all 0.3s;
+            touch-action: manipulation;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+
+        /* Header */
+        .app-header {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .app-header h1 {
+            font-size: 24px;
+            color: #667eea;
+        }
+
+        .user-info {
+            font-size: 16px;
+            color: #555;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* Navigation */
+        .nav-tabs {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .nav-tab {
+            padding: 14px 10px;
+            font-size: 15px;
+            background: #e2e8f0;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            touch-action: manipulation;
+        }
+
+        .nav-tab:active {
+            transform: scale(0.98);
+        }
+
+        .nav-tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Sections */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: 700;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .card.medication {
+            border-left: 6px solid #f56565;
+        }
+
+        .card.appointment {
+            border-left: 6px solid #4299e1;
+        }
+
+        .card.task {
+            border-left: 6px solid #48bb78;
+        }
+
+        .card.reminder {
+            border-left: 6px solid #ecc94b;
+            background: #fffbeb;
+        }
+
+        .card.bill {
+            border-left: 6px solid #ed8936;
+        }
+
+        .card-header {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .card-content {
+            font-size: 17px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .card-time {
+            font-size: 18px;
+            color: #667eea;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        /* Buttons */
+        .action-btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 8px 4px 0 0;
+            font-weight: 600;
+            touch-action: manipulation;
+        }
+
+        .action-btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-info {
+            background: #4299e1;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ecc94b;
+            color: #333;
+        }
+
+        .btn-delete {
+            background: #f56565;
+            color: white;
+        }
+
+        /* Emergency Button */
+        .emergency-btn {
+            width: 100%;
+            padding: 24px;
+            font-size: 26px;
+            background: #f56565;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 700;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+            touch-action: manipulation;
+        }
+
+        .emergency-btn:active {
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.03);
+            }
+        }
+
+        /* Contact Cards */
+        .contact-card {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #f7fafc;
+            padding: 16px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .contact-info {
+            flex: 1;
+        }
+
+        .contact-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .contact-relation {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .contact-phone {
+            font-size: 18px;
+            color: #4299e1;
+            margin-top: 5px;
+        }
+
+        .contact-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .call-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 14px 20px;
+            font-size: 18px;
+            background: #48bb78;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            touch-action: manipulation;
+        }
+
+        .call-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Checkbox */
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 14px;
+            background: #f7fafc;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .checkbox-item:active {
+            background: #e2e8f0;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 28px;
+            height: 28px;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            font-size: 17px;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .checkbox-item.completed {
+            background: #c6f6d5;
+            opacity: 0.7;
+        }
+
+        /* Forms */
+        .form-section {
+            background: #f7fafc;
+            padding: 16px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .form-section h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #333;
+            font-weight: 700;
+        }
+
+        /* Home Dashboard */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 16px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s;
+            touch-action: manipulation;
+        }
+
+        .dashboard-card:active {
+            transform: scale(0.98);
+        }
+
+        .dashboard-card h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .dashboard-card p {
+            font-size: 15px;
+        }
+
+        .emoji {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+
+        /* Install Banner */
+        .install-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+            text-align: center;
+        }
+
+        .install-banner h3 {
+            font-size: 20px;
+            margin: 0;
+        }
+
+        .install-banner p {
+            font-size: 15px;
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .install-btn {
+            background: white;
+            color: #667eea;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .install-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Hidden class */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Emergency Confirmation Modal */
+        .emergency-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .emergency-modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .emergency-modal-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: pulse 1s infinite;
+        }
+
+        .emergency-modal h2 {
+            font-size: 28px;
+            color: #f56565;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .emergency-modal p {
+            font-size: 20px;
+            color: #555;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .emergency-modal-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .emergency-confirm-btn {
+            padding: 18px 30px;
+            font-size: 22px;
+            background: #f56565;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            animation: pulse 2s infinite;
+        }
+
+        .emergency-cancel-btn {
+            padding: 16px 30px;
+            font-size: 18px;
+            background: #e2e8f0;
+            color: #333;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* Day checkboxes */
+        .day-checkbox-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .day-checkbox-label {
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            font-weight: normal;
+        }
+
+        .day-checkbox-label input {
+            margin-right: 5px;
+        }
+
+        /* Tablet and Desktop */
+        @media (min-width: 768px) {
+            .container {
+                padding: 30px;
+            }
+
+            .nav-tabs {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+
+            .contact-card {
+                flex-direction: row;
+                align-items: center;
+            }
+
+            .contact-buttons {
+                flex-direction: row;
+            }
+
+            .app-header {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .btn {
+                width: auto;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* Small phones */
+        @media (max-width: 360px) {
+            .section-title {
+                font-size: 20px;
+            }
+
+            .card-header {
+                font-size: 18px;
+            }
+
+            .emergency-btn {
+                font-size: 22px;
+                padding: 20px;
+            }
+        }
+
+        /* Loading animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Reminder Styles */
+        .reminder-card {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            border-left: 5px solid #e17055;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .reminder-card h3 {
+            color: #d63031;
+            font-size: 18px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .reminder-item {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .reminder-item-text {
+            flex: 1;
+        }
+
+        .reminder-item-time {
+            font-weight: bold;
+            color: #d63031;
+            margin-right: 10px;
+        }
+
+        .reminder-snooze-btn {
+            background: #74b9ff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .reminder-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .reminder-checkbox input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .reminder-time-select {
+            padding: 8px;
+            border-radius: 6px;
+            border: 2px solid #dfe6e9;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        /* Password Visibility Toggle */
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 20px;
+            user-select: none;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .password-toggle:hover {
+            opacity: 1;
+        }
+
+        .password-toggle.visible {
+            opacity: 0.8;
+        }
+
+        /* Alert Modal for Reminders */
+        .reminder-alert {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeIn 0.3s;
+        }
+
+        .reminder-alert-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .reminder-alert-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: pulse 1s infinite;
+        }
+
+        .reminder-alert h2 {
+            color: #d63031;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .reminder-alert p {
+            color: #2d3436;
+            font-size: 18px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .reminder-alert-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .reminder-alert-buttons button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .reminder-ok-btn {
+            background: #00b894;
+            color: white;
+        }
+
+        .reminder-snooze-alert-btn {
+            background: #74b9ff;
+            color: white;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Emergency Confirmation Modal -->
+        <div id="emergencyModal" class="emergency-modal hidden">
+            <div class="emergency-modal-content">
+                <div class="emergency-modal-icon">🚨</div>
+                <h2>EMERGENCY CALL</h2>
+                <p>Are you sure you want to call 911 Emergency Services?</p>
+                <div class="emergency-modal-buttons">
+                    <button class="emergency-confirm-btn" onclick="confirmEmergencyCall()">
+                        YES - CALL 911 NOW
+                    </button>
+                    <button class="emergency-cancel-btn" onclick="cancelEmergencyCall()">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Task Confirmation Modal -->
+        <div id="deleteTaskModal" class="emergency-modal hidden">
+            <div class="emergency-modal-content">
+                <div class="emergency-modal-icon" style="font-size: 60px;">🗑️</div>
+                <h2 style="color: #ed8936;">Delete Task</h2>
+                <p id="deleteTaskText">Are you sure you want to delete this task?</p>
+                <div class="emergency-modal-buttons">
+                    <button class="emergency-confirm-btn" onclick="confirmDeleteTask()" style="background: #ed8936;">
+                        Yes, Delete It
+                    </button>
+                    <button class="emergency-cancel-btn" onclick="cancelDeleteTask()">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reminder Alert Modal -->
+        <div id="reminderAlert" class="reminder-alert hidden">
+            <div class="reminder-alert-content">
+                <div class="reminder-alert-icon">🔔</div>
+                <h2 id="reminderAlertTitle">Reminder!</h2>
+                <p id="reminderAlertText"></p>
+                <div class="reminder-alert-buttons">
+                    <button class="reminder-ok-btn" onclick="dismissReminder()">
+                        OK, Got It!
+                    </button>
+                    <button class="reminder-snooze-alert-btn" onclick="snoozeReminder()">
+                        Snooze 10 Min
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Install Banner -->
+        <div id="installBanner" class="install-banner hidden">
+            <div class="logo-emoji">📱</div>
+            <h3>Install Senior Care App</h3>
+            <p>Add to your home screen for quick access!</p>
+            <button class="install-btn" id="installButton">Install App</button>
+            <button class="install-btn" onclick="hideInstallBanner()" style="background: transparent; color: white; border: 2px solid white;">Maybe Later</button>
+        </div>
+
+        <!-- Login Screen -->
+        <div id="loginScreen" class="login-screen">
+            <div class="logo-emoji">🏥</div>
+            <h1>Senior Care Companion</h1>
+            <div class="input-group">
+                <label for="loginUsername">Username</label>
+                <input type="text" id="loginUsername" placeholder="Enter your username" autocomplete="username">
+            </div>
+            <div class="input-group">
+                <label for="loginPassword">Password</label>
+                <div style="position: relative;">
+                    <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password" style="padding-right: 45px;">
+                    <span class="password-toggle" onclick="togglePasswordVisibility('loginPassword', this)">
+                        👁️
+                    </span>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="login()">Login</button>
+            <button class="btn btn-secondary" onclick="showRegister()">New User? Register</button>
+        </div>
+
+        <!-- Register Screen -->
+        <div id="registerScreen" class="register-screen hidden">
+            <div class="logo-emoji">👤</div>
+            <h1>Create New Account</h1>
+            <div class="input-group">
+                <label for="regName">Full Name</label>
+                <input type="text" id="regName" placeholder="Enter your full name" autocomplete="name">
+            </div>
+            <div class="input-group">
+                <label for="regUsername">Username</label>
+                <input type="text" id="regUsername" placeholder="Choose a username" autocomplete="username">
+            </div>
+            <div class="input-group">
+                <label for="regPassword">Password</label>
+                <div style="position: relative;">
+                    <input type="password" id="regPassword" placeholder="Choose a password" autocomplete="new-password" style="padding-right: 45px;">
+                    <span class="password-toggle" onclick="togglePasswordVisibility('regPassword', this)">
+                        👁️
+                    </span>
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="regAge">Age</label>
+                <input type="number" id="regAge" placeholder="Enter your age">
+            </div>
+            <button class="btn btn-primary" onclick="register()">Create Account</button>
+            <button class="btn btn-secondary" onclick="showLogin()">Back to Login</button>
+        </div>
+
+        <!-- Main App -->
+        <div id="mainApp" class="hidden">
+            <div class="app-header">
+                <h1>🏥 Senior Care</h1>
+                <div class="user-info">
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <span id="userName">Welcome!</span>
+                        <button class="btn btn-secondary" onclick="showSection('profile')" style="padding: 8px 16px; font-size: 14px; margin: 0;">👤 Profile</button>
+                    </div>
+                    <button class="btn btn-danger" onclick="logout()" style="padding: 10px 20px; font-size: 14px; margin: 0;">Logout</button>
+                </div>
+            </div>
+
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showSection('home')">🏠 Home</button>
+                <button class="nav-tab" onclick="showSection('medications')">💊 Meds</button>
+                <button class="nav-tab" onclick="showSection('appointments')">📅 Appts</button>
+                <button class="nav-tab" onclick="showSection('tasks')">✅ Tasks</button>
+                <button class="nav-tab" onclick="showSection('bills')">💰 Bills</button>
+                <button class="nav-tab" onclick="showSection('contacts')">📞 Contacts</button>
+            </div>
+
+            <!-- Home Section -->
+            <div id="home" class="section active">
+                <h2 class="section-title">Today's Overview</h2>
+                
+                <div id="homeReminders"></div>
+
+                <div class="dashboard-grid">
+                    <div class="dashboard-card" onclick="showSection('medications')">
+                        <div class="emoji">💊</div>
+                        <h3>Medications</h3>
+                        <p id="medCount" style="line-height: 1.6;">0 for today</p>
+                    </div>
+                    <div class="dashboard-card" onclick="showSection('appointments')">
+                        <div class="emoji">📅</div>
+                        <h3>Appointments</h3>
+                        <p id="apptCount" style="line-height: 1.6;">0 upcoming</p>
+                    </div>
+                    <div class="dashboard-card" onclick="showSection('tasks')">
+                        <div class="emoji">✅</div>
+                        <h3>Daily Tasks</h3>
+                        <p id="taskCount" style="line-height: 1.6;">0 tasks</p>
+                    </div>
+                    <div class="dashboard-card" onclick="showSection('bills')">
+                        <div class="emoji">💰</div>
+                        <h3>Bills</h3>
+                        <p id="billCount" style="line-height: 1.6;">0 bills due</p>
+                    </div>
+                </div>
+
+                <button class="emergency-btn" onclick="callEmergency()">
+                    🚨 CALL 911 EMERGENCY
+                </button>
+            </div>
+
+            <!-- Medications Section -->
+            <div id="medications" class="section">
+                <h2 class="section-title">💊 Medications</h2>
+                <div id="medicationList"></div>
+                
+                <div class="form-section">
+                    <h3>Add New Medication</h3>
+                    <div class="input-group">
+                        <label>Medication Name</label>
+                        <input type="text" id="medName" placeholder="e.g., Aspirin">
+                    </div>
+                    <div class="input-group">
+                        <label>Dosage</label>
+                        <input type="text" id="medDosage" placeholder="e.g., 100mg">
+                    </div>
+                    <div class="input-group">
+                        <label>Time</label>
+                        <input type="time" id="medTime">
+                    </div>
+                    <div class="input-group">
+                        <label>How Often?</label>
+                        <select id="medRecurrence" onchange="updateRecurrenceOptions()">
+                            <option value="daily">Daily (Every day)</option>
+                            <option value="specific-days">Specific Days of Week</option>
+                            <option value="every-x-days">Every X Days</option>
+                            <option value="weekly">Weekly (Once a week)</option>
+                        </select>
+                    </div>
+                    <div id="specificDaysContainer" class="input-group hidden">
+                        <label>Select Days:</label>
+                        <div class="day-checkbox-container">
+                            <label class="day-checkbox-label">
+                                <input type="checkbox" class="day-checkbox" value="0"> Sunday
+                            </label>
+                            <label class="day-checkbox-label">
+                                <input type="checkbox" class="day-checkbox" value="1"> Monday
+                            </label>
+                            <label class="day-checkbox-label">
+                                <input type="checkbox" class="day-checkbox" value="2"> Tuesday
+                            </label>
+                            <label class="day-checkbox-label">
+                                <input type="checkbox" class="day-checkbox" value="3"> Wednesday
+                            </label>
+                            <label class="day-checkbox-label">
+                                <input type="checkbox" class="day-checkbox" value="4"> Thursday
+                            </label>
+                            <label class="day-checkbox-label">
+                                <input type="checkbox" class="day-checkbox" value="5"> Friday
+                            </label>
+                            <label class="day-checkbox-label">
+                                <input type="checkbox" class="day-checkbox" value="6"> Saturday
+                            </label>
+                        </div>
+                    </div>
+                    <div id="everyXDaysContainer" class="input-group hidden">
+                        <label>Every how many days?</label>
+                        <input type="number" id="medEveryXDays" min="2" max="30" value="2" placeholder="e.g., 2">
+                    </div>
+                    <div id="weeklyDayContainer" class="input-group hidden">
+                        <label>Which day of the week?</label>
+                        <select id="medWeeklyDay">
+                            <option value="0">Sunday</option>
+                            <option value="1">Monday</option>
+                            <option value="2">Tuesday</option>
+                            <option value="3">Wednesday</option>
+                            <option value="4">Thursday</option>
+                            <option value="5">Friday</option>
+                            <option value="6">Saturday</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label class="reminder-checkbox">
+                            <input type="checkbox" id="medReminderEnabled" onchange="toggleMedReminderOptions()">
+                            🔔 Enable Reminder
+                        </label>
+                    </div>
+                    <div id="medReminderOptions" class="input-group hidden">
+                        <label>Remind me (minutes before):</label>
+                        <select id="medReminderMinutes" class="reminder-time-select">
+                            <option value="5">5 minutes before</option>
+                            <option value="10" selected>10 minutes before</option>
+                            <option value="15">15 minutes before</option>
+                            <option value="30">30 minutes before</option>
+                            <option value="60">1 hour before</option>
+                        </select>
+                    </div>
+                    <button id="addMedBtn" class="btn btn-primary" onclick="addMedication()">Add Medication</button>
+                    <button id="cancelEditMedBtn" class="btn hidden" onclick="cancelEditMedication()" style="background: #95a5a6; margin-top: 10px;">Cancel Editing</button>
+                </div>
+            </div>
+
+            <!-- Appointments Section -->
+            <div id="appointments" class="section">
+                <h2 class="section-title">📅 Appointments</h2>
+                <div id="appointmentList"></div>
+                
+                <div class="form-section">
+                    <h3>Add New Appointment</h3>
+                    <div class="input-group">
+                        <label>Doctor/Clinic Name</label>
+                        <div style="display: flex; gap: 10px;">
+                            <div style="flex: 1;">
+                                <input type="text" id="apptDoctor" list="doctorHistory" placeholder="e.g., Dr. Smith" style="width: 100%;">
+                                <datalist id="doctorHistory"></datalist>
+                            </div>
+                            <button type="button" class="btn btn-info" onclick="selectFromContacts('apptDoctor')" style="white-space: nowrap; padding: 10px 15px; height: fit-content;">
+                                📱 Contacts
+                            </button>
+                        </div>
+                        <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">💡 Type for suggestions OR tap 📱 to pick from iPhone contacts</p>
+                    </div>
+                    <div class="input-group">
+                        <label>Date</label>
+                        <input type="date" id="apptDate">
+                    </div>
+                    <div class="input-group">
+                        <label>Time</label>
+                        <input type="time" id="apptTime">
+                    </div>
+                    <div class="input-group">
+                        <label>Location</label>
+                        <input type="text" id="apptLocation" list="locationHistory" placeholder="e.g., Main Street Clinic">
+                        <datalist id="locationHistory"></datalist>
+                        <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">💡 Start typing to see suggestions from previous appointments</p>
+                    </div>
+                    <div class="input-group">
+                        <label class="reminder-checkbox">
+                            <input type="checkbox" id="apptReminderEnabled" onchange="toggleApptReminderOptions()">
+                            🔔 Enable Reminder
+                        </label>
+                    </div>
+                    <div id="apptReminderOptions" class="input-group hidden">
+                        <label>Remind me:</label>
+                        <select id="apptReminderMinutes" class="reminder-time-select">
+                            <option value="15">15 minutes before</option>
+                            <option value="30">30 minutes before</option>
+                            <option value="60" selected>1 hour before</option>
+                            <option value="120">2 hours before</option>
+                            <option value="1440">1 day before</option>
+                        </select>
+                    </div>
+                    <button id="addApptBtn" class="btn btn-primary" onclick="addAppointment()">Add Appointment</button>
+                    <button id="cancelEditApptBtn" class="btn hidden" onclick="cancelEditAppointment()" style="background: #95a5a6; margin-top: 10px;">Cancel Editing</button>
+                </div>
+            </div>
+
+            <!-- Tasks Section -->
+            <div id="tasks" class="section">
+                <h2 class="section-title">✅ Daily Tasks</h2>
+                
+                <div class="card task">
+                    <div class="card-header">🍽️ Meals</div>
+                    <div id="mealsTasks"></div>
+                </div>
+
+                <div class="card task">
+                    <div class="card-header">💧 Hydration</div>
+                    <div id="hydrationTasks"></div>
+                </div>
+
+                <div class="card task">
+                    <div class="card-header">🧼 Hygiene</div>
+                    <div id="hygieneTasks"></div>
+                </div>
+
+                <div class="card task">
+                    <div class="card-header">🛡️ Safety Checks</div>
+                    <div id="safetyTasks"></div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Add Custom Task</h3>
+                    <div class="input-group">
+                        <label>Task Name</label>
+                        <input type="text" id="customTaskName" placeholder="e.g., Take a walk">
+                    </div>
+                    <div class="input-group">
+                        <label>Category</label>
+                        <select id="customTaskCategory">
+                            <option value="meals">Meals</option>
+                            <option value="hydration">Hydration</option>
+                            <option value="hygiene">Hygiene</option>
+                            <option value="safety">Safety Checks</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Time (optional)</label>
+                        <input type="time" id="customTaskTime">
+                    </div>
+                    <div class="input-group">
+                        <label>How Often?</label>
+                        <select id="customTaskRecurrence" onchange="updateTaskRecurrenceOptions()">
+                            <option value="daily">Daily (Every day)</option>
+                            <option value="specific-days">Specific Days of Week</option>
+                            <option value="weekly">Weekly (Once a week)</option>
+                        </select>
+                    </div>
+                    <div id="taskSpecificDaysContainer" class="input-group hidden">
+                        <label>Select Days:</label>
+                        <div class="day-checkbox-container">
+                            <label class="day-checkbox-label">
+                                <input type="checkbox" class="task-day-checkbox" value="0"> Sunday
+                            </label>
+                            <label class="day-checkbox-label">
+                                <input type="checkbox" class="task-day-checkbox" value="1"> Monday
+                            </label>
+                            <label class="day-checkbox-label">
+                                <input type="checkbox" class="task-day-checkbox" value="2"> Tuesday
+                            </label>
+                            <label class="day-checkbox-label">
+                                <input type="checkbox" class="task-day-checkbox" value="3"> Wednesday
+                            </label>
+                            <label class="day-checkbox-label">
+                                <input type="checkbox" class="task-day-checkbox" value="4"> Thursday
+                            </label>
+                            <label class="day-checkbox-label">
+                                <input type="checkbox" class="task-day-checkbox" value="5"> Friday
+                            </label>
+                            <label class="day-checkbox-label">
+                                <input type="checkbox" class="task-day-checkbox" value="6"> Saturday
+                            </label>
+                        </div>
+                    </div>
+                    <div id="taskWeeklyDayContainer" class="input-group hidden">
+                        <label>Which day of the week?</label>
+                        <select id="customTaskWeeklyDay">
+                            <option value="0">Sunday</option>
+                            <option value="1">Monday</option>
+                            <option value="2">Tuesday</option>
+                            <option value="3">Wednesday</option>
+                            <option value="4">Thursday</option>
+                            <option value="5">Friday</option>
+                            <option value="6">Saturday</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label class="reminder-checkbox">
+                            <input type="checkbox" id="taskReminderEnabled" onchange="toggleTaskReminderOptions()">
+                            🔔 Enable Reminder
+                        </label>
+                    </div>
+                    <div id="taskReminderOptions" class="input-group hidden">
+                        <label>Remind me (minutes before):</label>
+                        <select id="taskReminderMinutes" class="reminder-time-select">
+                            <option value="5">5 minutes before</option>
+                            <option value="10" selected>10 minutes before</option>
+                            <option value="15">15 minutes before</option>
+                            <option value="30">30 minutes before</option>
+                        </select>
+                    </div>
+                    <button id="addTaskBtn" class="btn btn-primary" onclick="addCustomTask()">Add Task</button>
+                    <button id="cancelEditTaskBtn" class="btn hidden" onclick="cancelEditTask()" style="background: #95a5a6; margin-top: 10px;">Cancel Editing</button>
+                </div>
+            </div>
+
+            <!-- Bills Section -->
+            <div id="bills" class="section">
+                <h2 class="section-title">💰 Bills</h2>
+                <div id="billList"></div>
+                
+                <div class="form-section">
+                    <h3>Add New Bill</h3>
+                    <div class="input-group">
+                        <label>Bill Name</label>
+                        <input type="text" id="billName" placeholder="e.g., Electric Bill">
+                    </div>
+                    <div class="input-group">
+                        <label>Amount</label>
+                        <input type="number" id="billAmount" placeholder="e.g., 150">
+                    </div>
+                    <div class="input-group">
+                        <label>Due Date</label>
+                        <input type="date" id="billDueDate">
+                    </div>
+                    <div class="input-group">
+                        <label>How Often?</label>
+                        <select id="billRecurrence">
+                            <option value="one-time">One-Time (No repeat)</option>
+                            <option value="monthly">Monthly (Every month)</option>
+                            <option value="quarterly">Quarterly (Every 3 months)</option>
+                            <option value="yearly">Yearly (Once a year)</option>
+                            <option value="weekly">Weekly (Every week)</option>
+                            <option value="biweekly">Bi-Weekly (Every 2 weeks)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label class="reminder-checkbox">
+                            <input type="checkbox" id="billReminderEnabled" onchange="toggleBillReminderOptions()">
+                            🔔 Enable Reminder
+                        </label>
+                    </div>
+                    <div id="billReminderOptions" class="input-group hidden">
+                        <label>Remind me:</label>
+                        <select id="billReminderDays" class="reminder-time-select">
+                            <option value="1">1 day before due date</option>
+                            <option value="3" selected>3 days before due date</option>
+                            <option value="7">7 days before due date</option>
+                            <option value="14">14 days before due date</option>
+                        </select>
+                    </div>
+                    <button id="addBillBtn" class="btn btn-primary" onclick="addBill()">Add Bill</button>
+                    <button id="cancelEditBillBtn" class="btn hidden" onclick="cancelEditBill()" style="background: #95a5a6; margin-top: 10px;">Cancel Editing</button>
+                </div>
+            </div>
+
+            <!-- Contacts Section -->
+            <div id="contacts" class="section">
+                <h2 class="section-title">📞 Contacts</h2>
+
+                <div id="contactList"></div>
+                
+                <div class="form-section">
+                    <h3>Add New Contact</h3>
+                    <div class="input-group">
+                        <label>Name</label>
+                        <input type="text" id="contactName" placeholder="e.g., Sarah Johnson">
+                    </div>
+                    <div class="input-group">
+                        <label>Relationship</label>
+                        <input type="text" id="contactRelation" placeholder="e.g., Daughter">
+                    </div>
+                    <div class="input-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="contactPhone" placeholder="e.g., (555) 123-4567">
+                    </div>
+                    <button class="btn btn-primary" onclick="addContact()">Add Contact</button>
+                </div>
+            </div>
+
+            <!-- Profile Section -->
+            <div id="profile" class="section">
+                <h2 class="section-title">👤 Profile</h2>
+                
+                <div class="card">
+                    <div class="card-header">Personal Information</div>
+                    <div class="card-content" id="profileInfo"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">🔊 Voice Settings</div>
+                    <div class="card-content">
+                        <p style="margin-bottom: 15px;">Enable voice announcements for confirmations and reminders</p>
+                        <button id="voiceToggleBtn" class="btn" onclick="toggleVoice()" style="width: 100%; max-width: 100%; margin-bottom: 15px;">
+                            🔇 Voice OFF
+                        </button>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 2px solid #e9ecef;">
+                            <label class="reminder-checkbox" style="margin: 0; cursor: pointer;">
+                                <input type="checkbox" id="voiceAutoEnable" onchange="saveVoicePreference()" style="width: 20px; height: 20px; margin: 0;">
+                                <span style="font-size: 15px;">🔄 Always enable voice when I log in</span>
+                            </label>
+                            <p style="margin: 10px 0 0 30px; font-size: 13px; color: #6c757d;">
+                                When checked, voice will automatically turn on each time you open the app
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">💾 Data Management</div>
+                    <div class="card-content">
+                        <p style="margin-bottom: 15px;">Backup and restore your data</p>
+                        
+                        <div id="lastBackupInfo" style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 14px;">
+                            <strong>📅 Last Backup:</strong> <span id="lastBackupDate">Never</span>
+                        </div>
+                        
+                        <button class="btn btn-success" onclick="exportData()" style="width: 100%; max-width: 100%; margin-bottom: 10px;">
+                            📥 Export All Data
+                        </button>
+                        <p style="font-size: 13px; color: #6c757d; margin: 0 0 15px 0;">
+                            Download a backup file with all your medications, appointments, tasks, and bills
+                        </p>
+                        
+                        <button class="btn btn-info" onclick="document.getElementById('importFile').click()" style="width: 100%; max-width: 100%; margin-bottom: 10px;">
+                            📤 Import Data
+                        </button>
+                        <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+                        <p style="font-size: 13px; color: #6c757d; margin: 0 0 20px 0;">
+                            Restore data from a previously exported backup file
+                        </p>
+
+                        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border: 2px solid #ffc107;">
+                            <label class="reminder-checkbox" style="margin: 0 0 10px 0; cursor: pointer;">
+                                <input type="checkbox" id="backupReminderEnabled" onchange="saveBackupReminderSettings()" style="width: 20px; height: 20px; margin: 0;">
+                                <span style="font-size: 15px;">⏰ Remind me to backup regularly</span>
+                            </label>
+                            <div id="backupReminderOptions" class="hidden" style="margin-top: 10px;">
+                                <label style="font-size: 14px; color: #495057; display: block; margin-bottom: 5px;">Remind me every:</label>
+                                <select id="backupReminderDays" onchange="saveBackupReminderSettings()" style="width: 100%; padding: 10px; font-size: 14px; border: 1px solid #ddd; border-radius: 5px;">
+                                    <option value="3">3 days</option>
+                                    <option value="7" selected>7 days</option>
+                                    <option value="14">14 days</option>
+                                    <option value="30">30 days</option>
+                                </select>
+                            </div>
+                            <p style="margin: 10px 0 0 30px; font-size: 13px; color: #856404;">
+                                Get reminded to backup your data regularly - protects against phone loss!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Update Profile</h3>
+                    <div class="input-group">
+                        <label>Full Name</label>
+                        <input type="text" id="updateName">
+                    </div>
+                    <div class="input-group">
+                        <label>Age</label>
+                        <input type="number" id="updateAge">
+                    </div>
+                    <button class="btn btn-primary" onclick="updateProfile()">Update Profile</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // PWA Installation
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installBanner').classList.remove('hidden');
+        });
+
+        document.getElementById('installButton').addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response to install prompt: ${outcome}`);
+                deferredPrompt = null;
+                hideInstallBanner();
+            }
+        });
+
+        function hideInstallBanner() {
+            document.getElementById('installBanner').classList.add('hidden');
+        }
+
+        // Service Worker Registration - DISABLED FOR STANDALONE VERSION
+        // This version doesn't need external files!
+        /*
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(registration => console.log('SW registered:', registration))
+                    .catch(err => console.log('SW registration failed:', err));
+            });
+        }
+        */
+
+        // Global variables
+        let currentUser = null;
+        let voiceEnabled = false;
+        let pendingDeleteCategory = null;
+        let pendingDeleteIndex = null;
+        let pendingDeleteMedicationId = null;
+        let pendingDeleteAppointmentId = null;
+        let pendingDeleteBillId = null;
+        let editingMedicationId = null; // Track which medication is being edited
+        let editingAppointmentId = null; // Track which appointment is being edited
+        let editingTaskCategory = null; // Track which task category is being edited
+        let editingTaskIndex = null; // Track which task index is being edited
+        let editingBillId = null; // Track which bill is being edited
+        let reminderCheckInterval = null;
+        let currentReminderItem = null;
+        let shownReminders = new Set(); // Track which reminders we've already shown today
+
+        // Reminder System
+        function startReminderChecker() {
+            // Check for reminders every minute
+            if (reminderCheckInterval) {
+                clearInterval(reminderCheckInterval);
+            }
+            checkReminders(); // Check immediately
+            reminderCheckInterval = setInterval(checkReminders, 60000); // Check every minute
+        }
+
+        function checkReminders() {
+            if (!currentUser) return;
+            
+            const users = loadData('users');
+            if (!users || !users[currentUser]) return;
+            
+            try {
+                const userData = users[currentUser];
+                const now = new Date();
+                const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                const currentDate = now.toISOString().split('T')[0];
+            
+                // Check Medication Reminders
+                if (userData.medications) {
+                    userData.medications.forEach((med, index) => {
+                        if (med.reminderEnabled && med.time && shouldTakeMedicationToday(med)) {
+                            const reminderKey = `med-${med.id}-${currentDate}`;
+                            if (!shownReminders.has(reminderKey)) {
+                                // Calculate reminder time (10 minutes before medication time)
+                                const [hours, minutes] = med.time.split(':').map(Number);
+                                const medTime = new Date();
+                                medTime.setHours(hours, minutes, 0, 0);
+                                const reminderTime = new Date(medTime.getTime() - (med.reminderMinutes || 10) * 60000);
+                                const reminderTimeStr = `${String(reminderTime.getHours()).padStart(2, '0')}:${String(reminderTime.getMinutes()).padStart(2, '0')}`;
+                                
+                                if (currentTime === reminderTimeStr) {
+                                    showReminderAlert('Medication Reminder', `Time to take: ${med.name} (${med.dosage})`, 'medication', med.id);
+                                    shownReminders.add(reminderKey);
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                // Check Appointment Reminders
+                if (userData.appointments) {
+                    userData.appointments.forEach((appt, index) => {
+                        if (appt.reminderEnabled && !appt.completed) {
+                            const apptDateTime = new Date(appt.date + ' ' + appt.time);
+                            const reminderMinutes = appt.reminderMinutes || 60; // Default 1 hour before
+                            const reminderTime = new Date(apptDateTime.getTime() - reminderMinutes * 60000);
+                            const reminderKey = `appt-${appt.id}-${currentDate}`;
+                            
+                            if (!shownReminders.has(reminderKey) && now >= reminderTime && now < apptDateTime) {
+                                showReminderAlert('Appointment Reminder', `Appointment with ${appt.doctor} at ${formatTime(appt.time)}`, 'appointment', appt.id);
+                                shownReminders.add(reminderKey);
+                            }
+                        }
+                    });
+                }
+                
+                // Check Task Reminders
+                ['meals', 'hydration', 'hygiene', 'safety'].forEach(category => {
+                    if (userData.tasks && userData.tasks[category]) {
+                        userData.tasks[category].forEach((task, index) => {
+                            if (task.reminderEnabled && task.time && shouldShowTaskToday(task) && !task.completed) {
+                                const reminderKey = `task-${category}-${index}-${currentDate}`;
+                                if (!shownReminders.has(reminderKey)) {
+                                    const [hours, minutes] = task.time.split(':').map(Number);
+                                    const taskTime = new Date();
+                                    taskTime.setHours(hours, minutes, 0, 0);
+                                    const reminderTime = new Date(taskTime.getTime() - (task.reminderMinutes || 10) * 60000);
+                                    const reminderTimeStr = `${String(reminderTime.getHours()).padStart(2, '0')}:${String(reminderTime.getMinutes()).padStart(2, '0')}`;
+                                    
+                                    if (currentTime === reminderTimeStr) {
+                                        showReminderAlert('Task Reminder', `${task.name}`, 'task', {category, index});
+                                        shownReminders.add(reminderKey);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+                
+                // Check Bill Reminders
+                if (userData.bills) {
+                    userData.bills.forEach((bill, index) => {
+                        if (bill.reminderEnabled && !bill.paid) {
+                            const dueDate = parseLocalDate(bill.dueDate);
+                            const reminderDays = bill.reminderDays || 3; // Default 3 days before
+                            const reminderDate = new Date(dueDate.getTime() - reminderDays * 24 * 60 * 60 * 1000);
+                            const reminderKey = `bill-${bill.id}-${currentDate}`;
+                            
+                            if (!shownReminders.has(reminderKey) && now >= reminderDate && now < dueDate) {
+                                const daysUntilDue = Math.ceil((dueDate - now) / (1000 * 60 * 60 * 24));
+                                showReminderAlert('Bill Reminder', `${bill.name} is due in ${daysUntilDue} day${daysUntilDue !== 1 ? 's' : ''} ($${bill.amount.toFixed(2)})`, 'bill', bill.id);
+                                shownReminders.add(reminderKey);
+                            }
+                        }
+                    });
+                }
+                
+                // Update home reminders display
+                loadHomeReminders();
+            } catch (error) {
+                console.error('Error checking reminders:', error);
+                // Silently fail - don't break the app
+            }
+        }
+
+        function showReminderAlert(title, message, type, id) {
+            currentReminderItem = {type, id};
+            document.getElementById('reminderAlertTitle').textContent = title;
+            document.getElementById('reminderAlertText').textContent = message;
+            document.getElementById('reminderAlert').classList.remove('hidden');
+            speak(title + ': ' + message);
+        }
+
+        function dismissReminder() {
+            document.getElementById('reminderAlert').classList.add('hidden');
+            currentReminderItem = null;
+        }
+
+        function snoozeReminder() {
+            if (currentReminderItem) {
+                const {type, id} = currentReminderItem;
+                // Remove from shown reminders so it can show again in 10 minutes
+                const now = new Date();
+                const currentDate = now.toISOString().split('T')[0];
+                let reminderKey = '';
+                
+                if (type === 'medication') reminderKey = `med-${id}-${currentDate}`;
+                else if (type === 'appointment') reminderKey = `appt-${id}-${currentDate}`;
+                else if (type === 'task') reminderKey = `task-${id.category}-${id.index}-${currentDate}`;
+                else if (type === 'bill') reminderKey = `bill-${id}-${currentDate}`;
+                
+                shownReminders.delete(reminderKey);
+                speak('Reminder snoozed for 10 minutes');
+            }
+            dismissReminder();
+        }
+
+        function loadHomeReminders() {
+            const container = document.getElementById('homeReminders');
+            if (!container) return;
+            
+            const users = loadData('users');
+            if (!users || !users[currentUser]) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            const userData = users[currentUser];
+            const now = new Date();
+            const today = now.toISOString().split('T')[0];
+            let activeReminders = [];
+            
+            // Collect all active reminders for today
+            // Medications
+            if (userData.medications) {
+                userData.medications.forEach(med => {
+                    if (med.reminderEnabled && med.time && shouldTakeMedicationToday(med) && !wasTakenToday(med)) {
+                        activeReminders.push({
+                            type: '💊',
+                            text: `${med.name} at ${formatTime(med.time)}`,
+                            time: med.time
+                        });
+                    }
+                });
+            }
+            
+            // Appointments
+            if (userData.appointments) {
+                userData.appointments.forEach(appt => {
+                    if (appt.reminderEnabled && !appt.completed && appt.date === today) {
+                        activeReminders.push({
+                            type: '📅',
+                            text: `${appt.doctor} at ${formatTime(appt.time)}`,
+                            time: appt.time
+                        });
+                    }
+                });
+            }
+            
+            // Tasks
+            ['meals', 'hydration', 'hygiene', 'safety'].forEach(category => {
+                if (userData.tasks && userData.tasks[category]) {
+                    userData.tasks[category].forEach(task => {
+                        if (task.reminderEnabled && task.time && shouldShowTaskToday(task) && !task.completed) {
+                            activeReminders.push({
+                                type: '✅',
+                                text: task.name + (task.time ? ` at ${formatTime(task.time)}` : ''),
+                                time: task.time || '23:59'
+                            });
+                        }
+                    });
+                }
+            });
+            
+            // Bills (due within 7 days)
+            if (userData.bills) {
+                userData.bills.forEach(bill => {
+                    if (bill.reminderEnabled && !bill.paid) {
+                        const dueDate = parseLocalDate(bill.dueDate);
+                        const daysUntilDue = Math.ceil((dueDate - now) / (1000 * 60 * 60 * 24));
+                        if (daysUntilDue >= 0 && daysUntilDue <= 7) {
+                            activeReminders.push({
+                                type: '💰',
+                                text: `${bill.name} due in ${daysUntilDue} day${daysUntilDue !== 1 ? 's' : ''}`,
+                                time: '23:59'
+                            });
+                        }
+                    }
+                });
+            }
+            
+            // Sort by time
+            activeReminders.sort((a, b) => a.time.localeCompare(b.time));
+            
+            // Display reminders
+            if (activeReminders.length > 0) {
+                let html = '<div class="reminder-card"><h3>🔔 Today\'s Reminders</h3>';
+                activeReminders.slice(0, 5).forEach(reminder => {
+                    html += `<div class="reminder-item">
+                        <span class="reminder-item-text">${reminder.type} ${reminder.text}</span>
+                    </div>`;
+                });
+                if (activeReminders.length > 5) {
+                    html += `<div class="reminder-item">
+                        <span class="reminder-item-text">...and ${activeReminders.length - 5} more</span>
+                    </div>`;
+                }
+                html += '</div>';
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '';
+            }
+        }
+
+        // Initialize default tasks
+        const defaultTasks = {
+            meals: [
+                { name: 'Breakfast', time: '08:00', completed: false, recurrence: 'daily' },
+                { name: 'Lunch', time: '12:00', completed: false, recurrence: 'daily' },
+                { name: 'Dinner', time: '18:00', completed: false, recurrence: 'daily' }
+            ],
+            hydration: [
+                { name: 'Morning Water (8oz)', time: '09:00', completed: false, recurrence: 'daily' },
+                { name: 'Afternoon Water (8oz)', time: '14:00', completed: false, recurrence: 'daily' },
+                { name: 'Evening Water (8oz)', time: '19:00', completed: false, recurrence: 'daily' }
+            ],
+            hygiene: [
+                { name: 'Morning Routine', time: '07:00', completed: false, recurrence: 'daily' },
+                { name: 'Brush Teeth', time: '20:00', completed: false, recurrence: 'daily' }
+            ],
+            safety: [
+                { name: 'Check floor for tripping hazards', time: '', completed: false, recurrence: 'daily' },
+                { name: 'Ensure proper lighting in all rooms', time: '', completed: false, recurrence: 'daily' },
+                { name: 'Monitor room temperature (68-72°F)', time: '', completed: false, recurrence: 'daily' },
+                { name: 'Check that emergency numbers are accessible', time: '', completed: false, recurrence: 'daily' },
+                { name: 'Verify smoke detector batteries', time: '', completed: false, recurrence: 'daily' }
+            ]
+        };
+
+        const defaultSafetyChecks = [
+            'Check floor for tripping hazards',
+            'Ensure proper lighting in all rooms',
+            'Monitor room temperature (68-72°F)',
+            'Check that emergency numbers are accessible',
+            'Verify smoke detector batteries'
+        ];
+
+        // Voice function
+        function speak(text) {
+            if (voiceEnabled && 'speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 0.9;
+                utterance.pitch = 1;
+                utterance.volume = 1;
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        function toggleVoice() {
+            voiceEnabled = !voiceEnabled;
+            const btn = document.getElementById('voiceToggleBtn');
+            if (btn) {
+                if (voiceEnabled) {
+                    btn.textContent = '🔊 Voice ON';
+                    btn.classList.remove('btn-primary');
+                    btn.classList.add('btn-success');
+                    speak('Voice assistance enabled');
+                } else {
+                    btn.textContent = '🔇 Voice OFF';
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-primary');
+                }
+            }
+        }
+
+        function saveVoicePreference() {
+            const autoEnable = document.getElementById('voiceAutoEnable').checked;
+            const users = loadData('users');
+            if (users && users[currentUser]) {
+                users[currentUser].voiceAutoEnable = autoEnable;
+                saveData('users', users);
+                
+                if (autoEnable) {
+                    speak('Voice will automatically enable when you log in');
+                } else {
+                    speak('Voice auto-enable disabled');
+                }
+            }
+        }
+
+        function loadVoicePreference() {
+            const users = loadData('users');
+            if (users && users[currentUser]) {
+                const autoEnable = users[currentUser].voiceAutoEnable || false;
+                
+                // Set checkbox state
+                const checkbox = document.getElementById('voiceAutoEnable');
+                if (checkbox) {
+                    checkbox.checked = autoEnable;
+                }
+                
+                // Auto-enable voice if preference is set
+                if (autoEnable && !voiceEnabled) {
+                    voiceEnabled = true;
+                    const btn = document.getElementById('voiceToggleBtn');
+                    if (btn) {
+                        btn.textContent = '🔊 Voice ON';
+                        btn.classList.remove('btn-primary');
+                        btn.classList.add('btn-success');
+                    }
+                }
+            }
+        }
+
+        // Storage functions
+        function saveData(key, data) {
+            localStorage.setItem(key, JSON.stringify(data));
+        }
+
+        function loadData(key) {
+            const data = localStorage.getItem(key);
+            return data ? JSON.parse(data) : null;
+        }
+
+        // Authentication
+        function showLogin() {
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('registerScreen').classList.add('hidden');
+        }
+
+        function showRegister() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('registerScreen').classList.remove('hidden');
+        }
+
+        function register() {
+            const name = document.getElementById('regName').value;
+            const username = document.getElementById('regUsername').value;
+            const password = document.getElementById('regPassword').value;
+            const age = document.getElementById('regAge').value;
+
+            if (!name || !username || !password || !age) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const users = loadData('users') || {};
+            
+            if (users[username]) {
+                alert('Username already exists');
+                return;
+            }
+
+            users[username] = {
+                name: name,
+                password: password,
+                age: age,
+                medications: [],
+                appointments: [],
+                tasks: JSON.parse(JSON.stringify(defaultTasks)),
+                bills: [],
+                contacts: []
+            };
+
+            saveData('users', users);
+            alert('Account created successfully!');
+            speak('Account created successfully');
+            showLogin();
+        }
+
+        function togglePasswordVisibility(inputId, iconElement) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                iconElement.textContent = '🙈'; // Closed eye when password is visible
+                iconElement.classList.add('visible');
+            } else {
+                input.type = 'password';
+                iconElement.textContent = '👁️'; // Open eye when password is hidden
+                iconElement.classList.remove('visible');
+            }
+        }
+
+        async function selectFromContacts(inputId) {
+            // Check if Contact Picker API is supported
+            if (!('contacts' in navigator)) {
+                alert('Contact picker requires HTTPS.\n\nTo use this feature:\n1. Set up HTTPS on MAMP (see MAMP_HTTPS_SETUP.md)\n2. Access via https://YOUR-IP:8443\n\nOr use auto-complete (just start typing!)');
+                return;
+            }
+
+            try {
+                // Define what contact info we want
+                const props = ['name'];
+                const opts = { multiple: false }; // Only select one contact
+
+                // Open the contact picker
+                const contacts = await navigator.contacts.select(props, opts);
+
+                if (contacts && contacts.length > 0) {
+                    const contact = contacts[0];
+                    // Get the first name from the contact
+                    const name = contact.name && contact.name.length > 0 ? contact.name[0] : '';
+                    
+                    // Populate the input field
+                    const input = document.getElementById(inputId);
+                    if (input && name) {
+                        input.value = name;
+                        speak(`Selected ${name} from contacts`);
+                    }
+                }
+            } catch (error) {
+                // User cancelled or error occurred
+                if (error.name !== 'AbortError') {
+                    console.error('Contact picker error:', error);
+                    // Only show alert if it's not a user cancellation
+                    if (error.name === 'SecurityError') {
+                        alert('Contact picker requires HTTPS.\n\nPlease access the app via https:// instead of http://\n\nSee MAMP_HTTPS_SETUP.md for instructions.');
+                    }
+                }
+            }
+        }
+
+        function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!username || !password) {
+                alert('Please enter username and password');
+                return;
+            }
+
+            const users = loadData('users') || {};
+            
+            if (!users[username] || users[username].password !== password) {
+                alert('Invalid username or password');
+                return;
+            }
+
+            currentUser = username;
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('userName').textContent = users[username].name;
+            
+            // Initialize voice button
+            const voiceBtn = document.getElementById('voiceToggleBtn');
+            if (voiceBtn) {
+                voiceBtn.textContent = '🔇 Voice OFF';
+                voiceBtn.classList.add('btn-primary');
+            }
+            
+            loadAllData();
+            loadVoicePreference(); // Load user's voice preference
+            speak(`Welcome back, ${users[username].name}`);
+            startReminderChecker(); // Start checking for reminders
+            
+            // Check if backup reminder is due (after a short delay to let app load)
+            setTimeout(() => {
+                checkBackupReminder();
+            }, 3000);
+        }
+
+        function logout() {
+            currentUser = null;
+            voiceEnabled = false;
+            if (reminderCheckInterval) {
+                clearInterval(reminderCheckInterval); // Stop reminder checker
+                reminderCheckInterval = null;
+            }
+            shownReminders.clear(); // Clear shown reminders
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+            speak('Logged out successfully');
+        }
+
+        // Load all data
+        function loadAllData() {
+            const users = loadData('users');
+            if (!users || !users[currentUser]) return;
+
+            const userData = users[currentUser];
+            
+            // Migrate legacy medications to new format
+            if (userData.medications && userData.medications.length > 0) {
+                let needsSave = false;
+                userData.medications.forEach(med => {
+                    // Add recurrence if missing
+                    if (!med.recurrence) {
+                        med.recurrence = 'daily';
+                        needsSave = true;
+                    }
+                    // Convert old 'taken' property to 'takenDates'
+                    if (med.taken !== undefined && !med.takenDates) {
+                        med.takenDates = [];
+                        if (med.taken) {
+                            const todayDate = new Date().toISOString().split('T')[0];
+                            med.takenDates.push(todayDate);
+                        }
+                        delete med.taken;
+                        needsSave = true;
+                    }
+                    // Initialize takenDates if missing
+                    if (!med.takenDates) {
+                        med.takenDates = [];
+                        needsSave = true;
+                    }
+                });
+                
+                if (needsSave) {
+                    saveData('users', users);
+                }
+            }
+
+            // Migrate old safetyChecks to safety tasks
+            if (userData.safetyChecks && !userData.tasks.safety) {
+                userData.tasks.safety = userData.safetyChecks.map(check => ({
+                    name: check.text || check,
+                    time: '',
+                    completed: check.completed || false,
+                    recurrence: 'daily'
+                }));
+                delete userData.safetyChecks;
+                saveData('users', users);
+            }
+
+            // Add safety category if missing
+            if (!userData.tasks.safety) {
+                userData.tasks.safety = defaultTasks.safety;
+                saveData('users', users);
+            }
+
+            // Add recurrence to legacy tasks
+            let tasksSaved = false;
+            ['meals', 'hydration', 'hygiene', 'safety'].forEach(category => {
+                if (userData.tasks[category]) {
+                    userData.tasks[category].forEach(task => {
+                        if (!task.recurrence) {
+                            task.recurrence = 'daily';
+                            tasksSaved = true;
+                        }
+                    });
+                }
+            });
+            if (tasksSaved) {
+                saveData('users', users);
+            }
+            
+            loadMedications(userData.medications || []);
+            loadAppointments(userData.appointments || []);
+            loadTasks(userData.tasks || defaultTasks);
+            loadBills(userData.bills || []);
+            loadContacts(userData.contacts || []);
+            loadProfile(userData);
+            updateDashboard();
+            loadHomeReminders();
+        }
+
+        // Navigation
+        function showSection(sectionName) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            const section = document.getElementById(sectionName);
+            if (section) {
+                section.classList.add('active');
+                section.classList.add('fade-in');
+            }
+            
+            // Find and activate the corresponding tab
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => {
+                if (tab.textContent.toLowerCase().includes(sectionName.split('-')[0])) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // Simplified voice announcements - just say the section name
+            const sectionNames = {
+                'home': 'Home',
+                'medications': 'Medications',
+                'appointments': 'Appointments',
+                'tasks': 'Tasks',
+                'bills': 'Bills',
+                'contacts': 'Contacts',
+                'profile': 'Profile'
+            };
+            
+            speak(sectionNames[sectionName] || sectionName);
+        }
+
+        // Medication helper functions
+        function getRecurrenceText(med) {
+            // Handle legacy medications without recurrence property
+            if (!med.recurrence || med.recurrence === 'daily') {
+                return 'daily';
+            } else if (med.recurrence === 'specific-days' && med.specificDays) {
+                const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                return med.specificDays.map(d => dayNames[d]).join(', ');
+            } else if (med.recurrence === 'every-x-days' && med.everyXDays) {
+                return `every ${med.everyXDays} days`;
+            } else if (med.recurrence === 'weekly' && med.weeklyDay !== undefined) {
+                const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                return `weekly on ${dayNames[med.weeklyDay]}`;
+            }
+            return 'daily';
+        }
+
+        function shouldTakeMedicationToday(med) {
+            // Handle legacy medications without recurrence property (default to daily)
+            if (!med.recurrence || med.recurrence === 'daily') {
+                return true;
+            }
+
+            const today = new Date();
+            const todayDay = today.getDay(); // 0 = Sunday, 6 = Saturday
+            
+            if (med.recurrence === 'specific-days' && med.specificDays) {
+                return med.specificDays.includes(todayDay);
+            } else if (med.recurrence === 'every-x-days' && med.everyXDays && med.startDate) {
+                const startDate = new Date(med.startDate);
+                const daysDiff = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+                return daysDiff % med.everyXDays === 0;
+            } else if (med.recurrence === 'weekly' && med.weeklyDay !== undefined) {
+                return todayDay === med.weeklyDay;
+            }
+            
+            // Default to true for any unexpected cases
+            return true;
+        }
+
+        function wasTakenToday(med) {
+            // Handle legacy medications with old 'taken' property
+            if (med.taken !== undefined && !med.takenDates) {
+                return med.taken;
+            }
+            
+            const todayDate = new Date().toISOString().split('T')[0];
+            return med.takenDates && med.takenDates.includes(todayDate);
+        }
+
+        // Medications
+        function updateRecurrenceOptions() {
+            const recurrence = document.getElementById('medRecurrence').value;
+            document.getElementById('specificDaysContainer').classList.add('hidden');
+            document.getElementById('everyXDaysContainer').classList.add('hidden');
+            document.getElementById('weeklyDayContainer').classList.add('hidden');
+
+            if (recurrence === 'specific-days') {
+                document.getElementById('specificDaysContainer').classList.remove('hidden');
+            } else if (recurrence === 'every-x-days') {
+                document.getElementById('everyXDaysContainer').classList.remove('hidden');
+            } else if (recurrence === 'weekly') {
+                document.getElementById('weeklyDayContainer').classList.remove('hidden');
+            }
+        }
+
+        function addMedication() {
+            const name = document.getElementById('medName').value;
+            const dosage = document.getElementById('medDosage').value;
+            const time = document.getElementById('medTime').value;
+            const recurrence = document.getElementById('medRecurrence').value;
+
+            if (!name || !dosage || !time) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const users = loadData('users');
+            
+            // Check if we're editing or adding
+            if (editingMedicationId !== null) {
+                // EDITING MODE - Update existing medication
+                const medIndex = users[currentUser].medications.findIndex(m => m.id === editingMedicationId);
+                if (medIndex !== -1) {
+                    const existingMed = users[currentUser].medications[medIndex];
+                    
+                    // Keep the existing ID and takenDates
+                    const medication = {
+                        id: existingMed.id,
+                        name: name,
+                        dosage: dosage,
+                        time: time,
+                        recurrence: recurrence,
+                        takenDates: existingMed.takenDates || [],
+                        reminderEnabled: document.getElementById('medReminderEnabled').checked,
+                        reminderMinutes: parseInt(document.getElementById('medReminderMinutes').value) || 10
+                    };
+
+                    // Handle specific recurrence options
+                    if (recurrence === 'specific-days') {
+                        const selectedDays = Array.from(document.querySelectorAll('.day-checkbox:checked'))
+                            .map(cb => parseInt(cb.value));
+                        if (selectedDays.length === 0) {
+                            alert('Please select at least one day of the week');
+                            return;
+                        }
+                        medication.specificDays = selectedDays;
+                    } else if (recurrence === 'every-x-days') {
+                        const everyXDays = parseInt(document.getElementById('medEveryXDays').value);
+                        if (!everyXDays || everyXDays < 2) {
+                            alert('Please enter a valid number of days (2 or more)');
+                            return;
+                        }
+                        medication.everyXDays = everyXDays;
+                        medication.startDate = existingMed.startDate || new Date().toISOString().split('T')[0];
+                    } else if (recurrence === 'weekly') {
+                        medication.weeklyDay = parseInt(document.getElementById('medWeeklyDay').value);
+                    }
+
+                    users[currentUser].medications[medIndex] = medication;
+                    saveData('users', users);
+                    speak(`Updated medication ${name}`);
+                }
+                
+                // Reset editing mode
+                editingMedicationId = null;
+                document.getElementById('addMedBtn').textContent = 'Add Medication';
+                document.getElementById('cancelEditMedBtn').classList.add('hidden');
+                
+            } else {
+                // ADDING MODE - Create new medication
+                const medication = {
+                    id: Date.now(),
+                    name: name,
+                    dosage: dosage,
+                    time: time,
+                    recurrence: recurrence,
+                    takenDates: [],
+                    reminderEnabled: document.getElementById('medReminderEnabled').checked,
+                    reminderMinutes: parseInt(document.getElementById('medReminderMinutes').value) || 10
+                };
+
+                // Handle specific recurrence options
+                if (recurrence === 'specific-days') {
+                    const selectedDays = Array.from(document.querySelectorAll('.day-checkbox:checked'))
+                        .map(cb => parseInt(cb.value));
+                    if (selectedDays.length === 0) {
+                        alert('Please select at least one day of the week');
+                        return;
+                    }
+                    medication.specificDays = selectedDays;
+                } else if (recurrence === 'every-x-days') {
+                    const everyXDays = parseInt(document.getElementById('medEveryXDays').value);
+                    if (!everyXDays || everyXDays < 2) {
+                        alert('Please enter a valid number of days (2 or more)');
+                        return;
+                    }
+                    medication.everyXDays = everyXDays;
+                    medication.startDate = new Date().toISOString().split('T')[0];
+                } else if (recurrence === 'weekly') {
+                    medication.weeklyDay = parseInt(document.getElementById('medWeeklyDay').value);
+                }
+
+                users[currentUser].medications.push(medication);
+                saveData('users', users);
+                speak(`Added medication ${name} with ${getRecurrenceText(medication)} schedule`);
+            }
+
+            // Clear form
+            document.getElementById('medName').value = '';
+            document.getElementById('medDosage').value = '';
+            document.getElementById('medTime').value = '';
+            document.getElementById('medRecurrence').value = 'daily';
+            document.getElementById('medReminderEnabled').checked = false;
+            document.getElementById('medReminderMinutes').value = '10';
+            document.getElementById('medReminderOptions').classList.add('hidden');
+            document.querySelectorAll('.day-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('medEveryXDays').value = '2';
+            updateRecurrenceOptions();
+
+            loadMedications(users[currentUser].medications);
+            updateDashboard();
+            loadHomeReminders();
+        }
+
+        function editMedication(medId) {
+            const users = loadData('users');
+            const medication = users[currentUser].medications.find(m => m.id === medId);
+            
+            if (!medication) {
+                alert('Medication not found');
+                return;
+            }
+
+            // Set editing mode
+            editingMedicationId = medId;
+            
+            // Populate form
+            document.getElementById('medName').value = medication.name;
+            document.getElementById('medDosage').value = medication.dosage;
+            document.getElementById('medTime').value = medication.time;
+            document.getElementById('medRecurrence').value = medication.recurrence;
+            document.getElementById('medReminderEnabled').checked = medication.reminderEnabled || false;
+            document.getElementById('medReminderMinutes').value = medication.reminderMinutes || 10;
+            
+            // Show/hide reminder options
+            if (medication.reminderEnabled) {
+                document.getElementById('medReminderOptions').classList.remove('hidden');
+            } else {
+                document.getElementById('medReminderOptions').classList.add('hidden');
+            }
+            
+            // Update recurrence options
+            updateRecurrenceOptions();
+            
+            // Handle specific recurrence data
+            if (medication.recurrence === 'specific-days' && medication.specificDays) {
+                document.querySelectorAll('.day-checkbox').forEach(cb => {
+                    cb.checked = medication.specificDays.includes(parseInt(cb.value));
+                });
+            } else if (medication.recurrence === 'every-x-days' && medication.everyXDays) {
+                document.getElementById('medEveryXDays').value = medication.everyXDays;
+            } else if (medication.recurrence === 'weekly' && medication.weeklyDay !== undefined) {
+                document.getElementById('medWeeklyDay').value = medication.weeklyDay;
+            }
+            
+            // Change button text and show cancel button
+            document.getElementById('addMedBtn').textContent = 'Update Medication';
+            document.getElementById('cancelEditMedBtn').classList.remove('hidden');
+            
+            // Scroll to form
+            document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth' });
+            
+            speak(`Editing medication ${medication.name}`);
+        }
+
+        function cancelEditMedication() {
+            editingMedicationId = null;
+            
+            // Clear form
+            document.getElementById('medName').value = '';
+            document.getElementById('medDosage').value = '';
+            document.getElementById('medTime').value = '';
+            document.getElementById('medRecurrence').value = 'daily';
+            document.getElementById('medReminderEnabled').checked = false;
+            document.getElementById('medReminderMinutes').value = '10';
+            document.getElementById('medReminderOptions').classList.add('hidden');
+            document.querySelectorAll('.day-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('medEveryXDays').value = '2';
+            updateRecurrenceOptions();
+            
+            // Reset button text and hide cancel button
+            document.getElementById('addMedBtn').textContent = 'Add Medication';
+            document.getElementById('cancelEditMedBtn').classList.add('hidden');
+            
+            speak('Editing cancelled');
+        }
+
+        // Make functions available globally
+        window.editMedication = editMedication;
+
+        function toggleMedReminderOptions() {
+            const enabled = document.getElementById('medReminderEnabled').checked;
+            const options = document.getElementById('medReminderOptions');
+            if (enabled) {
+                options.classList.remove('hidden');
+            } else {
+                options.classList.add('hidden');
+            }
+        }
+
+        function toggleApptReminderOptions() {
+            const enabled = document.getElementById('apptReminderEnabled').checked;
+            const options = document.getElementById('apptReminderOptions');
+            if (enabled) {
+                options.classList.remove('hidden');
+            } else {
+                options.classList.add('hidden');
+            }
+        }
+
+        function toggleTaskReminderOptions() {
+            const enabled = document.getElementById('taskReminderEnabled').checked;
+            const options = document.getElementById('taskReminderOptions');
+            if (enabled) {
+                options.classList.remove('hidden');
+            } else {
+                options.classList.add('hidden');
+            }
+        }
+
+        function toggleBillReminderOptions() {
+            const enabled = document.getElementById('billReminderEnabled').checked;
+            const options = document.getElementById('billReminderOptions');
+            if (enabled) {
+                options.classList.remove('hidden');
+            } else {
+                options.classList.add('hidden');
+            }
+        }
+
+        function loadMedications(medications) {
+            const container = document.getElementById('medicationList');
+            if (!container) {
+                console.error('Medication list container not found');
+                return;
+            }
+            
+            container.innerHTML = '';
+
+            if (!medications || medications.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No medications added yet</p>';
+                return;
+            }
+
+            medications.sort((a, b) => a.time.localeCompare(b.time));
+
+            medications.forEach(med => {
+                try {
+                    const shouldTakeToday = shouldTakeMedicationToday(med);
+                    const takenToday = wasTakenToday(med);
+                    
+                    const card = document.createElement('div');
+                    card.className = 'card medication fade-in';
+                    
+                    let scheduleInfo = '';
+                    if (!shouldTakeToday) {
+                        scheduleInfo = '<div style="background: #e2e8f0; padding: 8px; border-radius: 6px; margin-top: 8px; font-size: 15px;"><strong>📅 Not scheduled for today</strong></div>';
+                    }
+
+                    const reminderBadge = med.reminderEnabled ? ' 🔔' : '';
+
+                    card.innerHTML = `
+                        <div class="card-header">
+                            ${med.name}${reminderBadge}
+                            <div style="display: flex; gap: 5px;">
+                                <button class="action-btn btn-info" onclick="window.editMedication(${med.id})" style="font-size: 14px;">Edit</button>
+                                <button class="action-btn btn-delete" onclick="window.deleteMedicationById(${med.id})">Delete</button>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <strong>Dosage:</strong> ${med.dosage}<br>
+                            <strong>Schedule:</strong> ${getRecurrenceText(med)}${med.reminderEnabled ? '<br><strong>🔔 Reminder:</strong> ' + med.reminderMinutes + ' min before' : ''}
+                        </div>
+                        <div class="card-time">⏰ ${formatTime(med.time)}</div>
+                        ${scheduleInfo}
+                        ${shouldTakeToday ? `
+                            <button class="action-btn ${takenToday ? 'btn-success' : 'btn-info'}" 
+                                    onclick="markMedicationTaken(${med.id})">
+                                ${takenToday ? '✓ Taken Today' : 'Mark as Taken'}
+                            </button>
+                        ` : ''}
+                    `;
+                    container.appendChild(card);
+                } catch (error) {
+                    console.error('Error loading medication:', med, error);
+                }
+            });
+        }
+
+        // Make medication delete function globally accessible
+        window.deleteMedicationById = function(id) {
+            console.log('Delete medication clicked:', id);
+            const users = loadData('users');
+            if (!users || !users[currentUser]) {
+                console.error('No user data found');
+                return;
+            }
+            
+            const med = users[currentUser].medications.find(m => m.id === id);
+            if (!med) {
+                console.error('No medication found with id', id);
+                return;
+            }
+            
+            const medName = med.name;
+            console.log('Attempting to delete medication:', medName);
+            
+            // Store the medication id for confirmation
+            pendingDeleteMedicationId = id;
+            
+            // Show custom modal
+            document.getElementById('deleteTaskText').textContent = 
+                'Are you sure you want to delete "' + medName + '"?';
+            document.getElementById('deleteTaskModal').classList.remove('hidden');
+            console.log('Delete modal shown for medication');
+        };
+
+        function confirmDeleteTask() {
+            console.log('Delete confirmed');
+            document.getElementById('deleteTaskModal').classList.add('hidden');
+            
+            // Check if deleting a medication
+            if (pendingDeleteMedicationId !== null) {
+                console.log('Deleting medication with id:', pendingDeleteMedicationId);
+                const users = loadData('users');
+                const med = users[currentUser].medications.find(m => m.id === pendingDeleteMedicationId);
+                if (!med) {
+                    console.error('Medication not found');
+                    pendingDeleteMedicationId = null;
+                    return;
+                }
+                const medName = med.name;
+                
+                users[currentUser].medications = users[currentUser].medications.filter(m => m.id !== pendingDeleteMedicationId);
+                saveData('users', users);
+                
+                console.log('Reloading medications...');
+                loadMedications(users[currentUser].medications);
+                updateDashboard();
+                loadHomeReminders();
+                speak('Medication deleted: ' + medName);
+                
+                pendingDeleteMedicationId = null;
+                console.log('Done!');
+                return; // Exit after medication delete
+            }
+            
+            // Check if deleting an appointment
+            if (pendingDeleteAppointmentId !== null) {
+                console.log('Deleting appointment with id:', pendingDeleteAppointmentId);
+                const users = loadData('users');
+                const appt = users[currentUser].appointments.find(a => a.id === pendingDeleteAppointmentId);
+                if (!appt) {
+                    console.error('Appointment not found');
+                    pendingDeleteAppointmentId = null;
+                    return;
+                }
+                const apptName = appt.doctor;
+                
+                users[currentUser].appointments = users[currentUser].appointments.filter(a => a.id !== pendingDeleteAppointmentId);
+                saveData('users', users);
+                
+                console.log('Reloading appointments...');
+                loadAppointments(users[currentUser].appointments);
+                updateDashboard();
+                loadHomeReminders();
+                speak('Appointment deleted: ' + apptName);
+                
+                pendingDeleteAppointmentId = null;
+                console.log('Done!');
+                return; // Exit after appointment delete
+            }
+            
+            // Check if deleting a bill
+            if (pendingDeleteBillId !== null) {
+                console.log('Deleting bill with id:', pendingDeleteBillId);
+                const users = loadData('users');
+                const bill = users[currentUser].bills.find(b => b.id === pendingDeleteBillId);
+                if (!bill) {
+                    console.error('Bill not found');
+                    pendingDeleteBillId = null;
+                    return;
+                }
+                const billName = bill.name;
+                
+                users[currentUser].bills = users[currentUser].bills.filter(b => b.id !== pendingDeleteBillId);
+                saveData('users', users);
+                
+                console.log('Reloading bills...');
+                loadBills(users[currentUser].bills);
+                updateDashboard();
+                loadHomeReminders();
+                speak('Bill deleted: ' + billName);
+                
+                pendingDeleteBillId = null;
+                console.log('Done!');
+                return; // Exit after bill delete
+            }
+            
+            // Check if deleting a task
+            if (pendingDeleteCategory !== null && pendingDeleteIndex !== null) {
+                // Deleting a task
+                console.log('Deleting task');
+                const users = loadData('users');
+                const task = users[currentUser].tasks[pendingDeleteCategory][pendingDeleteIndex];
+                const taskName = task.name;
+                
+                console.log('Deleting task:', taskName);
+                users[currentUser].tasks[pendingDeleteCategory].splice(pendingDeleteIndex, 1);
+                saveData('users', users);
+                
+                console.log('Reloading tasks...');
+                loadTasks(users[currentUser].tasks);
+                updateDashboard();
+                speak('Task deleted: ' + taskName);
+                
+                // Clear pending
+                pendingDeleteCategory = null;
+                pendingDeleteIndex = null;
+                console.log('Done!');
+                return; // Exit after task delete
+            } else {
+                // Neither was set - shouldn't happen but just in case
+                console.error('No pending delete found');
+            }
+        }
+
+        function cancelDeleteTask() {
+            console.log('Delete cancelled');
+            document.getElementById('deleteTaskModal').classList.add('hidden');
+            pendingDeleteCategory = null;
+            pendingDeleteIndex = null;
+            pendingDeleteMedicationId = null;
+            pendingDeleteAppointmentId = null;
+            pendingDeleteBillId = null;
+        }
+
+        function markMedicationTaken(id) {
+            const users = loadData('users');
+            const med = users[currentUser].medications.find(m => m.id === id);
+            if (!med) return;
+            
+            const todayDate = new Date().toISOString().split('T')[0];
+            
+            if (!med.takenDates) {
+                med.takenDates = [];
+            }
+
+            if (med.takenDates.includes(todayDate)) {
+                // Remove today's date (mark as not taken)
+                med.takenDates = med.takenDates.filter(date => date !== todayDate);
+                speak('Medication marked as not taken today');
+            } else {
+                // Add today's date (mark as taken)
+                med.takenDates.push(todayDate);
+                speak('Medication marked as taken today');
+            }
+
+            // Clean up old dates (keep only last 30 days)
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            const cutoffDate = thirtyDaysAgo.toISOString().split('T')[0];
+            med.takenDates = med.takenDates.filter(date => date >= cutoffDate);
+
+            saveData('users', users);
+            loadMedications(users[currentUser].medications);
+            loadHomeReminders();
+        }
+
+        function deleteMedication(id) {
+            if (!confirm('Are you sure you want to delete this medication?')) return;
+            
+            const users = loadData('users');
+            users[currentUser].medications = users[currentUser].medications.filter(m => m.id !== id);
+            saveData('users', users);
+            loadMedications(users[currentUser].medications);
+            updateDashboard();
+            speak('Medication deleted');
+        }
+
+        // Appointments
+        function addAppointment() {
+            const doctor = document.getElementById('apptDoctor').value;
+            const date = document.getElementById('apptDate').value;
+            const time = document.getElementById('apptTime').value;
+            const location = document.getElementById('apptLocation').value;
+
+            if (!doctor || !date || !time || !location) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const users = loadData('users');
+            
+            if (editingAppointmentId !== null) {
+                // EDITING MODE
+                const apptIndex = users[currentUser].appointments.findIndex(a => a.id === editingAppointmentId);
+                if (apptIndex !== -1) {
+                    const existingAppt = users[currentUser].appointments[apptIndex];
+                    users[currentUser].appointments[apptIndex] = {
+                        id: existingAppt.id,
+                        doctor: doctor,
+                        date: date,
+                        time: time,
+                        location: location,
+                        completed: existingAppt.completed || false,
+                        reminderEnabled: document.getElementById('apptReminderEnabled').checked,
+                        reminderMinutes: parseInt(document.getElementById('apptReminderMinutes').value) || 60
+                    };
+                    saveData('users', users);
+                    speak(`Updated appointment with ${doctor}`);
+                }
+                
+                editingAppointmentId = null;
+                document.getElementById('addApptBtn').textContent = 'Add Appointment';
+                document.getElementById('cancelEditApptBtn').classList.add('hidden');
+            } else {
+                // ADDING MODE
+                const appointment = {
+                    id: Date.now(),
+                    doctor: doctor,
+                    date: date,
+                    time: time,
+                    location: location,
+                    completed: false,
+                    reminderEnabled: document.getElementById('apptReminderEnabled').checked,
+                    reminderMinutes: parseInt(document.getElementById('apptReminderMinutes').value) || 60
+                };
+
+                users[currentUser].appointments.push(appointment);
+                saveData('users', users);
+                speak(`Added appointment with ${doctor}`);
+            }
+
+            document.getElementById('apptDoctor').value = '';
+            document.getElementById('apptDate').value = '';
+            document.getElementById('apptTime').value = '';
+            document.getElementById('apptLocation').value = '';
+            document.getElementById('apptReminderEnabled').checked = false;
+            document.getElementById('apptReminderMinutes').value = '60';
+            document.getElementById('apptReminderOptions').classList.add('hidden');
+
+            loadAppointments(users[currentUser].appointments);
+            updateDashboard();
+        }
+
+        function editAppointment(apptId) {
+            const users = loadData('users');
+            const appointment = users[currentUser].appointments.find(a => a.id === apptId);
+            
+            if (!appointment) {
+                alert('Appointment not found');
+                return;
+            }
+
+            editingAppointmentId = apptId;
+            
+            document.getElementById('apptDoctor').value = appointment.doctor;
+            document.getElementById('apptDate').value = appointment.date;
+            document.getElementById('apptTime').value = appointment.time;
+            document.getElementById('apptLocation').value = appointment.location;
+            document.getElementById('apptReminderEnabled').checked = appointment.reminderEnabled || false;
+            document.getElementById('apptReminderMinutes').value = appointment.reminderMinutes || 60;
+            
+            // Show/hide reminder options
+            if (appointment.reminderEnabled) {
+                document.getElementById('apptReminderOptions').classList.remove('hidden');
+            } else {
+                document.getElementById('apptReminderOptions').classList.add('hidden');
+            }
+            
+            document.getElementById('addApptBtn').textContent = 'Update Appointment';
+            document.getElementById('cancelEditApptBtn').classList.remove('hidden');
+            
+            document.querySelector('#appointments .form-section').scrollIntoView({ behavior: 'smooth' });
+            speak(`Editing appointment with ${appointment.doctor}`);
+        }
+
+        function cancelEditAppointment() {
+            editingAppointmentId = null;
+            
+            document.getElementById('apptDoctor').value = '';
+            document.getElementById('apptDate').value = '';
+            document.getElementById('apptTime').value = '';
+            document.getElementById('apptLocation').value = '';
+            document.getElementById('apptReminderEnabled').checked = false;
+            document.getElementById('apptReminderMinutes').value = '60';
+            document.getElementById('apptReminderOptions').classList.add('hidden');
+            
+            document.getElementById('addApptBtn').textContent = 'Add Appointment';
+            document.getElementById('cancelEditApptBtn').classList.add('hidden');
+            
+            speak('Editing cancelled');
+        }
+
+        window.editAppointment = editAppointment;
+
+
+        function updateAppointmentAutocomplete(appointments) {
+            // Extract unique doctor names and locations from appointment history
+            const doctors = new Set();
+            const locations = new Set();
+            
+            appointments.forEach(appt => {
+                if (appt.doctor && appt.doctor.trim()) {
+                    doctors.add(appt.doctor.trim());
+                }
+                if (appt.location && appt.location.trim()) {
+                    locations.add(appt.location.trim());
+                }
+            });
+            
+            // Update doctor datalist
+            const doctorDatalist = document.getElementById('doctorHistory');
+            if (doctorDatalist) {
+                doctorDatalist.innerHTML = '';
+                Array.from(doctors).sort().forEach(doctor => {
+                    const option = document.createElement('option');
+                    option.value = doctor;
+                    doctorDatalist.appendChild(option);
+                });
+            }
+            
+            // Update location datalist
+            const locationDatalist = document.getElementById('locationHistory');
+            if (locationDatalist) {
+                locationDatalist.innerHTML = '';
+                Array.from(locations).sort().forEach(location => {
+                    const option = document.createElement('option');
+                    option.value = location;
+                    locationDatalist.appendChild(option);
+                });
+            }
+        }
+
+        function loadAppointments(appointments) {
+            const container = document.getElementById('appointmentList');
+            container.innerHTML = '';
+
+            if (appointments.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No appointments scheduled</p>';
+                return;
+            }
+
+            // Add completed property to legacy appointments
+            appointments.forEach(appt => {
+                if (appt.completed === undefined) {
+                    appt.completed = false;
+                }
+            });
+
+            appointments.sort((a, b) => new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time));
+
+            appointments.forEach(appt => {
+                const card = document.createElement('div');
+                card.className = 'card appointment fade-in';
+                if (appt.completed) {
+                    card.style.opacity = '0.6';
+                    card.style.background = '#f7fafc';
+                }
+                
+                const reminderBadge = appt.reminderEnabled ? ' 🔔' : '';
+                const reminderText = appt.reminderEnabled ? `<br><strong>🔔 Reminder:</strong> ${appt.reminderMinutes >= 1440 ? Math.floor(appt.reminderMinutes / 1440) + ' day before' : appt.reminderMinutes >= 60 ? Math.floor(appt.reminderMinutes / 60) + ' hour' + (appt.reminderMinutes >= 120 ? 's' : '') + ' before' : appt.reminderMinutes + ' min before'}` : '';
+                
+                card.innerHTML = `
+                    <div class="card-header">
+                        ${appt.completed ? '✓ ' : ''}${appt.doctor}${reminderBadge}
+                        <div style="display: flex; gap: 5px;">
+                            <button class="action-btn btn-info" onclick="window.editAppointment(${appt.id})" style="font-size: 14px;">Edit</button>
+                            <button class="action-btn btn-delete" onclick="window.deleteAppointmentById(${appt.id})">Delete</button>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <strong>📍 Location:</strong> ${appt.location}<br>
+                        <strong>📅 Date:</strong> ${formatDate(appt.date)}<br>
+                        <strong>⏰ Time:</strong> ${formatTime(appt.time)}${reminderText}
+                    </div>
+                    <button class="action-btn ${appt.completed ? 'btn-success' : 'btn-info'}" 
+                            onclick="toggleAppointmentCompleted(${appt.id})">
+                        ${appt.completed ? '✓ Completed' : 'Mark as Completed'}
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+            
+            // Update autocomplete suggestions
+            updateAppointmentAutocomplete(appointments);
+        }
+
+        // Make appointment delete function globally accessible
+        window.deleteAppointmentById = function(id) {
+            console.log('Delete appointment clicked:', id);
+            const users = loadData('users');
+            if (!users || !users[currentUser]) {
+                console.error('No user data found');
+                return;
+            }
+            
+            const appt = users[currentUser].appointments.find(a => a.id === id);
+            if (!appt) {
+                console.error('No appointment found with id', id);
+                return;
+            }
+            
+            const apptName = appt.doctor;
+            console.log('Attempting to delete appointment:', apptName);
+            
+            // Store the appointment id for confirmation
+            pendingDeleteAppointmentId = id;
+            
+            // Show custom modal
+            document.getElementById('deleteTaskText').textContent = 
+                'Are you sure you want to delete appointment with "' + apptName + '"?';
+            document.getElementById('deleteTaskModal').classList.remove('hidden');
+            console.log('Delete modal shown for appointment');
+        };
+
+        function toggleAppointmentCompleted(id) {
+            const users = loadData('users');
+            const appt = users[currentUser].appointments.find(a => a.id === id);
+            if (!appt) return;
+            
+            appt.completed = !appt.completed;
+            saveData('users', users);
+            loadAppointments(users[currentUser].appointments);
+            updateDashboard();
+            speak(appt.completed ? 'Appointment marked as completed' : 'Appointment marked as not completed');
+        }
+
+        // Tasks
+        function updateTaskRecurrenceOptions() {
+            const recurrence = document.getElementById('customTaskRecurrence').value;
+            document.getElementById('taskSpecificDaysContainer').classList.add('hidden');
+            document.getElementById('taskWeeklyDayContainer').classList.add('hidden');
+
+            if (recurrence === 'specific-days') {
+                document.getElementById('taskSpecificDaysContainer').classList.remove('hidden');
+            } else if (recurrence === 'weekly') {
+                document.getElementById('taskWeeklyDayContainer').classList.remove('hidden');
+            }
+        }
+
+        function getTaskRecurrenceText(task) {
+            if (!task.recurrence || task.recurrence === 'daily') {
+                return '';
+            } else if (task.recurrence === 'specific-days' && task.specificDays) {
+                const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                return ' (' + task.specificDays.map(d => dayNames[d]).join(', ') + ')';
+            } else if (task.recurrence === 'weekly' && task.weeklyDay !== undefined) {
+                const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                return ' (' + dayNames[task.weeklyDay] + ')';
+            }
+            return '';
+        }
+
+        function shouldShowTaskToday(task) {
+            // If no recurrence, show every day (legacy tasks)
+            if (!task.recurrence || task.recurrence === 'daily') {
+                return true;
+            }
+
+            const today = new Date();
+            const todayDay = today.getDay(); // 0 = Sunday, 6 = Saturday
+            
+            if (task.recurrence === 'specific-days' && task.specificDays) {
+                return task.specificDays.includes(todayDay);
+            } else if (task.recurrence === 'weekly' && task.weeklyDay !== undefined) {
+                return todayDay === task.weeklyDay;
+            }
+            
+            return true;
+        }
+
+        function addCustomTask() {
+            const name = document.getElementById('customTaskName').value;
+            const category = document.getElementById('customTaskCategory').value;
+            const time = document.getElementById('customTaskTime').value;
+            const recurrence = document.getElementById('customTaskRecurrence').value;
+
+            console.log('Adding/Editing custom task:', { name, category, time, recurrence, editing: editingTaskCategory !== null });
+
+            if (!name) {
+                alert('Please enter a task name');
+                return;
+            }
+
+            const users = loadData('users');
+            if (!users || !users[currentUser]) {
+                console.error('No user data found');
+                alert('Error: User data not found');
+                return;
+            }
+
+            // Ensure category exists
+            if (!users[currentUser].tasks[category]) {
+                console.error('Category does not exist:', category);
+                alert('Error: Invalid category');
+                return;
+            }
+
+            if (editingTaskCategory !== null && editingTaskIndex !== null) {
+                // EDITING MODE
+                const task = {
+                    name: name,
+                    time: time || '',
+                    completed: users[currentUser].tasks[editingTaskCategory][editingTaskIndex].completed || false,
+                    recurrence: recurrence,
+                    reminderEnabled: document.getElementById('taskReminderEnabled').checked,
+                    reminderMinutes: parseInt(document.getElementById('taskReminderMinutes').value) || 10
+                };
+
+                // Handle specific recurrence options
+                if (recurrence === 'specific-days') {
+                    const selectedDays = Array.from(document.querySelectorAll('.task-day-checkbox:checked'))
+                        .map(cb => parseInt(cb.value));
+                    if (selectedDays.length === 0) {
+                        alert('Please select at least one day of the week');
+                        return;
+                    }
+                    task.specificDays = selectedDays;
+                } else if (recurrence === 'weekly') {
+                    task.weeklyDay = parseInt(document.getElementById('customTaskWeeklyDay').value);
+                }
+
+                // Update the task
+                users[currentUser].tasks[editingTaskCategory][editingTaskIndex] = task;
+                saveData('users', users);
+                speak(`Updated task ${name}`);
+                
+                editingTaskCategory = null;
+                editingTaskIndex = null;
+                document.getElementById('addTaskBtn').textContent = 'Add Task';
+                document.getElementById('cancelEditTaskBtn').classList.add('hidden');
+            } else {
+                // ADDING MODE
+                const task = {
+                    name: name,
+                    time: time || '',
+                    completed: false,
+                    recurrence: recurrence,
+                    reminderEnabled: document.getElementById('taskReminderEnabled').checked,
+                    reminderMinutes: parseInt(document.getElementById('taskReminderMinutes').value) || 10
+                };
+
+                // Handle specific recurrence options
+                if (recurrence === 'specific-days') {
+                    const selectedDays = Array.from(document.querySelectorAll('.task-day-checkbox:checked'))
+                        .map(cb => parseInt(cb.value));
+                    if (selectedDays.length === 0) {
+                        alert('Please select at least one day of the week');
+                        return;
+                    }
+                    task.specificDays = selectedDays;
+                } else if (recurrence === 'weekly') {
+                    task.weeklyDay = parseInt(document.getElementById('customTaskWeeklyDay').value);
+                }
+
+                console.log('Adding task to category:', category, task);
+                users[currentUser].tasks[category].push(task);
+                saveData('users', users);
+                console.log('Task added successfully');
+                speak(`Added task ${name} with ${recurrence === 'daily' ? 'daily' : getTaskRecurrenceText(task)} schedule`);
+            }
+
+            // Clear form
+            document.getElementById('customTaskName').value = '';
+            document.getElementById('customTaskTime').value = '';
+            document.getElementById('customTaskRecurrence').value = 'daily';
+            document.getElementById('customTaskCategory').value = 'meals';
+            document.getElementById('taskReminderEnabled').checked = false;
+            document.getElementById('taskReminderMinutes').value = '10';
+            document.getElementById('taskReminderOptions').classList.add('hidden');
+            document.querySelectorAll('.task-day-checkbox').forEach(cb => cb.checked = false);
+            updateTaskRecurrenceOptions();
+
+            loadTasks(users[currentUser].tasks);
+            updateDashboard();
+            console.log('Task display updated');
+        }
+
+        function editTaskByIndex(category, index) {
+            const users = loadData('users');
+            const task = users[currentUser].tasks[category][index];
+            
+            if (!task) {
+                alert('Task not found');
+                return;
+            }
+
+            editingTaskCategory = category;
+            editingTaskIndex = index;
+            
+            document.getElementById('customTaskName').value = task.name;
+            document.getElementById('customTaskCategory').value = category;
+            document.getElementById('customTaskTime').value = task.time || '';
+            document.getElementById('customTaskRecurrence').value = task.recurrence || 'daily';
+            document.getElementById('taskReminderEnabled').checked = task.reminderEnabled || false;
+            document.getElementById('taskReminderMinutes').value = task.reminderMinutes || 10;
+            
+            // Show/hide reminder options
+            if (task.reminderEnabled) {
+                document.getElementById('taskReminderOptions').classList.remove('hidden');
+            } else {
+                document.getElementById('taskReminderOptions').classList.add('hidden');
+            }
+            
+            updateTaskRecurrenceOptions();
+            
+            // Handle specific recurrence data
+            if (task.recurrence === 'specific-days' && task.specificDays) {
+                document.querySelectorAll('.task-day-checkbox').forEach(cb => {
+                    cb.checked = task.specificDays.includes(parseInt(cb.value));
+                });
+            } else if (task.recurrence === 'weekly' && task.weeklyDay !== undefined) {
+                document.getElementById('customTaskWeeklyDay').value = task.weeklyDay;
+            }
+            
+            document.getElementById('addTaskBtn').textContent = 'Update Task';
+            document.getElementById('cancelEditTaskBtn').classList.remove('hidden');
+            
+            document.querySelector('#tasks .form-section').scrollIntoView({ behavior: 'smooth' });
+            speak(`Editing task ${task.name}`);
+        }
+
+        function cancelEditTask() {
+            editingTaskCategory = null;
+            editingTaskIndex = null;
+            
+            document.getElementById('customTaskName').value = '';
+            document.getElementById('customTaskTime').value = '';
+            document.getElementById('customTaskRecurrence').value = 'daily';
+            document.getElementById('customTaskCategory').value = 'meals';
+            document.getElementById('taskReminderEnabled').checked = false;
+            document.getElementById('taskReminderMinutes').value = '10';
+            document.getElementById('taskReminderOptions').classList.add('hidden');
+            document.querySelectorAll('.task-day-checkbox').forEach(cb => cb.checked = false);
+            updateTaskRecurrenceOptions();
+            
+            document.getElementById('addTaskBtn').textContent = 'Add Task';
+            document.getElementById('cancelEditTaskBtn').classList.add('hidden');
+            
+            speak('Editing cancelled');
+        }
+
+        window.editTaskByIndex = editTaskByIndex;
+
+
+        function loadTasks(tasks) {
+            console.log('loadTasks called with:', tasks);
+            ['meals', 'hydration', 'hygiene', 'safety'].forEach(category => {
+                const container = document.getElementById(`${category}Tasks`);
+                console.log(`Loading ${category}:`, container ? 'container found' : 'container NOT found', tasks[category] ? `${tasks[category].length} tasks` : 'no tasks');
+                if (!container) return;
+                container.innerHTML = '';
+
+                if (tasks[category]) {
+                    tasks[category].forEach((task, index) => {
+                        console.log(`  Task ${index} in ${category}:`, task.name, 'showToday:', shouldShowTaskToday(task));
+                        // Check if task should be shown today
+                        const showToday = shouldShowTaskToday(task);
+                        
+                        const item = document.createElement('div');
+                        item.className = `checkbox-item ${task.completed ? 'completed' : ''}`;
+                        
+                        const taskTime = task.time ? ` - ${formatTime(task.time)}` : '';
+                        const taskRecurrence = getTaskRecurrenceText(task);
+                        const taskNameEscaped = task.name.replace(/'/g, "\\'");
+                        const taskReminderBadge = task.reminderEnabled ? ' 🔔' : '';
+                        const taskReminderText = task.reminderEnabled ? ` (${task.reminderMinutes} min before)` : '';
+                        
+                        // Show schedule info if not scheduled for today
+                        let scheduleNote = '';
+                        if (!showToday) {
+                            scheduleNote = '<div style="background: #e2e8f0; padding: 4px 8px; border-radius: 4px; margin-top: 4px; font-size: 13px; color: #666;">📅 Not scheduled for today</div>';
+                        }
+                        
+                        item.innerHTML = `
+                            <input type="checkbox" ${task.completed ? 'checked' : ''} 
+                                   ${!showToday ? 'disabled' : ''}
+                                   onchange="window.toggleTaskByIndex('${category}', ${index})"
+                                   style="width: 28px; height: 28px; margin-right: 15px; cursor: ${showToday ? 'pointer' : 'not-allowed'};">
+                            <label onclick="${showToday ? "window.toggleTaskByIndex('" + category + "', " + index + ")" : ''}" 
+                                   style="font-size: 17px; cursor: ${showToday ? 'pointer' : 'default'}; flex: 1; ${!showToday ? 'opacity: 0.6;' : ''}">
+                                ${task.name}${taskReminderBadge}${taskTime}${taskRecurrence}${taskReminderText}
+                                ${scheduleNote}
+                            </label>
+                            <button class="action-btn btn-info" 
+                                    onclick="window.editTaskByIndex('${category}', ${index})"
+                                    style="margin: 0; margin-right: 5px; padding: 8px 16px; font-size: 14px;">
+                                Edit
+                            </button>
+                            <button class="action-btn btn-delete" 
+                                    onclick="window.deleteTaskByIndex('${category}', ${index})"
+                                    style="margin: 0; padding: 8px 16px; font-size: 14px;">
+                                Delete
+                            </button>
+                        `;
+                        
+                        container.appendChild(item);
+                        console.log(`  Task ${index} added to DOM`);
+                    });
+                }
+            });
+            console.log('loadTasks complete');
+        }
+
+        // Make these functions available globally
+        window.deleteTaskByIndex = function(category, index) {
+            console.log('Delete clicked:', category, index);
+            const users = loadData('users');
+            if (!users || !users[currentUser] || !users[currentUser].tasks[category]) {
+                console.error('No user data found');
+                return;
+            }
+            
+            const task = users[currentUser].tasks[category][index];
+            if (!task) {
+                console.error('No task found at index', index);
+                return;
+            }
+            
+            const taskName = task.name;
+            console.log('Attempting to delete:', taskName);
+            
+            // Store the task info for confirmation
+            pendingDeleteCategory = category;
+            pendingDeleteIndex = index;
+            
+            // Show custom modal
+            document.getElementById('deleteTaskText').textContent = 
+                'Are you sure you want to delete "' + taskName + '"?';
+            document.getElementById('deleteTaskModal').classList.remove('hidden');
+            console.log('Delete modal shown');
+        };
+
+        window.toggleTaskByIndex = function(category, index) {
+            toggleTask(category, index);
+        };
+
+        function toggleTask(category, index) {
+            const users = loadData('users');
+            users[currentUser].tasks[category][index].completed = !users[currentUser].tasks[category][index].completed;
+            saveData('users', users);
+            loadTasks(users[currentUser].tasks);
+            updateDashboard();
+            
+            const task = users[currentUser].tasks[category][index];
+            speak(task.completed ? `Task completed: ${task.name}` : `Task uncompleted: ${task.name}`);
+        }
+
+        // Bills
+        function getBillRecurrenceText(bill) {
+            if (!bill.recurrence || bill.recurrence === 'one-time') {
+                return 'one-time';
+            } else if (bill.recurrence === 'monthly') {
+                return 'monthly';
+            } else if (bill.recurrence === 'quarterly') {
+                return 'every 3 months';
+            } else if (bill.recurrence === 'yearly') {
+                return 'yearly';
+            } else if (bill.recurrence === 'weekly') {
+                return 'weekly';
+            } else if (bill.recurrence === 'biweekly') {
+                return 'every 2 weeks';
+            }
+            return 'one-time';
+        }
+
+        function getNextBillDueDate(dueDate, recurrence) {
+            const currentDue = parseLocalDate(dueDate);
+            let nextDue = new Date(currentDue);
+
+            if (recurrence === 'monthly') {
+                nextDue.setMonth(nextDue.getMonth() + 1);
+            } else if (recurrence === 'quarterly') {
+                nextDue.setMonth(nextDue.getMonth() + 3);
+            } else if (recurrence === 'yearly') {
+                nextDue.setFullYear(nextDue.getFullYear() + 1);
+            } else if (recurrence === 'weekly') {
+                nextDue.setDate(nextDue.getDate() + 7);
+            } else if (recurrence === 'biweekly') {
+                nextDue.setDate(nextDue.getDate() + 14);
+            }
+
+            return nextDue.toISOString().split('T')[0];
+        }
+
+        function addBill() {
+            const name = document.getElementById('billName').value;
+            const amount = document.getElementById('billAmount').value;
+            const dueDate = document.getElementById('billDueDate').value;
+            const recurrence = document.getElementById('billRecurrence').value;
+
+            if (!name || !amount || !dueDate) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const users = loadData('users');
+            
+            if (editingBillId !== null) {
+                // EDITING MODE
+                const billIndex = users[currentUser].bills.findIndex(b => b.id === editingBillId);
+                if (billIndex !== -1) {
+                    const existingBill = users[currentUser].bills[billIndex];
+                    users[currentUser].bills[billIndex] = {
+                        id: existingBill.id,
+                        name: name,
+                        amount: parseFloat(amount),
+                        dueDate: dueDate,
+                        recurrence: recurrence,
+                        paid: existingBill.paid || false,
+                        reminderEnabled: document.getElementById('billReminderEnabled').checked,
+                        reminderDays: parseInt(document.getElementById('billReminderDays').value) || 3
+                    };
+                    saveData('users', users);
+                    speak(`Updated bill ${name}`);
+                }
+                
+                editingBillId = null;
+                document.getElementById('addBillBtn').textContent = 'Add Bill';
+                document.getElementById('cancelEditBillBtn').classList.add('hidden');
+            } else {
+                // ADDING MODE
+                const bill = {
+                    id: Date.now(),
+                    name: name,
+                    amount: parseFloat(amount),
+                    dueDate: dueDate,
+                    recurrence: recurrence,
+                    paid: false,
+                    reminderEnabled: document.getElementById('billReminderEnabled').checked,
+                    reminderDays: parseInt(document.getElementById('billReminderDays').value) || 3
+                };
+
+                users[currentUser].bills.push(bill);
+                saveData('users', users);
+                speak(`Added ${recurrence === 'one-time' ? '' : getBillRecurrenceText(bill)} bill ${name}`);
+            }
+
+            document.getElementById('billName').value = '';
+            document.getElementById('billAmount').value = '';
+            document.getElementById('billDueDate').value = '';
+            document.getElementById('billRecurrence').value = 'one-time';
+            document.getElementById('billReminderEnabled').checked = false;
+            document.getElementById('billReminderDays').value = '3';
+            document.getElementById('billReminderOptions').classList.add('hidden');
+
+            loadBills(users[currentUser].bills);
+            updateDashboard();
+        }
+
+        function editBill(billId) {
+            const users = loadData('users');
+            const bill = users[currentUser].bills.find(b => b.id === billId);
+            
+            if (!bill) {
+                alert('Bill not found');
+                return;
+            }
+
+            editingBillId = billId;
+            
+            document.getElementById('billName').value = bill.name;
+            document.getElementById('billAmount').value = bill.amount;
+            document.getElementById('billDueDate').value = bill.dueDate;
+            document.getElementById('billRecurrence').value = bill.recurrence || 'one-time';
+            document.getElementById('billReminderEnabled').checked = bill.reminderEnabled || false;
+            document.getElementById('billReminderDays').value = bill.reminderDays || 3;
+            
+            // Show/hide reminder options
+            if (bill.reminderEnabled) {
+                document.getElementById('billReminderOptions').classList.remove('hidden');
+            } else {
+                document.getElementById('billReminderOptions').classList.add('hidden');
+            }
+            
+            document.getElementById('addBillBtn').textContent = 'Update Bill';
+            document.getElementById('cancelEditBillBtn').classList.remove('hidden');
+            
+            document.querySelector('#bills .form-section').scrollIntoView({ behavior: 'smooth' });
+            speak(`Editing bill ${bill.name}`);
+        }
+
+        function cancelEditBill() {
+            editingBillId = null;
+            
+            document.getElementById('billName').value = '';
+            document.getElementById('billAmount').value = '';
+            document.getElementById('billDueDate').value = '';
+            document.getElementById('billRecurrence').value = 'one-time';
+            document.getElementById('billReminderEnabled').checked = false;
+            document.getElementById('billReminderDays').value = '3';
+            document.getElementById('billReminderOptions').classList.add('hidden');
+            
+            document.getElementById('addBillBtn').textContent = 'Add Bill';
+            document.getElementById('cancelEditBillBtn').classList.add('hidden');
+            
+            speak('Editing cancelled');
+        }
+
+        window.editBill = editBill;
+
+
+        function loadBills(bills) {
+            const container = document.getElementById('billList');
+            container.innerHTML = '';
+
+            if (bills.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No bills added yet</p>';
+                return;
+            }
+
+            bills.sort((a, b) => parseLocalDate(a.dueDate) - parseLocalDate(b.dueDate));
+
+            bills.forEach(bill => {
+                // Add recurrence if missing (legacy support)
+                if (!bill.recurrence) {
+                    bill.recurrence = 'one-time';
+                }
+
+                const reminderBadge = bill.reminderEnabled ? ' 🔔' : '';
+                const reminderText = bill.reminderEnabled ? `<br><strong>🔔 Reminder:</strong> ${bill.reminderDays} day${bill.reminderDays !== 1 ? 's' : ''} before due date` : '';
+
+                const card = document.createElement('div');
+                card.className = 'card bill fade-in';
+                card.innerHTML = `
+                    <div class="card-header">
+                        ${bill.name}${reminderBadge}
+                        <div style="display: flex; gap: 5px;">
+                            <button class="action-btn btn-info" onclick="window.editBill(${bill.id})" style="font-size: 14px;">Edit</button>
+                            <button class="action-btn btn-delete" onclick="window.deleteBillById(${bill.id})">Delete</button>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <strong>💵 Amount:</strong> $${bill.amount.toFixed(2)}<br>
+                        <strong>📅 Due Date:</strong> ${formatDate(bill.dueDate)}<br>
+                        <strong>🔄 Repeats:</strong> ${getBillRecurrenceText(bill)}${reminderText}
+                    </div>
+                    <button class="action-btn ${bill.paid ? 'btn-success' : 'btn-warning'}" 
+                            onclick="toggleBillPaid(${bill.id})">
+                        ${bill.paid ? '✓ Paid' : 'Mark as Paid'}
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Make bill delete function globally accessible
+        window.deleteBillById = function(id) {
+            console.log('Delete bill clicked:', id);
+            const users = loadData('users');
+            if (!users || !users[currentUser]) {
+                console.error('No user data found');
+                return;
+            }
+            
+            const bill = users[currentUser].bills.find(b => b.id === id);
+            if (!bill) {
+                console.error('No bill found with id', id);
+                return;
+            }
+            
+            const billName = bill.name;
+            console.log('Attempting to delete bill:', billName);
+            
+            // Store the bill id for confirmation
+            pendingDeleteBillId = id;
+            
+            // Show custom modal
+            document.getElementById('deleteTaskText').textContent = 
+                'Are you sure you want to delete "' + billName + '"?';
+            document.getElementById('deleteTaskModal').classList.remove('hidden');
+            console.log('Delete modal shown for bill');
+        };
+
+        function toggleBillPaid(id) {
+            const users = loadData('users');
+            const bill = users[currentUser].bills.find(b => b.id === id);
+            
+            if (!bill) return;
+
+            bill.paid = !bill.paid;
+
+            // If marking as paid and bill is recurring, create next occurrence
+            if (bill.paid && bill.recurrence && bill.recurrence !== 'one-time') {
+                const nextDueDate = getNextBillDueDate(bill.dueDate, bill.recurrence);
+                
+                // Create new bill for next period
+                const nextBill = {
+                    id: Date.now() + 1, // Ensure unique ID
+                    name: bill.name,
+                    amount: bill.amount,
+                    dueDate: nextDueDate,
+                    recurrence: bill.recurrence,
+                    paid: false
+                };
+                
+                users[currentUser].bills.push(nextBill);
+                speak(`Bill marked as paid. Next ${bill.name} due ${formatDate(nextDueDate)}`);
+            } else {
+                speak(bill.paid ? 'Bill marked as paid' : 'Bill marked as unpaid');
+            }
+
+            saveData('users', users);
+            loadBills(users[currentUser].bills);
+            updateDashboard();
+            loadHomeReminders();
+        }
+
+        // Contacts
+        function addContact() {
+            const name = document.getElementById('contactName').value;
+            const relation = document.getElementById('contactRelation').value;
+            const phone = document.getElementById('contactPhone').value;
+
+            if (!name || !relation || !phone) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const users = loadData('users');
+            const contact = {
+                id: Date.now(),
+                name: name,
+                relation: relation,
+                phone: phone
+            };
+
+            users[currentUser].contacts.push(contact);
+            saveData('users', users);
+
+            document.getElementById('contactName').value = '';
+            document.getElementById('contactRelation').value = '';
+            document.getElementById('contactPhone').value = '';
+
+            loadContacts(users[currentUser].contacts);
+            speak(`Added contact ${name}`);
+        }
+
+        function loadContacts(contacts) {
+            const container = document.getElementById('contactList');
+            container.innerHTML = '';
+
+            if (contacts.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No contacts added yet</p>';
+                return;
+            }
+
+            contacts.forEach(contact => {
+                const card = document.createElement('div');
+                card.className = 'contact-card fade-in';
+                card.innerHTML = `
+                    <div class="contact-info">
+                        <div class="contact-name">${contact.name}</div>
+                        <div class="contact-relation">${contact.relation}</div>
+                        <div class="contact-phone">📞 ${contact.phone}</div>
+                    </div>
+                    <div class="contact-buttons">
+                        <button class="call-btn" onclick="callContact('${contact.name}', '${contact.phone}')">
+                            📞 Call
+                        </button>
+                        <button class="action-btn btn-delete" onclick="deleteContact(${contact.id})">
+                            Delete
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function callContact(name, phone) {
+            speak(`Calling ${name}`);
+            window.location.href = `tel:${phone}`;
+        }
+
+        function callEmergency() {
+            // Show confirmation modal
+            document.getElementById('emergencyModal').classList.remove('hidden');
+            speak('Emergency call confirmation');
+        }
+
+        function confirmEmergencyCall() {
+            // Hide modal
+            document.getElementById('emergencyModal').classList.add('hidden');
+            speak('Calling emergency services nine one one');
+            // Make the call
+            window.location.href = 'tel:911';
+        }
+
+        function cancelEmergencyCall() {
+            // Hide modal
+            document.getElementById('emergencyModal').classList.add('hidden');
+            speak('Emergency call cancelled');
+        }
+
+        function deleteContact(id) {
+            if (!confirm('Are you sure you want to delete this contact?')) return;
+            
+            const users = loadData('users');
+            users[currentUser].contacts = users[currentUser].contacts.filter(c => c.id !== id);
+            saveData('users', users);
+            loadContacts(users[currentUser].contacts);
+            speak('Contact deleted');
+        }
+
+        // Profile
+        function loadProfile(userData) {
+            const container = document.getElementById('profileInfo');
+            if (!container) return;
+            container.innerHTML = `
+                <p style="margin-bottom: 10px;"><strong>Name:</strong> ${userData.name}</p>
+                <p style="margin-bottom: 10px;"><strong>Age:</strong> ${userData.age}</p>
+                <p><strong>Username:</strong> ${currentUser}</p>
+            `;
+
+            document.getElementById('updateName').value = userData.name;
+            document.getElementById('updateAge').value = userData.age;
+            
+            // Load voice preference checkbox state
+            loadVoicePreference();
+            
+            // Load backup reminder settings
+            loadBackupReminderSettings();
+        }
+
+        function updateProfile() {
+            const name = document.getElementById('updateName').value;
+            const age = document.getElementById('updateAge').value;
+
+            if (!name || !age) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const users = loadData('users');
+            users[currentUser].name = name;
+            users[currentUser].age = age;
+            saveData('users', users);
+
+            document.getElementById('userName').textContent = name;
+            loadProfile(users[currentUser]);
+            speak('Profile updated successfully');
+        }
+
+        // Export/Import Functions
+        function exportData() {
+            const users = loadData('users');
+            if (!users || !users[currentUser]) {
+                alert('No data to export');
+                return;
+            }
+
+            const userData = users[currentUser];
+            
+            // Create export object with all user data
+            const exportData = {
+                version: '1.0',
+                exportDate: new Date().toISOString(),
+                username: currentUser,
+                profile: {
+                    name: userData.name,
+                    age: userData.age,
+                    voiceAutoEnable: userData.voiceAutoEnable || false
+                },
+                medications: userData.medications || [],
+                appointments: userData.appointments || [],
+                tasks: userData.tasks || {
+                    meals: [],
+                    hydration: [],
+                    hygiene: [],
+                    safety: []
+                },
+                bills: userData.bills || []
+            };
+
+            // Convert to JSON string
+            const jsonString = JSON.stringify(exportData, null, 2);
+            
+            // Create blob and download
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            
+            // Create filename with current date
+            const date = new Date().toISOString().split('T')[0];
+            link.download = `senior-care-backup-${date}.json`;
+            link.href = url;
+            link.click();
+            
+            // Clean up
+            URL.revokeObjectURL(url);
+            
+            // Save last backup date
+            const users = loadData('users');
+            users[currentUser].lastBackupDate = new Date().toISOString();
+            saveData('users', users);
+            updateLastBackupDisplay();
+            
+            speak('Data exported successfully. Check your downloads folder.');
+            
+            // Show confirmation
+            setTimeout(() => {
+                alert('✅ Data exported successfully!\n\nFile: senior-care-backup-' + date + '.json\n\nCheck your Downloads folder.\n\nTip: Email this file to yourself for safekeeping!');
+            }, 500);
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Check if it's a JSON file
+            if (!file.name.endsWith('.json')) {
+                alert('❌ Please select a valid JSON backup file');
+                speak('Invalid file type');
+                return;
+            }
+
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    
+                    // Validate the imported data
+                    if (!importedData.version || !importedData.profile) {
+                        throw new Error('Invalid backup file format');
+                    }
+
+                    // Ask for confirmation
+                    const confirmMessage = `Import data from backup?\n\nBackup Date: ${new Date(importedData.exportDate).toLocaleDateString()}\n\nThis will REPLACE your current data!\n\nAre you sure?`;
+                    
+                    if (!confirm(confirmMessage)) {
+                        speak('Import cancelled');
+                        return;
+                    }
+
+                    // Load current users data
+                    const users = loadData('users');
+                    
+                    // Merge imported data into current user
+                    users[currentUser] = {
+                        ...users[currentUser],
+                        name: importedData.profile.name,
+                        age: importedData.profile.age,
+                        voiceAutoEnable: importedData.profile.voiceAutoEnable,
+                        medications: importedData.medications,
+                        appointments: importedData.appointments,
+                        tasks: importedData.tasks,
+                        bills: importedData.bills
+                    };
+
+                    // Save to localStorage
+                    saveData('users', users);
+
+                    // Reload all data
+                    loadAllData();
+
+                    speak('Data imported successfully');
+                    
+                    // Show success message
+                    alert('✅ Data imported successfully!\n\n' +
+                          'Medications: ' + (importedData.medications?.length || 0) + '\n' +
+                          'Appointments: ' + (importedData.appointments?.length || 0) + '\n' +
+                          'Tasks: ' + (
+                              (importedData.tasks?.meals?.length || 0) +
+                              (importedData.tasks?.hydration?.length || 0) +
+                              (importedData.tasks?.hygiene?.length || 0) +
+                              (importedData.tasks?.safety?.length || 0)
+                          ) + '\n' +
+                          'Bills: ' + (importedData.bills?.length || 0));
+
+                } catch (error) {
+                    console.error('Import error:', error);
+                    alert('❌ Error importing data\n\nThe file may be corrupted or invalid.\n\nError: ' + error.message);
+                    speak('Error importing data');
+                }
+            };
+
+            reader.onerror = function() {
+                alert('❌ Error reading file');
+                speak('Error reading file');
+            };
+
+            reader.readAsText(file);
+            
+            // Reset file input
+            event.target.value = '';
+        }
+
+        // Backup Reminder Functions
+        function saveBackupReminderSettings() {
+            const enabled = document.getElementById('backupReminderEnabled').checked;
+            const days = document.getElementById('backupReminderDays').value;
+            
+            const users = loadData('users');
+            users[currentUser].backupReminderEnabled = enabled;
+            users[currentUser].backupReminderDays = parseInt(days);
+            saveData('users', users);
+            
+            // Toggle visibility of options
+            const options = document.getElementById('backupReminderOptions');
+            if (enabled) {
+                options.classList.remove('hidden');
+                speak(`Backup reminder set for every ${days} days`);
+            } else {
+                options.classList.add('hidden');
+                speak('Backup reminder disabled');
+            }
+        }
+
+        function updateLastBackupDisplay() {
+            const users = loadData('users');
+            const lastBackup = users[currentUser]?.lastBackupDate;
+            const displayElement = document.getElementById('lastBackupDate');
+            
+            if (lastBackup) {
+                const backupDate = new Date(lastBackup);
+                const now = new Date();
+                const daysDiff = Math.floor((now - backupDate) / (1000 * 60 * 60 * 24));
+                
+                const dateStr = backupDate.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric', 
+                    year: 'numeric' 
+                });
+                
+                if (daysDiff === 0) {
+                    displayElement.textContent = 'Today (' + dateStr + ')';
+                    displayElement.style.color = '#28a745';
+                } else if (daysDiff === 1) {
+                    displayElement.textContent = 'Yesterday (' + dateStr + ')';
+                    displayElement.style.color = '#28a745';
+                } else if (daysDiff <= 7) {
+                    displayElement.textContent = daysDiff + ' days ago (' + dateStr + ')';
+                    displayElement.style.color = '#28a745';
+                } else if (daysDiff <= 14) {
+                    displayElement.textContent = daysDiff + ' days ago (' + dateStr + ')';
+                    displayElement.style.color = '#ffc107';
+                } else {
+                    displayElement.textContent = daysDiff + ' days ago (' + dateStr + ')';
+                    displayElement.style.color = '#dc3545';
+                }
+            } else {
+                displayElement.textContent = 'Never';
+                displayElement.style.color = '#dc3545';
+            }
+        }
+
+        function checkBackupReminder() {
+            const users = loadData('users');
+            const userData = users[currentUser];
+            
+            if (!userData.backupReminderEnabled) return;
+            
+            const lastBackup = userData.lastBackupDate;
+            const reminderDays = userData.backupReminderDays || 7;
+            
+            if (!lastBackup) {
+                // Never backed up - show reminder
+                showBackupReminder('You have never backed up your data!', reminderDays);
+                return;
+            }
+            
+            const lastBackupDate = new Date(lastBackup);
+            const now = new Date();
+            const daysSinceBackup = Math.floor((now - lastBackupDate) / (1000 * 60 * 60 * 24));
+            
+            if (daysSinceBackup >= reminderDays) {
+                showBackupReminder(`It's been ${daysSinceBackup} days since your last backup!`, reminderDays);
+            }
+        }
+
+        function showBackupReminder(message, reminderDays) {
+            const alertHtml = `
+                <div class="reminder-alert">
+                    <div class="reminder-content">
+                        <div style="font-size: 60px; margin-bottom: 20px;">💾</div>
+                        <h2 style="margin: 0 0 15px 0;">Backup Reminder</h2>
+                        <p style="font-size: 16px; margin-bottom: 15px;">${message}</p>
+                        <p style="font-size: 14px; color: #666; margin-bottom: 20px;">
+                            Regular backups protect your data if your phone is lost or damaged.<br>
+                            You're set to be reminded every ${reminderDays} days.
+                        </p>
+                        <button class="btn btn-success" style="margin: 5px; padding: 15px 30px; font-size: 16px;" onclick="closeBackupReminder(); exportData();">
+                            📥 Backup Now
+                        </button>
+                        <button class="btn" style="margin: 5px; padding: 15px 30px; font-size: 16px; background: #6c757d;" onclick="snoozeBackupReminder();">
+                            ⏰ Remind Me Tomorrow
+                        </button>
+                        <button class="btn" style="margin: 5px; padding: 15px 30px; font-size: 16px; background: #95a5a6;" onclick="closeBackupReminder();">
+                            Dismiss
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', alertHtml);
+            speak('Backup reminder: ' + message);
+        }
+
+        function closeBackupReminder() {
+            const alert = document.querySelector('.reminder-alert');
+            if (alert) alert.remove();
+        }
+
+        function snoozeBackupReminder() {
+            const users = loadData('users');
+            users[currentUser].backupReminderSnoozeUntil = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+            saveData('users', users);
+            closeBackupReminder();
+            speak('Backup reminder snoozed until tomorrow');
+        }
+
+        function loadBackupReminderSettings() {
+            const users = loadData('users');
+            const userData = users[currentUser];
+            
+            const enabled = userData.backupReminderEnabled || false;
+            const days = userData.backupReminderDays || 7;
+            
+            document.getElementById('backupReminderEnabled').checked = enabled;
+            document.getElementById('backupReminderDays').value = days;
+            
+            const options = document.getElementById('backupReminderOptions');
+            if (enabled) {
+                options.classList.remove('hidden');
+            } else {
+                options.classList.add('hidden');
+            }
+            
+            updateLastBackupDisplay();
+        }
+
+        // Dashboard
+        function updateDashboard() {
+            const users = loadData('users');
+            if (!users || !users[currentUser]) return;
+
+            const userData = users[currentUser];
+
+            // Count medications scheduled for today with breakdown
+            const medsScheduledToday = (userData.medications || []).filter(med => shouldTakeMedicationToday(med));
+            const medsTakenToday = medsScheduledToday.filter(med => wasTakenToday(med)).length;
+            const medsLeftToday = medsScheduledToday.length - medsTakenToday;
+            
+            const medCountText = `${medsScheduledToday.length} for today<br>` +
+                                `✓ ${medsTakenToday} taken<br>` +
+                                `• ${medsLeftToday} left`;
+            
+            document.getElementById('medCount').innerHTML = medCountText;
+            
+            // Count appointments with breakdown
+            const allAppointments = userData.appointments || [];
+            const upcomingAppts = allAppointments.filter(a => !a.completed).length;
+            const completedAppts = allAppointments.filter(a => a.completed).length;
+            
+            const apptCountText = `${allAppointments.length} total<br>` +
+                                 `• ${upcomingAppts} upcoming<br>` +
+                                 `✓ ${completedAppts} completed`;
+            
+            document.getElementById('apptCount').innerHTML = apptCountText;
+            
+            // Count tasks scheduled for today with breakdown
+            let tasksScheduledToday = [];
+            ['meals', 'hydration', 'hygiene', 'safety'].forEach(category => {
+                if (userData.tasks && userData.tasks[category]) {
+                    const categoryTasks = userData.tasks[category].filter(task => shouldShowTaskToday(task));
+                    tasksScheduledToday = tasksScheduledToday.concat(categoryTasks);
+                }
+            });
+            
+            const totalTasksToday = tasksScheduledToday.length;
+            const completedTasksToday = tasksScheduledToday.filter(task => task.completed).length;
+            const leftTasksToday = totalTasksToday - completedTasksToday;
+            
+            const taskCountText = `${totalTasksToday} for today<br>` +
+                                 `✓ ${completedTasksToday} done<br>` +
+                                 `• ${leftTasksToday} left`;
+            
+            document.getElementById('taskCount').innerHTML = taskCountText;
+            
+            // Count bills with breakdown
+            const allBills = userData.bills || [];
+            const unpaidBills = allBills.filter(b => !b.paid).length;
+            const paidBills = allBills.filter(b => b.paid).length;
+            
+            const billCountText = `${allBills.length} total<br>` +
+                                 `• ${unpaidBills} unpaid<br>` +
+                                 `✓ ${paidBills} paid`;
+            
+            document.getElementById('billCount').innerHTML = billCountText;
+        }
+
+
+        // Utility functions
+        function formatTime(time) {
+            const [hours, minutes] = time.split(':');
+            const hour = parseInt(hours);
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const displayHour = hour % 12 || 12;
+            return `${displayHour}:${minutes} ${ampm}`;
+        }
+
+        function formatDate(dateString) {
+            // Parse the date string directly to avoid timezone issues
+            // Split YYYY-MM-DD and create date in local timezone
+            const [year, month, day] = dateString.split('-').map(Number);
+            const date = new Date(year, month - 1, day); // month is 0-indexed in JavaScript
+            const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        // Helper function to parse date strings (YYYY-MM-DD) in local timezone
+        function parseLocalDate(dateString) {
+            const [year, month, day] = dateString.split('-').map(Number);
+            return new Date(year, month - 1, day);
+        }
+
+        // Check for updates every minute
+        setInterval(() => {
+            if (currentUser) {
+                loadHomeReminders();
+            }
+        }, 60000);
+    </script>
+</body>
+</html>
