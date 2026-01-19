@@ -961,6 +961,11 @@
                 <label for="regAge">Age</label>
                 <input type="number" id="regAge" placeholder="Enter your age">
             </div>
+            <div class="input-group">
+                <label for="regEmail">Email Address</label>
+                <input type="email" id="regEmail" placeholder="your.email@example.com">
+                <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">📧 Used to send backup files to your inbox</p>
+            </div>
             <button class="btn btn-primary" onclick="register()">Create Account</button>
             <button class="btn btn-secondary" onclick="showLogin()">Back to Login</button>
         </div>
@@ -1433,6 +1438,11 @@
                         <label>Age</label>
                         <input type="number" id="updateAge">
                     </div>
+                    <div class="input-group">
+                        <label>Email Address</label>
+                        <input type="email" id="updateEmail">
+                        <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">📧 Used to send backup files to your inbox</p>
+                    </div>
                     <button class="btn btn-primary" onclick="updateProfile()">Update Profile</button>
                 </div>
             </div>
@@ -1857,9 +1867,17 @@
             const username = document.getElementById('regUsername').value;
             const password = document.getElementById('regPassword').value;
             const age = document.getElementById('regAge').value;
+            const email = document.getElementById('regEmail').value;
 
-            if (!name || !username || !password || !age) {
+            if (!name || !username || !password || !age || !email) {
                 alert('Please fill in all fields');
+                return;
+            }
+
+            // Basic email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Please enter a valid email address');
                 return;
             }
 
@@ -1874,6 +1892,7 @@
                 name: name,
                 password: password,
                 age: age,
+                email: email,
                 medications: [],
                 appointments: [],
                 tasks: JSON.parse(JSON.stringify(defaultTasks)),
@@ -3596,11 +3615,13 @@
             container.innerHTML = `
                 <p style="margin-bottom: 10px;"><strong>Name:</strong> ${userData.name}</p>
                 <p style="margin-bottom: 10px;"><strong>Age:</strong> ${userData.age}</p>
+                <p style="margin-bottom: 10px;"><strong>Email:</strong> ${userData.email || 'Not set'}</p>
                 <p><strong>Username:</strong> ${currentUser}</p>
             `;
 
             document.getElementById('updateName').value = userData.name;
             document.getElementById('updateAge').value = userData.age;
+            document.getElementById('updateEmail').value = userData.email || '';
             
             // Load voice preference checkbox state
             loadVoicePreference();
@@ -3612,15 +3633,24 @@
         function updateProfile() {
             const name = document.getElementById('updateName').value;
             const age = document.getElementById('updateAge').value;
+            const email = document.getElementById('updateEmail').value;
 
-            if (!name || !age) {
+            if (!name || !age || !email) {
                 alert('Please fill in all fields');
+                return;
+            }
+
+            // Basic email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Please enter a valid email address');
                 return;
             }
 
             const users = loadData('users');
             users[currentUser].name = name;
             users[currentUser].age = age;
+            users[currentUser].email = email;
             saveData('users', users);
 
             document.getElementById('userName').textContent = name;
@@ -3629,7 +3659,7 @@
         }
 
         // Export/Import Functions
-        function exportData() {
+        async function exportData() {
             const users = loadData('users');
             if (!users || !users[currentUser]) {
                 alert('No data to export');
@@ -3639,13 +3669,14 @@
             const userData = users[currentUser];
             
             // Create export object with all user data
-            const exportData = {
+            const exportDataObj = {
                 version: '1.0',
                 exportDate: new Date().toISOString(),
                 username: currentUser,
                 profile: {
                     name: userData.name,
                     age: userData.age,
+                    email: userData.email,
                     voiceAutoEnable: userData.voiceAutoEnable || false
                 },
                 medications: userData.medications || [],
@@ -3660,34 +3691,99 @@
             };
 
             // Convert to JSON string
-            const jsonString = JSON.stringify(exportData, null, 2);
+            const jsonString = JSON.stringify(exportDataObj, null, 2);
             
-            // Create blob and download
+            // Create blob and file
             const blob = new Blob([jsonString], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            
-            // Create filename with current date
             const date = new Date().toISOString().split('T')[0];
-            link.download = `senior-care-backup-${date}.json`;
-            link.href = url;
-            link.click();
-            
-            // Clean up
-            URL.revokeObjectURL(url);
+            const filename = `senior-care-backup-${date}.json`;
+            const file = new File([blob], filename, { type: 'application/json' });
             
             // Save last backup date
-            users = loadData('users');
             users[currentUser].lastBackupDate = new Date().toISOString();
             saveData('users', users);
             updateLastBackupDisplay();
             
-            speak('Data exported successfully. Check your downloads folder.');
+            // Try Web Share API first (Option 2 - works great on mobile!)
+            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        title: 'Senior Care Backup',
+                        text: `Backup from ${date}`,
+                        files: [file]
+                    });
+                    speak('Backup shared successfully');
+                    return; // Success! Exit here
+                } catch (error) {
+                    if (error.name === 'AbortError') {
+                        speak('Share cancelled');
+                        return; // User cancelled, exit gracefully
+                    }
+                    // If share failed for other reason, fall through to download method
+                    console.log('Share failed, using download method:', error);
+                }
+            }
             
-            // Show confirmation
-            setTimeout(() => {
-                alert('✅ Data exported successfully!\n\nFile: senior-care-backup-' + date + '.json\n\nCheck your Downloads folder.\n\nTip: Email this file to yourself for safekeeping!');
-            }, 500);
+            // Fallback: Download file and offer to email (Option 1)
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = url;
+            link.click();
+            URL.revokeObjectURL(url);
+            
+            speak('Data exported successfully');
+            
+            // Show email option if user has email set
+            if (userData.email) {
+                setTimeout(() => {
+                    const emailNow = confirm('✅ Backup file downloaded!\n\nWould you like to email it to yourself now?\n\n📧 ' + userData.email);
+                    
+                    if (emailNow) {
+                        // Open email with pre-filled info
+                        const subject = encodeURIComponent(`Senior Care Backup - ${date}`);
+                        const body = encodeURIComponent(
+                            `Your Senior Care backup file from ${date} is attached.\n\n` +
+                            `Please save this file in a safe location.\n\n` +
+                            `To restore:\n` +
+                            `1. Open the Senior Care app\n` +
+                            `2. Go to Profile → Data Management\n` +
+                            `3. Click "Import Data"\n` +
+                            `4. Select this backup file\n\n` +
+                            `Backup contains:\n` +
+                            `- Medications: ${exportDataObj.medications.length}\n` +
+                            `- Appointments: ${exportDataObj.appointments.length}\n` +
+                            `- Tasks: ${
+                                (exportDataObj.tasks?.meals?.length || 0) +
+                                (exportDataObj.tasks?.hydration?.length || 0) +
+                                (exportDataObj.tasks?.hygiene?.length || 0) +
+                                (exportDataObj.tasks?.safety?.length || 0)
+                            }\n` +
+                            `- Bills: ${exportDataObj.bills.length}\n\n` +
+                            `Note: Please attach the file "${filename}" from your Downloads folder.`
+                        );
+                        
+                        const mailtoLink = `mailto:${userData.email}?subject=${subject}&body=${body}`;
+                        window.location.href = mailtoLink;
+                        
+                        speak('Opening email app');
+                        
+                        // Show helper message
+                        setTimeout(() => {
+                            alert('📧 Email app opened!\n\n' +
+                                  'The backup file is in your Downloads folder.\n\n' +
+                                  'Please attach it to the email before sending.');
+                        }, 1000);
+                    }
+                }, 500);
+            } else {
+                setTimeout(() => {
+                    alert('✅ Data exported successfully!\n\n' +
+                          'File: ' + filename + '\n\n' +
+                          'Check your Downloads folder.\n\n' +
+                          'Tip: Add your email in Profile to get quick email option!');
+                }, 500);
+            }
         }
 
         function importData(event) {
