@@ -851,6 +851,63 @@
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.1); }
         }
+
+        /* Custom Autocomplete Dropdown */
+        .autocomplete-wrapper {
+            position: relative;
+            width: 100%;
+        }
+        
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #4CAF50;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: none;
+        }
+        
+        .autocomplete-dropdown.show {
+            display: block;
+        }
+        
+        .autocomplete-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 16px;
+        }
+        
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+        
+        .autocomplete-item:hover {
+            background: #f0f9ff;
+        }
+        
+        .autocomplete-item.selected {
+            background: #e3f2fd;
+        }
+        
+        .autocomplete-no-results {
+            padding: 12px 15px;
+            color: #999;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .autocomplete-highlight {
+            background: #fff59d;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -1127,15 +1184,22 @@
                     <div class="input-group">
                         <label>Doctor/Clinic Name</label>
                         <div style="display: flex; gap: 10px;">
-                            <div style="flex: 1;">
-                                <input type="text" id="apptDoctor" list="doctorHistory" placeholder="Type name (e.g., 'C' shows names starting with C)" style="width: 100%;">
-                                <datalist id="doctorHistory"></datalist>
+                            <div class="autocomplete-wrapper" style="flex: 1;">
+                                <input type="text" 
+                                       id="apptDoctor" 
+                                       placeholder="Type name (e.g., 'C' shows names with C)" 
+                                       style="width: 100%;"
+                                       autocomplete="off"
+                                       onfocus="showAutocomplete('apptDoctor', 'doctorDropdown')"
+                                       oninput="filterAutocomplete('apptDoctor', 'doctorDropdown', doctorSuggestions)"
+                                       onblur="setTimeout(() => hideAutocomplete('doctorDropdown'), 200)">
+                                <div id="doctorDropdown" class="autocomplete-dropdown"></div>
                             </div>
                             <button type="button" class="btn btn-info" onclick="selectFromContacts('apptDoctor')" style="white-space: nowrap; padding: 10px 15px; height: fit-content;">
                                 📱 Contacts
                             </button>
                         </div>
-                        <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">💡 Smart search: Type any letter to filter names (e.g., type "C" to see only "C" names) OR tap 📱 for contacts</p>
+                        <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">💡 Click field to see all names, or type to filter (e.g., type "C" to see names with "C")</p>
                     </div>
                     <div class="input-group">
                         <label>Date</label>
@@ -1147,9 +1211,17 @@
                     </div>
                     <div class="input-group">
                         <label>Location</label>
-                        <input type="text" id="apptLocation" list="locationHistory" placeholder="Type location (e.g., 'M' shows locations with M)">
-                        <datalist id="locationHistory"></datalist>
-                        <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">💡 Smart search: Type any letter to filter locations from your history</p>
+                        <div class="autocomplete-wrapper">
+                            <input type="text" 
+                                   id="apptLocation" 
+                                   placeholder="Type location (e.g., 'M' shows locations with M)"
+                                   autocomplete="off"
+                                   onfocus="showAutocomplete('apptLocation', 'locationDropdown')"
+                                   oninput="filterAutocomplete('apptLocation', 'locationDropdown', locationSuggestions)"
+                                   onblur="setTimeout(() => hideAutocomplete('locationDropdown'), 200)">
+                            <div id="locationDropdown" class="autocomplete-dropdown"></div>
+                        </div>
+                        <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">💡 Click to see all locations, or type to filter</p>
                     </div>
                     <div class="input-group">
                         <label class="reminder-checkbox">
@@ -1920,9 +1992,9 @@
         }
 
         async function selectFromContacts(inputId) {
-            // Check if Contact Picker API is supported
-            if (!('contacts' in navigator)) {
-                alert('📱 Contact Picker Not Available\n\nContact picker requires HTTPS.\n\nGood news: You\'re using autocomplete!\nJust start typing and suggestions will appear.');
+            // Check if Contact Picker API is actually supported
+            if (!('contacts' in navigator) || !navigator.contacts) {
+                alert('📱 Contact Picker Not Supported\n\nYour browser doesn\'t support the iPhone Contact Picker.\n\n✅ Good news: Autocomplete works great!\nJust start typing and you\'ll see suggestions from your history.');
                 return;
             }
 
@@ -1951,9 +2023,7 @@
                 if (error.name !== 'AbortError') {
                     console.error('Contact picker error:', error);
                     // Only show alert if it's not a user cancellation
-                    if (error.name === 'SecurityError') {
-                        alert('📱 Contact Picker Not Available\n\nYour browser doesn\'t support the contact picker on this page.\n\nNo worries! Use autocomplete instead:\nJust start typing and suggestions will appear.');
-                    }
+                    alert('📱 Contact Picker Not Available\n\nThis feature requires:\n• Safari on iPhone/iPad\n• Chrome on Android\n\n✅ Use autocomplete instead:\nJust start typing and suggestions will appear!');
                 }
             }
         }
@@ -2800,6 +2870,10 @@
         window.editAppointment = editAppointment;
 
 
+        // Autocomplete suggestions storage
+        let doctorSuggestions = [];
+        let locationSuggestions = [];
+
         function updateAppointmentAutocomplete(appointments) {
             // Extract unique doctor names and locations from appointment history
             const doctors = new Set();
@@ -2814,28 +2888,80 @@
                 }
             });
             
-            // Update doctor datalist with case-insensitive sort
-            const doctorDatalist = document.getElementById('doctorHistory');
-            if (doctorDatalist) {
-                doctorDatalist.innerHTML = '';
-                // Sort case-insensitively
-                Array.from(doctors).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())).forEach(doctor => {
-                    const option = document.createElement('option');
-                    option.value = doctor;
-                    doctorDatalist.appendChild(option);
-                });
+            // Store suggestions globally for autocomplete
+            doctorSuggestions = Array.from(doctors).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+            locationSuggestions = Array.from(locations).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+        }
+
+        function showAutocomplete(inputId, dropdownId) {
+            const input = document.getElementById(inputId);
+            const dropdown = document.getElementById(dropdownId);
+            
+            if (!input || !dropdown) return;
+            
+            const suggestions = dropdownId === 'doctorDropdown' ? doctorSuggestions : locationSuggestions;
+            
+            if (suggestions.length === 0) {
+                dropdown.innerHTML = '<div class="autocomplete-no-results">Start adding appointments to build your history!</div>';
+                dropdown.classList.add('show');
+                return;
             }
             
-            // Update location datalist with case-insensitive sort
-            const locationDatalist = document.getElementById('locationHistory');
-            if (locationDatalist) {
-                locationDatalist.innerHTML = '';
-                // Sort case-insensitively
-                Array.from(locations).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())).forEach(location => {
-                    const option = document.createElement('option');
-                    option.value = location;
-                    locationDatalist.appendChild(option);
-                });
+            // Show all suggestions when focused
+            filterAutocomplete(inputId, dropdownId, suggestions);
+        }
+
+        function filterAutocomplete(inputId, dropdownId, suggestions) {
+            const input = document.getElementById(inputId);
+            const dropdown = document.getElementById(dropdownId);
+            
+            if (!input || !dropdown) return;
+            
+            const searchText = input.value.toLowerCase();
+            
+            // Filter suggestions - show items that contain the search text anywhere
+            const filtered = searchText === '' 
+                ? suggestions 
+                : suggestions.filter(item => item.toLowerCase().includes(searchText));
+            
+            if (filtered.length === 0) {
+                dropdown.innerHTML = '<div class="autocomplete-no-results">No matches found. Type a new name to add it!</div>';
+                dropdown.classList.add('show');
+                return;
+            }
+            
+            // Build dropdown HTML
+            let html = '';
+            filtered.forEach(item => {
+                // Highlight matching text
+                let displayText = item;
+                if (searchText) {
+                    const regex = new RegExp(`(${searchText})`, 'gi');
+                    displayText = item.replace(regex, '<span class="autocomplete-highlight">$1</span>');
+                }
+                html += `<div class="autocomplete-item" onclick="selectAutocomplete('${inputId}', '${dropdownId}', '${item.replace(/'/g, "\\'")}')">${displayText}</div>`;
+            });
+            
+            dropdown.innerHTML = html;
+            dropdown.classList.add('show');
+        }
+
+        function selectAutocomplete(inputId, dropdownId, value) {
+            const input = document.getElementById(inputId);
+            const dropdown = document.getElementById(dropdownId);
+            
+            if (input) {
+                input.value = value;
+            }
+            if (dropdown) {
+                dropdown.classList.remove('show');
+            }
+        }
+
+        function hideAutocomplete(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            if (dropdown) {
+                dropdown.classList.remove('show');
             }
         }
 
