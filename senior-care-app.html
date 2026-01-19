@@ -3704,12 +3704,17 @@
             saveData('users', users);
             updateLastBackupDisplay();
             
-            // Try Web Share API first (Option 2 - works great on mobile!)
+            // Try Web Share API (Mobile - iPhone/Android)
             if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
                 try {
                     await navigator.share({
                         title: 'Senior Care Backup',
-                        text: `Backup from ${date}`,
+                        text: `Backup from ${date}\n\nContains:\n- Medications: ${exportDataObj.medications.length}\n- Appointments: ${exportDataObj.appointments.length}\n- Tasks: ${
+                            (exportDataObj.tasks?.meals?.length || 0) +
+                            (exportDataObj.tasks?.hydration?.length || 0) +
+                            (exportDataObj.tasks?.hygiene?.length || 0) +
+                            (exportDataObj.tasks?.safety?.length || 0)
+                        }\n- Bills: ${exportDataObj.bills.length}`,
                         files: [file]
                     });
                     speak('Backup shared successfully');
@@ -3720,11 +3725,11 @@
                         return; // User cancelled, exit gracefully
                     }
                     // If share failed for other reason, fall through to download method
-                    console.log('Share failed, using download method:', error);
+                    console.log('Share not available, using download method:', error);
                 }
             }
             
-            // Fallback: Download file and offer to email (Option 1)
+            // Fallback: Download file (Desktop)
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.download = filename;
@@ -3734,56 +3739,26 @@
             
             speak('Data exported successfully');
             
-            // Show email option if user has email set
-            if (userData.email) {
-                setTimeout(() => {
-                    const emailNow = confirm('✅ Backup file downloaded!\n\nWould you like to email it to yourself now?\n\n📧 ' + userData.email);
-                    
-                    if (emailNow) {
-                        // Open email with pre-filled info
-                        const subject = encodeURIComponent(`Senior Care Backup - ${date}`);
-                        const body = encodeURIComponent(
-                            `Your Senior Care backup file from ${date} is attached.\n\n` +
-                            `Please save this file in a safe location.\n\n` +
-                            `To restore:\n` +
-                            `1. Open the Senior Care app\n` +
-                            `2. Go to Profile → Data Management\n` +
-                            `3. Click "Import Data"\n` +
-                            `4. Select this backup file\n\n` +
-                            `Backup contains:\n` +
-                            `- Medications: ${exportDataObj.medications.length}\n` +
-                            `- Appointments: ${exportDataObj.appointments.length}\n` +
-                            `- Tasks: ${
-                                (exportDataObj.tasks?.meals?.length || 0) +
-                                (exportDataObj.tasks?.hydration?.length || 0) +
-                                (exportDataObj.tasks?.hygiene?.length || 0) +
-                                (exportDataObj.tasks?.safety?.length || 0)
-                            }\n` +
-                            `- Bills: ${exportDataObj.bills.length}\n\n` +
-                            `Note: Please attach the file "${filename}" from your Downloads folder.`
-                        );
-                        
-                        const mailtoLink = `mailto:${userData.email}?subject=${subject}&body=${body}`;
-                        window.location.href = mailtoLink;
-                        
-                        speak('Opening email app');
-                        
-                        // Show helper message
-                        setTimeout(() => {
-                            alert('📧 Email app opened!\n\n' +
-                                  'The backup file is in your Downloads folder.\n\n' +
-                                  'Please attach it to the email before sending.');
-                        }, 1000);
-                    }
-                }, 500);
-            } else {
-                setTimeout(() => {
-                    alert('✅ Data exported successfully!\n\n' +
-                          'File: ' + filename + '\n\n' +
-                          'Check your Downloads folder.\n\n' +
-                          'Tip: Add your email in Profile to get quick email option!');
-                }, 500);
-            }
+            // Show simple confirmation with helpful instructions
+            setTimeout(() => {
+                alert('✅ Backup downloaded successfully!\n\n' +
+                      '📄 File: ' + filename + '\n\n' +
+                      '📁 Location: Downloads folder\n\n' +
+                      '💡 To save your backup:\n' +
+                      '• Email it to yourself\n' +
+                      '• Upload to Google Drive/iCloud\n' +
+                      '• Save to USB drive\n\n' +
+                      'Backup contains:\n' +
+                      '• Medications: ' + exportDataObj.medications.length + '\n' +
+                      '• Appointments: ' + exportDataObj.appointments.length + '\n' +
+                      '• Tasks: ' + (
+                          (exportDataObj.tasks?.meals?.length || 0) +
+                          (exportDataObj.tasks?.hydration?.length || 0) +
+                          (exportDataObj.tasks?.hygiene?.length || 0) +
+                          (exportDataObj.tasks?.safety?.length || 0)
+                      ) + '\n' +
+                      '• Bills: ' + exportDataObj.bills.length);
+            }, 500);
         }
 
         function importData(event) {
