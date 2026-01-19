@@ -1128,14 +1128,14 @@
                         <label>Doctor/Clinic Name</label>
                         <div style="display: flex; gap: 10px;">
                             <div style="flex: 1;">
-                                <input type="text" id="apptDoctor" list="doctorHistory" placeholder="e.g., Dr. Smith" style="width: 100%;">
+                                <input type="text" id="apptDoctor" list="doctorHistory" placeholder="Type name (e.g., 'C' shows names starting with C)" style="width: 100%;">
                                 <datalist id="doctorHistory"></datalist>
                             </div>
                             <button type="button" class="btn btn-info" onclick="selectFromContacts('apptDoctor')" style="white-space: nowrap; padding: 10px 15px; height: fit-content;">
                                 📱 Contacts
                             </button>
                         </div>
-                        <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">💡 Type for suggestions OR tap 📱 to pick from iPhone contacts</p>
+                        <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">💡 Smart search: Type any letter to filter names (e.g., type "C" to see only "C" names) OR tap 📱 for contacts</p>
                     </div>
                     <div class="input-group">
                         <label>Date</label>
@@ -1147,9 +1147,9 @@
                     </div>
                     <div class="input-group">
                         <label>Location</label>
-                        <input type="text" id="apptLocation" list="locationHistory" placeholder="e.g., Main Street Clinic">
+                        <input type="text" id="apptLocation" list="locationHistory" placeholder="Type location (e.g., 'M' shows locations with M)">
                         <datalist id="locationHistory"></datalist>
-                        <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">💡 Start typing to see suggestions from previous appointments</p>
+                        <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">💡 Smart search: Type any letter to filter locations from your history</p>
                     </div>
                     <div class="input-group">
                         <label class="reminder-checkbox">
@@ -1922,7 +1922,7 @@
         async function selectFromContacts(inputId) {
             // Check if Contact Picker API is supported
             if (!('contacts' in navigator)) {
-                alert('Contact picker requires HTTPS.\n\nTo use this feature:\n1. Set up HTTPS on MAMP (see MAMP_HTTPS_SETUP.md)\n2. Access via https://YOUR-IP:8443\n\nOr use auto-complete (just start typing!)');
+                alert('📱 Contact Picker Not Available\n\nContact picker requires HTTPS.\n\nGood news: You\'re using autocomplete!\nJust start typing and suggestions will appear.');
                 return;
             }
 
@@ -1952,7 +1952,7 @@
                     console.error('Contact picker error:', error);
                     // Only show alert if it's not a user cancellation
                     if (error.name === 'SecurityError') {
-                        alert('Contact picker requires HTTPS.\n\nPlease access the app via https:// instead of http://\n\nSee MAMP_HTTPS_SETUP.md for instructions.');
+                        alert('📱 Contact Picker Not Available\n\nYour browser doesn\'t support the contact picker on this page.\n\nNo worries! Use autocomplete instead:\nJust start typing and suggestions will appear.');
                     }
                 }
             }
@@ -2814,22 +2814,24 @@
                 }
             });
             
-            // Update doctor datalist
+            // Update doctor datalist with case-insensitive sort
             const doctorDatalist = document.getElementById('doctorHistory');
             if (doctorDatalist) {
                 doctorDatalist.innerHTML = '';
-                Array.from(doctors).sort().forEach(doctor => {
+                // Sort case-insensitively
+                Array.from(doctors).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())).forEach(doctor => {
                     const option = document.createElement('option');
                     option.value = doctor;
                     doctorDatalist.appendChild(option);
                 });
             }
             
-            // Update location datalist
+            // Update location datalist with case-insensitive sort
             const locationDatalist = document.getElementById('locationHistory');
             if (locationDatalist) {
                 locationDatalist.innerHTML = '';
-                Array.from(locations).sort().forEach(location => {
+                // Sort case-insensitively
+                Array.from(locations).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())).forEach(location => {
                     const option = document.createElement('option');
                     option.value = location;
                     locationDatalist.appendChild(option);
