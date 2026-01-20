@@ -1211,7 +1211,7 @@
                                    placeholder="Type doctor or clinic name" 
                                    autocomplete="off"
                                    onfocus="showAutocomplete('apptDoctor', 'doctorDropdown')"
-                                   oninput="filterAutocomplete('apptDoctor', 'doctorDropdown', doctorSuggestions)"
+                                   oninput="filterAutocomplete('apptDoctor', 'doctorDropdown')"
                                    onblur="setTimeout(() => hideAutocomplete('doctorDropdown'), 200)">
                             <div id="doctorDropdown" class="autocomplete-dropdown"></div>
                         </div>
@@ -1230,10 +1230,10 @@
                         <div class="autocomplete-wrapper">
                             <input type="text" 
                                    id="apptLocation" 
-                                   placeholder="Type location (e.g., 'M' shows locations with M)"
+                                   placeholder="Type location" 
                                    autocomplete="off"
                                    onfocus="showAutocomplete('apptLocation', 'locationDropdown')"
-                                   oninput="filterAutocomplete('apptLocation', 'locationDropdown', locationSuggestions)"
+                                   oninput="filterAutocomplete('apptLocation', 'locationDropdown')"
                                    onblur="setTimeout(() => hideAutocomplete('locationDropdown'), 200)">
                             <div id="locationDropdown" class="autocomplete-dropdown"></div>
                         </div>
@@ -2888,14 +2888,17 @@
             }
             
             // Show all suggestions when focused
-            filterAutocomplete(inputId, dropdownId, suggestions);
+            filterAutocomplete(inputId, dropdownId);
         }
 
-        function filterAutocomplete(inputId, dropdownId, suggestions) {
+        function filterAutocomplete(inputId, dropdownId) {
             const input = document.getElementById(inputId);
             const dropdown = document.getElementById(dropdownId);
             
             if (!input || !dropdown) return;
+            
+            // Determine which suggestions array to use
+            const suggestions = dropdownId === 'doctorDropdown' ? doctorSuggestions : locationSuggestions;
             
             const searchText = input.value.toLowerCase();
             
