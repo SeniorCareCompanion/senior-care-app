@@ -2855,6 +2855,8 @@
         let locationSuggestions = [];
 
         function updateAppointmentAutocomplete(appointments) {
+            console.log('updateAppointmentAutocomplete called with', appointments.length, 'appointments');
+            
             // Extract unique doctor names and locations from appointment history
             const doctors = new Set();
             const locations = new Set();
@@ -2871,19 +2873,31 @@
             // Store suggestions globally for autocomplete
             doctorSuggestions = Array.from(doctors).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
             locationSuggestions = Array.from(locations).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+            
+            console.log('Doctor suggestions updated:', doctorSuggestions);
+            console.log('Location suggestions updated:', locationSuggestions);
         }
 
         function showAutocomplete(inputId, dropdownId) {
             const input = document.getElementById(inputId);
             const dropdown = document.getElementById(dropdownId);
             
-            if (!input || !dropdown) return;
+            console.log('showAutocomplete called', inputId, dropdownId);
+            console.log('Input element:', input);
+            console.log('Dropdown element:', dropdown);
+            
+            if (!input || !dropdown) {
+                console.log('Missing input or dropdown!');
+                return;
+            }
             
             const suggestions = dropdownId === 'doctorDropdown' ? doctorSuggestions : locationSuggestions;
+            console.log('Suggestions:', suggestions);
             
             if (suggestions.length === 0) {
                 dropdown.innerHTML = '<div class="autocomplete-no-results">Start adding appointments to build your history!</div>';
                 dropdown.classList.add('show');
+                console.log('Showing "no history" message');
                 return;
             }
             
@@ -2895,21 +2909,28 @@
             const input = document.getElementById(inputId);
             const dropdown = document.getElementById(dropdownId);
             
+            console.log('filterAutocomplete called', inputId, dropdownId);
+            
             if (!input || !dropdown) return;
             
             // Determine which suggestions array to use
             const suggestions = dropdownId === 'doctorDropdown' ? doctorSuggestions : locationSuggestions;
             
             const searchText = input.value.toLowerCase();
+            console.log('Search text:', searchText);
+            console.log('Available suggestions:', suggestions);
             
             // Filter suggestions - show items that contain the search text anywhere
             const filtered = searchText === '' 
                 ? suggestions 
                 : suggestions.filter(item => item.toLowerCase().includes(searchText));
             
+            console.log('Filtered suggestions:', filtered);
+            
             if (filtered.length === 0) {
                 dropdown.innerHTML = '<div class="autocomplete-no-results">No matches found. Type a new name to add it!</div>';
                 dropdown.classList.add('show');
+                console.log('No matches - showing message');
                 return;
             }
             
@@ -2927,6 +2948,8 @@
             
             dropdown.innerHTML = html;
             dropdown.classList.add('show');
+            console.log('Dropdown HTML set, class "show" added');
+            console.log('Dropdown classList:', dropdown.classList);
         }
 
         function selectAutocomplete(inputId, dropdownId, value) {
