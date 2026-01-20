@@ -1429,7 +1429,17 @@
                     <h3>Add New Contact</h3>
                     <div class="input-group">
                         <label>Name</label>
-                        <input type="text" id="contactName" placeholder="e.g., Sarah Johnson">
+                        <div class="autocomplete-wrapper">
+                            <input type="text" 
+                                   id="contactName" 
+                                   placeholder="Type contact name" 
+                                   autocomplete="off"
+                                   onfocus="showContactAutocomplete()"
+                                   oninput="filterContactAutocomplete()"
+                                   onblur="setTimeout(() => hideAutocomplete('contactDropdown'), 200)">
+                            <div id="contactDropdown" class="autocomplete-dropdown"></div>
+                        </div>
+                        <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">💡 Start typing to see existing contacts - phone number will auto-fill!</p>
                     </div>
                     <div class="input-group">
                         <label>Relationship</label>
@@ -1438,6 +1448,7 @@
                     <div class="input-group">
                         <label>Phone Number</label>
                         <input type="tel" id="contactPhone" placeholder="e.g., (555) 123-4567">
+                        <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">📱 Auto-fills when you select an existing contact</p>
                     </div>
                     <button class="btn btn-primary" onclick="addContact()">Add Contact</button>
                 </div>
@@ -2971,6 +2982,107 @@
             }
         }
 
+        // Contact autocomplete
+        let contactSuggestions = []; // Stores {name, phone, relation} objects
+
+        function updateContactAutocomplete(contacts) {
+            console.log('updateContactAutocomplete called with', contacts.length, 'contacts');
+            
+            // Store contact objects for autocomplete
+            contactSuggestions = contacts.map(contact => ({
+                name: contact.name,
+                phone: contact.phone,
+                relation: contact.relation
+            })).sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+            
+            console.log('Contact suggestions updated:', contactSuggestions);
+        }
+
+        function showContactAutocomplete() {
+            const input = document.getElementById('contactName');
+            const dropdown = document.getElementById('contactDropdown');
+            
+            console.log('showContactAutocomplete called');
+            
+            if (!input || !dropdown) return;
+            
+            if (contactSuggestions.length === 0) {
+                dropdown.innerHTML = '<div class="autocomplete-no-results">Start adding contacts to build your list!</div>';
+                dropdown.classList.add('show');
+                console.log('Showing "no contacts" message');
+                return;
+            }
+            
+            // Show all contacts when focused
+            filterContactAutocomplete();
+        }
+
+        function filterContactAutocomplete() {
+            const input = document.getElementById('contactName');
+            const dropdown = document.getElementById('contactDropdown');
+            
+            console.log('filterContactAutocomplete called');
+            
+            if (!input || !dropdown) return;
+            
+            const searchText = input.value.toLowerCase();
+            console.log('Search text:', searchText);
+            console.log('Available contacts:', contactSuggestions);
+            
+            // Filter contacts - match name anywhere
+            const filtered = searchText === '' 
+                ? contactSuggestions 
+                : contactSuggestions.filter(contact => contact.name.toLowerCase().includes(searchText));
+            
+            console.log('Filtered contacts:', filtered);
+            
+            if (filtered.length === 0) {
+                dropdown.innerHTML = '<div class="autocomplete-no-results">No matches found. Add as new contact!</div>';
+                dropdown.classList.add('show');
+                console.log('No matches - showing message');
+                return;
+            }
+            
+            // Build dropdown HTML with name, relation, and phone
+            let html = '';
+            filtered.forEach(contact => {
+                // Highlight matching text in name
+                let displayName = contact.name;
+                if (searchText) {
+                    const regex = new RegExp(`(${searchText})`, 'gi');
+                    displayName = contact.name.replace(regex, '<span class="autocomplete-highlight">$1</span>');
+                }
+                
+                // Each item shows: Name (Relation) - Phone
+                html += `<div class="autocomplete-item" onclick="selectContact('${contact.name.replace(/'/g, "\\'")}', '${contact.phone}', '${contact.relation.replace(/'/g, "\\'")}')">
+                    <div style="font-weight: 600;">${displayName}</div>
+                    <div style="font-size: 14px; color: #666; margin-top: 2px;">${contact.relation} • ${contact.phone}</div>
+                </div>`;
+            });
+            
+            dropdown.innerHTML = html;
+            dropdown.classList.add('show');
+            console.log('Contact dropdown HTML set, class "show" added');
+        }
+
+        function selectContact(name, phone, relation) {
+            console.log('selectContact called:', name, phone, relation);
+            
+            // Fill in all fields
+            document.getElementById('contactName').value = name;
+            document.getElementById('contactPhone').value = phone;
+            document.getElementById('contactRelation').value = relation;
+            
+            // Hide dropdown
+            const dropdown = document.getElementById('contactDropdown');
+            if (dropdown) {
+                dropdown.classList.remove('show');
+            }
+            
+            // Speak confirmation
+            speak(`Selected ${name}, ${relation}`);
+        }
+
         function loadAppointments(appointments) {
             const container = document.getElementById('appointmentList');
             container.innerHTML = '';
@@ -3682,6 +3794,7 @@
 
             if (contacts.length === 0) {
                 container.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No contacts added yet</p>';
+                updateContactAutocomplete([]); // Update with empty array
                 return;
             }
 
@@ -3705,6 +3818,9 @@
                 `;
                 container.appendChild(card);
             });
+            
+            // Update autocomplete with current contacts
+            updateContactAutocomplete(contacts);
         }
 
         function callContact(name, phone) {
