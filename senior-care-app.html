@@ -4115,9 +4115,9 @@
 
         // Contacts
         function addContact() {
-            const name = document.getElementById('contactName').value;
-            const relation = document.getElementById('contactRelation').value;
-            const phone = document.getElementById('contactPhone').value;
+            const name = document.getElementById('contactName').value.trim();
+            const relation = document.getElementById('contactRelation').value.trim();
+            const phone = document.getElementById('contactPhone').value.trim();
 
             if (!name || !relation || !phone) {
                 alert('Please fill in all fields');
@@ -4125,6 +4125,50 @@
             }
 
             const users = loadData('users');
+            const existingContacts = users[currentUser].contacts || [];
+            
+            // Check for EXACT duplicate (name + phone + relation all match)
+            const exactDuplicate = existingContacts.find(contact => 
+                contact.name.toLowerCase() === name.toLowerCase() &&
+                contact.phone === phone &&
+                contact.relation.toLowerCase() === relation.toLowerCase()
+            );
+            
+            if (exactDuplicate) {
+                alert('❌ Duplicate Contact\n\nThis contact already exists:\n\n' +
+                      `Name: ${exactDuplicate.name}\n` +
+                      `Phone: ${exactDuplicate.phone}\n` +
+                      `Relation: ${exactDuplicate.relation}\n\n` +
+                      'Cannot add duplicate contact.');
+                speak('This contact already exists');
+                return;
+            }
+            
+            // Check for SAME NAME but different phone or relation
+            const sameNameContact = existingContacts.find(contact =>
+                contact.name.toLowerCase() === name.toLowerCase() &&
+                (contact.phone !== phone || contact.relation.toLowerCase() !== relation.toLowerCase())
+            );
+            
+            if (sameNameContact) {
+                const userConfirmed = confirm(
+                    `⚠️ Contact Name Already Exists\n\n` +
+                    `A contact named "${sameNameContact.name}" already exists:\n\n` +
+                    `Existing: ${sameNameContact.phone} (${sameNameContact.relation})\n` +
+                    `New: ${phone} (${relation})\n\n` +
+                    `This might be:\n` +
+                    `• Same person with different phone number\n` +
+                    `• Different person with same name\n\n` +
+                    `Do you want to add this contact anyway?`
+                );
+                
+                if (!userConfirmed) {
+                    speak('Contact not added');
+                    return;
+                }
+            }
+
+            // All checks passed - add the contact
             const contact = {
                 id: Date.now(),
                 name: name,
