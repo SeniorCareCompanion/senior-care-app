@@ -1528,6 +1528,36 @@
                 </div>
 
                 <div class="card">
+                    <div class="card-header">🔔 Notification Settings</div>
+                    <div class="card-content">
+                        <p style="margin-bottom: 15px;">Enable push notifications to receive reminders even when the app is in the background</p>
+                        
+                        <button id="notificationToggleBtn" class="btn btn-primary" onclick="requestNotificationPermission()" style="width: 100%; max-width: 100%; margin-bottom: 15px;">
+                            🔔 Enable Notifications
+                        </button>
+                        
+                        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border: 2px solid #ffc107; margin-bottom: 15px;">
+                            <p style="margin: 0; font-size: 14px; color: #856404;">
+                                <strong>📱 iOS Users:</strong> For best results:
+                            </p>
+                            <ol style="margin: 10px 0 0 20px; font-size: 13px; color: #856404;">
+                                <li>Tap the Share button (in Safari)</li>
+                                <li>Select "Add to Home Screen"</li>
+                                <li>Open the app from your home screen</li>
+                                <li>Enable notifications when prompted</li>
+                            </ol>
+                            <p style="margin: 10px 0 0 0; font-size: 12px; color: #856404;">
+                                <em>Note: iOS has limitations for web app notifications. They work best when the phone is unlocked.</em>
+                            </p>
+                        </div>
+                        
+                        <button class="btn btn-secondary" onclick="testNotification()" style="width: 100%; max-width: 100%;">
+                            🧪 Test Notification
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
                     <div class="card-header">💾 Data Management</div>
                     <div class="card-content">
                         <p style="margin-bottom: 15px;">Backup and restore your data</p>
@@ -1664,6 +1694,8 @@
         // Global variables
         let currentUser = null;
         let voiceEnabled = false;
+        let notificationsEnabled = false; // Track if push notifications are enabled
+        let serviceWorkerRegistration = null; // Store service worker registration
         let pendingDeleteCategory = null;
         let pendingDeleteIndex = null;
         let pendingDeleteMedicationId = null;
@@ -1677,6 +1709,116 @@
         let reminderCheckInterval = null;
         let currentReminderItem = null;
         let shownReminders = new Set(); // Track which reminders we've already shown today
+
+        // Service Worker & Notification Setup
+        async function initializeNotifications() {
+            // Check if browser supports notifications
+            if (!('Notification' in window)) {
+                console.log('This browser does not support notifications');
+                return;
+            }
+
+            // Register service worker
+            if ('serviceWorker' in navigator) {
+                try {
+                    serviceWorkerRegistration = await navigator.serviceWorker.register('/service-worker.js');
+                    console.log('Service Worker registered successfully');
+                    
+                    // Check notification permission status
+                    if (Notification.permission === 'granted') {
+                        notificationsEnabled = true;
+                        console.log('Notifications already enabled');
+                    }
+                } catch (error) {
+                    console.error('Service Worker registration failed:', error);
+                }
+            }
+        }
+
+        async function requestNotificationPermission() {
+            if (!('Notification' in window)) {
+                alert('❌ Notifications Not Supported\n\nYour browser does not support notifications.');
+                return false;
+            }
+
+            // Check current permission
+            if (Notification.permission === 'granted') {
+                notificationsEnabled = true;
+                return true;
+            }
+
+            if (Notification.permission === 'denied') {
+                alert('❌ Notifications Blocked\n\nYou previously blocked notifications.\n\nTo enable:\n1. Go to your browser settings\n2. Find this site\n3. Enable notifications\n4. Refresh the page');
+                return false;
+            }
+
+            // Request permission
+            try {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    notificationsEnabled = true;
+                    alert('✅ Notifications Enabled!\n\nYou will now receive reminder notifications.\n\n📱 iOS Users: For best results, "Add to Home Screen" from Safari share menu.');
+                    speak('Notifications enabled');
+                    return true;
+                } else {
+                    alert('⚠️ Notifications Not Enabled\n\nYou can enable them later in your browser settings.');
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error requesting notification permission:', error);
+                return false;
+            }
+        }
+
+        // Show notification
+        function showNotification(title, body, tag) {
+            if (!notificationsEnabled || Notification.permission !== 'granted') {
+                console.log('Notifications not enabled or permission not granted');
+                return;
+            }
+
+            // Check if service worker is available
+            if (serviceWorkerRegistration) {
+                // Use service worker to show notification (better for background)
+                serviceWorkerRegistration.showNotification(title, {
+                    body: body,
+                    icon: '/icon-192.png', // We'll create this
+                    badge: '/icon-72.png',
+                    tag: tag || 'reminder',
+                    requireInteraction: true, // Keeps notification visible
+                    vibrate: [200, 100, 200], // Vibrate pattern
+                    data: {
+                        dateOfArrival: Date.now(),
+                        primaryKey: tag
+                    }
+                });
+            } else {
+                // Fallback to regular notification
+                new Notification(title, {
+                    body: body,
+                    icon: '/icon-192.png',
+                    tag: tag || 'reminder',
+                    requireInteraction: true
+                });
+            }
+        }
+
+        // Test notification
+        function testNotification() {
+            if (!notificationsEnabled || Notification.permission !== 'granted') {
+                alert('⚠️ Notifications Not Enabled\n\nPlease enable notifications first by clicking the "Enable Notifications" button above.');
+                return;
+            }
+
+            showNotification(
+                '✅ Test Notification',
+                'Great! Notifications are working. You will receive reminders like this one.',
+                'test-notification'
+            );
+            
+            speak('Test notification sent');
+            alert('✅ Notification Sent!\n\nCheck your notification center to see it.\n\nOn iPhone: Pull down from top\nOn Android: Pull down from top');
+        }
 
         // Reminder System
         function startReminderChecker() {
@@ -1794,6 +1936,10 @@
             document.getElementById('reminderAlertText').textContent = message;
             document.getElementById('reminderAlert').classList.remove('hidden');
             speak(title + ': ' + message);
+            
+            // Send push notification
+            const tag = `${type}-${typeof id === 'object' ? JSON.stringify(id) : id}`;
+            showNotification(title, message, tag);
         }
 
         function dismissReminder() {
@@ -2128,6 +2274,7 @@
             
             loadAllData();
             loadVoicePreference(); // Load user's voice preference
+            initializeNotifications(); // Initialize notification system
             speak(`Welcome back, ${users[username].name}`);
             startReminderChecker(); // Start checking for reminders
             
