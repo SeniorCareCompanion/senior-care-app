@@ -1013,6 +1013,51 @@
             </div>
             <button class="btn btn-primary" onclick="login()">Login</button>
             <button class="btn btn-secondary" onclick="showRegister()">New User? Register</button>
+            <button class="btn" onclick="showForgotPassword()" style="background: transparent; color: #4CAF50; border: none; text-decoration: underline; margin-top: 10px; font-size: 14px;">Forgot Password?</button>
+        </div>
+
+        <!-- Forgot Password Screen -->
+        <div id="forgotPasswordScreen" class="register-screen hidden">
+            <div class="logo-emoji">🔑</div>
+            <h1>Reset Password</h1>
+            <p style="text-align: center; color: #666; margin-bottom: 20px;">Enter your username and email to reset your password</p>
+            <div class="input-group">
+                <label for="forgotUsername">Username</label>
+                <input type="text" id="forgotUsername" placeholder="Enter your username">
+            </div>
+            <div class="input-group">
+                <label for="forgotEmail">Email Address</label>
+                <input type="email" id="forgotEmail" placeholder="Enter your email">
+            </div>
+            <button class="btn btn-primary" onclick="verifyForgotPassword()">Verify & Reset</button>
+            <button class="btn btn-secondary" onclick="showLogin()">Back to Login</button>
+        </div>
+
+        <!-- Reset Password Screen (after verification) -->
+        <div id="resetPasswordScreen" class="register-screen hidden">
+            <div class="logo-emoji">🔐</div>
+            <h1>Set New Password</h1>
+            <p style="text-align: center; color: #666; margin-bottom: 20px;">Create a new password for your account</p>
+            <div class="input-group">
+                <label for="resetNewPassword">New Password</label>
+                <div style="position: relative;">
+                    <input type="password" id="resetNewPassword" placeholder="Enter new password" style="padding-right: 45px;">
+                    <span class="password-toggle" onclick="togglePasswordVisibility('resetNewPassword', this)">
+                        👁️
+                    </span>
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="resetConfirmPassword">Confirm New Password</label>
+                <div style="position: relative;">
+                    <input type="password" id="resetConfirmPassword" placeholder="Re-enter new password" style="padding-right: 45px;">
+                    <span class="password-toggle" onclick="togglePasswordVisibility('resetConfirmPassword', this)">
+                        👁️
+                    </span>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="completePasswordReset()">Set New Password</button>
+            <button class="btn btn-secondary" onclick="showLogin()">Cancel</button>
         </div>
 
         <!-- Register Screen -->
@@ -1544,6 +1589,38 @@
                     </div>
                     <button class="btn btn-primary" onclick="updateProfile()">Update Profile</button>
                 </div>
+
+                <div class="form-section">
+                    <h3>🔐 Change Password</h3>
+                    <div class="input-group">
+                        <label>Current Password</label>
+                        <div style="position: relative;">
+                            <input type="password" id="currentPassword" placeholder="Enter current password" style="padding-right: 45px;">
+                            <span class="password-toggle" onclick="togglePasswordVisibility('currentPassword', this)">
+                                👁️
+                            </span>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>New Password</label>
+                        <div style="position: relative;">
+                            <input type="password" id="newPassword" placeholder="Enter new password" style="padding-right: 45px;">
+                            <span class="password-toggle" onclick="togglePasswordVisibility('newPassword', this)">
+                                👁️
+                            </span>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Confirm New Password</label>
+                        <div style="position: relative;">
+                            <input type="password" id="confirmNewPassword" placeholder="Re-enter new password" style="padding-right: 45px;">
+                            <span class="password-toggle" onclick="togglePasswordVisibility('confirmNewPassword', this)">
+                                👁️
+                            </span>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="changePassword()">Change Password</button>
+                </div>
             </div>
         </div>
     </div>
@@ -1954,6 +2031,8 @@
         function showLogin() {
             document.getElementById('loginScreen').classList.remove('hidden');
             document.getElementById('registerScreen').classList.add('hidden');
+            document.getElementById('forgotPasswordScreen').classList.add('hidden');
+            document.getElementById('resetPasswordScreen').classList.add('hidden');
         }
 
         function showRegister() {
@@ -2071,6 +2150,135 @@
             document.getElementById('loginUsername').value = '';
             document.getElementById('loginPassword').value = '';
             speak('Logged out successfully');
+        }
+
+        // Forgot Password Functions
+        let resetUsername = null; // Store username during password reset
+
+        function showForgotPassword() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('registerScreen').classList.add('hidden');
+            document.getElementById('forgotPasswordScreen').classList.remove('hidden');
+            document.getElementById('resetPasswordScreen').classList.add('hidden');
+        }
+
+        function verifyForgotPassword() {
+            const username = document.getElementById('forgotUsername').value;
+            const email = document.getElementById('forgotEmail').value;
+
+            if (!username || !email) {
+                alert('Please enter both username and email');
+                return;
+            }
+
+            const users = loadData('users') || {};
+            
+            // Check if username exists
+            if (!users[username]) {
+                alert('Username not found');
+                return;
+            }
+
+            // Check if email matches
+            if (users[username].email !== email) {
+                alert('Email does not match our records');
+                return;
+            }
+
+            // Username and email verified! Allow password reset
+            resetUsername = username;
+            document.getElementById('forgotPasswordScreen').classList.add('hidden');
+            document.getElementById('resetPasswordScreen').classList.remove('hidden');
+            speak('Identity verified. Please set a new password.');
+        }
+
+        function completePasswordReset() {
+            const newPassword = document.getElementById('resetNewPassword').value;
+            const confirmPassword = document.getElementById('resetConfirmPassword').value;
+
+            if (!newPassword || !confirmPassword) {
+                alert('Please fill in both password fields');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+
+            if (newPassword.length < 4) {
+                alert('Password must be at least 4 characters');
+                return;
+            }
+
+            // Update password
+            const users = loadData('users');
+            users[resetUsername].password = newPassword;
+            saveData('users', users);
+
+            // Clear fields
+            document.getElementById('forgotUsername').value = '';
+            document.getElementById('forgotEmail').value = '';
+            document.getElementById('resetNewPassword').value = '';
+            document.getElementById('resetConfirmPassword').value = '';
+            resetUsername = null;
+
+            // Show login screen
+            document.getElementById('resetPasswordScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+
+            alert('✅ Password reset successfully!\n\nYou can now login with your new password.');
+            speak('Password reset successfully');
+        }
+
+        // Change Password in Profile
+        function changePassword() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmNewPassword').value;
+
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const users = loadData('users');
+            
+            // Verify current password
+            if (users[currentUser].password !== currentPassword) {
+                alert('Current password is incorrect');
+                return;
+            }
+
+            // Verify new passwords match
+            if (newPassword !== confirmPassword) {
+                alert('New passwords do not match');
+                return;
+            }
+
+            // Check password length
+            if (newPassword.length < 4) {
+                alert('Password must be at least 4 characters');
+                return;
+            }
+
+            // Don't allow same password
+            if (newPassword === currentPassword) {
+                alert('New password must be different from current password');
+                return;
+            }
+
+            // Update password
+            users[currentUser].password = newPassword;
+            saveData('users', users);
+
+            // Clear fields
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmNewPassword').value = '';
+
+            alert('✅ Password changed successfully!');
+            speak('Password changed successfully');
         }
 
         // Load all data
