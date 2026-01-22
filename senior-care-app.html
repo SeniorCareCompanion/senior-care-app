@@ -1115,6 +1115,7 @@
                 <button class="nav-tab" onclick="showSection('bills')">💰 Bills</button>
                 <button class="nav-tab" onclick="showSection('activities')">🎉 Activities</button>
                 <button class="nav-tab" onclick="showSection('contacts')">📞 Contacts</button>
+                <button class="nav-tab" onclick="showSection('help')">❓ Help</button>
             </div>
 
             <!-- Home Section -->
@@ -1627,6 +1628,412 @@
                 </div>
             </div>
 
+            <!-- Help Section -->
+            <div id="help" class="section">
+                <h2 class="section-title">❓ Help Center</h2>
+                
+                <!-- Search Box -->
+                <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+                    <div class="card-content">
+                        <h3 style="margin: 0 0 15px 0; color: white;">🔍 Search for Help</h3>
+                        <input type="text" id="helpSearch" placeholder="Try: 'add medication', 'reminder', 'password'..." 
+                               onkeyup="searchHelp()" 
+                               style="width: 100%; padding: 15px; font-size: 18px; border: 3px solid white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                        <p style="margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">Type a keyword to find help instantly</p>
+                    </div>
+                </div>
+
+                <!-- Search Results (hidden by default) -->
+                <div id="searchResults" class="hidden" style="margin-bottom: 20px;"></div>
+
+                <!-- Quick Access Buttons -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px;">
+                    <button class="btn btn-info" onclick="showHelpTopic('getting-started')" style="padding: 15px; font-size: 16px;">
+                        🚀 Getting Started
+                    </button>
+                    <button class="btn btn-info" onclick="showHelpTopic('common-questions')" style="padding: 15px; font-size: 16px;">
+                        ❓ Common Questions
+                    </button>
+                    <button class="btn btn-info" onclick="showHelpTopic('troubleshooting')" style="padding: 15px; font-size: 16px;">
+                        🔧 Troubleshooting
+                    </button>
+                </div>
+
+                <!-- Help Topics Container -->
+                <div id="helpTopicsContainer">
+                    <!-- All Topics Overview (shown by default) -->
+                    <div id="help-all-topics" class="help-topic-section">
+                        <div class="card">
+                            <div class="card-header" style="background: #4299e1; color: white;">
+                                📚 Browse All Help Topics
+                            </div>
+                            <div class="card-content" style="line-height: 1.8;">
+                                <div onclick="showHelpTopic('getting-started')" style="padding: 12px; margin: 5px 0; background: #f7fafc; border-radius: 8px; cursor: pointer; border-left: 4px solid #4299e1;">
+                                    <strong>🚀 Getting Started</strong><br>
+                                    <span style="font-size: 14px; color: #666;">First time using the app? Start here!</span>
+                                </div>
+                                <div onclick="showHelpTopic('medications')" style="padding: 12px; margin: 5px 0; background: #f7fafc; border-radius: 8px; cursor: pointer; border-left: 4px solid #9f7aea;">
+                                    <strong>💊 Medications</strong><br>
+                                    <span style="font-size: 14px; color: #666;">Add, track, and manage medications</span>
+                                </div>
+                                <div onclick="showHelpTopic('appointments')" style="padding: 12px; margin: 5px 0; background: #f7fafc; border-radius: 8px; cursor: pointer; border-left: 4px solid #ed8936;">
+                                    <strong>📅 Appointments</strong><br>
+                                    <span style="font-size: 14px; color: #666;">Schedule and track doctor visits</span>
+                                </div>
+                                <div onclick="showHelpTopic('tasks')" style="padding: 12px; margin: 5px 0; background: #f7fafc; border-radius: 8px; cursor: pointer; border-left: 4px solid #48bb78;">
+                                    <strong>✅ Tasks</strong><br>
+                                    <span style="font-size: 14px; color: #666;">Daily routines and to-do items</span>
+                                </div>
+                                <div onclick="showHelpTopic('bills')" style="padding: 12px; margin: 5px 0; background: #f7fafc; border-radius: 8px; cursor: pointer; border-left: 4px solid #f6ad55;">
+                                    <strong>💰 Bills</strong><br>
+                                    <span style="font-size: 14px; color: #666;">Track bills and payments</span>
+                                </div>
+                                <div onclick="showHelpTopic('activities')" style="padding: 12px; margin: 5px 0; background: #f7fafc; border-radius: 8px; cursor: pointer; border-left: 4px solid #ed64a6;">
+                                    <strong>🎉 Activities</strong><br>
+                                    <span style="font-size: 14px; color: #666;">Social events and classes</span>
+                                </div>
+                                <div onclick="showHelpTopic('contacts')" style="padding: 12px; margin: 5px 0; background: #f7fafc; border-radius: 8px; cursor: pointer; border-left: 4px solid #667eea;">
+                                    <strong>📞 Contacts</strong><br>
+                                    <span style="font-size: 14px; color: #666;">Save important phone numbers</span>
+                                </div>
+                                <div onclick="showHelpTopic('voice')" style="padding: 12px; margin: 5px 0; background: #f7fafc; border-radius: 8px; cursor: pointer; border-left: 4px solid #38b2ac;">
+                                    <strong>🎤 Voice Assistant</strong><br>
+                                    <span style="font-size: 14px; color: #666;">Use voice commands and dictation</span>
+                                </div>
+                                <div onclick="showHelpTopic('common-questions')" style="padding: 12px; margin: 5px 0; background: #f7fafc; border-radius: 8px; cursor: pointer; border-left: 4px solid #718096;">
+                                    <strong>❓ Common Questions</strong><br>
+                                    <span style="font-size: 14px; color: #666;">Frequently asked questions</span>
+                                </div>
+                                <div onclick="showHelpTopic('troubleshooting')" style="padding: 12px; margin: 5px 0; background: #f7fafc; border-radius: 8px; cursor: pointer; border-left: 4px solid #e53e3e;">
+                                    <strong>🔧 Troubleshooting</strong><br>
+                                    <span style="font-size: 14px; color: #666;">Fix common problems</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Getting Started Topic -->
+                    <div id="help-getting-started" class="help-topic-section hidden">
+                        <button class="btn" onclick="showHelpTopic('all-topics')" style="margin-bottom: 15px;">
+                            ← Back to All Topics
+                        </button>
+                        <div class="card">
+                            <div class="card-header" style="background: #4299e1; color: white;">
+                                🚀 Getting Started
+                            </div>
+                            <div class="card-content" style="line-height: 1.8; font-size: 16px;">
+                                <h3>Welcome to Senior Care! 👋</h3>
+                                <p>This app helps you manage medications, appointments, tasks, bills, activities, and contacts all in one place.</p>
+                                
+                                <h3>📱 Your First Steps:</h3>
+                                <ol style="line-height: 2;">
+                                    <li><strong>Home Screen:</strong> See today's overview - medications to take, upcoming appointments, tasks to complete</li>
+                                    <li><strong>Navigation Tabs:</strong> Tap the tabs at the top to switch between sections (Meds, Appts, Tasks, etc.)</li>
+                                    <li><strong>Add Your First Item:</strong> Go to any section and fill in the form at the bottom</li>
+                                    <li><strong>Set Reminders:</strong> Check the "Enable Reminder" box to get notifications</li>
+                                    <li><strong>Minimize Cards:</strong> Click the ▲ button to collapse items you don't need to see</li>
+                                </ol>
+
+                                <h3>🎯 Quick Tips:</h3>
+                                <ul style="line-height: 2;">
+                                    <li>🔔 <strong>Enable notifications</strong> in your Profile to never miss a reminder</li>
+                                    <li>🎤 <strong>Turn on Voice Assistant</strong> in Profile to use voice commands</li>
+                                    <li>💾 <strong>Backup your data</strong> regularly using Export Data in Profile</li>
+                                    <li>❓ <strong>Use this Help tab</strong> anytime you need assistance</li>
+                                </ul>
+
+                                <h3>📖 Understanding the Icons:</h3>
+                                <ul style="line-height: 2; list-style: none; padding-left: 0;">
+                                    <li>💊 = Medications</li>
+                                    <li>📅 = Appointments</li>
+                                    <li>✅ = Tasks</li>
+                                    <li>💰 = Bills</li>
+                                    <li>🎉 = Activities</li>
+                                    <li>📞 = Contacts</li>
+                                    <li>🔔 = Reminder is ON</li>
+                                    <li>▼ = Click to expand</li>
+                                    <li>▲ = Click to minimize</li>
+                                    <li>✓ = Completed</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Medications Topic -->
+                    <div id="help-medications" class="help-topic-section hidden">
+                        <button class="btn" onclick="showHelpTopic('all-topics')" style="margin-bottom: 15px;">
+                            ← Back to All Topics
+                        </button>
+                        <div class="card">
+                            <div class="card-header" style="background: #9f7aea; color: white;">
+                                💊 Medications Help
+                            </div>
+                            <div class="card-content" style="line-height: 1.8; font-size: 16px;">
+                                <h3>How to Add a Medication:</h3>
+                                <ol style="line-height: 2;">
+                                    <li>Tap the <strong>💊 Meds</strong> tab at the top</li>
+                                    <li>Scroll down to "Add New Medication"</li>
+                                    <li>Fill in:
+                                        <ul>
+                                            <li><strong>Medication Name:</strong> e.g., "Aspirin"</li>
+                                            <li><strong>Dosage:</strong> e.g., "81mg" or "1 tablet"</li>
+                                            <li><strong>Time:</strong> When you take it (e.g., 8:00 AM)</li>
+                                            <li><strong>How Often:</strong> Daily, weekly, specific days, etc.</li>
+                                        </ul>
+                                    </li>
+                                    <li>Check <strong>"Enable Reminder"</strong> to get notified</li>
+                                    <li>Tap <strong>"Add Medication"</strong></li>
+                                </ol>
+
+                                <h3>How to Mark as Taken:</h3>
+                                <ol style="line-height: 2;">
+                                    <li>Find the medication in your list</li>
+                                    <li>Click ▼ to expand if minimized</li>
+                                    <li>Tap <strong>"Mark as Taken"</strong> button</li>
+                                    <li>The button will turn green with a ✓</li>
+                                </ol>
+
+                                <h3>How to Edit a Medication:</h3>
+                                <ol style="line-height: 2;">
+                                    <li>Find the medication</li>
+                                    <li>Click ▼ to expand if minimized</li>
+                                    <li>Tap <strong>"Edit"</strong></li>
+                                    <li>Make your changes in the form</li>
+                                    <li>Tap <strong>"Update Medication"</strong></li>
+                                </ol>
+
+                                <h3>How to Delete a Medication:</h3>
+                                <ol style="line-height: 2;">
+                                    <li>Find the medication</li>
+                                    <li>Click ▼ to expand if minimized</li>
+                                    <li>Tap <strong>"Delete"</strong></li>
+                                    <li>Confirm you want to delete it</li>
+                                </ol>
+
+                                <h3>💡 Tips:</h3>
+                                <ul style="line-height: 2;">
+                                    <li>Use the ▲ button to minimize medications you don't need to see right now</li>
+                                    <li>Set reminders 10-15 minutes before you need to take them</li>
+                                    <li>If you take a medication twice daily, add it twice with different times</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Voice Assistant Topic -->
+                    <div id="help-voice" class="help-topic-section hidden">
+                        <button class="btn" onclick="showHelpTopic('all-topics')" style="margin-bottom: 15px;">
+                            ← Back to All Topics
+                        </button>
+                        <div class="card">
+                            <div class="card-header" style="background: #38b2ac; color: white;">
+                                🎤 Voice Assistant Help
+                            </div>
+                            <div class="card-content" style="line-height: 1.8; font-size: 16px;">
+                                <h3>How to Enable Voice Assistant:</h3>
+                                <ol style="line-height: 2;">
+                                    <li>Tap <strong>👤 Profile</strong> button (top right)</li>
+                                    <li>Scroll to "Voice Assistant Settings"</li>
+                                    <li>Tap the toggle to turn it <strong>ON</strong></li>
+                                    <li>A floating 🎤 button will appear at the bottom right</li>
+                                </ol>
+
+                                <h3>How to Use Voice Commands:</h3>
+                                <ol style="line-height: 2;">
+                                    <li>Tap the <strong>🎤 VOICE</strong> button</li>
+                                    <li>Wait for it to turn red (listening)</li>
+                                    <li>Speak your command clearly</li>
+                                    <li>The app will respond and take action</li>
+                                </ol>
+
+                                <h3>🗣️ Voice Commands You Can Use:</h3>
+                                
+                                <h4>Navigation:</h4>
+                                <ul style="line-height: 2;">
+                                    <li>"Go to medications"</li>
+                                    <li>"Show my appointments"</li>
+                                    <li>"Open tasks"</li>
+                                    <li>"Go to activities"</li>
+                                    <li>"Take me home"</li>
+                                </ul>
+
+                                <h4>Getting Help:</h4>
+                                <ul style="line-height: 2;">
+                                    <li>"How do I add a medication?"</li>
+                                    <li>"Help with reminders"</li>
+                                    <li>"How do I add an appointment?"</li>
+                                    <li>"Help with activities"</li>
+                                </ul>
+
+                                <h4>Reading Content:</h4>
+                                <ul style="line-height: 2;">
+                                    <li>"Read this to me"</li>
+                                    <li>"Read my medications"</li>
+                                    <li>"What's next?"</li>
+                                </ul>
+
+                                <h3>🎯 Voice Text Input:</h3>
+                                <p>When adding items, you can dictate instead of typing:</p>
+                                <ol style="line-height: 2;">
+                                    <li>Look for 🎤 icon next to text fields</li>
+                                    <li>Tap the microphone</li>
+                                    <li>Speak what you want to enter</li>
+                                    <li>The field fills automatically!</li>
+                                </ol>
+
+                                <h3>💡 Tips for Best Results:</h3>
+                                <ul style="line-height: 2;">
+                                    <li>Speak clearly and at normal speed</li>
+                                    <li>Reduce background noise</li>
+                                    <li>Wait for button to turn red before speaking</li>
+                                    <li>Use simple, direct commands</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Common Questions Topic -->
+                    <div id="help-common-questions" class="help-topic-section hidden">
+                        <button class="btn" onclick="showHelpTopic('all-topics')" style="margin-bottom: 15px;">
+                            ← Back to All Topics
+                        </button>
+                        <div class="card">
+                            <div class="card-header" style="background: #718096; color: white;">
+                                ❓ Common Questions
+                            </div>
+                            <div class="card-content" style="line-height: 1.8; font-size: 16px;">
+                                <h3>❓ I forgot my password. What do I do?</h3>
+                                <ol style="line-height: 2;">
+                                    <li>On the login screen, tap <strong>"Forgot Password?"</strong></li>
+                                    <li>Enter your username and email address</li>
+                                    <li>If they match, you can set a new password</li>
+                                </ol>
+
+                                <h3>❓ How do I change my password?</h3>
+                                <ol style="line-height: 2;">
+                                    <li>Go to <strong>Profile</strong> (top right)</li>
+                                    <li>Scroll to "Change Password"</li>
+                                    <li>Enter your current password</li>
+                                    <li>Enter your new password twice</li>
+                                    <li>Tap <strong>"Change Password"</strong></li>
+                                </ol>
+
+                                <h3>❓ Why am I not getting reminders?</h3>
+                                <ol style="line-height: 2;">
+                                    <li>Make sure you enabled reminders when adding items</li>
+                                    <li>Go to Profile → Notification Settings</li>
+                                    <li>Tap <strong>"Enable Notifications"</strong></li>
+                                    <li>Allow notifications when your browser asks</li>
+                                    <li>On iPhone: Must "Add to Home Screen" first</li>
+                                </ol>
+
+                                <h3>❓ How do I backup my data?</h3>
+                                <ol style="line-height: 2;">
+                                    <li>Go to <strong>Profile</strong></li>
+                                    <li>Scroll to "Data Backup"</li>
+                                    <li>Tap <strong>"Export Data"</strong></li>
+                                    <li>Save the file somewhere safe</li>
+                                    <li>Do this monthly for safety!</li>
+                                </ol>
+
+                                <h3>❓ What does the ▲/▼ button do?</h3>
+                                <p><strong>▼ (Down arrow):</strong> Click to expand and see full details</p>
+                                <p><strong>▲ (Up arrow):</strong> Click to minimize and save space</p>
+                                <p>This helps you see more items on one screen!</p>
+
+                                <h3>❓ Can I use this app on my phone?</h3>
+                                <p>Yes! This app works on all devices:</p>
+                                <ul style="line-height: 2;">
+                                    <li>iPhone (Safari)</li>
+                                    <li>Android (Chrome)</li>
+                                    <li>iPad</li>
+                                    <li>Computer</li>
+                                </ul>
+                                <p>For best results on phones, tap "Add to Home Screen" in your browser menu.</p>
+
+                                <h3>❓ How do I delete something by accident?</h3>
+                                <p>Unfortunately, once deleted, items cannot be recovered. That's why the app always asks "Are you sure?" before deleting. Always double-check before confirming!</p>
+                                <p><strong>Tip:</strong> Backup your data regularly so you have a copy.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Troubleshooting Topic -->
+                    <div id="help-troubleshooting" class="help-topic-section hidden">
+                        <button class="btn" onclick="showHelpTopic('all-topics')" style="margin-bottom: 15px;">
+                            ← Back to All Topics
+                        </button>
+                        <div class="card">
+                            <div class="card-header" style="background: #e53e3e; color: white;">
+                                🔧 Troubleshooting
+                            </div>
+                            <div class="card-content" style="line-height: 1.8; font-size: 16px;">
+                                <h3>🐌 App is Running Slow</h3>
+                                <p><strong>Try these solutions:</strong></p>
+                                <ol style="line-height: 2;">
+                                    <li>Refresh the page (pull down on mobile)</li>
+                                    <li>Close other apps/browser tabs</li>
+                                    <li>Restart your device</li>
+                                    <li>Clear browser cache (Settings → Privacy)</li>
+                                </ol>
+
+                                <h3>🔕 Not Getting Notifications</h3>
+                                <ol style="line-height: 2;">
+                                    <li>Check: Did you enable reminders on the item?</li>
+                                    <li>Go to Profile → Enable Notifications</li>
+                                    <li>Allow when browser asks for permission</li>
+                                    <li>On iPhone: Must use "Add to Home Screen" first</li>
+                                    <li>Check phone's notification settings (System Settings)</li>
+                                </ol>
+
+                                <h3>🔊 Voice Not Working</h3>
+                                <ol style="line-height: 2;">
+                                    <li>Make sure Voice Assistant is ON in Profile</li>
+                                    <li>Allow microphone access when browser asks</li>
+                                    <li>Check microphone isn't muted on device</li>
+                                    <li>Try closing and reopening the app</li>
+                                    <li>Speak clearly near the microphone</li>
+                                </ol>
+
+                                <h3>📱 Can't See All My Data</h3>
+                                <ol style="line-height: 2;">
+                                    <li>Check if items are minimized (▼ arrow)</li>
+                                    <li>Click ▼ to expand them</li>
+                                    <li>Scroll down - more items might be below</li>
+                                    <li>Check you're on the right tab (Meds, Appts, etc.)</li>
+                                </ol>
+
+                                <h3>🔑 Can't Log In</h3>
+                                <ol style="line-height: 2;">
+                                    <li>Check username and password are correct</li>
+                                    <li>Username is case-sensitive (John ≠ john)</li>
+                                    <li>Use "Forgot Password?" if needed</li>
+                                    <li>Try refreshing the page</li>
+                                </ol>
+
+                                <h3>💾 Lost My Data</h3>
+                                <p>Data is saved locally on your device. If you:</p>
+                                <ul style="line-height: 2;">
+                                    <li><strong>Cleared browser data:</strong> Data may be gone 😞</li>
+                                    <li><strong>Have a backup file:</strong> Go to Profile → Import Data</li>
+                                    <li><strong>Used different device:</strong> Data doesn't sync between devices</li>
+                                </ul>
+                                <p><strong>Prevention:</strong> Export data monthly and save the backup file!</p>
+
+                                <h3>🆘 Still Need Help?</h3>
+                                <p>If these solutions don't work:</p>
+                                <ol style="line-height: 2;">
+                                    <li>Try using the app in a different browser</li>
+                                    <li>Make sure your browser is up to date</li>
+                                    <li>Note what you were trying to do when the problem occurred</li>
+                                    <li>Use the search box at the top of this Help page</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Profile Section -->
             <div id="profile" class="section">
                 <h2 class="section-title">👤 Profile</h2>
@@ -1639,11 +2046,12 @@
                 <div class="card">
                     <div class="card-header">🔊 Voice Settings</div>
                     <div class="card-content">
+                        <h4 style="margin: 0 0 10px 0;">Voice Announcements</h4>
                         <p style="margin-bottom: 15px;">Enable voice announcements for confirmations and reminders</p>
                         <button id="voiceToggleBtn" class="btn" onclick="toggleVoice()" style="width: 100%; max-width: 100%; margin-bottom: 15px;">
                             🔇 Voice OFF
                         </button>
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 2px solid #e9ecef;">
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 2px solid #e9ecef; margin-bottom: 20px;">
                             <label class="reminder-checkbox" style="margin: 0; cursor: pointer;">
                                 <input type="checkbox" id="voiceAutoEnable" onchange="saveVoicePreference()" style="width: 20px; height: 20px; margin: 0;">
                                 <span style="font-size: 15px;">🔄 Always enable voice when I log in</span>
@@ -1651,6 +2059,30 @@
                             <p style="margin: 10px 0 0 30px; font-size: 13px; color: #6c757d;">
                                 When checked, voice will automatically turn on each time you open the app
                             </p>
+                        </div>
+
+                        <hr style="margin: 20px 0; border: none; border-top: 2px solid #e9ecef;">
+
+                        <h4 style="margin: 0 0 10px 0;">🎤 Voice Assistant</h4>
+                        <p style="margin-bottom: 15px;">Use voice commands to control the app hands-free!</p>
+                        
+                        <button id="voiceAssistantToggleBtn" class="btn" onclick="toggleVoiceAssistant()" style="width: 100%; max-width: 100%; margin-bottom: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; font-size: 18px;">
+                            🎤 Voice Assistant OFF
+                        </button>
+
+                        <div id="voiceAssistantInfo" class="hidden" style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 15px; border-radius: 8px; border: 2px solid #667eea;">
+                            <p style="margin: 0 0 10px 0; font-weight: 600;">✅ Voice Assistant is Active!</p>
+                            <p style="margin: 0 0 10px 0; font-size: 14px;">Look for the 🎤 VOICE button at the bottom-right of your screen.</p>
+                            <p style="margin: 0 0 10px 0; font-size: 14px; font-weight: 600;">Try saying:</p>
+                            <ul style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.8;">
+                                <li>"Go to medications"</li>
+                                <li>"Show my appointments"</li>
+                                <li>"Help with reminders"</li>
+                                <li>"How do I add a medication?"</li>
+                            </ul>
+                            <button class="btn btn-info" onclick="showHelpTopic('voice'); showSection('help');" style="width: 100%; margin-top: 10px;">
+                                📖 View Full Voice Commands Guide
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1782,6 +2214,101 @@
             </div>
         </div>
     </div>
+
+    <!-- Floating Help Button -->
+    <div id="floatingHelpBtn" class="floating-help-btn" onclick="showSection('help')" title="Get Help">
+        <div style="font-size: 24px;">❓</div>
+        <div style="font-size: 10px; margin-top: 2px;">HELP</div>
+    </div>
+
+    <!-- Floating Voice Button (hidden by default) -->
+    <div id="floatingVoiceBtn" class="floating-voice-btn hidden" onclick="startVoiceListening()" title="Voice Commands">
+        <div id="voiceBtnIcon" style="font-size: 24px;">🎤</div>
+        <div id="voiceBtnText" style="font-size: 10px; margin-top: 2px;">VOICE</div>
+    </div>
+
+    <!-- Voice Listening Overlay -->
+    <div id="voiceListeningOverlay" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center; color: white;">
+        <div style="text-align: center; max-width: 90%; padding: 30px;">
+            <div id="voiceStatusIcon" style="font-size: 80px; margin-bottom: 20px;">🎤</div>
+            <div id="voiceStatusText" style="font-size: 24px; font-weight: 600; margin-bottom: 10px;">Listening...</div>
+            <div id="voiceTranscript" style="font-size: 18px; margin-bottom: 20px; min-height: 30px; color: #a0aec0;">Speak now...</div>
+            <button onclick="stopVoiceListening()" class="btn" style="background: white; color: #333; padding: 15px 30px; font-size: 18px;">
+                Cancel
+            </button>
+        </div>
+    </div>
+
+    <style>
+        .floating-help-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            border: 3px solid white;
+        }
+
+        .floating-help-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .floating-voice-btn {
+            position: fixed;
+            bottom: 110px;
+            right: 20px;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #38b2ac 0%, #2c7a7b 100%);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(56, 178, 172, 0.4);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            border: 3px solid white;
+        }
+
+        .floating-voice-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(56, 178, 172, 0.6);
+        }
+
+        .floating-voice-btn.listening {
+            background: linear-gradient(135deg, #f56565 0%, #c53030 100%);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .help-topic-section {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 
     <script>
         // PWA Installation
@@ -5708,6 +6235,345 @@
                 loadHomeReminders();
             }
         }, 60000);
+
+        // ========================================
+        // HELP SYSTEM
+        // ========================================
+
+        // Help topic navigation
+        function showHelpTopic(topicId) {
+            // Hide all topic sections
+            document.querySelectorAll('.help-topic-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Show selected topic
+            const topic = document.getElementById(`help-${topicId}`);
+            if (topic) {
+                topic.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // Help search functionality
+        const helpContent = {
+            'medication': ['medications', 'How to add, edit, and manage medications'],
+            'add medication': ['medications', 'How to add a new medication to your list'],
+            'reminder': ['medications', 'How to set reminders for medications and appointments'],
+            'appointment': ['appointments', 'How to manage doctor appointments'],
+            'task': ['tasks', 'How to use daily tasks and to-do lists'],
+            'bill': ['bills', 'How to track bills and payments'],
+            'activity': ['activities', 'How to add yoga, bingo, and other activities'],
+            'contact': ['contacts', 'How to save important phone numbers'],
+            'voice': ['voice', 'How to use voice commands and voice assistant'],
+            'password': ['common-questions', 'Forgot password or change password'],
+            'forgot password': ['common-questions', 'How to reset your password'],
+            'backup': ['common-questions', 'How to backup and restore your data'],
+            'notification': ['common-questions', 'How to enable notifications and reminders'],
+            'slow': ['troubleshooting', 'App running slow - troubleshooting'],
+            'not working': ['troubleshooting', 'Common problems and solutions'],
+            'minimize': ['getting-started', 'How to use minimize/maximize buttons'],
+            'expand': ['getting-started', 'How to expand and collapse cards'],
+            'delete': ['common-questions', 'How to delete items'],
+            'edit': ['medications', 'How to edit existing items'],
+            'help': ['getting-started', 'Getting started with the app']
+        };
+
+        function searchHelp() {
+            const searchTerm = document.getElementById('helpSearch').value.toLowerCase().trim();
+            const resultsContainer = document.getElementById('searchResults');
+            
+            if (!searchTerm) {
+                resultsContainer.classList.add('hidden');
+                return;
+            }
+
+            const results = [];
+            for (const [keyword, [topic, description]] of Object.entries(helpContent)) {
+                if (keyword.includes(searchTerm) || searchTerm.includes(keyword)) {
+                    if (!results.find(r => r.topic === topic)) {
+                        results.push({ topic, description });
+                    }
+                }
+            }
+
+            if (results.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="card" style="background: #fff3cd; border: 2px solid #ffc107;">
+                        <div class="card-content">
+                            <strong>No results found for "${searchTerm}"</strong><br>
+                            Try different keywords like "medication", "reminder", "password", etc.
+                        </div>
+                    </div>
+                `;
+                resultsContainer.classList.remove('hidden');
+            } else {
+                resultsContainer.innerHTML = `
+                    <div class="card" style="background: #d4edda; border: 2px solid #28a745;">
+                        <div class="card-header" style="background: #28a745; color: white;">
+                            🔍 Search Results for "${searchTerm}"
+                        </div>
+                        <div class="card-content">
+                            ${results.map(r => `
+                                <div onclick="showHelpTopic('${r.topic}')" 
+                                     style="padding: 12px; margin: 5px 0; background: white; border-radius: 8px; cursor: pointer; border-left: 4px solid #28a745;">
+                                    <strong>${r.description}</strong>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                resultsContainer.classList.remove('hidden');
+            }
+        }
+
+        // ========================================
+        // VOICE ASSISTANT SYSTEM
+        // ========================================
+
+        let voiceAssistantEnabled = false;
+        let recognition = null;
+        let isListening = false;
+
+        // Initialize voice recognition
+        function initVoiceRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+
+                recognition.onstart = function() {
+                    isListening = true;
+                    document.getElementById('voiceListeningOverlay').classList.remove('hidden');
+                    document.getElementById('floatingVoiceBtn').classList.add('listening');
+                    document.getElementById('voiceStatusText').textContent = 'Listening...';
+                    document.getElementById('voiceStatusIcon').textContent = '🔴';
+                    document.getElementById('voiceTranscript').textContent = 'Speak now...';
+                };
+
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById('voiceTranscript').textContent = `You said: "${transcript}"`;
+                    document.getElementById('voiceStatusText').textContent = 'Processing...';
+                    document.getElementById('voiceStatusIcon').textContent = '⏳';
+                    
+                    setTimeout(() => {
+                        processVoiceCommand(transcript);
+                        stopVoiceListening();
+                    }, 500);
+                };
+
+                recognition.onerror = function(event) {
+                    console.error('Voice recognition error:', event.error);
+                    document.getElementById('voiceStatusText').textContent = 'Error: ' + event.error;
+                    document.getElementById('voiceStatusIcon').textContent = '❌';
+                    setTimeout(() => {
+                        stopVoiceListening();
+                    }, 2000);
+                };
+
+                recognition.onend = function() {
+                    isListening = false;
+                };
+            } else {
+                alert('Sorry, voice recognition is not supported in your browser. Please use Chrome, Safari, or Edge.');
+            }
+        }
+
+        // Toggle voice assistant
+        function toggleVoiceAssistant() {
+            voiceAssistantEnabled = !voiceAssistantEnabled;
+            const btn = document.getElementById('voiceAssistantToggleBtn');
+            const info = document.getElementById('voiceAssistantInfo');
+            const floatingBtn = document.getElementById('floatingVoiceBtn');
+            
+            if (voiceAssistantEnabled) {
+                btn.textContent = '🎤 Voice Assistant ON';
+                btn.style.background = 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)';
+                info.classList.remove('hidden');
+                floatingBtn.classList.remove('hidden');
+                
+                // Initialize recognition if not already done
+                if (!recognition) {
+                    initVoiceRecognition();
+                }
+                
+                speak('Voice assistant enabled. Click the microphone button to give voice commands.');
+                
+                // Save preference
+                localStorage.setItem('voiceAssistantEnabled', 'true');
+            } else {
+                btn.textContent = '🎤 Voice Assistant OFF';
+                btn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                info.classList.add('hidden');
+                floatingBtn.classList.add('hidden');
+                
+                speak('Voice assistant disabled');
+                localStorage.setItem('voiceAssistantEnabled', 'false');
+            }
+        }
+
+        // Start voice listening
+        function startVoiceListening() {
+            if (!voiceAssistantEnabled) {
+                alert('Please enable Voice Assistant in Profile settings first.');
+                return;
+            }
+            
+            if (!recognition) {
+                initVoiceRecognition();
+            }
+            
+            if (recognition && !isListening) {
+                try {
+                    recognition.start();
+                } catch (error) {
+                    console.error('Error starting recognition:', error);
+                }
+            }
+        }
+
+        // Stop voice listening
+        function stopVoiceListening() {
+            if (recognition && isListening) {
+                recognition.stop();
+            }
+            document.getElementById('voiceListeningOverlay').classList.add('hidden');
+            document.getElementById('floatingVoiceBtn').classList.remove('listening');
+            isListening = false;
+        }
+
+        // Process voice commands
+        function processVoiceCommand(command) {
+            const lowerCommand = command.toLowerCase();
+            let handled = false;
+
+            // Navigation commands
+            if (lowerCommand.includes('go to') || lowerCommand.includes('show') || lowerCommand.includes('open')) {
+                if (lowerCommand.includes('medication') || lowerCommand.includes('med')) {
+                    showSection('medications');
+                    speak('Opening Medications');
+                    handled = true;
+                } else if (lowerCommand.includes('appointment') || lowerCommand.includes('appt')) {
+                    showSection('appointments');
+                    speak('Opening Appointments');
+                    handled = true;
+                } else if (lowerCommand.includes('task')) {
+                    showSection('tasks');
+                    speak('Opening Tasks');
+                    handled = true;
+                } else if (lowerCommand.includes('bill')) {
+                    showSection('bills');
+                    speak('Opening Bills');
+                    handled = true;
+                } else if (lowerCommand.includes('activit')) {
+                    showSection('activities');
+                    speak('Opening Activities');
+                    handled = true;
+                } else if (lowerCommand.includes('contact')) {
+                    showSection('contacts');
+                    speak('Opening Contacts');
+                    handled = true;
+                } else if (lowerCommand.includes('home')) {
+                    showSection('home');
+                    speak('Going home');
+                    handled = true;
+                } else if (lowerCommand.includes('profile')) {
+                    showSection('profile');
+                    speak('Opening Profile');
+                    handled = true;
+                } else if (lowerCommand.includes('help')) {
+                    showSection('help');
+                    speak('Opening Help Center');
+                    handled = true;
+                }
+            }
+
+            // Help commands
+            if (lowerCommand.includes('help') || lowerCommand.includes('how do i') || lowerCommand.includes('how to')) {
+                showSection('help');
+                
+                if (lowerCommand.includes('medication') || lowerCommand.includes('med')) {
+                    showHelpTopic('medications');
+                    speak('Here is help for medications');
+                    handled = true;
+                } else if (lowerCommand.includes('appointment')) {
+                    showHelpTopic('appointments');
+                    speak('Here is help for appointments');
+                    handled = true;
+                } else if (lowerCommand.includes('reminder')) {
+                    showHelpTopic('medications');
+                    speak('Here is help for reminders');
+                    handled = true;
+                } else if (lowerCommand.includes('password')) {
+                    showHelpTopic('common-questions');
+                    speak('Here is help for passwords');
+                    handled = true;
+                } else if (lowerCommand.includes('voice')) {
+                    showHelpTopic('voice');
+                    speak('Here is help for voice commands');
+                    handled = true;
+                } else if (!handled) {
+                    showHelpTopic('getting-started');
+                    speak('Here is the getting started guide');
+                    handled = true;
+                }
+            }
+
+            // Reading commands
+            if (lowerCommand.includes('read this') || lowerCommand.includes('read the page')) {
+                readCurrentPage();
+                handled = true;
+            }
+
+            // If command not handled
+            if (!handled) {
+                speak(`I didn't understand "${command}". Try saying "go to medications", "help with reminders", or "show my appointments"`);
+            }
+        }
+
+        // Read current page content
+        function readCurrentPage() {
+            const activeSection = document.querySelector('.section.active');
+            if (!activeSection) return;
+            
+            const title = activeSection.querySelector('.section-title');
+            if (title) {
+                speak(title.textContent);
+            }
+        }
+
+        // Load voice assistant preference on login
+        function loadVoiceAssistantPreference() {
+            const savedPreference = localStorage.getItem('voiceAssistantEnabled');
+            if (savedPreference === 'true') {
+                voiceAssistantEnabled = true;
+                const btn = document.getElementById('voiceAssistantToggleBtn');
+                const info = document.getElementById('voiceAssistantInfo');
+                const floatingBtn = document.getElementById('floatingVoiceBtn');
+                
+                btn.textContent = '🎤 Voice Assistant ON';
+                btn.style.background = 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)';
+                info.classList.remove('hidden');
+                floatingBtn.classList.remove('hidden');
+                
+                initVoiceRecognition();
+            }
+        }
+
+        // Call on login
+        const originalLogin = login;
+        login = function() {
+            const result = originalLogin.apply(this, arguments);
+            setTimeout(() => {
+                if (currentUser) {
+                    loadVoiceAssistantPreference();
+                }
+            }, 100);
+            return result;
+        };
     </script>
 </body>
 </html>
