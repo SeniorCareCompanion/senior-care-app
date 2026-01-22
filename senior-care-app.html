@@ -1113,6 +1113,7 @@
                 <button class="nav-tab" onclick="showSection('appointments')">📅 Appts</button>
                 <button class="nav-tab" onclick="showSection('tasks')">✅ Tasks</button>
                 <button class="nav-tab" onclick="showSection('bills')">💰 Bills</button>
+                <button class="nav-tab" onclick="showSection('activities')">🎉 Activities</button>
                 <button class="nav-tab" onclick="showSection('contacts')">📞 Contacts</button>
             </div>
 
@@ -1142,6 +1143,11 @@
                         <div class="emoji">💰</div>
                         <h3>Bills</h3>
                         <p id="billCount" style="line-height: 1.6;">0 bills due</p>
+                    </div>
+                    <div class="dashboard-card" onclick="showSection('activities')">
+                        <div class="emoji">🎉</div>
+                        <h3>Activities</h3>
+                        <p id="activityCount" style="line-height: 1.6;">0 upcoming</p>
                     </div>
                 </div>
 
@@ -1461,6 +1467,128 @@
                     </div>
                     <button id="addBillBtn" class="btn btn-primary" onclick="addBill()">Add Bill</button>
                     <button id="cancelEditBillBtn" class="btn hidden" onclick="cancelEditBill()" style="background: #95a5a6; margin-top: 10px;">Cancel Editing</button>
+                </div>
+            </div>
+
+            <!-- Activities Section -->
+            <div id="activities" class="section">
+                <h2 class="section-title">🎉 Activities</h2>
+
+                <div id="activityList"></div>
+                
+                <div class="form-section">
+                    <h3>Add New Activity</h3>
+                    <div class="input-group">
+                        <label for="activityName">Activity Name</label>
+                        <input type="text" id="activityName" placeholder="e.g., Yoga Class, Bingo Night">
+                    </div>
+                    <div class="input-group">
+                        <label for="activityLocation">Location</label>
+                        <input type="text" id="activityLocation" placeholder="e.g., Recreation Center, Senior Center">
+                    </div>
+                    <div class="input-group">
+                        <label for="activityDescription">Description (Optional)</label>
+                        <textarea id="activityDescription" placeholder="Any additional details about the activity" rows="3" style="width: 100%; padding: 12px; font-size: 16px; border: 1px solid #cbd5e0; border-radius: 8px; resize: vertical;"></textarea>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="activityRecurrence">How Often?</label>
+                        <select id="activityRecurrence" onchange="updateActivityRecurrenceOptions()">
+                            <option value="one-time">One-time event</option>
+                            <option value="daily">Every day</option>
+                            <option value="weekly">Weekly (same day each week)</option>
+                            <option value="specific-days">Specific days of the week</option>
+                            <option value="monthly">Monthly (same date)</option>
+                        </select>
+                    </div>
+
+                    <div id="activityOneTimeContainer" style="display: none;">
+                        <div class="input-group">
+                            <label for="activityDate">Date</label>
+                            <input type="date" id="activityDate">
+                        </div>
+                    </div>
+
+                    <div id="activityWeeklyContainer" style="display: none;">
+                        <div class="input-group">
+                            <label for="activityWeeklyDay">Day of Week</label>
+                            <select id="activityWeeklyDay">
+                                <option value="0">Sunday</option>
+                                <option value="1">Monday</option>
+                                <option value="2">Tuesday</option>
+                                <option value="3">Wednesday</option>
+                                <option value="4">Thursday</option>
+                                <option value="5">Friday</option>
+                                <option value="6">Saturday</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="activitySpecificDaysContainer" style="display: none;">
+                        <label style="display: block; margin-bottom: 10px; font-weight: 600;">Select Days</label>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+                            <label class="reminder-checkbox" style="min-width: 80px;">
+                                <input type="checkbox" class="activity-day-checkbox" value="0">
+                                <span>Sun</span>
+                            </label>
+                            <label class="reminder-checkbox" style="min-width: 80px;">
+                                <input type="checkbox" class="activity-day-checkbox" value="1">
+                                <span>Mon</span>
+                            </label>
+                            <label class="reminder-checkbox" style="min-width: 80px;">
+                                <input type="checkbox" class="activity-day-checkbox" value="2">
+                                <span>Tue</span>
+                            </label>
+                            <label class="reminder-checkbox" style="min-width: 80px;">
+                                <input type="checkbox" class="activity-day-checkbox" value="3">
+                                <span>Wed</span>
+                            </label>
+                            <label class="reminder-checkbox" style="min-width: 80px;">
+                                <input type="checkbox" class="activity-day-checkbox" value="4">
+                                <span>Thu</span>
+                            </label>
+                            <label class="reminder-checkbox" style="min-width: 80px;">
+                                <input type="checkbox" class="activity-day-checkbox" value="5">
+                                <span>Fri</span>
+                            </label>
+                            <label class="reminder-checkbox" style="min-width: 80px;">
+                                <input type="checkbox" class="activity-day-checkbox" value="6">
+                                <span>Sat</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="activityMonthlyContainer" style="display: none;">
+                        <div class="input-group">
+                            <label for="activityMonthlyDate">Day of Month (1-31)</label>
+                            <input type="number" id="activityMonthlyDate" min="1" max="31" value="1">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="activityTime">Time</label>
+                        <input type="time" id="activityTime">
+                    </div>
+
+                    <div style="background: #e8f4f8; padding: 15px; border-radius: 8px; border: 2px solid #4299e1; margin-bottom: 15px;">
+                        <label class="reminder-checkbox" style="margin-bottom: 10px;">
+                            <input type="checkbox" id="activityReminderEnabled" onchange="toggleActivityReminderOptions()">
+                            <span style="font-size: 16px; font-weight: 600;">🔔 Enable Reminder</span>
+                        </label>
+                        <div id="activityReminderOptions" class="hidden" style="margin-top: 10px;">
+                            <label for="activityReminderMinutes" style="display: block; margin-bottom: 5px; font-size: 14px;">Remind me:</label>
+                            <select id="activityReminderMinutes" style="width: 100%; padding: 10px; font-size: 16px; border: 1px solid #cbd5e0; border-radius: 8px;">
+                                <option value="15">15 minutes before</option>
+                                <option value="30" selected>30 minutes before</option>
+                                <option value="60">1 hour before</option>
+                                <option value="120">2 hours before</option>
+                                <option value="1440">1 day before</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button id="addActivityBtn" class="btn btn-primary" onclick="addActivity()">Add Activity</button>
+                    <button id="cancelEditActivityBtn" class="btn hidden" onclick="cancelEditActivity()" style="background: #95a5a6; margin-top: 10px;">Cancel Editing</button>
                 </div>
             </div>
 
@@ -1922,6 +2050,33 @@
                     });
                 }
                 
+                // Check Activity Reminders
+                if (userData.activities) {
+                    userData.activities.forEach((activity, index) => {
+                        if (activity.reminderEnabled && shouldShowActivityToday(activity)) {
+                            const todayStr = new Date().toISOString().split('T')[0];
+                            const hasAttendedToday = activity.attended && activity.attended.includes(todayStr);
+                            
+                            if (!hasAttendedToday) {
+                                const reminderKey = `activity-${activity.id}-${currentDate}`;
+                                if (!shownReminders.has(reminderKey)) {
+                                    // Calculate reminder time
+                                    const [hours, minutes] = activity.time.split(':').map(Number);
+                                    const activityTime = new Date();
+                                    activityTime.setHours(hours, minutes, 0, 0);
+                                    const reminderTime = new Date(activityTime.getTime() - (activity.reminderMinutes || 30) * 60000);
+                                    const reminderTimeStr = `${String(reminderTime.getHours()).padStart(2, '0')}:${String(reminderTime.getMinutes()).padStart(2, '0')}`;
+                                    
+                                    if (currentTime === reminderTimeStr) {
+                                        showReminderAlert('Activity Reminder', `${activity.name} at ${activity.location} (${formatTime(activity.time)})`, 'activity', activity.id);
+                                        shownReminders.add(reminderKey);
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                
                 // Update home reminders display
                 loadHomeReminders();
             } catch (error) {
@@ -2221,6 +2376,7 @@
                 appointments: [],
                 tasks: JSON.parse(JSON.stringify(defaultTasks)),
                 bills: [],
+                activities: [],
                 contacts: []
             };
 
@@ -2504,6 +2660,7 @@
             loadAppointments(userData.appointments || []);
             loadTasks(userData.tasks || defaultTasks);
             loadBills(userData.bills || []);
+            loadActivities(userData.activities || []);
             loadContacts(userData.contacts || []);
             loadProfile(userData);
             updateDashboard();
@@ -4652,6 +4809,419 @@
             speak('Contact deleted');
         }
 
+        // Activities
+        let editingActivityId = null;
+
+        function updateActivityRecurrenceOptions() {
+            const recurrence = document.getElementById('activityRecurrence').value;
+            document.getElementById('activityOneTimeContainer').style.display = recurrence === 'one-time' ? 'block' : 'none';
+            document.getElementById('activityWeeklyContainer').style.display = recurrence === 'weekly' ? 'block' : 'none';
+            document.getElementById('activitySpecificDaysContainer').style.display = recurrence === 'specific-days' ? 'block' : 'none';
+            document.getElementById('activityMonthlyContainer').style.display = recurrence === 'monthly' ? 'block' : 'none';
+        }
+
+        function toggleActivityReminderOptions() {
+            const enabled = document.getElementById('activityReminderEnabled').checked;
+            document.getElementById('activityReminderOptions').classList.toggle('hidden', !enabled);
+        }
+
+        function getActivityRecurrenceText(activity) {
+            if (activity.recurrence === 'daily') {
+                return ' (Daily)';
+            } else if (activity.recurrence === 'weekly') {
+                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                return ` (Every ${days[activity.weeklyDay]})`;
+            } else if (activity.recurrence === 'specific-days' && activity.specificDays) {
+                const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                const selectedDays = activity.specificDays.map(d => dayNames[d]).join(', ');
+                return ` (${selectedDays})`;
+            } else if (activity.recurrence === 'monthly') {
+                return ` (Monthly on day ${activity.monthlyDate})`;
+            } else if (activity.recurrence === 'one-time') {
+                return ` (${formatDate(activity.date)})`;
+            }
+            return '';
+        }
+
+        function shouldShowActivityToday(activity) {
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const dayOfMonth = today.getDate();
+            const todayStr = today.toISOString().split('T')[0];
+
+            if (activity.recurrence === 'daily') {
+                return true;
+            } else if (activity.recurrence === 'weekly') {
+                return activity.weeklyDay === dayOfWeek;
+            } else if (activity.recurrence === 'specific-days' && activity.specificDays) {
+                return activity.specificDays.includes(dayOfWeek);
+            } else if (activity.recurrence === 'monthly') {
+                return activity.monthlyDate === dayOfMonth;
+            } else if (activity.recurrence === 'one-time') {
+                return activity.date === todayStr;
+            }
+            return false;
+        }
+
+        function addActivity() {
+            const name = document.getElementById('activityName').value.trim();
+            const location = document.getElementById('activityLocation').value.trim();
+            const description = document.getElementById('activityDescription').value.trim();
+            const time = document.getElementById('activityTime').value;
+            const recurrence = document.getElementById('activityRecurrence').value;
+
+            if (!name || !location || !time) {
+                alert('Please fill in Activity Name, Location, and Time');
+                return;
+            }
+
+            const users = loadData('users');
+            
+            if (editingActivityId !== null) {
+                // EDITING MODE
+                const actIndex = users[currentUser].activities.findIndex(a => a.id === editingActivityId);
+                if (actIndex !== -1) {
+                    const activity = {
+                        id: editingActivityId,
+                        name: name,
+                        location: location,
+                        description: description,
+                        time: time,
+                        recurrence: recurrence,
+                        reminderEnabled: document.getElementById('activityReminderEnabled').checked,
+                        reminderMinutes: parseInt(document.getElementById('activityReminderMinutes').value) || 30,
+                        attended: users[currentUser].activities[actIndex].attended || []
+                    };
+
+                    if (recurrence === 'one-time') {
+                        const date = document.getElementById('activityDate').value;
+                        if (!date) {
+                            alert('Please select a date for this one-time activity');
+                            return;
+                        }
+                        activity.date = date;
+                    } else if (recurrence === 'weekly') {
+                        activity.weeklyDay = parseInt(document.getElementById('activityWeeklyDay').value);
+                    } else if (recurrence === 'specific-days') {
+                        const selectedDays = Array.from(document.querySelectorAll('.activity-day-checkbox:checked'))
+                            .map(cb => parseInt(cb.value));
+                        if (selectedDays.length === 0) {
+                            alert('Please select at least one day of the week');
+                            return;
+                        }
+                        activity.specificDays = selectedDays;
+                    } else if (recurrence === 'monthly') {
+                        activity.monthlyDate = parseInt(document.getElementById('activityMonthlyDate').value);
+                    }
+
+                    users[currentUser].activities[actIndex] = activity;
+                    saveData('users', users);
+                    speak(`Updated activity ${name}`);
+                }
+                
+                editingActivityId = null;
+                document.getElementById('addActivityBtn').textContent = 'Add Activity';
+                document.getElementById('cancelEditActivityBtn').classList.add('hidden');
+                
+            } else {
+                // ADDING MODE - Check for duplicates
+                const existingActivities = users[currentUser].activities || [];
+                
+                const exactDuplicate = existingActivities.find(act =>
+                    act.name.toLowerCase().trim() === name.toLowerCase().trim() &&
+                    act.location.toLowerCase().trim() === location.toLowerCase().trim() &&
+                    act.time === time &&
+                    act.recurrence === recurrence
+                );
+                
+                if (exactDuplicate) {
+                    alert('❌ Duplicate Activity\n\n' +
+                          'This activity already exists:\n\n' +
+                          `Name: ${exactDuplicate.name}\n` +
+                          `Location: ${exactDuplicate.location}\n` +
+                          `Time: ${formatTime(exactDuplicate.time)}\n\n` +
+                          'Cannot add duplicate activity.');
+                    speak('This activity already exists');
+                    return;
+                }
+                
+                const sameName = existingActivities.find(act =>
+                    act.name.toLowerCase().trim() === name.toLowerCase().trim() &&
+                    (act.location.toLowerCase().trim() !== location.toLowerCase().trim() || act.time !== time)
+                );
+                
+                if (sameName) {
+                    const userConfirmed = confirm(
+                        `⚠️ Activity Name Already Exists\n\n` +
+                        `An activity named "${sameName.name}" already exists:\n\n` +
+                        `Existing: ${formatTime(sameName.time)} at ${sameName.location}\n` +
+                        `New: ${formatTime(time)} at ${location}\n\n` +
+                        `This might be:\n` +
+                        `• Same activity at different time or location\n` +
+                        `• Accidentally creating a duplicate\n\n` +
+                        `Do you want to add this activity anyway?`
+                    );
+                    
+                    if (!userConfirmed) {
+                        speak('Activity not added');
+                        return;
+                    }
+                }
+                
+                const activity = {
+                    id: Date.now(),
+                    name: name,
+                    location: location,
+                    description: description,
+                    time: time,
+                    recurrence: recurrence,
+                    reminderEnabled: document.getElementById('activityReminderEnabled').checked,
+                    reminderMinutes: parseInt(document.getElementById('activityReminderMinutes').value) || 30,
+                    attended: []
+                };
+
+                if (recurrence === 'one-time') {
+                    const date = document.getElementById('activityDate').value;
+                    if (!date) {
+                        alert('Please select a date for this one-time activity');
+                        return;
+                    }
+                    activity.date = date;
+                } else if (recurrence === 'weekly') {
+                    activity.weeklyDay = parseInt(document.getElementById('activityWeeklyDay').value);
+                } else if (recurrence === 'specific-days') {
+                    const selectedDays = Array.from(document.querySelectorAll('.activity-day-checkbox:checked'))
+                        .map(cb => parseInt(cb.value));
+                    if (selectedDays.length === 0) {
+                        alert('Please select at least one day of the week');
+                        return;
+                    }
+                    activity.specificDays = selectedDays;
+                } else if (recurrence === 'monthly') {
+                    activity.monthlyDate = parseInt(document.getElementById('activityMonthlyDate').value);
+                }
+
+                if (!users[currentUser].activities) {
+                    users[currentUser].activities = [];
+                }
+                users[currentUser].activities.push(activity);
+                saveData('users', users);
+                speak(`Added activity ${name}`);
+            }
+
+            // Clear form
+            document.getElementById('activityName').value = '';
+            document.getElementById('activityLocation').value = '';
+            document.getElementById('activityDescription').value = '';
+            document.getElementById('activityTime').value = '';
+            document.getElementById('activityRecurrence').value = 'one-time';
+            document.getElementById('activityDate').value = '';
+            document.getElementById('activityReminderEnabled').checked = false;
+            document.getElementById('activityReminderMinutes').value = '30';
+            document.getElementById('activityReminderOptions').classList.add('hidden');
+            document.querySelectorAll('.activity-day-checkbox').forEach(cb => cb.checked = false);
+            updateActivityRecurrenceOptions();
+
+            loadActivities(users[currentUser].activities);
+            updateDashboard();
+        }
+
+        function loadActivities(activities) {
+            const container = document.getElementById('activityList');
+            container.innerHTML = '';
+
+            if (!activities || activities.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No activities added yet</p>';
+                return;
+            }
+
+            const minimizedActivities = JSON.parse(localStorage.getItem('minimizedActivities') || '{}');
+
+            activities.sort((a, b) => {
+                if (a.time && b.time) return a.time.localeCompare(b.time);
+                return 0;
+            });
+
+            activities.forEach(activity => {
+                const isMinimized = minimizedActivities[activity.id] || false;
+                const showToday = shouldShowActivityToday(activity);
+                const todayStr = new Date().toISOString().split('T')[0];
+                const attendedToday = activity.attended && activity.attended.includes(todayStr);
+                
+                const card = document.createElement('div');
+                card.className = 'card activity fade-in';
+                if (attendedToday) {
+                    card.style.opacity = '0.6';
+                    card.style.background = '#f7fafc';
+                }
+                
+                const reminderBadge = activity.reminderEnabled ? ' 🔔' : '';
+                const toggleIcon = isMinimized ? '▼' : '▲';
+                const attendedIcon = attendedToday ? '✓ ' : '';
+                
+                let scheduleInfo = '';
+                if (!showToday) {
+                    scheduleInfo = '<div style="background: #e2e8f0; padding: 8px; border-radius: 6px; margin-top: 8px; font-size: 15px;"><strong>📅 Not scheduled for today</strong></div>';
+                }
+                
+                card.innerHTML = `
+                    <div class="card-header" style="cursor: pointer; user-select: none;">
+                        <div style="flex: 1;" onclick="toggleActivityCard(${activity.id})">
+                            ${attendedIcon}${activity.name}${reminderBadge}
+                            <div style="font-size: 14px; color: #666; margin-top: 2px;">
+                                ${formatTime(activity.time)} • ${activity.location}
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 5px; align-items: center;">
+                            <button class="action-btn" onclick="toggleActivityCard(${activity.id})" 
+                                    style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;"
+                                    title="${isMinimized ? 'Expand' : 'Minimize'}">
+                                <span id="toggle-icon-activity-${activity.id}">${toggleIcon}</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="activity-details-${activity.id}" style="${isMinimized ? 'display: none;' : ''}">
+                        <div class="card-content">
+                            <strong>📍 Location:</strong> ${activity.location}<br>
+                            <strong>⏰ Time:</strong> ${formatTime(activity.time)}<br>
+                            <strong>📅 Schedule:</strong> ${getActivityRecurrenceText(activity)}
+                            ${activity.description ? '<br><strong>📝 Description:</strong> ' + activity.description : ''}
+                            ${activity.reminderEnabled ? '<br><strong>🔔 Reminder:</strong> ' + activity.reminderMinutes + ' min before' : ''}
+                        </div>
+                        ${scheduleInfo}
+                        ${showToday ? `
+                            <button class="action-btn ${attendedToday ? 'btn-success' : 'btn-info'}" 
+                                    onclick="toggleActivityAttended(${activity.id})">
+                                ${attendedToday ? '✓ Attended' : 'Mark as Attended'}
+                            </button>
+                        ` : ''}
+                        <div style="display: flex; gap: 5px; margin-top: 10px;">
+                            <button class="action-btn btn-info" onclick="editActivity(${activity.id})" style="font-size: 14px; flex: 1;">Edit</button>
+                            <button class="action-btn btn-delete" onclick="deleteActivity(${activity.id})" style="flex: 1;">Delete</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function toggleActivityCard(activityId) {
+            const detailsDiv = document.getElementById(`activity-details-${activityId}`);
+            const toggleIcon = document.getElementById(`toggle-icon-activity-${activityId}`);
+            
+            if (!detailsDiv || !toggleIcon) return;
+            
+            const isMinimized = detailsDiv.style.display === 'none';
+            detailsDiv.style.display = isMinimized ? '' : 'none';
+            toggleIcon.textContent = isMinimized ? '▲' : '▼';
+            
+            const minimizedActivities = JSON.parse(localStorage.getItem('minimizedActivities') || '{}');
+            minimizedActivities[activityId] = !isMinimized;
+            localStorage.setItem('minimizedActivities', JSON.stringify(minimizedActivities));
+            
+            speak(isMinimized ? 'Expanded' : 'Minimized');
+        }
+        window.toggleActivityCard = toggleActivityCard;
+
+        function editActivity(activityId) {
+            const users = loadData('users');
+            const activity = users[currentUser].activities.find(a => a.id === activityId);
+            
+            if (!activity) {
+                alert('Activity not found');
+                return;
+            }
+
+            editingActivityId = activityId;
+            
+            document.getElementById('activityName').value = activity.name;
+            document.getElementById('activityLocation').value = activity.location;
+            document.getElementById('activityDescription').value = activity.description || '';
+            document.getElementById('activityTime').value = activity.time;
+            document.getElementById('activityRecurrence').value = activity.recurrence || 'one-time';
+            
+            if (activity.recurrence === 'one-time') {
+                document.getElementById('activityDate').value = activity.date || '';
+            } else if (activity.recurrence === 'weekly') {
+                document.getElementById('activityWeeklyDay').value = activity.weeklyDay || '1';
+            } else if (activity.recurrence === 'specific-days' && activity.specificDays) {
+                document.querySelectorAll('.activity-day-checkbox').forEach(cb => {
+                    cb.checked = activity.specificDays.includes(parseInt(cb.value));
+                });
+            } else if (activity.recurrence === 'monthly') {
+                document.getElementById('activityMonthlyDate').value = activity.monthlyDate || 1;
+            }
+            
+            document.getElementById('activityReminderEnabled').checked = activity.reminderEnabled || false;
+            document.getElementById('activityReminderMinutes').value = activity.reminderMinutes || 30;
+            
+            if (activity.reminderEnabled) {
+                document.getElementById('activityReminderOptions').classList.remove('hidden');
+            }
+            
+            updateActivityRecurrenceOptions();
+            
+            document.getElementById('addActivityBtn').textContent = 'Update Activity';
+            document.getElementById('cancelEditActivityBtn').classList.remove('hidden');
+            
+            showSection('activities');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            speak('Editing activity');
+        }
+
+        function cancelEditActivity() {
+            editingActivityId = null;
+            document.getElementById('activityName').value = '';
+            document.getElementById('activityLocation').value = '';
+            document.getElementById('activityDescription').value = '';
+            document.getElementById('activityTime').value = '';
+            document.getElementById('activityRecurrence').value = 'one-time';
+            document.getElementById('activityDate').value = '';
+            document.getElementById('activityReminderEnabled').checked = false;
+            document.getElementById('activityReminderMinutes').value = '30';
+            document.getElementById('activityReminderOptions').classList.add('hidden');
+            document.querySelectorAll('.activity-day-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('addActivityBtn').textContent = 'Add Activity';
+            document.getElementById('cancelEditActivityBtn').classList.add('hidden');
+            updateActivityRecurrenceOptions();
+            speak('Cancelled editing');
+        }
+
+        function deleteActivity(activityId) {
+            if (!confirm('Are you sure you want to delete this activity?')) return;
+            
+            const users = loadData('users');
+            const activity = users[currentUser].activities.find(a => a.id === activityId);
+            const activityName = activity ? activity.name : 'activity';
+            
+            users[currentUser].activities = users[currentUser].activities.filter(a => a.id !== activityId);
+            saveData('users', users);
+            loadActivities(users[currentUser].activities);
+            updateDashboard();
+            speak('Activity deleted: ' + activityName);
+        }
+
+        function toggleActivityAttended(activityId) {
+            const users = loadData('users');
+            const activity = users[currentUser].activities.find(a => a.id === activityId);
+            if (!activity) return;
+            
+            const todayStr = new Date().toISOString().split('T')[0];
+            if (!activity.attended) activity.attended = [];
+            
+            if (activity.attended.includes(todayStr)) {
+                activity.attended = activity.attended.filter(d => d !== todayStr);
+                speak('Marked as not attended');
+            } else {
+                activity.attended.push(todayStr);
+                speak('Marked as attended');
+            }
+            
+            saveData('users', users);
+            loadActivities(users[currentUser].activities);
+            updateDashboard();
+        }
+
         // Profile
         function loadProfile(userData) {
             const container = document.getElementById('profileInfo');
@@ -5090,6 +5660,21 @@
                                  `✓ ${paidBills} paid`;
             
             document.getElementById('billCount').innerHTML = billCountText;
+            
+            // Count activities
+            const allActivities = userData.activities || [];
+            const todayStr = new Date().toISOString().split('T')[0];
+            const activitiesScheduledToday = allActivities.filter(activity => shouldShowActivityToday(activity));
+            const activitiesAttendedToday = activitiesScheduledToday.filter(activity => 
+                activity.attended && activity.attended.includes(todayStr)
+            ).length;
+            const activitiesLeftToday = activitiesScheduledToday.length - activitiesAttendedToday;
+            
+            const activityCountText = `${activitiesScheduledToday.length} for today<br>` +
+                                     `✓ ${activitiesAttendedToday} attended<br>` +
+                                     `• ${activitiesLeftToday} upcoming`;
+            
+            document.getElementById('activityCount').innerHTML = activityCountText;
         }
 
 
