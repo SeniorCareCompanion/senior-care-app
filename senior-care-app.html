@@ -3589,6 +3589,9 @@
                 return;
             }
 
+            // Load minimized state
+            const minimizedAppts = JSON.parse(localStorage.getItem('minimizedAppts') || '{}');
+
             // Add completed property to legacy appointments
             appointments.forEach(appt => {
                 if (appt.completed === undefined) {
@@ -3599,6 +3602,7 @@
             appointments.sort((a, b) => new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time));
 
             appointments.forEach(appt => {
+                const isMinimized = minimizedAppts[appt.id] || false;
                 const card = document.createElement('div');
                 card.className = 'card appointment fade-in';
                 if (appt.completed) {
@@ -3608,24 +3612,40 @@
                 
                 const reminderBadge = appt.reminderEnabled ? ' 🔔' : '';
                 const reminderText = appt.reminderEnabled ? `<br><strong>🔔 Reminder:</strong> ${appt.reminderMinutes >= 1440 ? Math.floor(appt.reminderMinutes / 1440) + ' day before' : appt.reminderMinutes >= 60 ? Math.floor(appt.reminderMinutes / 60) + ' hour' + (appt.reminderMinutes >= 120 ? 's' : '') + ' before' : appt.reminderMinutes + ' min before'}` : '';
+                const toggleIcon = isMinimized ? '▼' : '▲';
+                const completedIcon = appt.completed ? '✓ ' : '';
                 
                 card.innerHTML = `
-                    <div class="card-header">
-                        ${appt.completed ? '✓ ' : ''}${appt.doctor}${reminderBadge}
-                        <div style="display: flex; gap: 5px;">
-                            <button class="action-btn btn-info" onclick="window.editAppointment(${appt.id})" style="font-size: 14px;">Edit</button>
-                            <button class="action-btn btn-delete" onclick="window.deleteAppointmentById(${appt.id})">Delete</button>
+                    <div class="card-header" style="cursor: pointer; user-select: none;">
+                        <div style="flex: 1;" onclick="toggleAppointmentCard(${appt.id})">
+                            ${completedIcon}${appt.doctor}${reminderBadge}
+                            <div style="font-size: 14px; color: #666; margin-top: 2px;">
+                                ${formatDate(appt.date)} at ${formatTime(appt.time)} • ${appt.location}
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 5px; align-items: center;">
+                            <button class="action-btn" onclick="toggleAppointmentCard(${appt.id})" 
+                                    style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;"
+                                    title="${isMinimized ? 'Expand' : 'Minimize'}">
+                                <span id="toggle-icon-appt-${appt.id}">${toggleIcon}</span>
+                            </button>
                         </div>
                     </div>
-                    <div class="card-content">
-                        <strong>📍 Location:</strong> ${appt.location}<br>
-                        <strong>📅 Date:</strong> ${formatDate(appt.date)}<br>
-                        <strong>⏰ Time:</strong> ${formatTime(appt.time)}${reminderText}
+                    <div id="appt-details-${appt.id}" style="${isMinimized ? 'display: none;' : ''}">
+                        <div class="card-content">
+                            <strong>📍 Location:</strong> ${appt.location}<br>
+                            <strong>📅 Date:</strong> ${formatDate(appt.date)}<br>
+                            <strong>⏰ Time:</strong> ${formatTime(appt.time)}${reminderText}
+                        </div>
+                        <button class="action-btn ${appt.completed ? 'btn-success' : 'btn-info'}" 
+                                onclick="toggleAppointmentCompleted(${appt.id})">
+                            ${appt.completed ? '✓ Completed' : 'Mark as Completed'}
+                        </button>
+                        <div style="display: flex; gap: 5px; margin-top: 10px;">
+                            <button class="action-btn btn-info" onclick="window.editAppointment(${appt.id})" style="font-size: 14px; flex: 1;">Edit</button>
+                            <button class="action-btn btn-delete" onclick="window.deleteAppointmentById(${appt.id})" style="flex: 1;">Delete</button>
+                        </div>
                     </div>
-                    <button class="action-btn ${appt.completed ? 'btn-success' : 'btn-info'}" 
-                            onclick="toggleAppointmentCompleted(${appt.id})">
-                        ${appt.completed ? '✓ Completed' : 'Mark as Completed'}
-                    </button>
                 `;
                 container.appendChild(card);
             });
@@ -3633,6 +3653,25 @@
             // Update autocomplete suggestions
             updateAppointmentAutocomplete(appointments);
         }
+
+        // Toggle appointment card
+        function toggleAppointmentCard(apptId) {
+            const detailsDiv = document.getElementById(`appt-details-${apptId}`);
+            const toggleIcon = document.getElementById(`toggle-icon-appt-${apptId}`);
+            
+            if (!detailsDiv || !toggleIcon) return;
+            
+            const isMinimized = detailsDiv.style.display === 'none';
+            detailsDiv.style.display = isMinimized ? '' : 'none';
+            toggleIcon.textContent = isMinimized ? '▲' : '▼';
+            
+            const minimizedAppts = JSON.parse(localStorage.getItem('minimizedAppts') || '{}');
+            minimizedAppts[apptId] = !isMinimized;
+            localStorage.setItem('minimizedAppts', JSON.stringify(minimizedAppts));
+            
+            speak(isMinimized ? 'Expanded' : 'Minimized');
+        }
+        window.toggleAppointmentCard = toggleAppointmentCard;
 
         // Make appointment delete function globally accessible
         window.deleteAppointmentById = function(id) {
@@ -3939,6 +3978,8 @@
 
         function loadTasks(tasks) {
             console.log('loadTasks called with:', tasks);
+            const minimizedTasks = JSON.parse(localStorage.getItem('minimizedTasks') || '{}');
+            
             ['meals', 'hydration', 'hygiene', 'safety'].forEach(category => {
                 const container = document.getElementById(`${category}Tasks`);
                 console.log(`Loading ${category}:`, container ? 'container found' : 'container NOT found', tasks[category] ? `${tasks[category].length} tasks` : 'no tasks');
@@ -3948,44 +3989,67 @@
                 if (tasks[category]) {
                     tasks[category].forEach((task, index) => {
                         console.log(`  Task ${index} in ${category}:`, task.name, 'showToday:', shouldShowTaskToday(task));
-                        // Check if task should be shown today
                         const showToday = shouldShowTaskToday(task);
+                        const taskKey = `${category}-${index}`;
+                        const isMinimized = minimizedTasks[taskKey] || false;
                         
                         const item = document.createElement('div');
                         item.className = `checkbox-item ${task.completed ? 'completed' : ''}`;
+                        item.style.display = 'block';
+                        item.style.padding = '12px';
+                        item.style.border = '1px solid #e2e8f0';
+                        item.style.borderRadius = '8px';
+                        item.style.marginBottom = '8px';
                         
-                        const taskTime = task.time ? ` - ${formatTime(task.time)}` : '';
+                        const taskTime = task.time ? ` • ${formatTime(task.time)}` : '';
                         const taskRecurrence = getTaskRecurrenceText(task);
                         const taskNameEscaped = task.name.replace(/'/g, "\\'");
                         const taskReminderBadge = task.reminderEnabled ? ' 🔔' : '';
                         const taskReminderText = task.reminderEnabled ? ` (${task.reminderMinutes} min before)` : '';
+                        const toggleIcon = isMinimized ? '▼' : '▲';
+                        const completedIcon = task.completed ? '✓ ' : '';
                         
-                        // Show schedule info if not scheduled for today
                         let scheduleNote = '';
                         if (!showToday) {
                             scheduleNote = '<div style="background: #e2e8f0; padding: 4px 8px; border-radius: 4px; margin-top: 4px; font-size: 13px; color: #666;">📅 Not scheduled for today</div>';
                         }
                         
                         item.innerHTML = `
-                            <input type="checkbox" ${task.completed ? 'checked' : ''} 
-                                   ${!showToday ? 'disabled' : ''}
-                                   onchange="window.toggleTaskByIndex('${category}', ${index})"
-                                   style="width: 28px; height: 28px; margin-right: 15px; cursor: ${showToday ? 'pointer' : 'not-allowed'};">
-                            <label onclick="${showToday ? "window.toggleTaskByIndex('" + category + "', " + index + ")" : ''}" 
-                                   style="font-size: 17px; cursor: ${showToday ? 'pointer' : 'default'}; flex: 1; ${!showToday ? 'opacity: 0.6;' : ''}">
-                                ${task.name}${taskReminderBadge}${taskTime}${taskRecurrence}${taskReminderText}
-                                ${scheduleNote}
-                            </label>
-                            <button class="action-btn btn-info" 
-                                    onclick="window.editTaskByIndex('${category}', ${index})"
-                                    style="margin: 0; margin-right: 5px; padding: 8px 16px; font-size: 14px;">
-                                Edit
-                            </button>
-                            <button class="action-btn btn-delete" 
-                                    onclick="window.deleteTaskByIndex('${category}', ${index})"
-                                    style="margin: 0; padding: 8px 16px; font-size: 14px;">
-                                Delete
-                            </button>
+                            <div style="display: flex; align-items: center; cursor: pointer; user-select: none;" onclick="toggleTaskCard('${taskKey}')">
+                                <input type="checkbox" ${task.completed ? 'checked' : ''} 
+                                       ${!showToday ? 'disabled' : ''}
+                                       onchange="window.toggleTaskByIndex('${category}', ${index}); event.stopPropagation();"
+                                       onclick="event.stopPropagation();"
+                                       style="width: 24px; height: 24px; margin-right: 12px; cursor: ${showToday ? 'pointer' : 'not-allowed'};">
+                                <div style="flex: 1; ${!showToday ? 'opacity: 0.6;' : ''}">
+                                    <div style="font-size: 16px; font-weight: 500;">
+                                        ${completedIcon}${task.name}${taskReminderBadge}${taskTime}
+                                    </div>
+                                </div>
+                                <button class="action-btn" onclick="toggleTaskCard('${taskKey}'); event.stopPropagation();" 
+                                        style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333; margin-left: 10px;"
+                                        title="${isMinimized ? 'Expand' : 'Minimize'}">
+                                    <span id="toggle-icon-task-${taskKey}">${toggleIcon}</span>
+                                </button>
+                            </div>
+                            <div id="task-details-${taskKey}" style="${isMinimized ? 'display: none;' : ''} margin-top: 8px; padding-top: 8px; border-top: 1px solid #e2e8f0;">
+                                <div style="font-size: 14px; color: #666; margin-bottom: 8px;">
+                                    ${taskRecurrence}${taskReminderText}
+                                    ${scheduleNote}
+                                </div>
+                                <div style="display: flex; gap: 5px;">
+                                    <button class="action-btn btn-info" 
+                                            onclick="window.editTaskByIndex('${category}', ${index}); event.stopPropagation();"
+                                            style="flex: 1; padding: 8px 16px; font-size: 14px;">
+                                        Edit
+                                    </button>
+                                    <button class="action-btn btn-delete" 
+                                            onclick="window.deleteTaskByIndex('${category}', ${index}); event.stopPropagation();"
+                                            style="flex: 1; padding: 8px 16px; font-size: 14px;">
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
                         `;
                         
                         container.appendChild(item);
@@ -3995,6 +4059,25 @@
             });
             console.log('loadTasks complete');
         }
+
+        // Toggle task card
+        function toggleTaskCard(taskKey) {
+            const detailsDiv = document.getElementById(`task-details-${taskKey}`);
+            const toggleIcon = document.getElementById(`toggle-icon-task-${taskKey}`);
+            
+            if (!detailsDiv || !toggleIcon) return;
+            
+            const isMinimized = detailsDiv.style.display === 'none';
+            detailsDiv.style.display = isMinimized ? '' : 'none';
+            toggleIcon.textContent = isMinimized ? '▲' : '▼';
+            
+            const minimizedTasks = JSON.parse(localStorage.getItem('minimizedTasks') || '{}');
+            minimizedTasks[taskKey] = !isMinimized;
+            localStorage.setItem('minimizedTasks', JSON.stringify(minimizedTasks));
+            
+            speak(isMinimized ? 'Expanded' : 'Minimized');
+        }
+        window.toggleTaskCard = toggleTaskCard;
 
         // Make these functions available globally
         window.deleteTaskByIndex = function(category, index) {
@@ -4250,6 +4333,7 @@
                 return;
             }
 
+            const minimizedBills = JSON.parse(localStorage.getItem('minimizedBills') || '{}');
             bills.sort((a, b) => parseLocalDate(a.dueDate) - parseLocalDate(b.dueDate));
 
             bills.forEach(bill => {
@@ -4258,32 +4342,68 @@
                     bill.recurrence = 'one-time';
                 }
 
+                const isMinimized = minimizedBills[bill.id] || false;
                 const reminderBadge = bill.reminderEnabled ? ' 🔔' : '';
                 const reminderText = bill.reminderEnabled ? `<br><strong>🔔 Reminder:</strong> ${bill.reminderDays} day${bill.reminderDays !== 1 ? 's' : ''} before due date` : '';
+                const toggleIcon = isMinimized ? '▼' : '▲';
+                const paidIcon = bill.paid ? '✓ ' : '';
 
                 const card = document.createElement('div');
                 card.className = 'card bill fade-in';
                 card.innerHTML = `
-                    <div class="card-header">
-                        ${bill.name}${reminderBadge}
-                        <div style="display: flex; gap: 5px;">
-                            <button class="action-btn btn-info" onclick="window.editBill(${bill.id})" style="font-size: 14px;">Edit</button>
-                            <button class="action-btn btn-delete" onclick="window.deleteBillById(${bill.id})">Delete</button>
+                    <div class="card-header" style="cursor: pointer; user-select: none;">
+                        <div style="flex: 1;" onclick="toggleBillCard(${bill.id})">
+                            ${paidIcon}${bill.name}${reminderBadge}
+                            <div style="font-size: 14px; color: #666; margin-top: 2px;">
+                                $${bill.amount.toFixed(2)} • Due ${formatDate(bill.dueDate)}
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 5px; align-items: center;">
+                            <button class="action-btn" onclick="toggleBillCard(${bill.id})" 
+                                    style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;"
+                                    title="${isMinimized ? 'Expand' : 'Minimize'}">
+                                <span id="toggle-icon-bill-${bill.id}">${toggleIcon}</span>
+                            </button>
                         </div>
                     </div>
-                    <div class="card-content">
-                        <strong>💵 Amount:</strong> $${bill.amount.toFixed(2)}<br>
-                        <strong>📅 Due Date:</strong> ${formatDate(bill.dueDate)}<br>
-                        <strong>🔄 Repeats:</strong> ${getBillRecurrenceText(bill)}${reminderText}
+                    <div id="bill-details-${bill.id}" style="${isMinimized ? 'display: none;' : ''}">
+                        <div class="card-content">
+                            <strong>💵 Amount:</strong> $${bill.amount.toFixed(2)}<br>
+                            <strong>📅 Due Date:</strong> ${formatDate(bill.dueDate)}<br>
+                            <strong>🔄 Repeats:</strong> ${getBillRecurrenceText(bill)}${reminderText}
+                        </div>
+                        <button class="action-btn ${bill.paid ? 'btn-success' : 'btn-warning'}" 
+                                onclick="toggleBillPaid(${bill.id})">
+                            ${bill.paid ? '✓ Paid' : 'Mark as Paid'}
+                        </button>
+                        <div style="display: flex; gap: 5px; margin-top: 10px;">
+                            <button class="action-btn btn-info" onclick="window.editBill(${bill.id})" style="font-size: 14px; flex: 1;">Edit</button>
+                            <button class="action-btn btn-delete" onclick="window.deleteBillById(${bill.id})" style="flex: 1;">Delete</button>
+                        </div>
                     </div>
-                    <button class="action-btn ${bill.paid ? 'btn-success' : 'btn-warning'}" 
-                            onclick="toggleBillPaid(${bill.id})">
-                        ${bill.paid ? '✓ Paid' : 'Mark as Paid'}
-                    </button>
                 `;
                 container.appendChild(card);
             });
         }
+
+        // Toggle bill card
+        function toggleBillCard(billId) {
+            const detailsDiv = document.getElementById(`bill-details-${billId}`);
+            const toggleIcon = document.getElementById(`toggle-icon-bill-${billId}`);
+            
+            if (!detailsDiv || !toggleIcon) return;
+            
+            const isMinimized = detailsDiv.style.display === 'none';
+            detailsDiv.style.display = isMinimized ? '' : 'none';
+            toggleIcon.textContent = isMinimized ? '▲' : '▼';
+            
+            const minimizedBills = JSON.parse(localStorage.getItem('minimizedBills') || '{}');
+            minimizedBills[billId] = !isMinimized;
+            localStorage.setItem('minimizedBills', JSON.stringify(minimizedBills));
+            
+            speak(isMinimized ? 'Expanded' : 'Minimized');
+        }
+        window.toggleBillCard = toggleBillCard;
 
         // Make bill delete function globally accessible
         window.deleteBillById = function(id) {
@@ -4431,22 +4551,44 @@
                 return;
             }
 
+            const minimizedContacts = JSON.parse(localStorage.getItem('minimizedContacts') || '{}');
+
             contacts.forEach(contact => {
+                const isMinimized = minimizedContacts[contact.id] || false;
+                const toggleIcon = isMinimized ? '▼' : '▲';
+                
                 const card = document.createElement('div');
                 card.className = 'contact-card fade-in';
+                card.style.display = 'block';
+                card.style.padding = '16px';
+                
                 card.innerHTML = `
-                    <div class="contact-info">
-                        <div class="contact-name">${contact.name}</div>
-                        <div class="contact-relation">${contact.relation}</div>
-                        <div class="contact-phone">📞 ${contact.phone}</div>
-                    </div>
-                    <div class="contact-buttons">
-                        <button class="call-btn" onclick="callContact('${contact.name}', '${contact.phone}')">
-                            📞 Call
-                        </button>
-                        <button class="action-btn btn-delete" onclick="deleteContact(${contact.id})">
-                            Delete
-                        </button>
+                    <div style="cursor: pointer; user-select: none;">
+                        <div style="display: flex; align-items: flex-start; justify-content: space-between;" onclick="toggleContactCard(${contact.id})">
+                            <div style="flex: 1;">
+                                <div class="contact-name" style="font-size: 18px; font-weight: 600; margin-bottom: 4px;">
+                                    ${contact.name}
+                                </div>
+                                <div style="font-size: 14px; color: #666;">
+                                    📞 ${contact.phone} • ${contact.relation}
+                                </div>
+                            </div>
+                            <button class="action-btn" onclick="toggleContactCard(${contact.id}); event.stopPropagation();" 
+                                    style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;"
+                                    title="${isMinimized ? 'Expand' : 'Minimize'}">
+                                <span id="toggle-icon-contact-${contact.id}">${toggleIcon}</span>
+                            </button>
+                        </div>
+                        <div id="contact-details-${contact.id}" style="${isMinimized ? 'display: none;' : ''} margin-top: 12px; padding-top: 12px; border-top: 1px solid #e2e8f0;">
+                            <div class="contact-buttons" style="display: flex; gap: 8px;">
+                                <button class="call-btn" onclick="callContact('${contact.name.replace(/'/g, "\\'")}', '${contact.phone}'); event.stopPropagation();" style="flex: 1;">
+                                    📞 Call
+                                </button>
+                                <button class="action-btn btn-delete" onclick="deleteContact(${contact.id}); event.stopPropagation();" style="flex: 1;">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 `;
                 container.appendChild(card);
@@ -4455,6 +4597,25 @@
             // Update autocomplete with current contacts
             updateContactAutocomplete(contacts);
         }
+
+        // Toggle contact card
+        function toggleContactCard(contactId) {
+            const detailsDiv = document.getElementById(`contact-details-${contactId}`);
+            const toggleIcon = document.getElementById(`toggle-icon-contact-${contactId}`);
+            
+            if (!detailsDiv || !toggleIcon) return;
+            
+            const isMinimized = detailsDiv.style.display === 'none';
+            detailsDiv.style.display = isMinimized ? '' : 'none';
+            toggleIcon.textContent = isMinimized ? '▲' : '▼';
+            
+            const minimizedContacts = JSON.parse(localStorage.getItem('minimizedContacts') || '{}');
+            minimizedContacts[contactId] = !isMinimized;
+            localStorage.setItem('minimizedContacts', JSON.stringify(minimizedContacts));
+            
+            speak(isMinimized ? 'Expanded' : 'Minimized');
+        }
+        window.toggleContactCard = toggleContactCard;
 
         function callContact(name, phone) {
             speak(`Calling ${name}`);
