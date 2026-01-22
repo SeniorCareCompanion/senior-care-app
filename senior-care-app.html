@@ -2909,15 +2909,20 @@
                 return;
             }
 
+            // Load minimized state from localStorage
+            const minimizedMeds = JSON.parse(localStorage.getItem('minimizedMeds') || '{}');
+
             medications.sort((a, b) => a.time.localeCompare(b.time));
 
             medications.forEach(med => {
                 try {
                     const shouldTakeToday = shouldTakeMedicationToday(med);
                     const takenToday = wasTakenToday(med);
+                    const isMinimized = minimizedMeds[med.id] || false;
                     
                     const card = document.createElement('div');
                     card.className = 'card medication fade-in';
+                    card.id = `med-card-${med.id}`;
                     
                     let scheduleInfo = '';
                     if (!shouldTakeToday) {
@@ -2925,27 +2930,42 @@
                     }
 
                     const reminderBadge = med.reminderEnabled ? ' 🔔' : '';
+                    const toggleIcon = isMinimized ? '▼' : '▲';
 
                     card.innerHTML = `
-                        <div class="card-header">
-                            ${med.name}${reminderBadge}
-                            <div style="display: flex; gap: 5px;">
-                                <button class="action-btn btn-info" onclick="window.editMedication(${med.id})" style="font-size: 14px;">Edit</button>
-                                <button class="action-btn btn-delete" onclick="window.deleteMedicationById(${med.id})">Delete</button>
+                        <div class="card-header" style="cursor: pointer; user-select: none;">
+                            <div style="flex: 1;" onclick="toggleMedicationCard(${med.id})">
+                                ${med.name}${reminderBadge}
+                                <div style="font-size: 14px; color: #666; margin-top: 2px;">
+                                    ${med.dosage} at ${formatTime(med.time)}
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 5px; align-items: center;">
+                                <button class="action-btn" onclick="toggleMedicationCard(${med.id})" 
+                                        style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;"
+                                        title="${isMinimized ? 'Expand' : 'Minimize'}">
+                                    <span id="toggle-icon-${med.id}">${toggleIcon}</span>
+                                </button>
                             </div>
                         </div>
-                        <div class="card-content">
-                            <strong>Dosage:</strong> ${med.dosage}<br>
-                            <strong>Schedule:</strong> ${getRecurrenceText(med)}${med.reminderEnabled ? '<br><strong>🔔 Reminder:</strong> ' + med.reminderMinutes + ' min before' : ''}
+                        <div id="med-details-${med.id}" class="med-details" style="${isMinimized ? 'display: none;' : ''}">
+                            <div class="card-content">
+                                <strong>Dosage:</strong> ${med.dosage}<br>
+                                <strong>Schedule:</strong> ${getRecurrenceText(med)}${med.reminderEnabled ? '<br><strong>🔔 Reminder:</strong> ' + med.reminderMinutes + ' min before' : ''}
+                            </div>
+                            <div class="card-time">⏰ ${formatTime(med.time)}</div>
+                            ${scheduleInfo}
+                            ${shouldTakeToday ? `
+                                <button class="action-btn ${takenToday ? 'btn-success' : 'btn-info'}" 
+                                        onclick="markMedicationTaken(${med.id})">
+                                    ${takenToday ? '✓ Taken Today' : 'Mark as Taken'}
+                                </button>
+                            ` : ''}
+                            <div style="display: flex; gap: 5px; margin-top: 10px;">
+                                <button class="action-btn btn-info" onclick="window.editMedication(${med.id})" style="font-size: 14px; flex: 1;">Edit</button>
+                                <button class="action-btn btn-delete" onclick="window.deleteMedicationById(${med.id})" style="flex: 1;">Delete</button>
+                            </div>
                         </div>
-                        <div class="card-time">⏰ ${formatTime(med.time)}</div>
-                        ${scheduleInfo}
-                        ${shouldTakeToday ? `
-                            <button class="action-btn ${takenToday ? 'btn-success' : 'btn-info'}" 
-                                    onclick="markMedicationTaken(${med.id})">
-                                ${takenToday ? '✓ Taken Today' : 'Mark as Taken'}
-                            </button>
-                        ` : ''}
                     `;
                     container.appendChild(card);
                 } catch (error) {
@@ -2953,6 +2973,31 @@
                 }
             });
         }
+
+        // Toggle medication card minimize/maximize
+        function toggleMedicationCard(medId) {
+            const detailsDiv = document.getElementById(`med-details-${medId}`);
+            const toggleIcon = document.getElementById(`toggle-icon-${medId}`);
+            
+            if (!detailsDiv || !toggleIcon) return;
+            
+            const isMinimized = detailsDiv.style.display === 'none';
+            
+            // Toggle display
+            detailsDiv.style.display = isMinimized ? '' : 'none';
+            toggleIcon.textContent = isMinimized ? '▲' : '▼';
+            
+            // Save state to localStorage
+            const minimizedMeds = JSON.parse(localStorage.getItem('minimizedMeds') || '{}');
+            minimizedMeds[medId] = !isMinimized;
+            localStorage.setItem('minimizedMeds', JSON.stringify(minimizedMeds));
+            
+            // Voice feedback
+            speak(isMinimized ? 'Expanded' : 'Minimized');
+        }
+
+        // Make function globally accessible
+        window.toggleMedicationCard = toggleMedicationCard;
 
         // Make medication delete function globally accessible
         window.deleteMedicationById = function(id) {
