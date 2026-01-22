@@ -2678,6 +2678,53 @@
                 
             } else {
                 // ADDING MODE - Create new medication
+                
+                // Check for duplicates
+                const existingMeds = users[currentUser].medications || [];
+                
+                // Check for EXACT duplicate (name + dosage + time all match)
+                const exactDuplicate = existingMeds.find(med =>
+                    med.name.toLowerCase().trim() === name.toLowerCase().trim() &&
+                    med.dosage.toLowerCase().trim() === dosage.toLowerCase().trim() &&
+                    med.time === time
+                );
+                
+                if (exactDuplicate) {
+                    alert('❌ Duplicate Medication\n\n' +
+                          'This medication already exists:\n\n' +
+                          `Name: ${exactDuplicate.name}\n` +
+                          `Dosage: ${exactDuplicate.dosage}\n` +
+                          `Time: ${formatTime(exactDuplicate.time)}\n\n` +
+                          'Cannot add duplicate medication.');
+                    speak('This medication already exists');
+                    return;
+                }
+                
+                // Check for SAME NAME but different dosage or time
+                const sameMedName = existingMeds.find(med =>
+                    med.name.toLowerCase().trim() === name.toLowerCase().trim() &&
+                    (med.dosage.toLowerCase().trim() !== dosage.toLowerCase().trim() || med.time !== time)
+                );
+                
+                if (sameMedName) {
+                    const userConfirmed = confirm(
+                        `⚠️ Medication Name Already Exists\n\n` +
+                        `A medication named "${sameMedName.name}" already exists:\n\n` +
+                        `Existing: ${sameMedName.dosage} at ${formatTime(sameMedName.time)}\n` +
+                        `New: ${dosage} at ${formatTime(time)}\n\n` +
+                        `This might be:\n` +
+                        `• Dosage change or adjustment\n` +
+                        `• Same medication taken at different times\n` +
+                        `• Accidentally creating a duplicate\n\n` +
+                        `Do you want to add this medication anyway?`
+                    );
+                    
+                    if (!userConfirmed) {
+                        speak('Medication not added');
+                        return;
+                    }
+                }
+                
                 const medication = {
                     id: Date.now(),
                     name: name,
@@ -3136,6 +3183,56 @@
                 document.getElementById('cancelEditApptBtn').classList.add('hidden');
             } else {
                 // ADDING MODE
+                
+                // Check for duplicates
+                const existingAppts = users[currentUser].appointments || [];
+                
+                // Check for EXACT duplicate (doctor + date + time + location all match)
+                const exactDuplicate = existingAppts.find(appt =>
+                    appt.doctor.toLowerCase().trim() === doctor.toLowerCase().trim() &&
+                    appt.date === date &&
+                    appt.time === time &&
+                    appt.location.toLowerCase().trim() === location.toLowerCase().trim()
+                );
+                
+                if (exactDuplicate) {
+                    alert('❌ Duplicate Appointment\n\n' +
+                          'This appointment already exists:\n\n' +
+                          `Doctor: ${exactDuplicate.doctor}\n` +
+                          `Date: ${formatDate(exactDuplicate.date)}\n` +
+                          `Time: ${formatTime(exactDuplicate.time)}\n` +
+                          `Location: ${exactDuplicate.location}\n\n` +
+                          'Cannot add duplicate appointment.');
+                    speak('This appointment already exists');
+                    return;
+                }
+                
+                // Check for SAME DOCTOR on same day but different time or location
+                const sameDoctorSameDay = existingAppts.find(appt =>
+                    appt.doctor.toLowerCase().trim() === doctor.toLowerCase().trim() &&
+                    appt.date === date &&
+                    (appt.time !== time || appt.location.toLowerCase().trim() !== location.toLowerCase().trim())
+                );
+                
+                if (sameDoctorSameDay) {
+                    const userConfirmed = confirm(
+                        `⚠️ Appointment with This Doctor Already Exists\n\n` +
+                        `You already have an appointment with ${sameDoctorSameDay.doctor} on ${formatDate(date)}:\n\n` +
+                        `Existing: ${formatTime(sameDoctorSameDay.time)} at ${sameDoctorSameDay.location}\n` +
+                        `New: ${formatTime(time)} at ${location}\n\n` +
+                        `This might be:\n` +
+                        `• Time or location change\n` +
+                        `• Multiple appointments same day\n` +
+                        `• Accidentally creating a duplicate\n\n` +
+                        `Do you want to add this appointment anyway?`
+                    );
+                    
+                    if (!userConfirmed) {
+                        speak('Appointment not added');
+                        return;
+                    }
+                }
+                
                 const appointment = {
                     id: Date.now(),
                     doctor: doctor,
@@ -3638,6 +3735,51 @@
                 document.getElementById('cancelEditTaskBtn').classList.add('hidden');
             } else {
                 // ADDING MODE
+                
+                // Check for duplicates in the same category
+                const existingTasks = users[currentUser].tasks[category] || [];
+                
+                // Check for EXACT duplicate (name + time in same category)
+                const exactDuplicate = existingTasks.find(task =>
+                    task.name.toLowerCase().trim() === name.toLowerCase().trim() &&
+                    task.time === time
+                );
+                
+                if (exactDuplicate) {
+                    alert('❌ Duplicate Task\n\n' +
+                          'This task already exists in this category:\n\n' +
+                          `Name: ${exactDuplicate.name}\n` +
+                          `Time: ${time ? formatTime(time) : 'No specific time'}\n` +
+                          `Category: ${category.charAt(0).toUpperCase() + category.slice(1)}\n\n` +
+                          'Cannot add duplicate task.');
+                    speak('This task already exists');
+                    return;
+                }
+                
+                // Check for SAME NAME but different time in same category
+                const sameTaskName = existingTasks.find(task =>
+                    task.name.toLowerCase().trim() === name.toLowerCase().trim() &&
+                    task.time !== time
+                );
+                
+                if (sameTaskName) {
+                    const userConfirmed = confirm(
+                        `⚠️ Task Name Already Exists\n\n` +
+                        `A task named "${sameTaskName.name}" already exists in ${category}:\n\n` +
+                        `Existing: ${sameTaskName.time ? formatTime(sameTaskName.time) : 'No specific time'}\n` +
+                        `New: ${time ? formatTime(time) : 'No specific time'}\n\n` +
+                        `This might be:\n` +
+                        `• Same task at different times\n` +
+                        `• Accidentally creating a duplicate\n\n` +
+                        `Do you want to add this task anyway?`
+                    );
+                    
+                    if (!userConfirmed) {
+                        speak('Task not added');
+                        return;
+                    }
+                }
+                
                 const task = {
                     name: name,
                     time: time || '',
@@ -3927,6 +4069,53 @@
                 document.getElementById('cancelEditBillBtn').classList.add('hidden');
             } else {
                 // ADDING MODE
+                
+                // Check for duplicates
+                const existingBills = users[currentUser].bills || [];
+                
+                // Check for EXACT duplicate (name + amount + due date all match)
+                const exactDuplicate = existingBills.find(bill =>
+                    bill.name.toLowerCase().trim() === name.toLowerCase().trim() &&
+                    Math.abs(bill.amount - parseFloat(amount)) < 0.01 && // Allow for floating point comparison
+                    bill.dueDate === dueDate
+                );
+                
+                if (exactDuplicate) {
+                    alert('❌ Duplicate Bill\n\n' +
+                          'This bill already exists:\n\n' +
+                          `Name: ${exactDuplicate.name}\n` +
+                          `Amount: $${exactDuplicate.amount.toFixed(2)}\n` +
+                          `Due Date: ${formatDate(exactDuplicate.dueDate)}\n\n` +
+                          'Cannot add duplicate bill.');
+                    speak('This bill already exists');
+                    return;
+                }
+                
+                // Check for SAME NAME but different amount or date
+                const sameBillName = existingBills.find(bill =>
+                    bill.name.toLowerCase().trim() === name.toLowerCase().trim() &&
+                    (Math.abs(bill.amount - parseFloat(amount)) >= 0.01 || bill.dueDate !== dueDate)
+                );
+                
+                if (sameBillName) {
+                    const userConfirmed = confirm(
+                        `⚠️ Bill Name Already Exists\n\n` +
+                        `A bill named "${sameBillName.name}" already exists:\n\n` +
+                        `Existing: $${sameBillName.amount.toFixed(2)} due ${formatDate(sameBillName.dueDate)}\n` +
+                        `New: $${parseFloat(amount).toFixed(2)} due ${formatDate(dueDate)}\n\n` +
+                        `This might be:\n` +
+                        `• Recurring bill for different month\n` +
+                        `• Amount changed (e.g., electric bill varies)\n` +
+                        `• Accidentally creating a duplicate\n\n` +
+                        `Do you want to add this bill anyway?`
+                    );
+                    
+                    if (!userConfirmed) {
+                        speak('Bill not added');
+                        return;
+                    }
+                }
+                
                 const bill = {
                     id: Date.now(),
                     name: name,
