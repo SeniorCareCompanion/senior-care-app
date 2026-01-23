@@ -2469,8 +2469,8 @@
         </div>
     </div>
 
-    <!-- Floating Help Button -->
-    <div id="floatingHelpBtn" class="floating-help-btn" onclick="showSection('help')" title="Get Help">
+    <!-- Floating Help Button (hidden until login) -->
+    <div id="floatingHelpBtn" class="floating-help-btn hidden" onclick="showSection('help')" title="Get Help">
         <div style="font-size: 24px;">❓</div>
         <div style="font-size: 10px; margin-top: 2px;">HELP</div>
     </div>
@@ -3205,6 +3205,9 @@
             document.getElementById('mainApp').classList.remove('hidden');
             document.getElementById('userName').textContent = users[username].name;
             
+            // Show floating help button (now that user is logged in)
+            document.getElementById('floatingHelpBtn').classList.remove('hidden');
+            
             // Initialize voice button
             const voiceBtn = document.getElementById('voiceToggleBtn');
             if (voiceBtn) {
@@ -3232,6 +3235,11 @@
                 reminderCheckInterval = null;
             }
             shownReminders.clear(); // Clear shown reminders
+            
+            // Hide floating buttons on logout
+            document.getElementById('floatingHelpBtn').classList.add('hidden');
+            document.getElementById('floatingVoiceBtn').classList.add('hidden');
+            
             document.getElementById('mainApp').classList.add('hidden');
             document.getElementById('loginScreen').classList.remove('hidden');
             document.getElementById('loginUsername').value = '';
