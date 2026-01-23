@@ -2373,19 +2373,22 @@
                 return;
             }
 
-            // Register service worker
+            // Register service worker for push notifications
             if ('serviceWorker' in navigator) {
                 try {
                     serviceWorkerRegistration = await navigator.serviceWorker.register('/service-worker.js');
-                    console.log('Service Worker registered successfully');
+                    console.log('✅ Service Worker registered - Push notifications enabled');
                     
                     // Check notification permission status
                     if (Notification.permission === 'granted') {
                         notificationsEnabled = true;
-                        console.log('Notifications already enabled');
+                        console.log('✅ Notifications already enabled');
                     }
                 } catch (error) {
-                    console.error('Service Worker registration failed:', error);
+                    // Service worker failed to register (file might not be deployed)
+                    // App works fine without it - notifications just won't be available
+                    console.log('ℹ️ Service Worker not available - Push notifications disabled');
+                    console.log('   To enable push notifications, upload service-worker.js to your server');
                 }
             }
         }
@@ -6283,6 +6286,9 @@
             const searchTerm = document.getElementById('helpSearch').value.toLowerCase().trim();
             const resultsContainer = document.getElementById('searchResults');
             
+            // Always clear previous results first
+            resultsContainer.innerHTML = '';
+            
             if (!searchTerm) {
                 resultsContainer.classList.add('hidden');
                 return;
@@ -6306,7 +6312,6 @@
                         </div>
                     </div>
                 `;
-                resultsContainer.classList.remove('hidden');
             } else {
                 resultsContainer.innerHTML = `
                     <div class="card" style="background: #d4edda; border: 2px solid #28a745;">
@@ -6323,8 +6328,10 @@
                         </div>
                     </div>
                 `;
-                resultsContainer.classList.remove('hidden');
             }
+            
+            // Show results container
+            resultsContainer.classList.remove('hidden');
         }
 
         // ========================================
