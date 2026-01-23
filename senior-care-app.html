@@ -1638,6 +1638,7 @@
                         <h3 style="margin: 0 0 15px 0; color: white;">🔍 Search for Help</h3>
                         <input type="text" id="helpSearch" placeholder="Try: 'add medication', 'reminder', 'password'..." 
                                onkeyup="searchHelp()" 
+                               onkeydown="handleHelpSearchKeydown(event)"
                                style="width: 100%; padding: 15px; font-size: 18px; border: 3px solid white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
                         <p style="margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">Type a keyword to find help instantly</p>
                     </div>
@@ -6527,9 +6528,12 @@
                 
                 console.log('   - Is hidden after:', topic.classList.contains('hidden'));
                 console.log('👁️ Topic made visible');
-                console.log('⬆️ Scrolling to top');
+                console.log('📍 Scrolling to topic content');
                 
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                // Scroll to the topic content, not the top of the page
+                setTimeout(() => {
+                    topic.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
                 
                 console.log('✅ Successfully showed topic:', topicId);
             } else {
@@ -6597,6 +6601,24 @@
         console.log('');
         console.log('💡 TIP: Search for any of these keywords to find help!');
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+        // Handle Enter key in search box
+        function handleHelpSearchKeydown(event) {
+            if (event.key === 'Enter' || event.keyCode === 13) {
+                console.log('🔍 Enter key pressed in search - preventing default scroll');
+                event.preventDefault(); // Prevent form submission/page scroll
+                
+                // Just trigger search (already done by onkeyup)
+                // Results will appear and scroll to them
+                const resultsContainer = document.getElementById('searchResults');
+                if (resultsContainer && !resultsContainer.classList.contains('hidden')) {
+                    console.log('📍 Scrolling to search results');
+                    setTimeout(() => {
+                        resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 100);
+                }
+            }
+        }
 
         function searchHelp() {
             console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
@@ -6683,6 +6705,13 @@
             // Show results container
             resultsContainer.classList.remove('hidden');
             console.log('👁️ Results container made visible');
+            
+            // Scroll to results after a brief delay (so they're rendered)
+            setTimeout(() => {
+                console.log('📍 Scrolling to search results');
+                resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+            
             console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         }
 
