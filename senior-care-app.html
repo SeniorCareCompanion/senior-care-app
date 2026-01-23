@@ -6245,17 +6245,53 @@
 
         // Help topic navigation
         function showHelpTopic(topicId) {
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('📖 SHOW HELP TOPIC - Starting...');
+            console.log('🎯 Topic ID requested:', topicId);
+            
             // Hide all topic sections
-            document.querySelectorAll('.help-topic-section').forEach(section => {
+            const allSections = document.querySelectorAll('.help-topic-section');
+            console.log('📦 Found help sections:', allSections.length);
+            
+            allSections.forEach((section, index) => {
+                console.log(`  - Hiding section ${index + 1}: ${section.id}`);
                 section.classList.add('hidden');
             });
             
             // Show selected topic
-            const topic = document.getElementById(`help-${topicId}`);
+            const targetId = `help-${topicId}`;
+            console.log('🔍 Looking for element with ID:', targetId);
+            
+            const topic = document.getElementById(targetId);
+            
             if (topic) {
+                console.log('✅ Topic element found!');
+                console.log('   - Element ID:', topic.id);
+                console.log('   - Element classes:', topic.className);
+                console.log('   - Is hidden before:', topic.classList.contains('hidden'));
+                
                 topic.classList.remove('hidden');
+                
+                console.log('   - Is hidden after:', topic.classList.contains('hidden'));
+                console.log('👁️ Topic made visible');
+                console.log('⬆️ Scrolling to top');
+                
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                console.log('✅ Successfully showed topic:', topicId);
+            } else {
+                console.error('❌ ERROR: Topic element NOT found!');
+                console.error('   - Searched for ID:', targetId);
+                console.error('   - Available help sections:');
+                
+                document.querySelectorAll('.help-topic-section').forEach(section => {
+                    console.error(`     - ${section.id}`);
+                });
+                
+                console.error('⚠️ This topic does not exist in the HTML!');
             }
+            
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         }
 
         // Help search functionality
@@ -6282,28 +6318,85 @@
             'help': ['getting-started', 'Getting started with the app']
         };
 
+        // Debug: Log all available help content on load
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.log('📚 HELP SYSTEM INITIALIZED');
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.log(`📊 Total keywords available: ${Object.keys(helpContent).length}`);
+        console.log('');
+        console.log('📋 Available keywords and their topics:');
+        
+        const topicGroups = {};
+        for (const [keyword, [topic, description]] of Object.entries(helpContent)) {
+            if (!topicGroups[topic]) {
+                topicGroups[topic] = [];
+            }
+            topicGroups[topic].push(keyword);
+        }
+        
+        for (const [topic, keywords] of Object.entries(topicGroups)) {
+            console.log(`\n  📖 ${topic}:`);
+            keywords.forEach(keyword => {
+                console.log(`     - "${keyword}"`);
+            });
+        }
+        
+        console.log('');
+        console.log('💡 TIP: Search for any of these keywords to find help!');
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
         function searchHelp() {
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('🔍 HELP SEARCH - Starting search...');
+            
             const searchTerm = document.getElementById('helpSearch').value.toLowerCase().trim();
             const resultsContainer = document.getElementById('searchResults');
             
+            console.log('📝 Search term (raw):', document.getElementById('helpSearch').value);
+            console.log('📝 Search term (processed):', searchTerm);
+            console.log('📦 Results container:', resultsContainer ? 'Found' : 'NOT FOUND!');
+            
             // Always clear previous results first
             resultsContainer.innerHTML = '';
+            console.log('🧹 Cleared previous results');
             
             if (!searchTerm) {
+                console.log('⚠️ Empty search term - hiding results');
                 resultsContainer.classList.add('hidden');
+                console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
                 return;
             }
 
+            console.log('🔎 Searching through help content...');
+            console.log('📚 Total keywords available:', Object.keys(helpContent).length);
+            
             const results = [];
+            let matchCount = 0;
+            
             for (const [keyword, [topic, description]] of Object.entries(helpContent)) {
-                if (keyword.includes(searchTerm) || searchTerm.includes(keyword)) {
+                const keywordMatch = keyword.includes(searchTerm);
+                const searchMatch = searchTerm.includes(keyword);
+                
+                if (keywordMatch || searchMatch) {
+                    matchCount++;
+                    console.log(`  ✅ Match #${matchCount}: "${keyword}" → ${topic}`);
+                    console.log(`     - Keyword includes search: ${keywordMatch}`);
+                    console.log(`     - Search includes keyword: ${searchMatch}`);
+                    
                     if (!results.find(r => r.topic === topic)) {
                         results.push({ topic, description });
+                        console.log(`     - Added to results (unique topic)`);
+                    } else {
+                        console.log(`     - Skipped (topic already in results)`);
                     }
                 }
             }
 
+            console.log(`📊 Search complete: ${matchCount} keyword matches → ${results.length} unique topics`);
+            console.log('📋 Results:', results.map(r => r.topic).join(', ') || 'none');
+
             if (results.length === 0) {
+                console.log('❌ No results found - showing "no results" message');
                 resultsContainer.innerHTML = `
                     <div class="card" style="background: #fff3cd; border: 2px solid #ffc107;">
                         <div class="card-content">
@@ -6313,18 +6406,22 @@
                     </div>
                 `;
             } else {
+                console.log(`✅ Rendering ${results.length} results`);
                 resultsContainer.innerHTML = `
                     <div class="card" style="background: #d4edda; border: 2px solid #28a745;">
                         <div class="card-header" style="background: #28a745; color: white;">
                             🔍 Search Results for "${searchTerm}"
                         </div>
                         <div class="card-content">
-                            ${results.map(r => `
-                                <div onclick="showHelpTopic('${r.topic}')" 
-                                     style="padding: 12px; margin: 5px 0; background: white; border-radius: 8px; cursor: pointer; border-left: 4px solid #28a745;">
-                                    <strong>${r.description}</strong>
-                                </div>
-                            `).join('')}
+                            ${results.map((r, index) => {
+                                console.log(`  - Result ${index + 1}: ${r.description} (${r.topic})`);
+                                return `
+                                    <div onclick="showHelpTopic('${r.topic}')" 
+                                         style="padding: 12px; margin: 5px 0; background: white; border-radius: 8px; cursor: pointer; border-left: 4px solid #28a745;">
+                                        <strong>${r.description}</strong>
+                                    </div>
+                                `;
+                            }).join('')}
                         </div>
                     </div>
                 `;
@@ -6332,6 +6429,8 @@
             
             // Show results container
             resultsContainer.classList.remove('hidden');
+            console.log('👁️ Results container made visible');
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         }
 
         // ========================================
