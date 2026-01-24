@@ -7184,8 +7184,9 @@
             if (lowerCommand.includes('yes') || lowerCommand.includes('correct') || lowerCommand.includes('right') || lowerCommand.includes('confirm')) {
                 executeConfirmedAction();
             } else if (lowerCommand.includes('no') || lowerCommand.includes('cancel') || lowerCommand.includes('wrong')) {
-                speak('Cancelled. What would you like to do?');
+                speak('Cancelled');
                 resetVoiceConversation();
+                stopVoiceListening();
             } else {
                 speak('Please say yes to confirm or no to cancel');
                 startVoiceListening();
@@ -7223,6 +7224,9 @@
             
             speak(`Added ${ctx.name} ${ctx.dosage} at ${formatTime(ctx.time)}`);
             resetVoiceConversation();
+            
+            // Close the voice overlay
+            stopVoiceListening();
         }
         
         // ======================
@@ -7268,6 +7272,9 @@
             markMedicationTaken(medId);
             speak(`Marked ${medName} as taken`);
             resetVoiceConversation();
+            
+            // Close the voice overlay
+            stopVoiceListening();
         }
         
         // ======================
@@ -7316,8 +7323,15 @@
             const name = voiceConversationState.context.contactName;
             
             speak(`Calling ${name}`);
-            window.location.href = `tel:${phone}`;
             resetVoiceConversation();
+            
+            // Close the voice overlay before initiating call
+            stopVoiceListening();
+            
+            // Initiate call after a brief delay
+            setTimeout(() => {
+                window.location.href = `tel:${phone}`;
+            }, 500);
         }
         
         // ======================
