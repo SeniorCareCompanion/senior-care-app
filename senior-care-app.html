@@ -4,6 +4,10 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
+    VERSION: 2026-01-24-1956 UTC - Voice Actions DEBUG BUILD
+    BUILD DATE: January 24, 2026 at 7:56 PM UTC
+    CHANGES: Extensive console logging added to debug voice confirmation loop
+    
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
     ✅ Perfect for iPhone installation from Files app
@@ -2536,6 +2540,16 @@
                         </div>
                     </div>
                     <button class="btn btn-primary" onclick="changePassword()">Change Password</button>
+                </div>
+                
+                <!-- App Version Info -->
+                <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
+                    <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
+                        <strong>App Version:</strong> 2026-01-24-1956 UTC
+                    </p>
+                    <p style="font-size: 11px; color: #6c757d; margin: 0;">
+                        DEBUG BUILD - Extensive Console Logging Enabled
+                    </p>
                 </div>
             </div>
         </div>
@@ -6831,15 +6845,25 @@
                 };
 
                 recognition.onresult = function(event) {
+                    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+                    console.log('🔊 RECOGNITION.ONRESULT fired');
                     const transcript = event.results[0][0].transcript;
+                    console.log('   - Transcript:', transcript);
+                    
+                    console.log('   - Updating overlay UI...');
                     document.getElementById('voiceTranscript').textContent = `You said: "${transcript}"`;
                     document.getElementById('voiceStatusText').textContent = 'Processing...';
                     document.getElementById('voiceStatusIcon').textContent = '⏳';
+                    console.log('   - Overlay UI updated');
                     
                     // Process the command - each command decides when to close
+                    console.log('   - Scheduling processVoiceCommand in 100ms...');
                     setTimeout(() => {
+                        console.log('   - Timeout fired, calling processVoiceCommand');
                         processVoiceCommand(transcript);
+                        console.log('   - processVoiceCommand returned');
                     }, 100);
+                    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
                 };
 
                 recognition.onerror = function(event) {
@@ -6914,31 +6938,51 @@
 
         // Stop voice listening
         function stopVoiceListening() {
+            console.log('🛑 STOP VOICE LISTENING called');
+            console.log('   - isListening:', isListening);
+            console.log('   - recognition exists:', !!recognition);
+            
             if (recognition && isListening) {
+                console.log('   - Calling recognition.stop()');
                 recognition.stop();
             }
+            
+            console.log('   - Hiding overlay');
             document.getElementById('voiceListeningOverlay').classList.add('hidden');
+            
+            console.log('   - Removing listening class from button');
             document.getElementById('floatingVoiceBtn').classList.remove('listening');
+            
             isListening = false;
+            console.log('   - isListening set to false');
+            console.log('✅ STOP VOICE LISTENING complete');
         }
 
         // Process voice commands
         function processVoiceCommand(command) {
-            console.log('🎤 Processing voice command:', command);
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('🎤 PROCESS VOICE COMMAND');
+            console.log('   - Command:', command);
+            console.log('   - Conversation active:', voiceConversationState.active);
+            console.log('   - Confirmation pending:', voiceConversationState.confirmationPending);
+            console.log('   - Current action:', voiceConversationState.action);
             
             // If waiting for confirmation
             if (voiceConversationState.confirmationPending) {
+                console.log('   → Routing to handleConfirmationResponse');
                 handleConfirmationResponse(command);
                 return;
             }
             
             // If in active conversation
             if (voiceConversationState.active) {
+                console.log('   → Routing to continueConversation');
                 continueConversation(command);
                 return;
             }
             
             // Start new command
+            console.log('   → Routing to parseAndExecuteCommand');
             parseAndExecuteCommand(command);
         }
         
@@ -7180,54 +7224,93 @@
         
         function handleConfirmationResponse(command) {
             const lowerCommand = command.toLowerCase();
-            console.log('✅ Handling confirmation:', lowerCommand);
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('✅ HANDLE CONFIRMATION RESPONSE');
+            console.log('   - Command:', command);
+            console.log('   - Lower command:', lowerCommand);
+            console.log('   - Confirmation pending:', voiceConversationState.confirmationPending);
+            console.log('   - Confirmation action:', voiceConversationState.confirmationAction);
             
             if (lowerCommand.includes('yes') || lowerCommand.includes('correct') || lowerCommand.includes('right') || lowerCommand.includes('confirm')) {
+                console.log('   - User said YES - executing action');
                 executeConfirmedAction();
             } else if (lowerCommand.includes('no') || lowerCommand.includes('cancel') || lowerCommand.includes('wrong')) {
+                console.log('   - User said NO - cancelling');
                 speak('Cancelled');
                 resetVoiceConversation();
                 stopVoiceListening();
             } else {
+                console.log('   - User said something else - asking again');
                 speak('Please say yes to confirm or no to cancel');
                 startVoiceListening();
             }
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         }
         
         function executeConfirmedAction() {
             const action = voiceConversationState.confirmationAction;
-            console.log('⚡ Executing confirmed action:', action);
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('⚡ EXECUTE CONFIRMED ACTION');
+            console.log('   - Action:', action);
+            console.log('   - Context:', voiceConversationState.context);
             
             if (action === 'add-medication') {
+                console.log('   - Calling executedAddMedication()');
                 executedAddMedication();
             } else if (action === 'mark-medication-taken') {
+                console.log('   - Calling executeMarkMedicationTaken()');
                 executeMarkMedicationTaken();
             } else if (action === 'call-contact') {
+                console.log('   - Calling executeCallContact()');
                 executeCallContact();
             } else if (action === 'add-appointment') {
+                console.log('   - Calling executeAddAppointment()');
                 executeAddAppointment();
             } else if (action === 'add-contact') {
+                console.log('   - Calling executeAddContact()');
                 executeAddContact();
+            } else {
+                console.log('   - ❌ Unknown action!');
             }
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         }
         
         function executedAddMedication() {
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('💊 EXECUTED ADD MEDICATION');
             const ctx = voiceConversationState.context;
+            console.log('   - Context:', ctx);
+            console.log('   - Name:', ctx.name);
+            console.log('   - Dosage:', ctx.dosage);
+            console.log('   - Time:', ctx.time);
+            console.log('   - Frequency:', ctx.frequency);
             
             // Fill in the form programmatically
+            console.log('   - Filling form fields...');
             document.getElementById('medicationName').value = ctx.name;
             document.getElementById('medicationDosage').value = ctx.dosage;
             document.getElementById('medicationTime').value = ctx.time;
             document.getElementById('medicationFrequency').value = ctx.frequency || 'daily';
+            console.log('   - Form filled');
             
             // Call the existing add function
+            console.log('   - Calling addMedication()...');
             addMedication();
+            console.log('   - addMedication() complete');
             
+            console.log('   - Speaking confirmation...');
             speak(`Added ${ctx.name} ${ctx.dosage} at ${formatTime(ctx.time)}`);
+            console.log('   - Speak called');
+            
+            console.log('   - Resetting conversation state...');
             resetVoiceConversation();
+            console.log('   - State reset');
             
             // Close the voice overlay
+            console.log('   - Calling stopVoiceListening()...');
             stopVoiceListening();
+            console.log('✅ EXECUTED ADD MEDICATION - COMPLETE');
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         }
         
         // ======================
