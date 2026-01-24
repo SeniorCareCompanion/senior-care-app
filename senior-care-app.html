@@ -6836,10 +6836,10 @@
                     document.getElementById('voiceStatusText').textContent = 'Processing...';
                     document.getElementById('voiceStatusIcon').textContent = '⏳';
                     
+                    // Process the command - each command decides when to close
                     setTimeout(() => {
                         processVoiceCommand(transcript);
-                        stopVoiceListening();
-                    }, 500);
+                    }, 100);
                 };
 
                 recognition.onerror = function(event) {
@@ -7000,6 +7000,7 @@
             
             // Command not understood
             speak(`I didn't understand "${command}". Try saying "add medication", "mark as taken", "call contact", or "go to medications"`);
+            stopVoiceListening();
         }
         
         // ======================
@@ -7381,43 +7382,53 @@
             if (lowerCommand.includes('medication') || lowerCommand.includes('med')) {
                 showSection('medications');
                 speak('Opening Medications');
+                stopVoiceListening();
                 handled = true;
             } else if (lowerCommand.includes('appointment') || lowerCommand.includes('appt')) {
                 showSection('appointments');
                 speak('Opening Appointments');
+                stopVoiceListening();
                 handled = true;
             } else if (lowerCommand.includes('task')) {
                 showSection('tasks');
                 speak('Opening Tasks');
+                stopVoiceListening();
                 handled = true;
             } else if (lowerCommand.includes('bill')) {
                 showSection('bills');
                 speak('Opening Bills');
+                stopVoiceListening();
                 handled = true;
             } else if (lowerCommand.includes('activit')) {
                 showSection('activities');
                 speak('Opening Activities');
+                stopVoiceListening();
                 handled = true;
             } else if (lowerCommand.includes('contact')) {
                 showSection('contacts');
                 speak('Opening Contacts');
+                stopVoiceListening();
                 handled = true;
             } else if (lowerCommand.includes('home')) {
                 showSection('home');
                 speak('Going home');
+                stopVoiceListening();
                 handled = true;
             } else if (lowerCommand.includes('profile')) {
                 showSection('profile');
                 speak('Opening Profile');
+                stopVoiceListening();
                 handled = true;
             } else if (lowerCommand.includes('help')) {
                 showSection('help');
                 speak('Opening Help Center');
+                stopVoiceListening();
                 handled = true;
             }
             
             if (!handled) {
                 speak('Where would you like to go?');
+                stopVoiceListening();
             }
         }
         
@@ -7455,6 +7466,9 @@
                 showHelpTopic('getting-started');
                 speak('Here is the getting started guide');
             }
+            
+            // Close overlay after showing help
+            stopVoiceListening();
         }
         
         // ======================
@@ -7494,12 +7508,18 @@
         // Read current page content
         function readCurrentPage() {
             const activeSection = document.querySelector('.section.active');
-            if (!activeSection) return;
+            if (!activeSection) {
+                stopVoiceListening();
+                return;
+            }
             
             const title = activeSection.querySelector('.section-title');
             if (title) {
                 speak(title.textContent);
             }
+            
+            // Close overlay after reading
+            stopVoiceListening();
         }
 
         // Load voice assistant preference on login
