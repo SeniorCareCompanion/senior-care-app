@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-24-1956 UTC - Voice Actions DEBUG BUILD
-    BUILD DATE: January 24, 2026 at 7:56 PM UTC
-    CHANGES: Extensive console logging added to debug voice confirmation loop
+    VERSION: 2026-01-25-0052 UTC - ROLLBACK to Simple Voice Navigation
+    BUILD DATE: January 25, 2026 at 12:52 AM UTC
+    CHANGES: Restored simple working voice navigation (removed complex features)
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -2545,10 +2545,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-24-1956 UTC
+                        <strong>App Version:</strong> 2026-01-25-0052 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        DEBUG BUILD - Extensive Console Logging Enabled
+                        ROLLBACK - Simple Voice Navigation Only
                     </p>
                 </div>
             </div>
@@ -6816,15 +6816,6 @@
         let voiceAssistantEnabled = false;
         let recognition = null;
         let isListening = false;
-        
-        // Voice conversation state
-        let voiceConversationState = {
-            active: false,
-            action: null, // 'add-medication', 'add-appointment', 'mark-taken', etc.
-            context: {}, // Store collected information
-            confirmationPending: false,
-            confirmationAction: null
-        };
 
         // Initialize voice recognition
         function initVoiceRecognition() {
@@ -6845,25 +6836,15 @@
                 };
 
                 recognition.onresult = function(event) {
-                    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-                    console.log('🔊 RECOGNITION.ONRESULT fired');
                     const transcript = event.results[0][0].transcript;
-                    console.log('   - Transcript:', transcript);
-                    
-                    console.log('   - Updating overlay UI...');
                     document.getElementById('voiceTranscript').textContent = `You said: "${transcript}"`;
                     document.getElementById('voiceStatusText').textContent = 'Processing...';
                     document.getElementById('voiceStatusIcon').textContent = '⏳';
-                    console.log('   - Overlay UI updated');
                     
-                    // Process the command - each command decides when to close
-                    console.log('   - Scheduling processVoiceCommand in 100ms...');
+                    // Process the command
                     setTimeout(() => {
-                        console.log('   - Timeout fired, calling processVoiceCommand');
                         processVoiceCommand(transcript);
-                        console.log('   - processVoiceCommand returned');
                     }, 100);
-                    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
                 };
 
                 recognition.onerror = function(event) {
@@ -6938,654 +6919,114 @@
 
         // Stop voice listening
         function stopVoiceListening() {
-            console.log('🛑 STOP VOICE LISTENING called');
-            console.log('   - isListening:', isListening);
-            console.log('   - recognition exists:', !!recognition);
-            
             if (recognition && isListening) {
-                console.log('   - Calling recognition.stop()');
                 recognition.stop();
             }
-            
-            console.log('   - Hiding overlay');
             document.getElementById('voiceListeningOverlay').classList.add('hidden');
-            
-            console.log('   - Removing listening class from button');
             document.getElementById('floatingVoiceBtn').classList.remove('listening');
-            
             isListening = false;
-            console.log('   - isListening set to false');
-            console.log('✅ STOP VOICE LISTENING complete');
         }
 
-        // Process voice commands
+        // Process voice commands - SIMPLE VERSION (Navigation, Help, Reading ONLY)
         function processVoiceCommand(command) {
-            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-            console.log('🎤 PROCESS VOICE COMMAND');
-            console.log('   - Command:', command);
-            console.log('   - Conversation active:', voiceConversationState.active);
-            console.log('   - Confirmation pending:', voiceConversationState.confirmationPending);
-            console.log('   - Current action:', voiceConversationState.action);
-            
-            // If waiting for confirmation
-            if (voiceConversationState.confirmationPending) {
-                console.log('   → Routing to handleConfirmationResponse');
-                handleConfirmationResponse(command);
-                return;
-            }
-            
-            // If in active conversation
-            if (voiceConversationState.active) {
-                console.log('   → Routing to continueConversation');
-                continueConversation(command);
-                return;
-            }
-            
-            // Start new command
-            console.log('   → Routing to parseAndExecuteCommand');
-            parseAndExecuteCommand(command);
-        }
-        
-        // Parse and execute voice commands
-        function parseAndExecuteCommand(command) {
             const lowerCommand = command.toLowerCase();
-            console.log('📝 Parsing command:', lowerCommand);
-            
-            // ADD COMMANDS
-            if (lowerCommand.includes('add medication') || (lowerCommand.includes('add') && lowerCommand.includes('med'))) {
-                startAddMedication(lowerCommand);
-                return;
-            }
-            
-            if (lowerCommand.includes('add appointment') || (lowerCommand.includes('add') && lowerCommand.includes('appointment'))) {
-                startAddAppointment(lowerCommand);
-                return;
-            }
-            
-            if (lowerCommand.includes('add contact') || (lowerCommand.includes('add') && lowerCommand.includes('contact'))) {
-                startAddContact(lowerCommand);
-                return;
-            }
-            
-            // MARK COMMANDS
-            if (lowerCommand.includes('mark') && (lowerCommand.includes('taken') || lowerCommand.includes('take'))) {
-                handleMarkMedicationTaken(lowerCommand);
-                return;
-            }
-            
-            if (lowerCommand.includes('mark') && lowerCommand.includes('completed')) {
-                handleMarkAppointmentCompleted(lowerCommand);
-                return;
-            }
-            
-            // CALL COMMANDS
-            if (lowerCommand.includes('call ') || lowerCommand.includes('phone ')) {
-                handleCallContact(lowerCommand);
-                return;
-            }
-            
-            // NAVIGATION COMMANDS (existing)
+            console.log('🎤 Processing voice command:', command);
+            let handled = false;
+
+            // Navigation commands
             if (lowerCommand.includes('go to') || lowerCommand.includes('show') || lowerCommand.includes('open')) {
-                handleNavigationCommand(lowerCommand);
-                return;
-            }
-            
-            // HELP COMMANDS (existing)
-            if (lowerCommand.includes('help') || lowerCommand.includes('how do i') || lowerCommand.includes('how to')) {
-                handleHelpCommand(lowerCommand);
-                return;
-            }
-            
-            // READING COMMANDS (existing)
-            if (lowerCommand.includes('read this') || lowerCommand.includes('read the page')) {
-                readCurrentPage();
-                return;
-            }
-            
-            // Command not understood
-            speak(`I didn't understand "${command}". Try saying "add medication", "mark as taken", "call contact", or "go to medications"`);
-            stopVoiceListening();
-        }
-        
-        // ======================
-        // ADD MEDICATION BY VOICE
-        // ======================
-        function startAddMedication(command) {
-            console.log('💊 Starting add medication');
-            
-            voiceConversationState.active = true;
-            voiceConversationState.action = 'add-medication';
-            voiceConversationState.context = {};
-            
-            // Try to extract information from command
-            const extracted = extractMedicationInfo(command);
-            voiceConversationState.context = extracted;
-            
-            // Ask for missing information
-            if (!extracted.name) {
-                speak('What medication would you like to add?');
-                startVoiceListening();
-            } else if (!extracted.dosage) {
-                speak(`Adding ${extracted.name}. What dosage?`);
-                startVoiceListening();
-            } else if (!extracted.time) {
-                speak(`${extracted.name} ${extracted.dosage}. What time?`);
-                startVoiceListening();
-            } else {
-                // Have all required info, ask for confirmation
-                confirmAddMedication();
-            }
-        }
-        
-        function extractMedicationInfo(command) {
-            const info = {};
-            
-            // Extract medication name (simple version - looks for common patterns)
-            const medPatterns = [
-                /add (?:medication |med )?([a-z]+)/i,
-                /medication ([a-z]+)/i
-            ];
-            
-            for (const pattern of medPatterns) {
-                const match = command.match(pattern);
-                if (match) {
-                    info.name = match[1].charAt(0).toUpperCase() + match[1].slice(1);
-                    break;
+                if (lowerCommand.includes('medication') || lowerCommand.includes('med')) {
+                    showSection('medications');
+                    speak('Opening Medications');
+                    stopVoiceListening();
+                    handled = true;
+                } else if (lowerCommand.includes('appointment') || lowerCommand.includes('appt')) {
+                    showSection('appointments');
+                    speak('Opening Appointments');
+                    stopVoiceListening();
+                    handled = true;
+                } else if (lowerCommand.includes('task')) {
+                    showSection('tasks');
+                    speak('Opening Tasks');
+                    stopVoiceListening();
+                    handled = true;
+                } else if (lowerCommand.includes('bill')) {
+                    showSection('bills');
+                    speak('Opening Bills');
+                    stopVoiceListening();
+                    handled = true;
+                } else if (lowerCommand.includes('activit')) {
+                    showSection('activities');
+                    speak('Opening Activities');
+                    stopVoiceListening();
+                    handled = true;
+                } else if (lowerCommand.includes('contact')) {
+                    showSection('contacts');
+                    speak('Opening Contacts');
+                    stopVoiceListening();
+                    handled = true;
+                } else if (lowerCommand.includes('home')) {
+                    showSection('home');
+                    speak('Going home');
+                    stopVoiceListening();
+                    handled = true;
+                } else if (lowerCommand.includes('profile')) {
+                    showSection('profile');
+                    speak('Opening Profile');
+                    stopVoiceListening();
+                    handled = true;
+                } else if (lowerCommand.includes('help')) {
+                    showSection('help');
+                    speak('Opening Help Center');
+                    stopVoiceListening();
+                    handled = true;
                 }
             }
-            
-            // Extract dosage
-            const dosagePatterns = [
-                /(\d+)\s*(mg|milligram|milligrams)/i,
-                /(\d+)\s*(tablet|tablets|pill|pills)/i
-            ];
-            
-            for (const pattern of dosagePatterns) {
-                const match = command.match(pattern);
-                if (match) {
-                    info.dosage = match[1] + (match[2].toLowerCase().startsWith('mg') || match[2].toLowerCase().startsWith('milligram') ? 'mg' : ' tablet');
-                    break;
-                }
-            }
-            
-            // Extract time
-            const timePatterns = [
-                /at (\d{1,2})\s*(am|pm|a\.?m\.?|p\.?m\.?)/i,
-                /(\d{1,2})\s*(am|pm|a\.?m\.?|p\.?m\.?)/i,
-                /at (\d{1,2}):(\d{2})/i
-            ];
-            
-            for (const pattern of timePatterns) {
-                const match = command.match(pattern);
-                if (match) {
-                    if (match[2]) {
-                        // Has AM/PM
-                        let hour = parseInt(match[1]);
-                        const period = match[2].toLowerCase().replace('.', '');
-                        if (period.startsWith('p') && hour < 12) hour += 12;
-                        if (period.startsWith('a') && hour === 12) hour = 0;
-                        info.time = `${hour.toString().padStart(2, '0')}:00`;
-                    } else if (match[3]) {
-                        // Has hour:minute
-                        info.time = `${match[1].padStart(2, '0')}:${match[2]}`;
-                    }
-                    break;
-                }
-            }
-            
-            // Check for frequency keywords
-            if (command.includes('daily') || command.includes('every day')) {
-                info.frequency = 'daily';
-            }
-            
-            console.log('📊 Extracted medication info:', info);
-            return info;
-        }
-        
-        function continueConversation(command) {
-            const action = voiceConversationState.action;
-            console.log('💬 Continuing conversation:', action);
-            
-            if (action === 'add-medication') {
-                continueAddMedication(command);
-            } else if (action === 'add-appointment') {
-                continueAddAppointment(command);
-            } else if (action === 'add-contact') {
-                continueAddContact(command);
-            }
-        }
-        
-        function continueAddMedication(command) {
-            const ctx = voiceConversationState.context;
-            
-            if (!ctx.name) {
-                // Extract name from response
-                const name = command.trim().split(' ')[0];
-                ctx.name = name.charAt(0).toUpperCase() + name.slice(1);
-                speak(`${ctx.name}. What dosage?`);
-                startVoiceListening();
-            } else if (!ctx.dosage) {
-                // Extract dosage from response
-                const extracted = extractMedicationInfo(command);
-                if (extracted.dosage) {
-                    ctx.dosage = extracted.dosage;
-                } else {
-                    // Try simple number extraction
-                    const match = command.match(/(\d+)/);
-                    if (match) {
-                        ctx.dosage = match[1] + 'mg';
-                    } else {
-                        speak('I didn\'t catch that. Please say the dosage, like "81 milligrams" or "100 mg"');
-                        startVoiceListening();
-                        return;
-                    }
-                }
-                speak(`${ctx.dosage}. What time do you take it?`);
-                startVoiceListening();
-            } else if (!ctx.time) {
-                // Extract time from response
-                const extracted = extractMedicationInfo('at ' + command);
-                if (extracted.time) {
-                    ctx.time = extracted.time;
-                } else {
-                    speak('I didn\'t understand the time. Please say something like "8 AM" or "2 PM"');
-                    startVoiceListening();
-                    return;
-                }
-                
-                // Set default frequency
-                if (!ctx.frequency) {
-                    ctx.frequency = 'daily';
-                }
-                
-                // Now have all info, confirm
-                confirmAddMedication();
-            }
-        }
-        
-        function confirmAddMedication() {
-            const ctx = voiceConversationState.context;
-            const timeFormatted = formatTime(ctx.time);
-            
-            voiceConversationState.confirmationPending = true;
-            voiceConversationState.confirmationAction = 'add-medication';
-            
-            speak(`I will add ${ctx.name} ${ctx.dosage} at ${timeFormatted} daily. Is this correct? Say yes to confirm or no to cancel.`);
-            startVoiceListening();
-        }
-        
-        function formatTime(time24) {
-            const [hour, minute] = time24.split(':');
-            const h = parseInt(hour);
-            const period = h >= 12 ? 'PM' : 'AM';
-            const hour12 = h % 12 || 12;
-            return `${hour12}:${minute} ${period}`;
-        }
-        
-        function handleConfirmationResponse(command) {
-            const lowerCommand = command.toLowerCase();
-            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-            console.log('✅ HANDLE CONFIRMATION RESPONSE');
-            console.log('   - Command:', command);
-            console.log('   - Lower command:', lowerCommand);
-            console.log('   - Confirmation pending:', voiceConversationState.confirmationPending);
-            console.log('   - Confirmation action:', voiceConversationState.confirmationAction);
-            
-            if (lowerCommand.includes('yes') || lowerCommand.includes('correct') || lowerCommand.includes('right') || lowerCommand.includes('confirm')) {
-                console.log('   - User said YES - executing action');
-                executeConfirmedAction();
-            } else if (lowerCommand.includes('no') || lowerCommand.includes('cancel') || lowerCommand.includes('wrong')) {
-                console.log('   - User said NO - cancelling');
-                speak('Cancelled');
-                resetVoiceConversation();
-                stopVoiceListening();
-            } else {
-                console.log('   - User said something else - asking again');
-                speak('Please say yes to confirm or no to cancel');
-                startVoiceListening();
-            }
-            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        }
-        
-        function executeConfirmedAction() {
-            const action = voiceConversationState.confirmationAction;
-            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-            console.log('⚡ EXECUTE CONFIRMED ACTION');
-            console.log('   - Action:', action);
-            console.log('   - Context:', voiceConversationState.context);
-            
-            if (action === 'add-medication') {
-                console.log('   - Calling executedAddMedication()');
-                executedAddMedication();
-            } else if (action === 'mark-medication-taken') {
-                console.log('   - Calling executeMarkMedicationTaken()');
-                executeMarkMedicationTaken();
-            } else if (action === 'call-contact') {
-                console.log('   - Calling executeCallContact()');
-                executeCallContact();
-            } else if (action === 'add-appointment') {
-                console.log('   - Calling executeAddAppointment()');
-                executeAddAppointment();
-            } else if (action === 'add-contact') {
-                console.log('   - Calling executeAddContact()');
-                executeAddContact();
-            } else {
-                console.log('   - ❌ Unknown action!');
-            }
-            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        }
-        
-        function executedAddMedication() {
-            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-            console.log('💊 EXECUTED ADD MEDICATION');
-            const ctx = voiceConversationState.context;
-            console.log('   - Context:', ctx);
-            console.log('   - Name:', ctx.name);
-            console.log('   - Dosage:', ctx.dosage);
-            console.log('   - Time:', ctx.time);
-            console.log('   - Frequency:', ctx.frequency);
-            
-            // Fill in the form programmatically
-            console.log('   - Filling form fields...');
-            document.getElementById('medicationName').value = ctx.name;
-            document.getElementById('medicationDosage').value = ctx.dosage;
-            document.getElementById('medicationTime').value = ctx.time;
-            document.getElementById('medicationFrequency').value = ctx.frequency || 'daily';
-            console.log('   - Form filled');
-            
-            // Call the existing add function
-            console.log('   - Calling addMedication()...');
-            addMedication();
-            console.log('   - addMedication() complete');
-            
-            console.log('   - Speaking confirmation...');
-            speak(`Added ${ctx.name} ${ctx.dosage} at ${formatTime(ctx.time)}`);
-            console.log('   - Speak called');
-            
-            console.log('   - Resetting conversation state...');
-            resetVoiceConversation();
-            console.log('   - State reset');
-            
-            // Close the voice overlay
-            console.log('   - Calling stopVoiceListening()...');
-            stopVoiceListening();
-            console.log('✅ EXECUTED ADD MEDICATION - COMPLETE');
-            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        }
-        
-        // ======================
-        // MARK MEDICATION AS TAKEN
-        // ======================
-        function handleMarkMedicationTaken(command) {
-            console.log('✓ Handling mark medication taken');
-            
-            // Extract medication name
-            const name = extractItemName(command, ['mark', 'taken', 'take', 'as']);
-            
-            if (!name) {
-                speak('Which medication did you take?');
-                voiceConversationState.active = true;
-                voiceConversationState.action = 'mark-medication-taken';
-                voiceConversationState.context = {};
-                startVoiceListening();
-                return;
-            }
-            
-            // Find medication
-            const users = loadData('users');
-            const medications = users[currentUser].medications || [];
-            const med = medications.find(m => m.name.toLowerCase() === name.toLowerCase());
-            
-            if (!med) {
-                speak(`I couldn't find a medication called ${name}`);
-                return;
-            }
-            
-            voiceConversationState.confirmationPending = true;
-            voiceConversationState.confirmationAction = 'mark-medication-taken';
-            voiceConversationState.context = { medicationId: med.id, medicationName: med.name };
-            
-            speak(`Mark ${med.name} as taken? Say yes to confirm.`);
-            startVoiceListening();
-        }
-        
-        function executeMarkMedicationTaken() {
-            const medId = voiceConversationState.context.medicationId;
-            const medName = voiceConversationState.context.medicationName;
-            
-            markMedicationTaken(medId);
-            speak(`Marked ${medName} as taken`);
-            resetVoiceConversation();
-            
-            // Close the voice overlay
-            stopVoiceListening();
-        }
-        
-        // ======================
-        // CALL CONTACT
-        // ======================
-        function handleCallContact(command) {
-            console.log('📞 Handling call contact');
-            
-            // Extract contact name
-            const name = extractItemName(command, ['call', 'phone']);
-            
-            if (!name) {
-                speak('Who would you like to call?');
-                voiceConversationState.active = true;
-                voiceConversationState.action = 'call-contact';
-                voiceConversationState.context = {};
-                startVoiceListening();
-                return;
-            }
-            
-            // Find contact
-            const users = loadData('users');
-            const contacts = users[currentUser].contacts || [];
-            let contact = contacts.find(c => c.name.toLowerCase() === name.toLowerCase());
-            
-            // Also try to match by relationship
-            if (!contact) {
-                contact = contacts.find(c => c.relation && c.relation.toLowerCase() === name.toLowerCase());
-            }
-            
-            if (!contact) {
-                speak(`I couldn't find a contact named ${name}`);
-                return;
-            }
-            
-            voiceConversationState.confirmationPending = true;
-            voiceConversationState.confirmationAction = 'call-contact';
-            voiceConversationState.context = { contactName: contact.name, contactPhone: contact.phone };
-            
-            speak(`Call ${contact.name} at ${contact.phone}? Say yes to confirm.`);
-            startVoiceListening();
-        }
-        
-        function executeCallContact() {
-            const phone = voiceConversationState.context.contactPhone;
-            const name = voiceConversationState.context.contactName;
-            
-            speak(`Calling ${name}`);
-            resetVoiceConversation();
-            
-            // Close the voice overlay before initiating call
-            stopVoiceListening();
-            
-            // Initiate call after a brief delay
-            setTimeout(() => {
-                window.location.href = `tel:${phone}`;
-            }, 500);
-        }
-        
-        // ======================
-        // ADD APPOINTMENT (Simplified)
-        // ======================
-        function startAddAppointment(command) {
-            console.log('📅 Starting add appointment');
-            speak('Appointment feature coming soon! For now, please use the form to add appointments.');
-            resetVoiceConversation();
-        }
-        
-        function continueAddAppointment(command) {
-            // Simplified for now
-        }
-        
-        function executeAddAppointment() {
-            // Simplified for now
-        }
-        
-        function handleMarkAppointmentCompleted(command) {
-            speak('This feature is coming soon!');
-        }
-        
-        // ======================
-        // ADD CONTACT (Simplified)
-        // ======================
-        function startAddContact(command) {
-            console.log('📞 Starting add contact');
-            speak('Add contact feature coming soon! For now, please use the form to add contacts.');
-            resetVoiceConversation();
-        }
-        
-        function continueAddContact(command) {
-            // Simplified for now
-        }
-        
-        function executeAddContact() {
-            // Simplified for now
-        }
-        
-        // ======================
-        // NAVIGATION COMMANDS (existing)
-        // ======================
-        function handleNavigationCommand(lowerCommand) {
-            let handled = false;
-            
-            if (lowerCommand.includes('medication') || lowerCommand.includes('med')) {
-                showSection('medications');
-                speak('Opening Medications');
-                stopVoiceListening();
-                handled = true;
-            } else if (lowerCommand.includes('appointment') || lowerCommand.includes('appt')) {
-                showSection('appointments');
-                speak('Opening Appointments');
-                stopVoiceListening();
-                handled = true;
-            } else if (lowerCommand.includes('task')) {
-                showSection('tasks');
-                speak('Opening Tasks');
-                stopVoiceListening();
-                handled = true;
-            } else if (lowerCommand.includes('bill')) {
-                showSection('bills');
-                speak('Opening Bills');
-                stopVoiceListening();
-                handled = true;
-            } else if (lowerCommand.includes('activit')) {
-                showSection('activities');
-                speak('Opening Activities');
-                stopVoiceListening();
-                handled = true;
-            } else if (lowerCommand.includes('contact')) {
-                showSection('contacts');
-                speak('Opening Contacts');
-                stopVoiceListening();
-                handled = true;
-            } else if (lowerCommand.includes('home')) {
-                showSection('home');
-                speak('Going home');
-                stopVoiceListening();
-                handled = true;
-            } else if (lowerCommand.includes('profile')) {
-                showSection('profile');
-                speak('Opening Profile');
-                stopVoiceListening();
-                handled = true;
-            } else if (lowerCommand.includes('help')) {
+
+            // Help commands
+            if (!handled && (lowerCommand.includes('help') || lowerCommand.includes('how do i') || lowerCommand.includes('how to'))) {
                 showSection('help');
-                speak('Opening Help Center');
+                
+                if (lowerCommand.includes('medication') || lowerCommand.includes('med')) {
+                    showHelpTopic('medications');
+                    speak('Here is help for medications');
+                    handled = true;
+                } else if (lowerCommand.includes('appointment')) {
+                    showHelpTopic('appointments');
+                    speak('Here is help for appointments');
+                    handled = true;
+                } else if (lowerCommand.includes('reminder')) {
+                    showHelpTopic('medications');
+                    speak('Here is help for reminders');
+                    handled = true;
+                } else if (lowerCommand.includes('password')) {
+                    showHelpTopic('common-questions');
+                    speak('Here is help for passwords');
+                    handled = true;
+                } else if (lowerCommand.includes('voice')) {
+                    showHelpTopic('voice');
+                    speak('Here is help for voice commands');
+                    handled = true;
+                } else {
+                    showHelpTopic('getting-started');
+                    speak('Here is the getting started guide');
+                    handled = true;
+                }
+                
                 stopVoiceListening();
+            }
+
+            // Reading commands
+            if (!handled && (lowerCommand.includes('read this') || lowerCommand.includes('read the page'))) {
+                readCurrentPage();
                 handled = true;
             }
-            
+
+            // If command not handled
             if (!handled) {
-                speak('Where would you like to go?');
+                speak(`I didn't understand "${command}". Try saying "go to medications", "help with reminders", or "show my appointments"`);
                 stopVoiceListening();
             }
-        }
-        
-        // ======================
-        // HELP COMMANDS (existing)
-        // ======================
-        function handleHelpCommand(lowerCommand) {
-            showSection('help');
-            
-            let handled = false;
-            
-            if (lowerCommand.includes('medication') || lowerCommand.includes('med')) {
-                showHelpTopic('medications');
-                speak('Here is help for medications');
-                handled = true;
-            } else if (lowerCommand.includes('appointment')) {
-                showHelpTopic('appointments');
-                speak('Here is help for appointments');
-                handled = true;
-            } else if (lowerCommand.includes('reminder')) {
-                showHelpTopic('medications');
-                speak('Here is help for reminders');
-                handled = true;
-            } else if (lowerCommand.includes('password')) {
-                showHelpTopic('common-questions');
-                speak('Here is help for passwords');
-                handled = true;
-            } else if (lowerCommand.includes('voice')) {
-                showHelpTopic('voice');
-                speak('Here is help for voice commands');
-                handled = true;
-            }
-            
-            if (!handled) {
-                showHelpTopic('getting-started');
-                speak('Here is the getting started guide');
-            }
-            
-            // Close overlay after showing help
-            stopVoiceListening();
-        }
-        
-        // ======================
-        // UTILITY FUNCTIONS
-        // ======================
-        function extractItemName(command, wordsToRemove) {
-            let name = command.toLowerCase();
-            
-            // Remove command words
-            for (const word of wordsToRemove) {
-                name = name.replace(new RegExp(word, 'g'), '');
-            }
-            
-            // Remove common connecting words
-            name = name.replace(/\b(my|the|a|an)\b/g, '');
-            
-            // Clean up
-            name = name.trim();
-            
-            // Capitalize first letter
-            if (name) {
-                name = name.charAt(0).toUpperCase() + name.slice(1);
-            }
-            
-            return name;
-        }
-        
-        function resetVoiceConversation() {
-            console.log('🔄 Resetting voice conversation');
-            voiceConversationState.active = false;
-            voiceConversationState.action = null;
-            voiceConversationState.context = {};
-            voiceConversationState.confirmationPending = false;
-            voiceConversationState.confirmationAction = null;
         }
 
         // Read current page content
