@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-25-0204 UTC - Call Contact DEBUG (Fix call initiation)
-    BUILD DATE: January 25, 2026 at 2:04 AM UTC
-    CHANGES: Added logging and improved call initiation for iOS
+    VERSION: 2026-01-25-1829 UTC - Added Mark Medication as Taken
+    BUILD DATE: January 25, 2026 at 6:29 PM UTC
+    CHANGES: Added "Mark as Taken" voice feature with confirmation
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -2545,10 +2545,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-25-0204 UTC
+                        <strong>App Version:</strong> 2026-01-25-1829 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        DEBUG - Call Contact with Extensive Logging
+                        Voice Features: Navigation, Help, Call Contact, Mark as Taken
                     </p>
                 </div>
             </div>
@@ -6930,7 +6930,7 @@
             isListening = false;
         }
 
-        // Process voice commands - WITH Call Contact Feature
+        // Process voice commands - WITH Call Contact & Mark as Taken Features
         function processVoiceCommand(command) {
             const lowerCommand = command.toLowerCase();
             console.log('🎤 Processing voice command:', command);
@@ -6943,7 +6943,13 @@
             
             let handled = false;
 
-            // Call contact commands (NEW FEATURE!)
+            // Mark medication as taken (NEW FEATURE!)
+            if (!handled && lowerCommand.includes('mark') && (lowerCommand.includes('taken') || lowerCommand.includes('take'))) {
+                handleMarkMedicationTaken(command);
+                return;
+            }
+
+            // Call contact commands
             if (!handled && (lowerCommand.includes('call ') || lowerCommand.includes('phone '))) {
                 handleCallContact(command);
                 return;
@@ -7040,12 +7046,12 @@
 
             // If command not handled
             if (!handled) {
-                speak(`I didn't understand "${command}". Try saying "call Cathy", "go to medications", or "help with reminders"`);
+                speak(`I didn't understand "${command}". Try saying "mark Aspirin as taken", "call Cathy", or "go to medications"`);
                 stopVoiceListening();
             }
         }
 
-        // Handle call contact command
+        // Handle call contact command - DIRECT CALL (no app confirmation)
         function handleCallContact(command) {
             console.log('📞 Handle call contact:', command);
             
@@ -7090,14 +7096,89 @@
             }
             
             console.log('📞 Found contact:', contact);
+            console.log('📞 Phone number:', contact.phone);
+            
+            // DIRECTLY INITIATE CALL - no app confirmation!
+            // iOS will show its own confirmation dialog
+            speak(`Calling ${contact.name}`);
+            
+            console.log('📞 Calling immediately...');
+            
+            // Close overlay
+            stopVoiceListening();
+            
+            // Initiate call - iOS will show "Call [number]?" dialog
+            console.log('📞 Creating tel: link');
+            const telLink = document.createElement('a');
+            telLink.href = `tel:${contact.phone}`;
+            telLink.style.display = 'none';
+            document.body.appendChild(telLink);
+            
+            console.log('📞 Tel link created:', telLink.href);
+            console.log('📞 Clicking link...');
+            
+            // Click immediately after voice overlay closes
+            setTimeout(() => {
+                console.log('📞 CLICKING NOW!');
+                telLink.click();
+                console.log('📞 Link clicked - iOS should show confirmation dialog');
+                
+                // Clean up
+                setTimeout(() => {
+                    document.body.removeChild(telLink);
+                    console.log('📞 Cleaned up tel link');
+                }, 1000);
+            }, 300);
+        }
+
+        // Handle mark medication as taken command
+        function handleMarkMedicationTaken(command) {
+            console.log('✅ Handle mark medication as taken:', command);
+            
+            // Extract medication name from command
+            const lowerCommand = command.toLowerCase();
+            let medicationName = '';
+            
+            // Remove "mark", "as", "taken", "take" and common words
+            medicationName = lowerCommand
+                .replace(/mark|as|taken|take|my|the|please/g, '')
+                .trim();
+            
+            // Capitalize first letter
+            if (medicationName) {
+                medicationName = medicationName.charAt(0).toUpperCase() + medicationName.slice(1);
+            }
+            
+            if (!medicationName) {
+                speak('Which medication did you take?');
+                stopVoiceListening();
+                return;
+            }
+            
+            console.log('✅ Looking for medication:', medicationName);
+            
+            // Find medication in user's medications
+            const users = loadData('users');
+            const medications = users[currentUser]?.medications || [];
+            
+            // Try to find by name
+            let medication = medications.find(m => m.name.toLowerCase() === medicationName.toLowerCase());
+            
+            if (!medication) {
+                speak(`I couldn't find a medication named ${medicationName}. Please check your medications.`);
+                stopVoiceListening();
+                return;
+            }
+            
+            console.log('✅ Found medication:', medication);
             
             // Set up confirmation
             pendingConfirmation = {
-                action: 'call-contact',
-                contact: contact
+                action: 'mark-medication-taken',
+                medication: medication
             };
             
-            speak(`Call ${contact.name} at ${contact.phone}? Say yes to confirm or no to cancel.`);
+            speak(`Mark ${medication.name} as taken? Say yes to confirm or no to cancel.`);
             
             // Keep listening for confirmation
             startVoiceListening();
@@ -7187,6 +7268,29 @@
                 }, 500);
                 
                 console.log('   ✅ Call initiation scheduled');
+            } else if (action === 'mark-medication-taken') {
+                const medication = pendingConfirmation.medication;
+                console.log('   - Medication:', medication);
+                console.log('   - Medication ID:', medication.id);
+                console.log('   - Medication name:', medication.name);
+                
+                console.log('   - Speaking confirmation...');
+                speak(`Marked ${medication.name} as taken`);
+                
+                console.log('   - Clearing pending confirmation...');
+                const medicationId = medication.id;
+                pendingConfirmation = null;
+                console.log('   - Pending confirmation cleared');
+                
+                console.log('   - Marking medication as taken...');
+                markMedicationTaken(medicationId);
+                console.log('   - Medication marked as taken');
+                
+                console.log('   - Closing voice overlay...');
+                stopVoiceListening();
+                console.log('   - Voice overlay closed');
+                
+                console.log('   ✅ Mark medication complete');
             }
             console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         }
