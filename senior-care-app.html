@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-25-1829 UTC - Added Mark Medication as Taken
-    BUILD DATE: January 25, 2026 at 6:29 PM UTC
-    CHANGES: Added "Mark as Taken" voice feature with confirmation
+    VERSION: 2026-01-25-1913 UTC - "Aspirin Taken" Voice Pattern
+    BUILD DATE: January 25, 2026 at 7:13 PM UTC
+    CHANGES: Changed to "Aspirin Taken" pattern (more natural for seniors)
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -2545,10 +2545,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-25-1829 UTC
+                        <strong>App Version:</strong> 2026-01-25-1913 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Voice Features: Navigation, Help, Call Contact, Mark as Taken
+                        Natural Voice Pattern: "Aspirin Taken" (Thing-Action)
                     </p>
                 </div>
             </div>
@@ -6943,8 +6943,9 @@
             
             let handled = false;
 
-            // Mark medication as taken (NEW FEATURE!)
-            if (!handled && lowerCommand.includes('mark') && (lowerCommand.includes('taken') || lowerCommand.includes('take'))) {
+            // Mark medication as taken - NATURAL PATTERN for seniors!
+            // Accepts: "Aspirin Taken", "Aspirin Done", "Metformin Taken"
+            if (!handled && (lowerCommand.includes(' taken') || lowerCommand.includes(' done'))) {
                 handleMarkMedicationTaken(command);
                 return;
             }
@@ -7046,7 +7047,7 @@
 
             // If command not handled
             if (!handled) {
-                speak(`I didn't understand "${command}". Try saying "mark Aspirin as taken", "call Cathy", or "go to medications"`);
+                speak(`I didn't understand "${command}". Try saying "Aspirin Taken", "call Cathy", or "go to medications"`);
                 stopVoiceListening();
             }
         }
@@ -7131,7 +7132,7 @@
             }, 300);
         }
 
-        // Handle mark medication as taken command
+        // Handle mark medication as taken command - NATURAL PATTERN!
         function handleMarkMedicationTaken(command) {
             console.log('✅ Handle mark medication as taken:', command);
             
@@ -7139,9 +7140,10 @@
             const lowerCommand = command.toLowerCase();
             let medicationName = '';
             
-            // Remove "mark", "as", "taken", "take" and common words
+            // Remove common words to extract medication name
+            // Handles: "aspirin taken", "aspirin done", "metformin taken"
             medicationName = lowerCommand
-                .replace(/mark|as|taken|take|my|the|please/g, '')
+                .replace(/taken|done|my|the|please|i\s|is\s/g, '')
                 .trim();
             
             // Capitalize first letter
@@ -7172,13 +7174,13 @@
             
             console.log('✅ Found medication:', medication);
             
-            // Set up confirmation
+            // Set up confirmation - SIMPLIFIED message!
             pendingConfirmation = {
                 action: 'mark-medication-taken',
                 medication: medication
             };
             
-            speak(`Mark ${medication.name} as taken? Say yes to confirm or no to cancel.`);
+            speak(`Mark ${medication.name}? Say yes or no.`);
             
             // Keep listening for confirmation
             startVoiceListening();
