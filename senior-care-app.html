@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-25-0052 UTC - ROLLBACK to Simple Voice Navigation
-    BUILD DATE: January 25, 2026 at 12:52 AM UTC
-    CHANGES: Restored simple working voice navigation (removed complex features)
+    VERSION: 2026-01-25-0140 UTC - Added Call Contact Feature
+    BUILD DATE: January 25, 2026 at 1:40 AM UTC
+    CHANGES: Added simple "Call Contact" voice command with confirmation
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -2545,10 +2545,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-25-0052 UTC
+                        <strong>App Version:</strong> 2026-01-25-0140 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        ROLLBACK - Simple Voice Navigation Only
+                        Simple Voice + Call Contact Feature
                     </p>
                 </div>
             </div>
@@ -6816,6 +6816,9 @@
         let voiceAssistantEnabled = false;
         let recognition = null;
         let isListening = false;
+        
+        // Simple confirmation state (for call contact feature)
+        let pendingConfirmation = null; // Will hold {action: 'call-contact', data: {...}}
 
         // Initialize voice recognition
         function initVoiceRecognition() {
@@ -6927,11 +6930,24 @@
             isListening = false;
         }
 
-        // Process voice commands - SIMPLE VERSION (Navigation, Help, Reading ONLY)
+        // Process voice commands - WITH Call Contact Feature
         function processVoiceCommand(command) {
             const lowerCommand = command.toLowerCase();
             console.log('🎤 Processing voice command:', command);
+            
+            // Check if we're waiting for a confirmation
+            if (pendingConfirmation) {
+                handleConfirmation(command);
+                return;
+            }
+            
             let handled = false;
+
+            // Call contact commands (NEW FEATURE!)
+            if (!handled && (lowerCommand.includes('call ') || lowerCommand.includes('phone '))) {
+                handleCallContact(command);
+                return;
+            }
 
             // Navigation commands
             if (lowerCommand.includes('go to') || lowerCommand.includes('show') || lowerCommand.includes('open')) {
@@ -7024,8 +7040,115 @@
 
             // If command not handled
             if (!handled) {
-                speak(`I didn't understand "${command}". Try saying "go to medications", "help with reminders", or "show my appointments"`);
+                speak(`I didn't understand "${command}". Try saying "call Cathy", "go to medications", or "help with reminders"`);
                 stopVoiceListening();
+            }
+        }
+
+        // Handle call contact command
+        function handleCallContact(command) {
+            console.log('📞 Handle call contact:', command);
+            
+            // Extract contact name from command
+            const lowerCommand = command.toLowerCase();
+            let contactName = '';
+            
+            // Remove "call" or "phone" and common words
+            contactName = lowerCommand
+                .replace(/call|phone|my|the|please/g, '')
+                .trim();
+            
+            // Capitalize first letter
+            if (contactName) {
+                contactName = contactName.charAt(0).toUpperCase() + contactName.slice(1);
+            }
+            
+            if (!contactName) {
+                speak('Who would you like to call?');
+                stopVoiceListening();
+                return;
+            }
+            
+            console.log('📞 Looking for contact:', contactName);
+            
+            // Find contact in user's contacts
+            const users = loadData('users');
+            const contacts = users[currentUser]?.contacts || [];
+            
+            // Try to find by name
+            let contact = contacts.find(c => c.name.toLowerCase() === contactName.toLowerCase());
+            
+            // Try to find by relationship (e.g., "call my daughter")
+            if (!contact) {
+                contact = contacts.find(c => c.relation && c.relation.toLowerCase() === contactName.toLowerCase());
+            }
+            
+            if (!contact) {
+                speak(`I couldn't find a contact named ${contactName}. Please check your contacts.`);
+                stopVoiceListening();
+                return;
+            }
+            
+            console.log('📞 Found contact:', contact);
+            
+            // Set up confirmation
+            pendingConfirmation = {
+                action: 'call-contact',
+                contact: contact
+            };
+            
+            speak(`Call ${contact.name} at ${contact.phone}? Say yes to confirm or no to cancel.`);
+            
+            // Keep listening for confirmation
+            startVoiceListening();
+        }
+
+        // Handle confirmation responses
+        function handleConfirmation(command) {
+            const lowerCommand = command.toLowerCase();
+            console.log('✅ Handle confirmation:', command);
+            
+            if (lowerCommand.includes('yes') || lowerCommand.includes('yeah') || lowerCommand.includes('sure') || lowerCommand.includes('confirm')) {
+                console.log('✅ User confirmed');
+                executeConfirmedAction();
+            } else if (lowerCommand.includes('no') || lowerCommand.includes('cancel') || lowerCommand.includes('nope')) {
+                console.log('❌ User cancelled');
+                speak('Cancelled');
+                pendingConfirmation = null;
+                stopVoiceListening();
+            } else {
+                console.log('❓ Unclear response, asking again');
+                speak('Please say yes to confirm or no to cancel');
+                startVoiceListening();
+            }
+        }
+
+        // Execute the confirmed action
+        function executeConfirmedAction() {
+            if (!pendingConfirmation) {
+                console.log('❌ No pending confirmation');
+                return;
+            }
+            
+            const action = pendingConfirmation.action;
+            console.log('⚡ Execute confirmed action:', action);
+            
+            if (action === 'call-contact') {
+                const contact = pendingConfirmation.contact;
+                console.log('📞 Calling:', contact.name);
+                
+                speak(`Calling ${contact.name}`);
+                
+                // Clear confirmation
+                pendingConfirmation = null;
+                
+                // Close overlay
+                stopVoiceListening();
+                
+                // Initiate call after brief delay
+                setTimeout(() => {
+                    window.location.href = `tel:${contact.phone}`;
+                }, 1000);
             }
         }
 
