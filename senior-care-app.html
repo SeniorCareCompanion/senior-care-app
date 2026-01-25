@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-25-0140 UTC - Added Call Contact Feature
-    BUILD DATE: January 25, 2026 at 1:40 AM UTC
-    CHANGES: Added simple "Call Contact" voice command with confirmation
+    VERSION: 2026-01-25-0204 UTC - Call Contact DEBUG (Fix call initiation)
+    BUILD DATE: January 25, 2026 at 2:04 AM UTC
+    CHANGES: Added logging and improved call initiation for iOS
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -2545,10 +2545,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-25-0140 UTC
+                        <strong>App Version:</strong> 2026-01-25-0204 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Simple Voice + Call Contact Feature
+                        DEBUG - Call Contact with Extensive Logging
                     </p>
                 </div>
             </div>
@@ -7106,50 +7106,89 @@
         // Handle confirmation responses
         function handleConfirmation(command) {
             const lowerCommand = command.toLowerCase();
-            console.log('✅ Handle confirmation:', command);
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('✅ HANDLE CONFIRMATION');
+            console.log('   - Command:', command);
+            console.log('   - Lower:', lowerCommand);
+            console.log('   - Pending confirmation:', pendingConfirmation);
             
             if (lowerCommand.includes('yes') || lowerCommand.includes('yeah') || lowerCommand.includes('sure') || lowerCommand.includes('confirm')) {
-                console.log('✅ User confirmed');
+                console.log('   ✅ User said YES - executing action');
                 executeConfirmedAction();
             } else if (lowerCommand.includes('no') || lowerCommand.includes('cancel') || lowerCommand.includes('nope')) {
-                console.log('❌ User cancelled');
+                console.log('   ❌ User said NO - cancelling');
                 speak('Cancelled');
                 pendingConfirmation = null;
                 stopVoiceListening();
             } else {
-                console.log('❓ Unclear response, asking again');
+                console.log('   ❓ Unclear response - asking again');
                 speak('Please say yes to confirm or no to cancel');
                 startVoiceListening();
             }
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         }
 
         // Execute the confirmed action
         function executeConfirmedAction() {
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('⚡ EXECUTE CONFIRMED ACTION');
+            console.log('   - Pending confirmation:', pendingConfirmation);
+            
             if (!pendingConfirmation) {
-                console.log('❌ No pending confirmation');
+                console.log('   ❌ ERROR: No pending confirmation!');
+                console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
                 return;
             }
             
             const action = pendingConfirmation.action;
-            console.log('⚡ Execute confirmed action:', action);
+            console.log('   - Action:', action);
             
             if (action === 'call-contact') {
                 const contact = pendingConfirmation.contact;
-                console.log('📞 Calling:', contact.name);
+                console.log('   - Contact:', contact);
+                console.log('   - Contact name:', contact.name);
+                console.log('   - Contact phone:', contact.phone);
                 
+                console.log('   - Speaking confirmation...');
                 speak(`Calling ${contact.name}`);
                 
-                // Clear confirmation
+                console.log('   - Clearing pending confirmation...');
+                const phoneNumber = contact.phone;
                 pendingConfirmation = null;
+                console.log('   - Pending confirmation cleared');
                 
-                // Close overlay
+                console.log('   - Closing voice overlay...');
                 stopVoiceListening();
+                console.log('   - Voice overlay closed');
                 
-                // Initiate call after brief delay
+                console.log('   - Initiating phone call...');
+                console.log('   - Phone number:', phoneNumber);
+                console.log('   - Creating tel: link...');
+                
+                // Method 1: Create anchor element and click it (more reliable on iOS)
+                const telLink = document.createElement('a');
+                telLink.href = `tel:${phoneNumber}`;
+                telLink.style.display = 'none';
+                document.body.appendChild(telLink);
+                
+                console.log('   - Anchor created with href:', telLink.href);
+                console.log('   - Clicking anchor in 500ms...');
+                
                 setTimeout(() => {
-                    window.location.href = `tel:${contact.phone}`;
-                }, 1000);
+                    console.log('   - CLICKING ANCHOR NOW!');
+                    telLink.click();
+                    console.log('   - Anchor clicked');
+                    
+                    // Clean up
+                    setTimeout(() => {
+                        document.body.removeChild(telLink);
+                        console.log('   - Anchor removed from DOM');
+                    }, 1000);
+                }, 500);
+                
+                console.log('   ✅ Call initiation scheduled');
             }
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         }
 
         // Read current page content
