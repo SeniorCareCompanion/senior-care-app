@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-26-0205 UTC - Home Update Fix + Delete Medication
-    BUILD DATE: January 26, 2026 at 2:05 AM UTC
-    CHANGES: Fixed home page update after marking taken, added "Delete Aspirin" voice command
+    VERSION: 2026-01-26-2243 UTC - Added Appointments Voice Commands
+    BUILD DATE: January 26, 2026 at 10:43 PM UTC
+    CHANGES: Added "Dentist Done" and "Delete Dentist" voice commands
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -2545,10 +2545,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-26-0205 UTC
+                        <strong>App Version:</strong> 2026-01-26-2243 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Home Update Fix + "Aspirin Taken" + "Delete Aspirin"
+                        Appointments Voice: "Dentist Done" + "Delete Dentist"
                     </p>
                 </div>
             </div>
@@ -6943,10 +6943,33 @@
             
             let handled = false;
 
+            // Mark appointment as done - NATURAL PATTERN for seniors!
+            // Accepts: "Dentist Done", "Appointment Done", "Checkup Done"
+            // Check appointments FIRST before medications (more specific)
+            if (!handled && (lowerCommand.includes(' done') || lowerCommand.includes(' completed'))) {
+                // Check if this might be an appointment by looking for appointment-like words
+                if (lowerCommand.includes('appointment') || lowerCommand.includes('appt') ||
+                    lowerCommand.includes('doctor') || lowerCommand.includes('dentist') || 
+                    lowerCommand.includes('checkup') || lowerCommand.includes('visit')) {
+                    handleMarkAppointmentDone(command);
+                    return;
+                }
+            }
+
             // Mark medication as taken - NATURAL PATTERN for seniors!
             // Accepts: "Aspirin Taken", "Aspirin Done", "Metformin Taken"
             if (!handled && (lowerCommand.includes(' taken') || lowerCommand.includes(' done'))) {
                 handleMarkMedicationTaken(command);
+                return;
+            }
+
+            // Delete appointment - ACTION FIRST (intentional for destructive actions)
+            // Accepts: "Delete Dentist", "Delete Appointment", "Remove Checkup"
+            if (!handled && (lowerCommand.includes('delete ') || lowerCommand.includes('remove ')) &&
+                (lowerCommand.includes('appointment') || lowerCommand.includes('appt') ||
+                 lowerCommand.includes('doctor') || lowerCommand.includes('dentist') ||
+                 lowerCommand.includes('checkup') || lowerCommand.includes('visit'))) {
+                handleDeleteAppointment(command);
                 return;
             }
 
@@ -7054,7 +7077,7 @@
 
             // If command not handled
             if (!handled) {
-                speak(`I didn't understand "${command}". Try saying "Aspirin Taken", "Delete Aspirin", "Call Cathy", or "Go Medications"`);
+                speak(`I didn't understand "${command}". Try saying "Aspirin Taken", "Dentist Done", "Delete Aspirin", or "Call Cathy"`);
                 stopVoiceListening();
             }
         }
@@ -7246,6 +7269,112 @@
             startVoiceListening();
         }
 
+        // Handle mark appointment as done command - NATURAL PATTERN!
+        function handleMarkAppointmentDone(command) {
+            console.log('📅 Handle mark appointment done:', command);
+            
+            // Extract appointment name from command
+            const lowerCommand = command.toLowerCase();
+            let appointmentName = '';
+            
+            // Remove common words to extract appointment identifier
+            appointmentName = lowerCommand
+                .replace(/done|completed|my|the|please|appointment|appt|visit|is\s/g, '')
+                .trim();
+            
+            // Capitalize first letter
+            if (appointmentName) {
+                appointmentName = appointmentName.charAt(0).toUpperCase() + appointmentName.slice(1);
+            }
+            
+            if (!appointmentName) {
+                speak('Which appointment did you complete?');
+                stopVoiceListening();
+                return;
+            }
+            
+            console.log('📅 Looking for appointment:', appointmentName);
+            
+            // Find appointment in user's appointments
+            const users = loadData('users');
+            const appointments = users[currentUser]?.appointments || [];
+            
+            // Try to find by doctor name (case-insensitive, partial match)
+            let appointment = appointments.find(a => a.doctor.toLowerCase().includes(appointmentName.toLowerCase()));
+            
+            if (!appointment) {
+                speak(`I couldn't find an appointment for ${appointmentName}. Please check your appointments.`);
+                stopVoiceListening();
+                return;
+            }
+            
+            console.log('📅 Found appointment:', appointment);
+            
+            // Set up confirmation
+            pendingConfirmation = {
+                action: 'mark-appointment-done',
+                appointment: appointment
+            };
+            
+            speak(`Mark ${appointment.doctor} appointment as done? Say yes or no.`);
+            
+            // Keep listening for confirmation
+            startVoiceListening();
+        }
+
+        // Handle delete appointment command - ACTION FIRST for safety!
+        function handleDeleteAppointment(command) {
+            console.log('🗑️ Handle delete appointment:', command);
+            
+            // Extract appointment name from command
+            const lowerCommand = command.toLowerCase();
+            let appointmentName = '';
+            
+            // Remove "delete", "remove" and common words
+            appointmentName = lowerCommand
+                .replace(/delete|remove|my|the|please|appointment|appt|visit/g, '')
+                .trim();
+            
+            // Capitalize first letter
+            if (appointmentName) {
+                appointmentName = appointmentName.charAt(0).toUpperCase() + appointmentName.slice(1);
+            }
+            
+            if (!appointmentName) {
+                speak('Which appointment do you want to delete?');
+                stopVoiceListening();
+                return;
+            }
+            
+            console.log('🗑️ Looking for appointment:', appointmentName);
+            
+            // Find appointment in user's appointments
+            const users = loadData('users');
+            const appointments = users[currentUser]?.appointments || [];
+            
+            // Try to find by doctor name (case-insensitive, partial match)
+            let appointment = appointments.find(a => a.doctor.toLowerCase().includes(appointmentName.toLowerCase()));
+            
+            if (!appointment) {
+                speak(`I couldn't find an appointment for ${appointmentName}. Please check your appointments.`);
+                stopVoiceListening();
+                return;
+            }
+            
+            console.log('🗑️ Found appointment:', appointment);
+            
+            // Set up confirmation - IMPORTANT for destructive action!
+            pendingConfirmation = {
+                action: 'delete-appointment',
+                appointment: appointment
+            };
+            
+            speak(`Delete ${appointment.doctor} appointment? Say yes or no.`);
+            
+            // Keep listening for confirmation
+            startVoiceListening();
+        }
+
         // Handle confirmation responses
         function handleConfirmation(command) {
             const lowerCommand = command.toLowerCase();
@@ -7386,6 +7515,71 @@
                 console.log('   - Voice overlay closed');
                 
                 console.log('   ✅ Delete medication complete');
+            } else if (action === 'mark-appointment-done') {
+                const appointment = pendingConfirmation.appointment;
+                console.log('   - Appointment:', appointment);
+                console.log('   - Appointment ID:', appointment.id);
+                console.log('   - Appointment doctor:', appointment.doctor);
+                
+                console.log('   - Speaking confirmation...');
+                speak(`Marked ${appointment.doctor} appointment as done`);
+                
+                console.log('   - Clearing pending confirmation...');
+                const appointmentId = appointment.id;
+                pendingConfirmation = null;
+                console.log('   - Pending confirmation cleared');
+                
+                console.log('   - Marking appointment as completed...');
+                const users = loadData('users');
+                const appt = users[currentUser].appointments.find(a => a.id === appointmentId);
+                if (appt) {
+                    appt.completed = true;
+                    saveData('users', users);
+                    loadAppointments(users[currentUser].appointments);
+                }
+                console.log('   - Appointment marked as completed');
+                
+                console.log('   - Updating home page...');
+                loadHomeReminders();
+                updateDashboard();
+                console.log('   - Home page updated');
+                
+                console.log('   - Closing voice overlay...');
+                stopVoiceListening();
+                console.log('   - Voice overlay closed');
+                
+                console.log('   ✅ Mark appointment complete');
+            } else if (action === 'delete-appointment') {
+                const appointment = pendingConfirmation.appointment;
+                console.log('   - Appointment:', appointment);
+                console.log('   - Appointment ID:', appointment.id);
+                console.log('   - Appointment doctor:', appointment.doctor);
+                
+                console.log('   - Speaking confirmation...');
+                speak(`Deleted ${appointment.doctor} appointment`);
+                
+                console.log('   - Clearing pending confirmation...');
+                const appointmentId = appointment.id;
+                pendingConfirmation = null;
+                console.log('   - Pending confirmation cleared');
+                
+                console.log('   - Deleting appointment...');
+                const users = loadData('users');
+                users[currentUser].appointments = users[currentUser].appointments.filter(a => a.id !== appointmentId);
+                saveData('users', users);
+                loadAppointments(users[currentUser].appointments);
+                console.log('   - Appointment deleted');
+                
+                console.log('   - Updating home page...');
+                loadHomeReminders();
+                updateDashboard();
+                console.log('   - Home page updated');
+                
+                console.log('   - Closing voice overlay...');
+                stopVoiceListening();
+                console.log('   - Voice overlay closed');
+                
+                console.log('   ✅ Delete appointment complete');
             }
             console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         }
