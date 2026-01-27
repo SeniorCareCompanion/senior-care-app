@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-27-0207 UTC - Explicit Prefix Voice Commands
-    BUILD DATE: January 27, 2026 at 2:07 AM UTC
-    CHANGES: Rebuilt voice commands with explicit prefix pattern (no ambiguity!)
+    VERSION: 2026-01-27-0305 UTC - Hybrid Voice Optimization
+    BUILD DATE: January 27, 2026 at 3:05 AM UTC
+    CHANGES: Last-word extraction + UI guidance for better voice recognition
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -1169,7 +1169,12 @@
                 <div class="form-section">
                     <h3>Add New Medication</h3>
                     <div class="input-group">
-                        <label>Medication Name</label>
+                        <label>
+                            Medication Name
+                            <span style="display: block; font-size: 11px; color: #666; font-weight: normal; margin-top: 3px;">
+                                💡 Voice Tip: Single words work best (e.g., "Aspirin" not "Dr. John's Aspirin")
+                            </span>
+                        </label>
                         <input type="text" id="medName" placeholder="e.g., Aspirin">
                     </div>
                     <div class="input-group">
@@ -1260,18 +1265,22 @@
                 <div class="form-section">
                     <h3>Add New Appointment</h3>
                     <div class="input-group">
-                        <label>Doctor/Clinic Name</label>
+                        <label>
+                            Doctor/Clinic Name
+                            <span style="display: block; font-size: 11px; color: #666; font-weight: normal; margin-top: 3px;">
+                                💡 Voice Tip: Single words work best (e.g., "Dentist" or "John" not "Dr. John Smith")
+                            </span>
+                        </label>
                         <div class="autocomplete-wrapper">
                             <input type="text" 
                                    id="apptDoctor" 
-                                   placeholder="Type doctor or clinic name" 
+                                   placeholder="e.g., Dentist, John, Cardiologist" 
                                    autocomplete="off"
                                    onfocus="showAutocomplete('apptDoctor', 'doctorDropdown')"
                                    oninput="filterAutocomplete('apptDoctor', 'doctorDropdown')"
                                    onblur="setTimeout(() => hideAutocomplete('doctorDropdown'), 200)">
                             <div id="doctorDropdown" class="autocomplete-dropdown"></div>
                         </div>
-                        <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">💡 Start typing to see suggestions from your history</p>
                     </div>
                     <div class="input-group">
                         <label>Date</label>
@@ -2545,10 +2554,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-27-0207 UTC
+                        <strong>App Version:</strong> 2026-01-27-0305 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Explicit Prefix: "Medication Aspirin Taken" (No Ambiguity!)
+                        Hybrid Voice: Last-Word Extraction + UI Guidance
                     </p>
                 </div>
             </div>
@@ -7184,19 +7193,26 @@
             }, 300);
         }
 
-        // Handle mark medication as taken command - EXPLICIT PREFIX!
+        // Handle mark medication as taken command - HYBRID OPTIMIZATION!
         function handleMarkMedicationTaken(command) {
             console.log('✅ Handle mark medication as taken:', command);
             
             // Extract medication name from command
-            // Format: "Medication Aspirin Taken" or "Med Aspirin Done"
+            // Format: "Medication Aspirin Taken" or "Med Blood Pressure Meds Done"
+            // OPTIMIZATION: Extract LAST word for better voice recognition!
             const lowerCommand = command.toLowerCase();
             let medicationName = '';
             
             // Remove section keyword, action keyword, and filler words
-            medicationName = lowerCommand
-                .replace(/medication|med|taken|done|my|the|please|i\s|is\s/g, '')
+            const cleaned = lowerCommand
+                .replace(/medication|med|taken|done|my|the|please|i\s|is\s/g, ' ')
                 .trim();
+            
+            // Split into words and take the LAST significant word
+            const words = cleaned.split(/\s+/).filter(w => w.length > 0);
+            if (words.length > 0) {
+                medicationName = words[words.length - 1]; // Last word!
+            }
             
             // Capitalize first letter
             if (medicationName) {
@@ -7209,14 +7225,14 @@
                 return;
             }
             
-            console.log('✅ Looking for medication:', medicationName);
+            console.log('✅ Looking for medication (last word):', medicationName);
             
             // Find medication in user's medications
             const users = loadData('users');
             const medications = users[currentUser]?.medications || [];
             
-            // Try to find by name
-            let medication = medications.find(m => m.name.toLowerCase() === medicationName.toLowerCase());
+            // Try to find by partial name match (contains the last word)
+            let medication = medications.find(m => m.name.toLowerCase().includes(medicationName.toLowerCase()));
             
             if (!medication) {
                 speak(`I couldn't find a medication named ${medicationName}. Please check your medications.`);
@@ -7238,19 +7254,26 @@
             startVoiceListening();
         }
 
-        // Handle delete medication command - EXPLICIT PREFIX!
+        // Handle delete medication command - HYBRID OPTIMIZATION!
         function handleDeleteMedication(command) {
             console.log('🗑️ Handle delete medication:', command);
             
             // Extract medication name from command
-            // Format: "Delete Medication Aspirin" or "Remove Med Aspirin"
+            // Format: "Delete Medication Aspirin" or "Remove Med Blood Pressure Meds"
+            // OPTIMIZATION: Extract LAST word for better voice recognition!
             const lowerCommand = command.toLowerCase();
             let medicationName = '';
             
             // Remove section keyword, action keyword, and filler words
-            medicationName = lowerCommand
-                .replace(/delete|remove|medication|med|my|the|please/g, '')
+            const cleaned = lowerCommand
+                .replace(/delete|remove|medication|med|my|the|please/g, ' ')
                 .trim();
+            
+            // Split into words and take the LAST significant word
+            const words = cleaned.split(/\s+/).filter(w => w.length > 0);
+            if (words.length > 0) {
+                medicationName = words[words.length - 1]; // Last word!
+            }
             
             // Capitalize first letter
             if (medicationName) {
@@ -7263,14 +7286,14 @@
                 return;
             }
             
-            console.log('🗑️ Looking for medication:', medicationName);
+            console.log('🗑️ Looking for medication (last word):', medicationName);
             
             // Find medication in user's medications
             const users = loadData('users');
             const medications = users[currentUser]?.medications || [];
             
-            // Try to find by name
-            let medication = medications.find(m => m.name.toLowerCase() === medicationName.toLowerCase());
+            // Try to find by partial name match (contains the last word)
+            let medication = medications.find(m => m.name.toLowerCase().includes(medicationName.toLowerCase()));
             
             if (!medication) {
                 speak(`I couldn't find a medication named ${medicationName}. Please check your medications.`);
@@ -7292,19 +7315,26 @@
             startVoiceListening();
         }
 
-        // Handle mark appointment as done command - EXPLICIT PREFIX!
+        // Handle mark appointment as done command - HYBRID OPTIMIZATION!
         function handleMarkAppointmentDone(command) {
             console.log('📅 Handle mark appointment done:', command);
             
             // Extract appointment name from command
-            // Format: "Appointment Dr. John Done" or "Appt Dentist Done"
+            // Format: "Appointment Dentist Done" or "Appt Dr. John Done"
+            // OPTIMIZATION: Extract LAST word for better voice recognition!
             const lowerCommand = command.toLowerCase();
             let appointmentName = '';
             
             // Remove section keyword, action keyword, and filler words
-            appointmentName = lowerCommand
-                .replace(/done|completed|my|the|please|appointment|appt|visit|is\s/g, '')
+            const cleaned = lowerCommand
+                .replace(/done|completed|my|the|please|appointment|appt|visit|is\s/g, ' ')
                 .trim();
+            
+            // Split into words and take the LAST significant word
+            const words = cleaned.split(/\s+/).filter(w => w.length > 0);
+            if (words.length > 0) {
+                appointmentName = words[words.length - 1]; // Last word!
+            }
             
             // Capitalize first letter
             if (appointmentName) {
@@ -7317,7 +7347,7 @@
                 return;
             }
             
-            console.log('📅 Looking for appointment:', appointmentName);
+            console.log('📅 Looking for appointment (last word):', appointmentName);
             
             // Find appointment in user's appointments
             const users = loadData('users');
@@ -7346,19 +7376,26 @@
             startVoiceListening();
         }
 
-        // Handle delete appointment command - EXPLICIT PREFIX!
+        // Handle delete appointment command - HYBRID OPTIMIZATION!
         function handleDeleteAppointment(command) {
             console.log('🗑️ Handle delete appointment:', command);
             
             // Extract appointment name from command
-            // Format: "Delete Appointment Dr. John" or "Remove Appt Dentist"
+            // Format: "Delete Appointment Dentist" or "Remove Appt Dr. John"
+            // OPTIMIZATION: Extract LAST word for better voice recognition!
             const lowerCommand = command.toLowerCase();
             let appointmentName = '';
             
             // Remove section keyword, action keyword, and filler words
-            appointmentName = lowerCommand
-                .replace(/delete|remove|my|the|please|appointment|appt|visit/g, '')
+            const cleaned = lowerCommand
+                .replace(/delete|remove|my|the|please|appointment|appt|visit/g, ' ')
                 .trim();
+            
+            // Split into words and take the LAST significant word
+            const words = cleaned.split(/\s+/).filter(w => w.length > 0);
+            if (words.length > 0) {
+                appointmentName = words[words.length - 1]; // Last word!
+            }
             
             // Capitalize first letter
             if (appointmentName) {
@@ -7371,7 +7408,7 @@
                 return;
             }
             
-            console.log('🗑️ Looking for appointment:', appointmentName);
+            console.log('🗑️ Looking for appointment (last word):', appointmentName);
             
             // Find appointment in user's appointments
             const users = loadData('users');
