@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-26-2243 UTC - Added Appointments Voice Commands
-    BUILD DATE: January 26, 2026 at 10:43 PM UTC
-    CHANGES: Added "Dentist Done" and "Delete Dentist" voice commands
+    VERSION: 2026-01-27-0207 UTC - Explicit Prefix Voice Commands
+    BUILD DATE: January 27, 2026 at 2:07 AM UTC
+    CHANGES: Rebuilt voice commands with explicit prefix pattern (no ambiguity!)
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -2545,10 +2545,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-26-2243 UTC
+                        <strong>App Version:</strong> 2026-01-27-0207 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Appointments Voice: "Dentist Done" + "Delete Dentist"
+                        Explicit Prefix: "Medication Aspirin Taken" (No Ambiguity!)
                     </p>
                 </div>
             </div>
@@ -6930,7 +6930,9 @@
             isListening = false;
         }
 
-        // Process voice commands - WITH Call Contact & Mark as Taken Features
+        // Process voice commands - EXPLICIT PREFIX PATTERN (No Ambiguity!)
+        // Format: [SECTION] [ITEM] [ACTION]
+        // Examples: "Medication Aspirin Taken", "Appointment Dr. John Done", "Delete Contact Bob"
         function processVoiceCommand(command) {
             const lowerCommand = command.toLowerCase();
             console.log('🎤 Processing voice command:', command);
@@ -6943,51 +6945,71 @@
             
             let handled = false;
 
-            // Mark appointment as done - NATURAL PATTERN for seniors!
-            // Accepts: "Dentist Done", "Appointment Done", "Checkup Done"
-            // Check appointments FIRST before medications (more specific)
-            if (!handled && (lowerCommand.includes(' done') || lowerCommand.includes(' completed'))) {
-                // Check if this might be an appointment by looking for appointment-like words
-                if (lowerCommand.includes('appointment') || lowerCommand.includes('appt') ||
-                    lowerCommand.includes('doctor') || lowerCommand.includes('dentist') || 
-                    lowerCommand.includes('checkup') || lowerCommand.includes('visit')) {
-                    handleMarkAppointmentDone(command);
+            // MEDICATION COMMANDS
+            if (lowerCommand.includes('medication') || lowerCommand.includes(' med ')) {
+                if (lowerCommand.includes('taken') || lowerCommand.includes('done')) {
+                    handleMarkMedicationTaken(command);
+                    return;
+                } else if (lowerCommand.includes('delete') || lowerCommand.includes('remove')) {
+                    handleDeleteMedication(command);
                     return;
                 }
             }
 
-            // Mark medication as taken - NATURAL PATTERN for seniors!
-            // Accepts: "Aspirin Taken", "Aspirin Done", "Metformin Taken"
-            if (!handled && (lowerCommand.includes(' taken') || lowerCommand.includes(' done'))) {
-                handleMarkMedicationTaken(command);
-                return;
+            // APPOINTMENT COMMANDS
+            if (lowerCommand.includes('appointment') || lowerCommand.includes(' appt ')) {
+                if (lowerCommand.includes('done') || lowerCommand.includes('completed')) {
+                    handleMarkAppointmentDone(command);
+                    return;
+                } else if (lowerCommand.includes('delete') || lowerCommand.includes('remove')) {
+                    handleDeleteAppointment(command);
+                    return;
+                }
             }
 
-            // Delete appointment - ACTION FIRST (intentional for destructive actions)
-            // Accepts: "Delete Dentist", "Delete Appointment", "Remove Checkup"
-            if (!handled && (lowerCommand.includes('delete ') || lowerCommand.includes('remove ')) &&
-                (lowerCommand.includes('appointment') || lowerCommand.includes('appt') ||
-                 lowerCommand.includes('doctor') || lowerCommand.includes('dentist') ||
-                 lowerCommand.includes('checkup') || lowerCommand.includes('visit'))) {
-                handleDeleteAppointment(command);
-                return;
+            // TASK COMMANDS (future)
+            if (lowerCommand.includes('task')) {
+                if (lowerCommand.includes('done') || lowerCommand.includes('completed')) {
+                    speak('Task commands coming soon!');
+                    stopVoiceListening();
+                    return;
+                } else if (lowerCommand.includes('delete') || lowerCommand.includes('remove')) {
+                    speak('Task delete coming soon!');
+                    stopVoiceListening();
+                    return;
+                }
             }
 
-            // Delete medication - ACTION FIRST (intentional for destructive actions)
-            // Accepts: "Delete Aspirin", "Delete Metformin", "Remove Aspirin"
-            if (!handled && (lowerCommand.includes('delete ') || lowerCommand.includes('remove '))) {
-                handleDeleteMedication(command);
-                return;
+            // BILL COMMANDS (future)
+            if (lowerCommand.includes('bill')) {
+                if (lowerCommand.includes('paid') || lowerCommand.includes('done')) {
+                    speak('Bill commands coming soon!');
+                    stopVoiceListening();
+                    return;
+                } else if (lowerCommand.includes('delete') || lowerCommand.includes('remove')) {
+                    speak('Bill delete coming soon!');
+                    stopVoiceListening();
+                    return;
+                }
             }
 
-            // Call contact commands
+            // CONTACT COMMANDS
+            if (lowerCommand.includes('contact')) {
+                if (lowerCommand.includes('delete') || lowerCommand.includes('remove')) {
+                    speak('Delete contact coming soon!');
+                    stopVoiceListening();
+                    return;
+                }
+            }
+
+            // CALL COMMANDS (unchanged - already clear)
             if (!handled && (lowerCommand.includes('call ') || lowerCommand.includes('phone '))) {
                 handleCallContact(command);
                 return;
             }
 
             // Navigation commands
-            if (lowerCommand.includes('go to') || lowerCommand.includes('show') || lowerCommand.includes('open')) {
+            if (lowerCommand.includes('go to') || lowerCommand.includes('show') || lowerCommand.includes('open') || lowerCommand.includes('go ')) {
                 if (lowerCommand.includes('medication') || lowerCommand.includes('med')) {
                     showSection('medications');
                     speak('Opening Medications');
@@ -7077,7 +7099,7 @@
 
             // If command not handled
             if (!handled) {
-                speak(`I didn't understand "${command}". Try saying "Aspirin Taken", "Dentist Done", "Delete Aspirin", or "Call Cathy"`);
+                speak(`I didn't understand "${command}". Try saying "Medication Aspirin Taken", "Appointment Dr. John Done", "Delete Medication Aspirin", or "Call Cathy"`);
                 stopVoiceListening();
             }
         }
@@ -7162,18 +7184,18 @@
             }, 300);
         }
 
-        // Handle mark medication as taken command - NATURAL PATTERN!
+        // Handle mark medication as taken command - EXPLICIT PREFIX!
         function handleMarkMedicationTaken(command) {
             console.log('✅ Handle mark medication as taken:', command);
             
             // Extract medication name from command
+            // Format: "Medication Aspirin Taken" or "Med Aspirin Done"
             const lowerCommand = command.toLowerCase();
             let medicationName = '';
             
-            // Remove common words to extract medication name
-            // Handles: "aspirin taken", "aspirin done", "metformin taken"
+            // Remove section keyword, action keyword, and filler words
             medicationName = lowerCommand
-                .replace(/taken|done|my|the|please|i\s|is\s/g, '')
+                .replace(/medication|med|taken|done|my|the|please|i\s|is\s/g, '')
                 .trim();
             
             // Capitalize first letter
@@ -7216,17 +7238,18 @@
             startVoiceListening();
         }
 
-        // Handle delete medication command - ACTION FIRST for safety!
+        // Handle delete medication command - EXPLICIT PREFIX!
         function handleDeleteMedication(command) {
             console.log('🗑️ Handle delete medication:', command);
             
             // Extract medication name from command
+            // Format: "Delete Medication Aspirin" or "Remove Med Aspirin"
             const lowerCommand = command.toLowerCase();
             let medicationName = '';
             
-            // Remove "delete", "remove" and common words to extract medication name
+            // Remove section keyword, action keyword, and filler words
             medicationName = lowerCommand
-                .replace(/delete|remove|my|the|please/g, '')
+                .replace(/delete|remove|medication|med|my|the|please/g, '')
                 .trim();
             
             // Capitalize first letter
@@ -7269,15 +7292,16 @@
             startVoiceListening();
         }
 
-        // Handle mark appointment as done command - NATURAL PATTERN!
+        // Handle mark appointment as done command - EXPLICIT PREFIX!
         function handleMarkAppointmentDone(command) {
             console.log('📅 Handle mark appointment done:', command);
             
             // Extract appointment name from command
+            // Format: "Appointment Dr. John Done" or "Appt Dentist Done"
             const lowerCommand = command.toLowerCase();
             let appointmentName = '';
             
-            // Remove common words to extract appointment identifier
+            // Remove section keyword, action keyword, and filler words
             appointmentName = lowerCommand
                 .replace(/done|completed|my|the|please|appointment|appt|visit|is\s/g, '')
                 .trim();
@@ -7322,15 +7346,16 @@
             startVoiceListening();
         }
 
-        // Handle delete appointment command - ACTION FIRST for safety!
+        // Handle delete appointment command - EXPLICIT PREFIX!
         function handleDeleteAppointment(command) {
             console.log('🗑️ Handle delete appointment:', command);
             
             // Extract appointment name from command
+            // Format: "Delete Appointment Dr. John" or "Remove Appt Dentist"
             const lowerCommand = command.toLowerCase();
             let appointmentName = '';
             
-            // Remove "delete", "remove" and common words
+            // Remove section keyword, action keyword, and filler words
             appointmentName = lowerCommand
                 .replace(/delete|remove|my|the|please|appointment|appt|visit/g, '')
                 .trim();
