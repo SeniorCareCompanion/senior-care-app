@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-27-0429 UTC - Multi-Dose Medications
-    BUILD DATE: January 27, 2026 at 4:29 AM UTC
-    CHANGES: Added support for medications taken multiple times per day (1-4x daily)
+    VERSION: 2026-01-27-2138 UTC - Complete Voice Feature Set
+    BUILD DATE: January 27, 2026 at 9:38 PM UTC
+    CHANGES: Added voice commands for Tasks, Bills, Activities, and Contacts (complete!)
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -2566,10 +2566,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-27-0429 UTC
+                        <strong>App Version:</strong> 2026-01-27-2138 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Multi-Dose: Medications 1-4x Daily with Per-Dose Tracking
+                        Complete Voice: All Sections + Multi-Dose + Hybrid Optimization
                     </p>
                 </div>
             </div>
@@ -7092,28 +7092,35 @@
                 }
             }
 
-            // TASK COMMANDS (future)
+            // TASK COMMANDS
             if (lowerCommand.includes('task')) {
                 if (lowerCommand.includes('done') || lowerCommand.includes('completed')) {
-                    speak('Task commands coming soon!');
-                    stopVoiceListening();
+                    handleMarkTaskDone(command);
                     return;
                 } else if (lowerCommand.includes('delete') || lowerCommand.includes('remove')) {
-                    speak('Task delete coming soon!');
-                    stopVoiceListening();
+                    handleDeleteTask(command);
                     return;
                 }
             }
 
-            // BILL COMMANDS (future)
+            // BILL COMMANDS
             if (lowerCommand.includes('bill')) {
                 if (lowerCommand.includes('paid') || lowerCommand.includes('done')) {
-                    speak('Bill commands coming soon!');
-                    stopVoiceListening();
+                    handleMarkBillPaid(command);
                     return;
                 } else if (lowerCommand.includes('delete') || lowerCommand.includes('remove')) {
-                    speak('Bill delete coming soon!');
-                    stopVoiceListening();
+                    handleDeleteBill(command);
+                    return;
+                }
+            }
+
+            // ACTIVITY COMMANDS
+            if (lowerCommand.includes('activity')) {
+                if (lowerCommand.includes('done') || lowerCommand.includes('completed')) {
+                    handleMarkActivityDone(command);
+                    return;
+                } else if (lowerCommand.includes('delete') || lowerCommand.includes('remove')) {
+                    handleDeleteActivity(command);
                     return;
                 }
             }
@@ -7121,8 +7128,7 @@
             // CONTACT COMMANDS
             if (lowerCommand.includes('contact')) {
                 if (lowerCommand.includes('delete') || lowerCommand.includes('remove')) {
-                    speak('Delete contact coming soon!');
-                    stopVoiceListening();
+                    handleDeleteContact(command);
                     return;
                 }
             }
@@ -7224,7 +7230,7 @@
 
             // If command not handled
             if (!handled) {
-                speak(`I didn't understand "${command}". Try saying "Medication Aspirin Taken", "Appointment Dr. John Done", "Delete Medication Aspirin", or "Call Cathy"`);
+                speak(`I didn't understand "${command}". Try saying "Medication Aspirin Taken", "Task Laundry Done", "Bill Electric Paid", or "Delete Contact Bob"`);
                 stopVoiceListening();
             }
         }
@@ -7583,6 +7589,359 @@
             startVoiceListening();
         }
 
+        // Handle mark task as done command - HYBRID OPTIMIZATION!
+        function handleMarkTaskDone(command) {
+            console.log('✅ Handle mark task done:', command);
+            
+            const lowerCommand = command.toLowerCase();
+            let taskName = '';
+            
+            // Remove section keyword, action keyword, and filler words
+            const cleaned = lowerCommand
+                .replace(/done|completed|my|the|please|task|is\s/g, ' ')
+                .trim();
+            
+            // Split into words and take the LAST significant word
+            const words = cleaned.split(/\s+/).filter(w => w.length > 0);
+            if (words.length > 0) {
+                taskName = words[words.length - 1];
+            }
+            
+            // Capitalize first letter
+            if (taskName) {
+                taskName = taskName.charAt(0).toUpperCase() + taskName.slice(1);
+            }
+            
+            if (!taskName) {
+                speak('Which task did you complete?');
+                stopVoiceListening();
+                return;
+            }
+            
+            console.log('✅ Looking for task (last word):', taskName);
+            
+            const users = loadData('users');
+            const tasks = users[currentUser]?.tasks || [];
+            
+            let task = tasks.find(t => t.task.toLowerCase().includes(taskName.toLowerCase()));
+            
+            if (!task) {
+                speak(`I couldn't find a task named ${taskName}. Please check your tasks.`);
+                stopVoiceListening();
+                return;
+            }
+            
+            console.log('✅ Found task:', task);
+            
+            pendingConfirmation = {
+                action: 'mark-task-done',
+                task: task
+            };
+            
+            speak(`Mark ${task.task}? Say yes or no.`);
+            startVoiceListening();
+        }
+
+        // Handle delete task command - HYBRID OPTIMIZATION!
+        function handleDeleteTask(command) {
+            console.log('🗑️ Handle delete task:', command);
+            
+            const lowerCommand = command.toLowerCase();
+            let taskName = '';
+            
+            const cleaned = lowerCommand
+                .replace(/delete|remove|my|the|please|task/g, ' ')
+                .trim();
+            
+            const words = cleaned.split(/\s+/).filter(w => w.length > 0);
+            if (words.length > 0) {
+                taskName = words[words.length - 1];
+            }
+            
+            if (taskName) {
+                taskName = taskName.charAt(0).toUpperCase() + taskName.slice(1);
+            }
+            
+            if (!taskName) {
+                speak('Which task do you want to delete?');
+                stopVoiceListening();
+                return;
+            }
+            
+            console.log('🗑️ Looking for task (last word):', taskName);
+            
+            const users = loadData('users');
+            const tasks = users[currentUser]?.tasks || [];
+            
+            let task = tasks.find(t => t.task.toLowerCase().includes(taskName.toLowerCase()));
+            
+            if (!task) {
+                speak(`I couldn't find a task named ${taskName}. Please check your tasks.`);
+                stopVoiceListening();
+                return;
+            }
+            
+            console.log('🗑️ Found task:', task);
+            
+            pendingConfirmation = {
+                action: 'delete-task',
+                task: task
+            };
+            
+            speak(`Delete ${task.task}? Say yes or no.`);
+            startVoiceListening();
+        }
+
+        // Handle mark bill as paid command - HYBRID OPTIMIZATION!
+        function handleMarkBillPaid(command) {
+            console.log('💵 Handle mark bill paid:', command);
+            
+            const lowerCommand = command.toLowerCase();
+            let billName = '';
+            
+            const cleaned = lowerCommand
+                .replace(/paid|done|my|the|please|bill|is\s/g, ' ')
+                .trim();
+            
+            const words = cleaned.split(/\s+/).filter(w => w.length > 0);
+            if (words.length > 0) {
+                billName = words[words.length - 1];
+            }
+            
+            if (billName) {
+                billName = billName.charAt(0).toUpperCase() + billName.slice(1);
+            }
+            
+            if (!billName) {
+                speak('Which bill did you pay?');
+                stopVoiceListening();
+                return;
+            }
+            
+            console.log('💵 Looking for bill (last word):', billName);
+            
+            const users = loadData('users');
+            const bills = users[currentUser]?.bills || [];
+            
+            let bill = bills.find(b => b.name.toLowerCase().includes(billName.toLowerCase()));
+            
+            if (!bill) {
+                speak(`I couldn't find a bill named ${billName}. Please check your bills.`);
+                stopVoiceListening();
+                return;
+            }
+            
+            console.log('💵 Found bill:', bill);
+            
+            pendingConfirmation = {
+                action: 'mark-bill-paid',
+                bill: bill
+            };
+            
+            speak(`Mark ${bill.name} as paid? Say yes or no.`);
+            startVoiceListening();
+        }
+
+        // Handle delete bill command - HYBRID OPTIMIZATION!
+        function handleDeleteBill(command) {
+            console.log('🗑️ Handle delete bill:', command);
+            
+            const lowerCommand = command.toLowerCase();
+            let billName = '';
+            
+            const cleaned = lowerCommand
+                .replace(/delete|remove|my|the|please|bill/g, ' ')
+                .trim();
+            
+            const words = cleaned.split(/\s+/).filter(w => w.length > 0);
+            if (words.length > 0) {
+                billName = words[words.length - 1];
+            }
+            
+            if (billName) {
+                billName = billName.charAt(0).toUpperCase() + billName.slice(1);
+            }
+            
+            if (!billName) {
+                speak('Which bill do you want to delete?');
+                stopVoiceListening();
+                return;
+            }
+            
+            console.log('🗑️ Looking for bill (last word):', billName);
+            
+            const users = loadData('users');
+            const bills = users[currentUser]?.bills || [];
+            
+            let bill = bills.find(b => b.name.toLowerCase().includes(billName.toLowerCase()));
+            
+            if (!bill) {
+                speak(`I couldn't find a bill named ${billName}. Please check your bills.`);
+                stopVoiceListening();
+                return;
+            }
+            
+            console.log('🗑️ Found bill:', bill);
+            
+            pendingConfirmation = {
+                action: 'delete-bill',
+                bill: bill
+            };
+            
+            speak(`Delete ${bill.name}? Say yes or no.`);
+            startVoiceListening();
+        }
+
+        // Handle mark activity as done command - HYBRID OPTIMIZATION!
+        function handleMarkActivityDone(command) {
+            console.log('🎯 Handle mark activity done:', command);
+            
+            const lowerCommand = command.toLowerCase();
+            let activityName = '';
+            
+            const cleaned = lowerCommand
+                .replace(/done|completed|my|the|please|activity|is\s/g, ' ')
+                .trim();
+            
+            const words = cleaned.split(/\s+/).filter(w => w.length > 0);
+            if (words.length > 0) {
+                activityName = words[words.length - 1];
+            }
+            
+            if (activityName) {
+                activityName = activityName.charAt(0).toUpperCase() + activityName.slice(1);
+            }
+            
+            if (!activityName) {
+                speak('Which activity did you complete?');
+                stopVoiceListening();
+                return;
+            }
+            
+            console.log('🎯 Looking for activity (last word):', activityName);
+            
+            const users = loadData('users');
+            const activities = users[currentUser]?.activities || [];
+            
+            let activity = activities.find(a => a.activity.toLowerCase().includes(activityName.toLowerCase()));
+            
+            if (!activity) {
+                speak(`I couldn't find an activity named ${activityName}. Please check your activities.`);
+                stopVoiceListening();
+                return;
+            }
+            
+            console.log('🎯 Found activity:', activity);
+            
+            pendingConfirmation = {
+                action: 'mark-activity-done',
+                activity: activity
+            };
+            
+            speak(`Mark ${activity.activity}? Say yes or no.`);
+            startVoiceListening();
+        }
+
+        // Handle delete activity command - HYBRID OPTIMIZATION!
+        function handleDeleteActivity(command) {
+            console.log('🗑️ Handle delete activity:', command);
+            
+            const lowerCommand = command.toLowerCase();
+            let activityName = '';
+            
+            const cleaned = lowerCommand
+                .replace(/delete|remove|my|the|please|activity/g, ' ')
+                .trim();
+            
+            const words = cleaned.split(/\s+/).filter(w => w.length > 0);
+            if (words.length > 0) {
+                activityName = words[words.length - 1];
+            }
+            
+            if (activityName) {
+                activityName = activityName.charAt(0).toUpperCase() + activityName.slice(1);
+            }
+            
+            if (!activityName) {
+                speak('Which activity do you want to delete?');
+                stopVoiceListening();
+                return;
+            }
+            
+            console.log('🗑️ Looking for activity (last word):', activityName);
+            
+            const users = loadData('users');
+            const activities = users[currentUser]?.activities || [];
+            
+            let activity = activities.find(a => a.activity.toLowerCase().includes(activityName.toLowerCase()));
+            
+            if (!activity) {
+                speak(`I couldn't find an activity named ${activityName}. Please check your activities.`);
+                stopVoiceListening();
+                return;
+            }
+            
+            console.log('🗑️ Found activity:', activity);
+            
+            pendingConfirmation = {
+                action: 'delete-activity',
+                activity: activity
+            };
+            
+            speak(`Delete ${activity.activity}? Say yes or no.`);
+            startVoiceListening();
+        }
+
+        // Handle delete contact command - HYBRID OPTIMIZATION!
+        function handleDeleteContact(command) {
+            console.log('🗑️ Handle delete contact:', command);
+            
+            const lowerCommand = command.toLowerCase();
+            let contactName = '';
+            
+            const cleaned = lowerCommand
+                .replace(/delete|remove|my|the|please|contact/g, ' ')
+                .trim();
+            
+            const words = cleaned.split(/\s+/).filter(w => w.length > 0);
+            if (words.length > 0) {
+                contactName = words[words.length - 1];
+            }
+            
+            if (contactName) {
+                contactName = contactName.charAt(0).toUpperCase() + contactName.slice(1);
+            }
+            
+            if (!contactName) {
+                speak('Which contact do you want to delete?');
+                stopVoiceListening();
+                return;
+            }
+            
+            console.log('🗑️ Looking for contact (last word):', contactName);
+            
+            const users = loadData('users');
+            const contacts = users[currentUser]?.contacts || [];
+            
+            let contact = contacts.find(c => c.name.toLowerCase().includes(contactName.toLowerCase()));
+            
+            if (!contact) {
+                speak(`I couldn't find a contact named ${contactName}. Please check your contacts.`);
+                stopVoiceListening();
+                return;
+            }
+            
+            console.log('🗑️ Found contact:', contact);
+            
+            pendingConfirmation = {
+                action: 'delete-contact',
+                contact: contact
+            };
+            
+            speak(`Delete ${contact.name}? Say yes or no.`);
+            startVoiceListening();
+        }
+
         // Handle confirmation responses
         function handleConfirmation(command) {
             const lowerCommand = command.toLowerCase();
@@ -7791,6 +8150,154 @@
                 console.log('   - Voice overlay closed');
                 
                 console.log('   ✅ Delete appointment complete');
+            } else if (action === 'mark-task-done') {
+                const task = pendingConfirmation.task;
+                console.log('   - Task:', task);
+                
+                speak(`Marked ${task.task} as done`);
+                
+                const taskId = task.id;
+                pendingConfirmation = null;
+                
+                const users = loadData('users');
+                const t = users[currentUser].tasks.find(t => t.id === taskId);
+                if (t) {
+                    t.completed = true;
+                    saveData('users', users);
+                    loadTasks(users[currentUser].tasks);
+                }
+                
+                loadHomeReminders();
+                updateDashboard();
+                stopVoiceListening();
+                
+                console.log('   ✅ Mark task complete');
+            } else if (action === 'delete-task') {
+                const task = pendingConfirmation.task;
+                console.log('   - Task:', task);
+                
+                speak(`Deleted ${task.task}`);
+                
+                const taskId = task.id;
+                pendingConfirmation = null;
+                
+                const users = loadData('users');
+                users[currentUser].tasks = users[currentUser].tasks.filter(t => t.id !== taskId);
+                saveData('users', users);
+                loadTasks(users[currentUser].tasks);
+                
+                loadHomeReminders();
+                updateDashboard();
+                stopVoiceListening();
+                
+                console.log('   ✅ Delete task complete');
+            } else if (action === 'mark-bill-paid') {
+                const bill = pendingConfirmation.bill;
+                console.log('   - Bill:', bill);
+                
+                speak(`Marked ${bill.name} as paid`);
+                
+                const billId = bill.id;
+                pendingConfirmation = null;
+                
+                const users = loadData('users');
+                const b = users[currentUser].bills.find(b => b.id === billId);
+                if (b) {
+                    const todayDate = new Date().toISOString().split('T')[0];
+                    if (!b.paidDates) b.paidDates = [];
+                    if (!b.paidDates.includes(todayDate)) {
+                        b.paidDates.push(todayDate);
+                    }
+                    saveData('users', users);
+                    loadBills(users[currentUser].bills);
+                }
+                
+                loadHomeReminders();
+                updateDashboard();
+                stopVoiceListening();
+                
+                console.log('   ✅ Mark bill paid complete');
+            } else if (action === 'delete-bill') {
+                const bill = pendingConfirmation.bill;
+                console.log('   - Bill:', bill);
+                
+                speak(`Deleted ${bill.name}`);
+                
+                const billId = bill.id;
+                pendingConfirmation = null;
+                
+                const users = loadData('users');
+                users[currentUser].bills = users[currentUser].bills.filter(b => b.id !== billId);
+                saveData('users', users);
+                loadBills(users[currentUser].bills);
+                
+                loadHomeReminders();
+                updateDashboard();
+                stopVoiceListening();
+                
+                console.log('   ✅ Delete bill complete');
+            } else if (action === 'mark-activity-done') {
+                const activity = pendingConfirmation.activity;
+                console.log('   - Activity:', activity);
+                
+                speak(`Marked ${activity.activity} as done`);
+                
+                const activityId = activity.id;
+                pendingConfirmation = null;
+                
+                const users = loadData('users');
+                const a = users[currentUser].activities.find(a => a.id === activityId);
+                if (a) {
+                    const todayDate = new Date().toISOString().split('T')[0];
+                    if (!a.completedDates) a.completedDates = [];
+                    if (!a.completedDates.includes(todayDate)) {
+                        a.completedDates.push(todayDate);
+                    }
+                    saveData('users', users);
+                    loadActivities(users[currentUser].activities);
+                }
+                
+                loadHomeReminders();
+                updateDashboard();
+                stopVoiceListening();
+                
+                console.log('   ✅ Mark activity complete');
+            } else if (action === 'delete-activity') {
+                const activity = pendingConfirmation.activity;
+                console.log('   - Activity:', activity);
+                
+                speak(`Deleted ${activity.activity}`);
+                
+                const activityId = activity.id;
+                pendingConfirmation = null;
+                
+                const users = loadData('users');
+                users[currentUser].activities = users[currentUser].activities.filter(a => a.id !== activityId);
+                saveData('users', users);
+                loadActivities(users[currentUser].activities);
+                
+                loadHomeReminders();
+                updateDashboard();
+                stopVoiceListening();
+                
+                console.log('   ✅ Delete activity complete');
+            } else if (action === 'delete-contact') {
+                const contact = pendingConfirmation.contact;
+                console.log('   - Contact:', contact);
+                
+                speak(`Deleted ${contact.name}`);
+                
+                const contactId = contact.id;
+                pendingConfirmation = null;
+                
+                const users = loadData('users');
+                users[currentUser].contacts = users[currentUser].contacts.filter(c => c.id !== contactId);
+                saveData('users', users);
+                loadContacts(users[currentUser].contacts);
+                
+                stopVoiceListening();
+                
+                console.log('   ✅ Delete contact complete');
             }
             console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         }
