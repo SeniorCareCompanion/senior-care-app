@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-27-0305 UTC - Hybrid Voice Optimization
-    BUILD DATE: January 27, 2026 at 3:05 AM UTC
-    CHANGES: Last-word extraction + UI guidance for better voice recognition
+    VERSION: 2026-01-27-0429 UTC - Multi-Dose Medications
+    BUILD DATE: January 27, 2026 at 4:29 AM UTC
+    CHANGES: Added support for medications taken multiple times per day (1-4x daily)
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -1182,8 +1182,20 @@
                         <input type="text" id="medDosage" placeholder="e.g., 100mg">
                     </div>
                     <div class="input-group">
-                        <label>Time</label>
-                        <input type="time" id="medTime">
+                        <label>Times Per Day</label>
+                        <select id="medTimesPerDay" onchange="updateMedicationTimePickers()">
+                            <option value="1">Once daily</option>
+                            <option value="2">Twice daily</option>
+                            <option value="3">Three times daily</option>
+                            <option value="4">Four times daily</option>
+                        </select>
+                    </div>
+                    <div id="medicationTimePickersContainer">
+                        <!-- Dynamic time pickers will be inserted here -->
+                        <div class="input-group">
+                            <label>Time</label>
+                            <input type="time" id="medTime1">
+                        </div>
                     </div>
                     <div class="input-group">
                         <label>How Often?</label>
@@ -2554,10 +2566,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-27-0305 UTC
+                        <strong>App Version:</strong> 2026-01-27-0429 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Hybrid Voice: Last-Word Extraction + UI Guidance
+                        Multi-Dose: Medications 1-4x Daily with Per-Dose Tracking
                     </p>
                 </div>
             </div>
@@ -3642,6 +3654,34 @@
         }
 
         // Medications
+        // Update medication time pickers based on times per day
+        function updateMedicationTimePickers() {
+            const timesPerDay = parseInt(document.getElementById('medTimesPerDay').value);
+            const container = document.getElementById('medicationTimePickersContainer');
+            
+            // Labels for each dose
+            const labels = {
+                1: ['Time'],
+                2: ['Morning Dose', 'Evening Dose'],
+                3: ['Morning Dose', 'Afternoon Dose', 'Evening Dose'],
+                4: ['Morning Dose', 'Midday Dose', 'Afternoon Dose', 'Evening Dose']
+            };
+            
+            // Clear existing time pickers
+            container.innerHTML = '';
+            
+            // Create time pickers for each dose
+            for (let i = 1; i <= timesPerDay; i++) {
+                const div = document.createElement('div');
+                div.className = 'input-group';
+                div.innerHTML = `
+                    <label>${labels[timesPerDay][i-1]}</label>
+                    <input type="time" id="medTime${i}">
+                `;
+                container.appendChild(div);
+            }
+        }
+
         function updateRecurrenceOptions() {
             const recurrence = document.getElementById('medRecurrence').value;
             document.getElementById('specificDaysContainer').classList.add('hidden');
@@ -3660,10 +3700,21 @@
         function addMedication() {
             const name = document.getElementById('medName').value;
             const dosage = document.getElementById('medDosage').value;
-            const time = document.getElementById('medTime').value;
+            const timesPerDay = parseInt(document.getElementById('medTimesPerDay').value);
             const recurrence = document.getElementById('medRecurrence').value;
 
-            if (!name || !dosage || !time) {
+            // Collect all times based on timesPerDay
+            const times = [];
+            for (let i = 1; i <= timesPerDay; i++) {
+                const time = document.getElementById(`medTime${i}`).value;
+                if (!time) {
+                    alert(`Please fill in all time fields (Dose ${i})`);
+                    return;
+                }
+                times.push(time);
+            }
+
+            if (!name || !dosage) {
                 alert('Please fill in all fields');
                 return;
             }
@@ -3677,14 +3728,17 @@
                 if (medIndex !== -1) {
                     const existingMed = users[currentUser].medications[medIndex];
                     
-                    // Keep the existing ID and takenDates
+                    // Keep the existing ID and reset takenTimes for new schedule
                     const medication = {
                         id: existingMed.id,
                         name: name,
                         dosage: dosage,
-                        time: time,
+                        timesPerDay: timesPerDay,
+                        times: times,
+                        time: times[0], // Keep for backward compatibility
                         recurrence: recurrence,
                         takenDates: existingMed.takenDates || [],
+                        takenTimes: [], // Reset for new times
                         reminderEnabled: document.getElementById('medReminderEnabled').checked,
                         reminderMinutes: parseInt(document.getElementById('medReminderMinutes').value) || 10
                     };
@@ -3722,60 +3776,16 @@
                 
             } else {
                 // ADDING MODE - Create new medication
-                
-                // Check for duplicates
-                const existingMeds = users[currentUser].medications || [];
-                
-                // Check for EXACT duplicate (name + dosage + time all match)
-                const exactDuplicate = existingMeds.find(med =>
-                    med.name.toLowerCase().trim() === name.toLowerCase().trim() &&
-                    med.dosage.toLowerCase().trim() === dosage.toLowerCase().trim() &&
-                    med.time === time
-                );
-                
-                if (exactDuplicate) {
-                    alert('❌ Duplicate Medication\n\n' +
-                          'This medication already exists:\n\n' +
-                          `Name: ${exactDuplicate.name}\n` +
-                          `Dosage: ${exactDuplicate.dosage}\n` +
-                          `Time: ${formatTime(exactDuplicate.time)}\n\n` +
-                          'Cannot add duplicate medication.');
-                    speak('This medication already exists');
-                    return;
-                }
-                
-                // Check for SAME NAME but different dosage or time
-                const sameMedName = existingMeds.find(med =>
-                    med.name.toLowerCase().trim() === name.toLowerCase().trim() &&
-                    (med.dosage.toLowerCase().trim() !== dosage.toLowerCase().trim() || med.time !== time)
-                );
-                
-                if (sameMedName) {
-                    const userConfirmed = confirm(
-                        `⚠️ Medication Name Already Exists\n\n` +
-                        `A medication named "${sameMedName.name}" already exists:\n\n` +
-                        `Existing: ${sameMedName.dosage} at ${formatTime(sameMedName.time)}\n` +
-                        `New: ${dosage} at ${formatTime(time)}\n\n` +
-                        `This might be:\n` +
-                        `• Dosage change or adjustment\n` +
-                        `• Same medication taken at different times\n` +
-                        `• Accidentally creating a duplicate\n\n` +
-                        `Do you want to add this medication anyway?`
-                    );
-                    
-                    if (!userConfirmed) {
-                        speak('Medication not added');
-                        return;
-                    }
-                }
-                
                 const medication = {
                     id: Date.now(),
                     name: name,
                     dosage: dosage,
-                    time: time,
+                    timesPerDay: timesPerDay,
+                    times: times,
+                    time: times[0], // Keep for backward compatibility
                     recurrence: recurrence,
                     takenDates: [],
+                    takenTimes: [], // Track which doses taken today
                     reminderEnabled: document.getElementById('medReminderEnabled').checked,
                     reminderMinutes: parseInt(document.getElementById('medReminderMinutes').value) || 10
                 };
@@ -3803,13 +3813,16 @@
 
                 users[currentUser].medications.push(medication);
                 saveData('users', users);
-                speak(`Added medication ${name} with ${getRecurrenceText(medication)} schedule`);
+                
+                const timeDesc = timesPerDay === 1 ? 'once daily' : `${timesPerDay} times daily`;
+                speak(`Added medication ${name}, ${timeDesc} with ${getRecurrenceText(medication)} schedule`);
             }
 
             // Clear form
             document.getElementById('medName').value = '';
             document.getElementById('medDosage').value = '';
-            document.getElementById('medTime').value = '';
+            document.getElementById('medTimesPerDay').value = '1';
+            updateMedicationTimePickers(); // Reset to 1 time picker
             document.getElementById('medRecurrence').value = 'daily';
             document.getElementById('medReminderEnabled').checked = false;
             document.getElementById('medReminderMinutes').value = '10';
@@ -3835,10 +3848,26 @@
             // Set editing mode
             editingMedicationId = medId;
             
+            // Ensure backward compatibility
+            if (!medication.timesPerDay) {
+                medication.timesPerDay = 1;
+                medication.times = [medication.time];
+            }
+            
             // Populate form
             document.getElementById('medName').value = medication.name;
             document.getElementById('medDosage').value = medication.dosage;
-            document.getElementById('medTime').value = medication.time;
+            document.getElementById('medTimesPerDay').value = medication.timesPerDay;
+            
+            // Update time pickers and populate times
+            updateMedicationTimePickers();
+            for (let i = 1; i <= medication.timesPerDay; i++) {
+                const timeInput = document.getElementById(`medTime${i}`);
+                if (timeInput && medication.times[i-1]) {
+                    timeInput.value = medication.times[i-1];
+                }
+            }
+            
             document.getElementById('medRecurrence').value = medication.recurrence;
             document.getElementById('medReminderEnabled').checked = medication.reminderEnabled || false;
             document.getElementById('medReminderMinutes').value = medication.reminderMinutes || 10;
@@ -3871,7 +3900,8 @@
             // Scroll to form
             document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth' });
             
-            speak(`Editing medication ${medication.name}`);
+            const timesDesc = medication.timesPerDay === 1 ? '' : ` (${medication.timesPerDay}x daily)`;
+            speak(`Editing medication ${medication.name}${timesDesc}`);
         }
 
         function cancelEditMedication() {
@@ -3880,7 +3910,8 @@
             // Clear form
             document.getElementById('medName').value = '';
             document.getElementById('medDosage').value = '';
-            document.getElementById('medTime').value = '';
+            document.getElementById('medTimesPerDay').value = '1';
+            updateMedicationTimePickers(); // Reset to 1 time picker
             document.getElementById('medRecurrence').value = 'daily';
             document.getElementById('medReminderEnabled').checked = false;
             document.getElementById('medReminderMinutes').value = '10';
@@ -3956,12 +3987,29 @@
             // Load minimized state from localStorage
             const minimizedMeds = JSON.parse(localStorage.getItem('minimizedMeds') || '{}');
 
-            medications.sort((a, b) => a.time.localeCompare(b.time));
+            medications.sort((a, b) => {
+                const aTime = a.times ? a.times[0] : a.time;
+                const bTime = b.times ? b.times[0] : b.time;
+                return aTime.localeCompare(bTime);
+            });
+
+            const todayDate = new Date().toISOString().split('T')[0];
 
             medications.forEach(med => {
                 try {
+                    // Ensure backward compatibility
+                    if (!med.timesPerDay) {
+                        med.timesPerDay = 1;
+                        med.times = [med.time];
+                        med.takenTimes = med.takenTimes || [];
+                    }
+                    
+                    // Reset takenTimes if new day
+                    if (med.lastTakenDate !== todayDate) {
+                        med.takenTimes = [];
+                    }
+                    
                     const shouldTakeToday = shouldTakeMedicationToday(med);
-                    const takenToday = wasTakenToday(med);
                     const isMinimized = minimizedMeds[med.id] || false;
                     
                     const card = document.createElement('div');
@@ -3975,13 +4023,44 @@
 
                     const reminderBadge = med.reminderEnabled ? ' 🔔' : '';
                     const toggleIcon = isMinimized ? '▼' : '▲';
+                    
+                    // Build times display
+                    let timesDisplay = '';
+                    if (med.timesPerDay === 1) {
+                        timesDisplay = `${med.dosage} at ${formatTime(med.times[0])}`;
+                    } else {
+                        const timesList = med.times.map(t => formatTime(t)).join(', ');
+                        timesDisplay = `${med.dosage} - ${med.timesPerDay}x daily: ${timesList}`;
+                    }
+                    
+                    // Build dose tracking UI
+                    let doseTrackingHTML = '';
+                    if (shouldTakeToday && med.timesPerDay > 1) {
+                        const takenCount = med.takenTimes?.length || 0;
+                        const dosesList = med.times.map((time, idx) => {
+                            const isTaken = med.takenTimes?.includes(time);
+                            const checkmark = isTaken ? '✅' : '⏳';
+                            return `<div style="display: flex; justify-content: space-between; align-items: center; padding: 6px; background: ${isTaken ? '#d4edda' : '#f8f9fa'}; border-radius: 4px; margin: 4px 0;">
+                                <span>${checkmark} ${formatTime(time)} dose</span>
+                            </div>`;
+                        }).join('');
+                        
+                        doseTrackingHTML = `
+                            <div style="margin-top: 10px;">
+                                <strong>Today's Doses (${takenCount}/${med.timesPerDay}):</strong>
+                                <div style="margin-top: 6px;">
+                                    ${dosesList}
+                                </div>
+                            </div>
+                        `;
+                    }
 
                     card.innerHTML = `
                         <div class="card-header" style="cursor: pointer; user-select: none;">
                             <div style="flex: 1;" onclick="toggleMedicationCard(${med.id})">
                                 ${med.name}${reminderBadge}
                                 <div style="font-size: 14px; color: #666; margin-top: 2px;">
-                                    ${med.dosage} at ${formatTime(med.time)}
+                                    ${timesDisplay}
                                 </div>
                             </div>
                             <div style="display: flex; gap: 5px; align-items: center;">
@@ -3995,14 +4074,17 @@
                         <div id="med-details-${med.id}" class="med-details" style="${isMinimized ? 'display: none;' : ''}">
                             <div class="card-content">
                                 <strong>Dosage:</strong> ${med.dosage}<br>
-                                <strong>Schedule:</strong> ${getRecurrenceText(med)}${med.reminderEnabled ? '<br><strong>🔔 Reminder:</strong> ' + med.reminderMinutes + ' min before' : ''}
+                                <strong>Schedule:</strong> ${getRecurrenceText(med)}${med.reminderEnabled ? '<br><strong>🔔 Reminder:</strong> ' + med.reminderMinutes + ' min before each dose' : ''}
                             </div>
-                            <div class="card-time">⏰ ${formatTime(med.time)}</div>
+                            ${shouldTakeToday && med.timesPerDay === 1 ? `
+                                <div class="card-time">⏰ ${formatTime(med.times[0])}</div>
+                            ` : ''}
+                            ${doseTrackingHTML}
                             ${scheduleInfo}
-                            ${shouldTakeToday ? `
-                                <button class="action-btn ${takenToday ? 'btn-success' : 'btn-info'}" 
+                            ${shouldTakeToday && med.timesPerDay === 1 ? `
+                                <button class="action-btn ${wasTakenToday(med) ? 'btn-success' : 'btn-info'}" 
                                         onclick="markMedicationTaken(${med.id})">
-                                    ${takenToday ? '✓ Taken Today' : 'Mark as Taken'}
+                                    ${wasTakenToday(med) ? '✓ Taken Today' : 'Mark as Taken'}
                                 </button>
                             ` : ''}
                             <div style="display: flex; gap: 5px; margin-top: 10px;">
@@ -4191,25 +4273,59 @@
             pendingDeleteBillId = null;
         }
 
-        function markMedicationTaken(id) {
+        function markMedicationTaken(id, doseTime) {
             const users = loadData('users');
             const med = users[currentUser].medications.find(m => m.id === id);
             if (!med) return;
             
             const todayDate = new Date().toISOString().split('T')[0];
             
+            // Initialize arrays if needed
             if (!med.takenDates) {
                 med.takenDates = [];
             }
-
-            if (med.takenDates.includes(todayDate)) {
-                // Remove today's date (mark as not taken)
-                med.takenDates = med.takenDates.filter(date => date !== todayDate);
-                speak('Medication marked as not taken today');
+            if (!med.takenTimes) {
+                med.takenTimes = [];
+            }
+            
+            // Ensure backward compatibility
+            if (!med.timesPerDay) {
+                med.timesPerDay = 1;
+                med.times = [med.time];
+            }
+            
+            // Reset takenTimes if it's a new day
+            if (med.lastTakenDate !== todayDate) {
+                med.takenTimes = [];
+            }
+            
+            // If doseTime is provided (from voice), mark that specific dose
+            if (doseTime) {
+                if (!med.takenTimes.includes(doseTime)) {
+                    med.takenTimes.push(doseTime);
+                    med.lastTakenDate = todayDate;
+                    
+                    // If all doses taken, add to takenDates
+                    if (med.takenTimes.length >= med.timesPerDay) {
+                        if (!med.takenDates.includes(todayDate)) {
+                            med.takenDates.push(todayDate);
+                        }
+                    }
+                }
             } else {
-                // Add today's date (mark as taken)
-                med.takenDates.push(todayDate);
-                speak('Medication marked as taken today');
+                // Manual toggle (from UI checkbox) - toggle whole day
+                if (med.takenDates.includes(todayDate)) {
+                    // Remove today's date and clear taken times
+                    med.takenDates = med.takenDates.filter(date => date !== todayDate);
+                    med.takenTimes = [];
+                    speak('Medication marked as not taken today');
+                } else {
+                    // Add today's date and mark all doses
+                    med.takenDates.push(todayDate);
+                    med.takenTimes = [...med.times]; // Mark all doses
+                    med.lastTakenDate = todayDate;
+                    speak('Medication marked as taken today');
+                }
             }
 
             // Clean up old dates (keep only last 30 days)
@@ -7242,13 +7358,43 @@
             
             console.log('✅ Found medication:', medication);
             
-            // Set up confirmation - SIMPLIFIED message!
+            // Ensure backward compatibility - convert old single-time format to new multi-time format
+            if (!medication.timesPerDay) {
+                medication.timesPerDay = 1;
+                medication.times = [medication.time];
+                medication.takenTimes = medication.takenTimes || [];
+            }
+            
+            // Find next untaken dose for today
+            const today = new Date().toISOString().split('T')[0];
+            const takenTimes = medication.takenTimes || [];
+            
+            // Reset takenTimes if it's a new day
+            if (medication.lastTakenDate !== today) {
+                medication.takenTimes = [];
+            }
+            
+            // Find next dose that hasn't been taken
+            const nextDose = medication.times.find(time => !medication.takenTimes.includes(time));
+            
+            if (!nextDose) {
+                speak(`All doses of ${medication.name} already taken today`);
+                stopVoiceListening();
+                return;
+            }
+            
+            console.log('✅ Next untaken dose:', nextDose);
+            
+            // Set up confirmation with dose time
             pendingConfirmation = {
                 action: 'mark-medication-taken',
-                medication: medication
+                medication: medication,
+                doseTime: nextDose
             };
             
-            speak(`Mark ${medication.name}? Say yes or no.`);
+            // Confirmation message includes time for multi-dose meds
+            const timeInfo = medication.timesPerDay > 1 ? ` ${formatTime(nextDose)} dose` : '';
+            speak(`Mark ${medication.name}${timeInfo}? Say yes or no.`);
             
             // Keep listening for confirmation
             startVoiceListening();
@@ -7523,21 +7669,24 @@
                 console.log('   ✅ Call initiation scheduled');
             } else if (action === 'mark-medication-taken') {
                 const medication = pendingConfirmation.medication;
+                const doseTime = pendingConfirmation.doseTime;
                 console.log('   - Medication:', medication);
                 console.log('   - Medication ID:', medication.id);
                 console.log('   - Medication name:', medication.name);
+                console.log('   - Dose time:', doseTime);
                 
                 console.log('   - Speaking confirmation...');
-                speak(`Marked ${medication.name} as taken`);
+                const timeInfo = medication.timesPerDay > 1 ? ` ${formatTime(doseTime)} dose` : '';
+                speak(`Marked ${medication.name}${timeInfo} as taken`);
                 
                 console.log('   - Clearing pending confirmation...');
                 const medicationId = medication.id;
                 pendingConfirmation = null;
                 console.log('   - Pending confirmation cleared');
                 
-                console.log('   - Marking medication as taken...');
-                markMedicationTaken(medicationId);
-                console.log('   - Medication marked as taken');
+                console.log('   - Marking medication dose as taken...');
+                markMedicationTaken(medicationId, doseTime);
+                console.log('   - Medication dose marked as taken');
                 
                 console.log('   - Updating home page...');
                 loadHomeReminders();
