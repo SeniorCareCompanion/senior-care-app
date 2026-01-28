@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-28-2010 UTC - Fuzzy + Phonetic Matching
-    BUILD DATE: January 28, 2026 at 8:10 PM UTC
-    CHANGES: Added intelligent voice recognition with fuzzy matching and Soundex phonetic algorithm
+    VERSION: 2026-01-28-2051 UTC - Enhanced Task Debugging
+    BUILD DATE: January 28, 2026 at 8:51 PM UTC
+    CHANGES: Added extensive logging to debug task search issue
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -2566,10 +2566,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-28-2010 UTC
+                        <strong>App Version:</strong> 2026-01-28-2051 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Smart Voice: Fuzzy + Phonetic Matching (Soundex Algorithm)
+                        Debug: Enhanced Task Search Logging
                     </p>
                 </div>
             </div>
@@ -7800,21 +7800,35 @@
             const lowerCommand = command.toLowerCase();
             let taskName = '';
             
+            console.log('══════════════════════════════════════════════');
+            console.log('🔍 TASK DONE COMMAND PROCESSING');
+            console.log('🔍 Original command:', command);
+            console.log('🔍 Lowercase command:', lowerCommand);
+            
             // Remove section keyword, action keyword, and filler words
             const cleaned = lowerCommand
-                .replace(/done|completed|my|the|please|task|is\s/g, ' ')
+                .replace(/done|completed|my|the|please|task|tasks|is\s/g, ' ')
                 .trim();
+            
+            console.log('🔍 After cleaning:', cleaned);
             
             // Split into words and take the LAST significant word
             const words = cleaned.split(/\s+/).filter(w => w.length > 0);
+            console.log('🔍 Split words:', words);
+            
             if (words.length > 0) {
                 taskName = words[words.length - 1];
             }
+            
+            console.log('🔍 Last word (taskName):', taskName);
             
             // Capitalize first letter
             if (taskName) {
                 taskName = taskName.charAt(0).toUpperCase() + taskName.slice(1);
             }
+            
+            console.log('🔍 Capitalized taskName:', taskName);
+            console.log('══════════════════════════════════════════════');
             
             if (!taskName) {
                 speak('Which task did you complete?');
@@ -7881,10 +7895,35 @@
                 return;
             }
             
+            console.log('══════════════════════════════════════════════');
+            console.log('🔍 SEARCHING FOR TASK');
+            console.log('🔍 Looking for taskName:', taskName);
+            console.log('🔍 Total tasks to search:', allTasks.length);
+            console.log('🔍 All tasks:', allTasks);
+            
+            // Log each task being searched
+            for (let i = 0; i < allTasks.length; i++) {
+                const t = allTasks[i];
+                console.log(`🔍 Task ${i}:`, t);
+                if (t && t.task) {
+                    console.log(`   - task.task: "${t.task}"`);
+                    console.log(`   - Lowercase: "${t.task.toLowerCase()}"`);
+                    console.log(`   - Includes "${taskName.toLowerCase()}"? ${t.task.toLowerCase().includes(taskName.toLowerCase())}`);
+                } else {
+                    console.log(`   - WARNING: Task missing 'task' property!`);
+                }
+            }
+            
             // Find task by name
             let task = allTasks.find(t => t && t.task && t.task.toLowerCase().includes(taskName.toLowerCase()));
             
+            console.log('🔍 Search result:', task);
+            console.log('══════════════════════════════════════════════');
+            
             if (!task) {
+                console.error('❌ TASK NOT FOUND');
+                console.error('❌ Searched for:', taskName);
+                console.error('❌ In tasks:', allTasks);
                 speak(`I couldn't find a task named ${taskName}. Please check your tasks.`);
                 stopVoiceListening();
                 return;
@@ -8058,14 +8097,36 @@
                 return;
             }
             
-            let bills = users[currentUser].bills;
-            if (!bills || !Array.isArray(bills)) {
-                bills = [];
-                users[currentUser].bills = [];
-                saveData('users', users);
+            // Get bills - might be categorized object or flat array
+            let billsData = users[currentUser].bills;
+            let allBills = [];
+            
+            if (!billsData) {
+                speak(`I couldn't find any bills. Please add some bills first.`);
+                stopVoiceListening();
+                return;
             }
             
-            let bill = bills.find(b => b && b.name && b.name.toLowerCase().includes(billName.toLowerCase()));
+            // Check if bills are categorized
+            if (typeof billsData === 'object' && !Array.isArray(billsData)) {
+                console.log('💵 Bills are categorized, flattening...');
+                const categories = Object.keys(billsData);
+                for (const category of categories) {
+                    if (billsData[category] && Array.isArray(billsData[category])) {
+                        allBills = allBills.concat(billsData[category]);
+                    }
+                }
+            } else if (Array.isArray(billsData)) {
+                allBills = billsData;
+            }
+            
+            if (allBills.length === 0) {
+                speak(`I couldn't find any bills.`);
+                stopVoiceListening();
+                return;
+            }
+            
+            let bill = allBills.find(b => b && b.name && b.name.toLowerCase().includes(billName.toLowerCase()));
             
             if (!bill) {
                 speak(`I couldn't find a bill named ${billName}. Please check your bills.`);
@@ -8128,14 +8189,35 @@
                 return;
             }
             
-            let bills = users[currentUser].bills;
-            if (!bills || !Array.isArray(bills)) {
-                bills = [];
-                users[currentUser].bills = [];
-                saveData('users', users);
+            // Get bills - might be categorized object or flat array
+            let billsData = users[currentUser].bills;
+            let allBills = [];
+            
+            if (!billsData) {
+                speak(`I couldn't find any bills.`);
+                stopVoiceListening();
+                return;
             }
             
-            let bill = bills.find(b => b && b.name && b.name.toLowerCase().includes(billName.toLowerCase()));
+            // Check if bills are categorized
+            if (typeof billsData === 'object' && !Array.isArray(billsData)) {
+                const categories = Object.keys(billsData);
+                for (const category of categories) {
+                    if (billsData[category] && Array.isArray(billsData[category])) {
+                        allBills = allBills.concat(billsData[category]);
+                    }
+                }
+            } else if (Array.isArray(billsData)) {
+                allBills = billsData;
+            }
+            
+            if (allBills.length === 0) {
+                speak(`I couldn't find any bills.`);
+                stopVoiceListening();
+                return;
+            }
+            
+            let bill = allBills.find(b => b && b.name && b.name.toLowerCase().includes(billName.toLowerCase()));
             
             if (!bill) {
                 speak(`I couldn't find a bill named ${billName}. Please check your bills.`);
@@ -8198,14 +8280,48 @@
                 return;
             }
             
-            let activities = users[currentUser].activities;
-            if (!activities || !Array.isArray(activities)) {
-                activities = [];
-                users[currentUser].activities = [];
-                saveData('users', users);
+            // Get activities - might be categorized object or flat array
+            let activitiesData = users[currentUser].activities;
+            let allActivities = [];
+            
+            console.log('🎯 Raw activities:', activitiesData);
+            console.log('🎯 Activities type:', typeof activitiesData);
+            
+            if (!activitiesData) {
+                speak(`I couldn't find any activities. Please add some activities first.`);
+                stopVoiceListening();
+                return;
             }
             
-            let activity = activities.find(a => a && a.activity && a.activity.toLowerCase().includes(activityName.toLowerCase()));
+            // Check if activities are categorized (object) or flat array
+            if (typeof activitiesData === 'object' && !Array.isArray(activitiesData)) {
+                console.log('🎯 Activities are categorized, flattening...');
+                // Flatten all categories into single array
+                // Common activity categories
+                const categories = Object.keys(activitiesData);
+                for (const category of categories) {
+                    if (activitiesData[category] && Array.isArray(activitiesData[category])) {
+                        allActivities = allActivities.concat(activitiesData[category]);
+                    }
+                }
+                console.log('🎯 Flattened activities:', allActivities);
+                console.log('🎯 Total activities:', allActivities.length);
+            } else if (Array.isArray(activitiesData)) {
+                console.log('🎯 Activities are already a flat array');
+                allActivities = activitiesData;
+            } else {
+                speak('Error: Activity data is corrupted.');
+                stopVoiceListening();
+                return;
+            }
+            
+            if (allActivities.length === 0) {
+                speak(`I couldn't find any activities. Please add some activities first.`);
+                stopVoiceListening();
+                return;
+            }
+            
+            let activity = allActivities.find(a => a && a.activity && a.activity.toLowerCase().includes(activityName.toLowerCase()));
             
             if (!activity) {
                 speak(`I couldn't find an activity named ${activityName}. Please check your activities.`);
@@ -8268,14 +8384,36 @@
                 return;
             }
             
-            let activities = users[currentUser].activities;
-            if (!activities || !Array.isArray(activities)) {
-                activities = [];
-                users[currentUser].activities = [];
-                saveData('users', users);
+            // Get activities - might be categorized object or flat array
+            let activitiesData = users[currentUser].activities;
+            let allActivities = [];
+            
+            if (!activitiesData) {
+                speak(`I couldn't find any activities.`);
+                stopVoiceListening();
+                return;
             }
             
-            let activity = activities.find(a => a && a.activity && a.activity.toLowerCase().includes(activityName.toLowerCase()));
+            // Check if activities are categorized
+            if (typeof activitiesData === 'object' && !Array.isArray(activitiesData)) {
+                // Flatten all categories
+                const categories = Object.keys(activitiesData);
+                for (const category of categories) {
+                    if (activitiesData[category] && Array.isArray(activitiesData[category])) {
+                        allActivities = allActivities.concat(activitiesData[category]);
+                    }
+                }
+            } else if (Array.isArray(activitiesData)) {
+                allActivities = activitiesData;
+            }
+            
+            if (allActivities.length === 0) {
+                speak(`I couldn't find any activities.`);
+                stopVoiceListening();
+                return;
+            }
+            
+            let activity = allActivities.find(a => a && a.activity && a.activity.toLowerCase().includes(activityName.toLowerCase()));
             
             if (!activity) {
                 speak(`I couldn't find an activity named ${activityName}. Please check your activities.`);
