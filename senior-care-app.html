@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-28-1849 UTC - Voice Fix v2 (Enhanced Logging)
-    BUILD DATE: January 28, 2026 at 6:49 PM UTC
-    CHANGES: Enhanced voice confirmation with extensive logging and longer delays
+    VERSION: 2026-01-28-1920 UTC - Critical Array Bug Fix
+    BUILD DATE: January 28, 2026 at 7:20 PM UTC
+    CHANGES: Fixed "tasks.find is not a function" error with defensive array checks
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -2566,10 +2566,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-28-1849 UTC
+                        <strong>App Version:</strong> 2026-01-28-1920 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Voice Fix v2: Enhanced Logging + Longer Delays
+                        Array Fix: Defensive Checks for All Voice Commands
                     </p>
                 </div>
             </div>
@@ -7692,9 +7692,42 @@
             console.log('✅ Looking for task (last word):', taskName);
             
             const users = loadData('users');
-            const tasks = users[currentUser]?.tasks || [];
+            console.log('✅ Users data:', users);
+            console.log('✅ Current user:', currentUser);
+            console.log('✅ Users[currentUser]:', users[currentUser]);
             
-            let task = tasks.find(t => t.task.toLowerCase().includes(taskName.toLowerCase()));
+            // Defensive check - ensure we have a valid user
+            if (!users || !users[currentUser]) {
+                console.error('❌ No user data found');
+                speak('Error: User data not found. Please check your profile.');
+                stopVoiceListening();
+                return;
+            }
+            
+            // Defensive check - ensure tasks is an array
+            let tasks = users[currentUser].tasks;
+            console.log('✅ Raw tasks:', tasks);
+            console.log('✅ Tasks type:', typeof tasks);
+            console.log('✅ Tasks is array?', Array.isArray(tasks));
+            
+            if (!tasks) {
+                console.log('⚠️ Tasks is null/undefined, initializing to empty array');
+                tasks = [];
+                users[currentUser].tasks = [];
+                saveData('users', users);
+            }
+            
+            if (!Array.isArray(tasks)) {
+                console.error('❌ Tasks is not an array!', tasks);
+                speak('Error: Task data is corrupted. Please check your tasks.');
+                stopVoiceListening();
+                return;
+            }
+            
+            console.log('✅ Tasks array:', tasks);
+            console.log('✅ Number of tasks:', tasks.length);
+            
+            let task = tasks.find(t => t && t.task && t.task.toLowerCase().includes(taskName.toLowerCase()));
             
             if (!task) {
                 speak(`I couldn't find a task named ${taskName}. Please check your tasks.`);
@@ -7770,9 +7803,21 @@
             console.log('🗑️ Looking for task (last word):', taskName);
             
             const users = loadData('users');
-            const tasks = users[currentUser]?.tasks || [];
             
-            let task = tasks.find(t => t.task.toLowerCase().includes(taskName.toLowerCase()));
+            if (!users || !users[currentUser]) {
+                speak('Error: User data not found.');
+                stopVoiceListening();
+                return;
+            }
+            
+            let tasks = users[currentUser].tasks;
+            if (!tasks || !Array.isArray(tasks)) {
+                tasks = [];
+                users[currentUser].tasks = [];
+                saveData('users', users);
+            }
+            
+            let task = tasks.find(t => t && t.task && t.task.toLowerCase().includes(taskName.toLowerCase()));
             
             if (!task) {
                 speak(`I couldn't find a task named ${taskName}. Please check your tasks.`);
@@ -7829,9 +7874,21 @@
             console.log('💵 Looking for bill (last word):', billName);
             
             const users = loadData('users');
-            const bills = users[currentUser]?.bills || [];
             
-            let bill = bills.find(b => b.name.toLowerCase().includes(billName.toLowerCase()));
+            if (!users || !users[currentUser]) {
+                speak('Error: User data not found.');
+                stopVoiceListening();
+                return;
+            }
+            
+            let bills = users[currentUser].bills;
+            if (!bills || !Array.isArray(bills)) {
+                bills = [];
+                users[currentUser].bills = [];
+                saveData('users', users);
+            }
+            
+            let bill = bills.find(b => b && b.name && b.name.toLowerCase().includes(billName.toLowerCase()));
             
             if (!bill) {
                 speak(`I couldn't find a bill named ${billName}. Please check your bills.`);
@@ -7887,9 +7944,21 @@
             console.log('🗑️ Looking for bill (last word):', billName);
             
             const users = loadData('users');
-            const bills = users[currentUser]?.bills || [];
             
-            let bill = bills.find(b => b.name.toLowerCase().includes(billName.toLowerCase()));
+            if (!users || !users[currentUser]) {
+                speak('Error: User data not found.');
+                stopVoiceListening();
+                return;
+            }
+            
+            let bills = users[currentUser].bills;
+            if (!bills || !Array.isArray(bills)) {
+                bills = [];
+                users[currentUser].bills = [];
+                saveData('users', users);
+            }
+            
+            let bill = bills.find(b => b && b.name && b.name.toLowerCase().includes(billName.toLowerCase()));
             
             if (!bill) {
                 speak(`I couldn't find a bill named ${billName}. Please check your bills.`);
@@ -7945,9 +8014,21 @@
             console.log('🎯 Looking for activity (last word):', activityName);
             
             const users = loadData('users');
-            const activities = users[currentUser]?.activities || [];
             
-            let activity = activities.find(a => a.activity.toLowerCase().includes(activityName.toLowerCase()));
+            if (!users || !users[currentUser]) {
+                speak('Error: User data not found.');
+                stopVoiceListening();
+                return;
+            }
+            
+            let activities = users[currentUser].activities;
+            if (!activities || !Array.isArray(activities)) {
+                activities = [];
+                users[currentUser].activities = [];
+                saveData('users', users);
+            }
+            
+            let activity = activities.find(a => a && a.activity && a.activity.toLowerCase().includes(activityName.toLowerCase()));
             
             if (!activity) {
                 speak(`I couldn't find an activity named ${activityName}. Please check your activities.`);
@@ -8003,9 +8084,21 @@
             console.log('🗑️ Looking for activity (last word):', activityName);
             
             const users = loadData('users');
-            const activities = users[currentUser]?.activities || [];
             
-            let activity = activities.find(a => a.activity.toLowerCase().includes(activityName.toLowerCase()));
+            if (!users || !users[currentUser]) {
+                speak('Error: User data not found.');
+                stopVoiceListening();
+                return;
+            }
+            
+            let activities = users[currentUser].activities;
+            if (!activities || !Array.isArray(activities)) {
+                activities = [];
+                users[currentUser].activities = [];
+                saveData('users', users);
+            }
+            
+            let activity = activities.find(a => a && a.activity && a.activity.toLowerCase().includes(activityName.toLowerCase()));
             
             if (!activity) {
                 speak(`I couldn't find an activity named ${activityName}. Please check your activities.`);
@@ -8061,9 +8154,21 @@
             console.log('🗑️ Looking for contact (last word):', contactName);
             
             const users = loadData('users');
-            const contacts = users[currentUser]?.contacts || [];
             
-            let contact = contacts.find(c => c.name.toLowerCase().includes(contactName.toLowerCase()));
+            if (!users || !users[currentUser]) {
+                speak('Error: User data not found.');
+                stopVoiceListening();
+                return;
+            }
+            
+            let contacts = users[currentUser].contacts;
+            if (!contacts || !Array.isArray(contacts)) {
+                contacts = [];
+                users[currentUser].contacts = [];
+                saveData('users', users);
+            }
+            
+            let contact = contacts.find(c => c && c.name && c.name.toLowerCase().includes(contactName.toLowerCase()));
             
             if (!contact) {
                 speak(`I couldn't find a contact named ${contactName}. Please check your contacts.`);
