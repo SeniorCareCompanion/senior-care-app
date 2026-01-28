@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-28-1948 UTC - Categorized Tasks Support
-    BUILD DATE: January 28, 2026 at 7:48 PM UTC
-    CHANGES: Fixed voice commands to work with categorized task structure
+    VERSION: 2026-01-28-2010 UTC - Fuzzy + Phonetic Matching
+    BUILD DATE: January 28, 2026 at 8:10 PM UTC
+    CHANGES: Added intelligent voice recognition with fuzzy matching and Soundex phonetic algorithm
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -2566,10 +2566,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-28-1948 UTC
+                        <strong>App Version:</strong> 2026-01-28-2010 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Tasks Fix: Now Works with Categorized Structure
+                        Smart Voice: Fuzzy + Phonetic Matching (Soundex Algorithm)
                     </p>
                 </div>
             </div>
@@ -7101,12 +7101,124 @@
             isListening = false;
         }
 
+        // ═══════════════════════════════════════════════════════════════
+        // FUZZY MATCHING & PHONETIC MATCHING FOR VOICE RECOGNITION
+        // ═══════════════════════════════════════════════════════════════
+
+        // Known variations for each section (fuzzy matching)
+        const sectionVariations = {
+            medication: ['medication', 'medications', 'medicine', 'medicines', 'med', 'meds', 'medic', 'medical', 'pill', 'pills'],
+            appointment: ['appointment', 'appointments', 'appt', 'apts', 'doctor', 'dentist', 'visit'],
+            task: ['task', 'tasks', 'tasc', 'tascs', 'tack', 'tacks', 'desk', 'todo', 'chore', 'chores'],
+            bill: ['bill', 'bills', 'build', 'payment', 'payments', 'invoice', 'pay'],
+            activity: ['activity', 'activities', 'exercise', 'workout', 'walk'],
+            contact: ['contact', 'contacts', 'person', 'people']
+        };
+
+        // Soundex phonetic algorithm - matches words that sound similar
+        function soundex(word) {
+            if (!word) return '';
+            
+            word = word.toUpperCase().replace(/[^A-Z]/g, '');
+            if (word.length === 0) return '';
+            
+            const firstLetter = word[0];
+            
+            // Soundex code mapping
+            const codes = {
+                'B': '1', 'F': '1', 'P': '1', 'V': '1',
+                'C': '2', 'G': '2', 'J': '2', 'K': '2', 'Q': '2', 'S': '2', 'X': '2', 'Z': '2',
+                'D': '3', 'T': '3',
+                'L': '4',
+                'M': '5', 'N': '5',
+                'R': '6'
+            };
+            
+            let code = firstLetter;
+            let lastCode = codes[firstLetter] || '';
+            
+            for (let i = 1; i < word.length && code.length < 4; i++) {
+                const currentCode = codes[word[i]];
+                if (currentCode && currentCode !== lastCode) {
+                    code += currentCode;
+                    lastCode = currentCode;
+                }
+            }
+            
+            // Pad with zeros
+            while (code.length < 4) {
+                code += '0';
+            }
+            
+            return code;
+        }
+
+        // Check if two words match phonetically
+        function phoneticMatch(word1, word2) {
+            const s1 = soundex(word1);
+            const s2 = soundex(word2);
+            const match = s1 === s2 && s1.length > 0;
+            
+            if (match) {
+                console.log(`🎯 PHONETIC MATCH: "${word1}" ≈ "${word2}" (${s1})`);
+            }
+            
+            return match;
+        }
+
+        // Fuzzy match a word against known variations
+        function fuzzyMatchSection(word, section) {
+            const variations = sectionVariations[section] || [];
+            const lowerWord = word.toLowerCase().trim();
+            
+            // Direct match
+            if (variations.includes(lowerWord)) {
+                console.log(`✅ FUZZY MATCH: "${word}" → ${section} (direct)`);
+                return true;
+            }
+            
+            // Phonetic match against variations
+            for (const variation of variations) {
+                if (phoneticMatch(lowerWord, variation)) {
+                    console.log(`✅ FUZZY MATCH: "${word}" → ${section} (phonetic: "${variation}")`);
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+
+        // Smart section detection with fuzzy + phonetic matching
+        function detectSection(command) {
+            const words = command.toLowerCase().split(/\s+/);
+            
+            console.log('🔍 Detecting section from words:', words);
+            
+            // Try each word in the command
+            for (const word of words) {
+                // Check each section
+                for (const section of ['medication', 'appointment', 'task', 'bill', 'activity', 'contact']) {
+                    if (fuzzyMatchSection(word, section)) {
+                        console.log(`🎯 SECTION DETECTED: ${section} (from word: "${word}")`);
+                        return section;
+                    }
+                }
+            }
+            
+            console.log('❌ No section detected');
+            return null;
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+
         // Process voice commands - EXPLICIT PREFIX PATTERN (No Ambiguity!)
         // Format: [SECTION] [ITEM] [ACTION]
         // Examples: "Medication Aspirin Taken", "Appointment Dr. John Done", "Delete Contact Bob"
         function processVoiceCommand(command) {
             const lowerCommand = command.toLowerCase();
+            console.log('═══════════════════════════════════════');
             console.log('🎤 Processing voice command:', command);
+            console.log('🎤 Lowercase:', lowerCommand);
             
             // Check if we're waiting for a confirmation
             if (pendingConfirmation) {
@@ -7116,64 +7228,79 @@
             
             let handled = false;
 
+            // Use intelligent section detection with fuzzy + phonetic matching
+            const detectedSection = detectSection(command);
+            console.log('🎯 Detected section:', detectedSection);
+
             // MEDICATION COMMANDS
-            if (lowerCommand.includes('medication') || lowerCommand.includes(' med ')) {
+            if (detectedSection === 'medication') {
                 if (lowerCommand.includes('taken') || lowerCommand.includes('done')) {
+                    console.log('✅ Medication TAKEN command detected');
                     handleMarkMedicationTaken(command);
                     return;
                 } else if (lowerCommand.includes('delete') || lowerCommand.includes('remove')) {
+                    console.log('✅ Medication DELETE command detected');
                     handleDeleteMedication(command);
                     return;
                 }
             }
 
             // APPOINTMENT COMMANDS
-            if (lowerCommand.includes('appointment') || lowerCommand.includes(' appt ')) {
+            if (detectedSection === 'appointment') {
                 if (lowerCommand.includes('done') || lowerCommand.includes('completed')) {
+                    console.log('✅ Appointment DONE command detected');
                     handleMarkAppointmentDone(command);
                     return;
                 } else if (lowerCommand.includes('delete') || lowerCommand.includes('remove')) {
+                    console.log('✅ Appointment DELETE command detected');
                     handleDeleteAppointment(command);
                     return;
                 }
             }
 
             // TASK COMMANDS
-            if (lowerCommand.includes('task')) {
+            if (detectedSection === 'task') {
                 if (lowerCommand.includes('done') || lowerCommand.includes('completed')) {
+                    console.log('✅ Task DONE command detected');
                     handleMarkTaskDone(command);
                     return;
                 } else if (lowerCommand.includes('delete') || lowerCommand.includes('remove')) {
+                    console.log('✅ Task DELETE command detected');
                     handleDeleteTask(command);
                     return;
                 }
             }
 
             // BILL COMMANDS
-            if (lowerCommand.includes('bill')) {
+            if (detectedSection === 'bill') {
                 if (lowerCommand.includes('paid') || lowerCommand.includes('done')) {
+                    console.log('✅ Bill PAID command detected');
                     handleMarkBillPaid(command);
                     return;
                 } else if (lowerCommand.includes('delete') || lowerCommand.includes('remove')) {
+                    console.log('✅ Bill DELETE command detected');
                     handleDeleteBill(command);
                     return;
                 }
             }
 
             // ACTIVITY COMMANDS
-            if (lowerCommand.includes('activity')) {
+            if (detectedSection === 'activity') {
                 if (lowerCommand.includes('done') || lowerCommand.includes('completed')) {
+                    console.log('✅ Activity DONE command detected');
                     handleMarkActivityDone(command);
                     return;
                 } else if (lowerCommand.includes('delete') || lowerCommand.includes('remove')) {
+                    console.log('✅ Activity DELETE command detected');
                     handleDeleteActivity(command);
                     return;
                 }
             }
 
             // CONTACT COMMANDS
-            if (lowerCommand.includes('contact')) {
+            if (detectedSection === 'contact') {
                 if (lowerCommand.includes('delete') || lowerCommand.includes('remove')) {
+                    console.log('✅ Contact DELETE command detected');
                     handleDeleteContact(command);
                     return;
                 }
@@ -7181,6 +7308,7 @@
 
             // CALL COMMANDS (unchanged - already clear)
             if (!handled && (lowerCommand.includes('call ') || lowerCommand.includes('phone '))) {
+                console.log('✅ CALL command detected');
                 handleCallContact(command);
                 return;
             }
@@ -7276,9 +7404,14 @@
 
             // If command not handled
             if (!handled) {
+                console.log('❌ Command not understood');
+                console.log('❌ Detected section:', detectedSection);
+                console.log('❌ Lower command:', lowerCommand);
                 speak(`I didn't understand "${command}". Try saying "Medication Aspirin Taken", "Task Laundry Done", "Bill Electric Paid", or "Delete Contact Bob"`);
                 stopVoiceListening();
             }
+            
+            console.log('═══════════════════════════════════════');
         }
 
         // Handle call contact command - DIRECT CALL (no app confirmation)
