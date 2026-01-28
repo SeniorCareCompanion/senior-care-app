@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-28-2051 UTC - Enhanced Task Debugging
-    BUILD DATE: January 28, 2026 at 8:51 PM UTC
-    CHANGES: Added extensive logging to debug task search issue
+    VERSION: 2026-01-28-2102 UTC - Task Property Fix (name vs task)
+    BUILD DATE: January 28, 2026 at 9:02 PM UTC
+    CHANGES: Fixed task search to use 'name' property instead of 'task'
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -2566,10 +2566,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-28-2051 UTC
+                        <strong>App Version:</strong> 2026-01-28-2102 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Debug: Enhanced Task Search Logging
+                        Fix: Tasks Use 'name' Property (NOT 'task')
                     </p>
                 </div>
             </div>
@@ -7905,17 +7905,17 @@
             for (let i = 0; i < allTasks.length; i++) {
                 const t = allTasks[i];
                 console.log(`🔍 Task ${i}:`, t);
-                if (t && t.task) {
-                    console.log(`   - task.task: "${t.task}"`);
-                    console.log(`   - Lowercase: "${t.task.toLowerCase()}"`);
-                    console.log(`   - Includes "${taskName.toLowerCase()}"? ${t.task.toLowerCase().includes(taskName.toLowerCase())}`);
+                if (t && t.name) {
+                    console.log(`   - task.name: "${t.name}"`);
+                    console.log(`   - Lowercase: "${t.name.toLowerCase()}"`);
+                    console.log(`   - Includes "${taskName.toLowerCase()}"? ${t.name.toLowerCase().includes(taskName.toLowerCase())}`);
                 } else {
-                    console.log(`   - WARNING: Task missing 'task' property!`);
+                    console.log(`   - WARNING: Task missing 'name' property!`);
                 }
             }
             
-            // Find task by name
-            let task = allTasks.find(t => t && t.task && t.task.toLowerCase().includes(taskName.toLowerCase()));
+            // Find task by name - FIXED: Use 'name' property, not 'task'
+            let task = allTasks.find(t => t && t.name && t.name.toLowerCase().includes(taskName.toLowerCase()));
             
             console.log('🔍 Search result:', task);
             console.log('══════════════════════════════════════════════');
@@ -7938,7 +7938,7 @@
             
             console.log('═══════════════════════════════════════');
             console.log('🎤 PREPARING TO SPEAK CONFIRMATION');
-            console.log('🎤 Task:', task.task);
+            console.log('🎤 Task:', task.name);
             console.log('🎤 Current isListening:', isListening);
             
             // Stop recognition with delay before speaking
@@ -7949,7 +7949,7 @@
                 console.log('🎤 Recognition stopped');
             }
             
-            const confirmationMessage = `Mark ${task.task}? Say yes or no.`;
+            const confirmationMessage = `Mark ${task.name}? Say yes or no.`;
             console.log('🎤 Confirmation message:', confirmationMessage);
             console.log('🎤 About to call speak()...');
             
@@ -8033,7 +8033,8 @@
                 return;
             }
             
-            let task = allTasks.find(t => t && t.task && t.task.toLowerCase().includes(taskName.toLowerCase()));
+            // Find task by name - FIXED: Use 'name' property
+            let task = allTasks.find(t => t && t.name && t.name.toLowerCase().includes(taskName.toLowerCase()));
             
             if (!task) {
                 speak(`I couldn't find a task named ${taskName}. Please check your tasks.`);
@@ -8055,7 +8056,7 @@
             }
             
             setTimeout(() => {
-                speak(`Delete ${task.task}? Say yes or no.`, function() {
+                speak(`Delete ${task.name}? Say yes or no.`, function() {
                     setTimeout(() => startVoiceListening(), 300);
                 });
             }, 300);
