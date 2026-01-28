@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-28-1920 UTC - Critical Array Bug Fix
-    BUILD DATE: January 28, 2026 at 7:20 PM UTC
-    CHANGES: Fixed "tasks.find is not a function" error with defensive array checks
+    VERSION: 2026-01-28-1948 UTC - Categorized Tasks Support
+    BUILD DATE: January 28, 2026 at 7:48 PM UTC
+    CHANGES: Fixed voice commands to work with categorized task structure
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -2566,10 +2566,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-28-1920 UTC
+                        <strong>App Version:</strong> 2026-01-28-1948 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Array Fix: Defensive Checks for All Voice Commands
+                        Tasks Fix: Now Works with Categorized Structure
                     </p>
                 </div>
             </div>
@@ -7704,30 +7704,52 @@
                 return;
             }
             
-            // Defensive check - ensure tasks is an array
-            let tasks = users[currentUser].tasks;
-            console.log('✅ Raw tasks:', tasks);
-            console.log('✅ Tasks type:', typeof tasks);
-            console.log('✅ Tasks is array?', Array.isArray(tasks));
+            // Get tasks - might be categorized object or flat array
+            let tasksData = users[currentUser].tasks;
+            console.log('✅ Raw tasks:', tasksData);
+            console.log('✅ Tasks type:', typeof tasksData);
             
-            if (!tasks) {
-                console.log('⚠️ Tasks is null/undefined, initializing to empty array');
-                tasks = [];
-                users[currentUser].tasks = [];
-                saveData('users', users);
+            // Flatten tasks if they're categorized
+            let allTasks = [];
+            
+            if (!tasksData) {
+                console.log('⚠️ No tasks found');
+                speak(`I couldn't find any tasks. Please add some tasks first.`);
+                stopVoiceListening();
+                return;
             }
             
-            if (!Array.isArray(tasks)) {
-                console.error('❌ Tasks is not an array!', tasks);
+            // Check if tasks are categorized (object with category keys)
+            if (typeof tasksData === 'object' && !Array.isArray(tasksData)) {
+                console.log('✅ Tasks are categorized, flattening...');
+                // Flatten all categories into single array
+                const categories = ['meals', 'hydration', 'hygiene', 'safety', 'other'];
+                for (const category of categories) {
+                    if (tasksData[category] && Array.isArray(tasksData[category])) {
+                        allTasks = allTasks.concat(tasksData[category]);
+                    }
+                }
+                console.log('✅ Flattened tasks:', allTasks);
+                console.log('✅ Total tasks:', allTasks.length);
+            } else if (Array.isArray(tasksData)) {
+                // Tasks are already a flat array
+                console.log('✅ Tasks are already a flat array');
+                allTasks = tasksData;
+            } else {
+                console.error('❌ Tasks data structure is invalid');
                 speak('Error: Task data is corrupted. Please check your tasks.');
                 stopVoiceListening();
                 return;
             }
             
-            console.log('✅ Tasks array:', tasks);
-            console.log('✅ Number of tasks:', tasks.length);
+            if (allTasks.length === 0) {
+                speak(`I couldn't find any tasks. Please add some tasks first.`);
+                stopVoiceListening();
+                return;
+            }
             
-            let task = tasks.find(t => t && t.task && t.task.toLowerCase().includes(taskName.toLowerCase()));
+            // Find task by name
+            let task = allTasks.find(t => t && t.task && t.task.toLowerCase().includes(taskName.toLowerCase()));
             
             if (!task) {
                 speak(`I couldn't find a task named ${taskName}. Please check your tasks.`);
@@ -7810,14 +7832,36 @@
                 return;
             }
             
-            let tasks = users[currentUser].tasks;
-            if (!tasks || !Array.isArray(tasks)) {
-                tasks = [];
-                users[currentUser].tasks = [];
-                saveData('users', users);
+            // Get tasks - might be categorized object or flat array
+            let tasksData = users[currentUser].tasks;
+            let allTasks = [];
+            
+            if (!tasksData) {
+                speak(`I couldn't find any tasks. Please add some tasks first.`);
+                stopVoiceListening();
+                return;
             }
             
-            let task = tasks.find(t => t && t.task && t.task.toLowerCase().includes(taskName.toLowerCase()));
+            // Check if tasks are categorized
+            if (typeof tasksData === 'object' && !Array.isArray(tasksData)) {
+                // Flatten all categories
+                const categories = ['meals', 'hydration', 'hygiene', 'safety', 'other'];
+                for (const category of categories) {
+                    if (tasksData[category] && Array.isArray(tasksData[category])) {
+                        allTasks = allTasks.concat(tasksData[category]);
+                    }
+                }
+            } else if (Array.isArray(tasksData)) {
+                allTasks = tasksData;
+            }
+            
+            if (allTasks.length === 0) {
+                speak(`I couldn't find any tasks.`);
+                stopVoiceListening();
+                return;
+            }
+            
+            let task = allTasks.find(t => t && t.task && t.task.toLowerCase().includes(taskName.toLowerCase()));
             
             if (!task) {
                 speak(`I couldn't find a task named ${taskName}. Please check your tasks.`);
