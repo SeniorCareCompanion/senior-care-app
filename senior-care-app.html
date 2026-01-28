@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-28-1826 UTC - Voice Confirmation Bug Fix
-    BUILD DATE: January 28, 2026 at 6:26 PM UTC
-    CHANGES: Fixed voice confirmation not speaking for Tasks, Bills, Activities, Contacts
+    VERSION: 2026-01-28-1849 UTC - Voice Fix v2 (Enhanced Logging)
+    BUILD DATE: January 28, 2026 at 6:49 PM UTC
+    CHANGES: Enhanced voice confirmation with extensive logging and longer delays
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -2566,10 +2566,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-28-1826 UTC
+                        <strong>App Version:</strong> 2026-01-28-1849 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Voice Fix: Confirmation Audio Now Works for All Sections
+                        Voice Fix v2: Enhanced Logging + Longer Delays
                     </p>
                 </div>
             </div>
@@ -3144,38 +3144,59 @@
 
         // Voice function
         function speak(text, callback) {
-            console.log('🔊 Speak called with text:', text);
-            if (voiceEnabled && 'speechSynthesis' in window) {
-                // Cancel any pending speech
-                speechSynthesis.cancel();
+            console.log('═══════════════════════════════════════');
+            console.log('🔊 SPEAK FUNCTION CALLED');
+            console.log('🔊 Text:', text);
+            console.log('🔊 Callback provided:', !!callback);
+            console.log('🔊 voiceEnabled:', voiceEnabled);
+            console.log('🔊 speechSynthesis available:', 'speechSynthesis' in window);
+            
+            if (!voiceEnabled) {
+                console.log('❌ Voice is disabled - not speaking');
+                if (callback) callback();
+                return;
+            }
+            
+            if (!('speechSynthesis' in window)) {
+                console.log('❌ speechSynthesis not available');
+                if (callback) callback();
+                return;
+            }
+            
+            // Small delay to ensure recognition has fully stopped
+            setTimeout(() => {
+                console.log('🔊 Creating utterance after delay...');
                 
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.rate = 0.9;
                 utterance.pitch = 1;
                 utterance.volume = 1;
                 
-                // If callback provided, call it when speech ends
-                if (callback) {
-                    utterance.onend = function() {
-                        console.log('🔊 Speech ended, calling callback');
-                        callback();
-                    };
-                    utterance.onerror = function(event) {
-                        console.error('🔊 Speech error:', event);
-                        callback(); // Still call callback on error
-                    };
-                }
+                utterance.onstart = function() {
+                    console.log('✅ Speech STARTED');
+                };
                 
-                console.log('🔊 Starting speech synthesis...');
+                utterance.onend = function() {
+                    console.log('✅ Speech ENDED normally');
+                    if (callback) {
+                        console.log('🔊 Calling callback after speech end');
+                        callback();
+                    }
+                };
+                
+                utterance.onerror = function(event) {
+                    console.error('❌ Speech ERROR:', event.error);
+                    if (callback) {
+                        console.log('🔊 Calling callback after error');
+                        callback();
+                    }
+                };
+                
+                console.log('🔊 Calling speechSynthesis.speak()...');
                 speechSynthesis.speak(utterance);
-                console.log('🔊 Speech synthesis started');
-            } else {
-                console.log('🔊 Voice not enabled or speechSynthesis not available');
-                // If voice not available, still call callback
-                if (callback) {
-                    callback();
-                }
-            }
+                console.log('🔊 speechSynthesis.speak() called');
+                console.log('═══════════════════════════════════════');
+            }, 100); // Small delay to ensure clean state
         }
 
         function toggleVoice() {
@@ -7426,15 +7447,16 @@
             // Confirmation message includes time for multi-dose meds
             const timeInfo = medication.timesPerDay > 1 ? ` ${formatTime(nextDose)} dose` : '';
             
-            // Stop recognition before speaking
             if (recognition && isListening) {
                 recognition.stop();
                 isListening = false;
             }
             
-            speak(`Mark ${medication.name}${timeInfo}? Say yes or no.`, function() {
-                setTimeout(() => startVoiceListening(), 200);
-            });
+            setTimeout(() => {
+                speak(`Mark ${medication.name}${timeInfo}? Say yes or no.`, function() {
+                    setTimeout(() => startVoiceListening(), 300);
+                });
+            }, 300);
         }
 
         // Handle delete medication command - HYBRID OPTIMIZATION!
@@ -7492,15 +7514,16 @@
                 medication: medication
             };
             
-            // Stop recognition before speaking
             if (recognition && isListening) {
                 recognition.stop();
                 isListening = false;
             }
             
-            speak(`Delete ${medication.name}? Say yes or no.`, function() {
-                setTimeout(() => startVoiceListening(), 200);
-            });
+            setTimeout(() => {
+                speak(`Delete ${medication.name}? Say yes or no.`, function() {
+                    setTimeout(() => startVoiceListening(), 300);
+                });
+            }, 300);
         }
 
         // Handle mark appointment as done command - HYBRID OPTIMIZATION!
@@ -7558,15 +7581,16 @@
                 appointment: appointment
             };
             
-            // Stop recognition before speaking
             if (recognition && isListening) {
                 recognition.stop();
                 isListening = false;
             }
             
-            speak(`Mark ${appointment.doctor} appointment as done? Say yes or no.`, function() {
-                setTimeout(() => startVoiceListening(), 200);
-            });
+            setTimeout(() => {
+                speak(`Mark ${appointment.doctor} appointment as done? Say yes or no.`, function() {
+                    setTimeout(() => startVoiceListening(), 300);
+                });
+            }, 300);
         }
 
         // Handle delete appointment command - HYBRID OPTIMIZATION!
@@ -7624,15 +7648,16 @@
                 appointment: appointment
             };
             
-            // Stop recognition before speaking
             if (recognition && isListening) {
                 recognition.stop();
                 isListening = false;
             }
             
-            speak(`Delete ${appointment.doctor} appointment? Say yes or no.`, function() {
-                setTimeout(() => startVoiceListening(), 200);
-            });
+            setTimeout(() => {
+                speak(`Delete ${appointment.doctor} appointment? Say yes or no.`, function() {
+                    setTimeout(() => startVoiceListening(), 300);
+                });
+            }, 300);
         }
 
         // Handle mark task as done command - HYBRID OPTIMIZATION!
@@ -7684,24 +7709,36 @@
                 task: task
             };
             
-            console.log('🎤 About to speak confirmation for task:', task.task);
-            const confirmationMessage = `Mark ${task.task}? Say yes or no.`;
-            console.log('🎤 Confirmation message:', confirmationMessage);
+            console.log('═══════════════════════════════════════');
+            console.log('🎤 PREPARING TO SPEAK CONFIRMATION');
+            console.log('🎤 Task:', task.task);
+            console.log('🎤 Current isListening:', isListening);
             
-            // Stop recognition before speaking, then restart after speech
+            // Stop recognition with delay before speaking
             if (recognition && isListening) {
+                console.log('🎤 Stopping recognition...');
                 recognition.stop();
                 isListening = false;
+                console.log('🎤 Recognition stopped');
             }
             
-            speak(confirmationMessage, function() {
-                // Start listening again after speech finishes
-                console.log('🎤 Speech finished, restarting voice listening...');
-                setTimeout(() => {
-                    startVoiceListening();
-                    console.log('🎤 Voice listening restarted');
-                }, 200); // Small delay to ensure clean transition
-            });
+            const confirmationMessage = `Mark ${task.task}? Say yes or no.`;
+            console.log('🎤 Confirmation message:', confirmationMessage);
+            console.log('🎤 About to call speak()...');
+            
+            // Wait a bit after stopping recognition before speaking
+            setTimeout(() => {
+                console.log('🎤 Now calling speak() after delay...');
+                speak(confirmationMessage, function() {
+                    console.log('🎤 Speech callback received');
+                    // Wait before restarting recognition
+                    setTimeout(() => {
+                        console.log('🎤 Restarting voice listening...');
+                        startVoiceListening();
+                        console.log('🎤 Voice listening restarted');
+                    }, 300);
+                });
+            }, 300); // Longer delay to ensure recognition fully stopped
         }
 
         // Handle delete task command - HYBRID OPTIMIZATION!
@@ -7750,15 +7787,17 @@
                 task: task
             };
             
-            // Stop recognition before speaking
+            console.log('🎤 Stopping recognition before delete confirmation...');
             if (recognition && isListening) {
                 recognition.stop();
                 isListening = false;
             }
             
-            speak(`Delete ${task.task}? Say yes or no.`, function() {
-                setTimeout(() => startVoiceListening(), 200);
-            });
+            setTimeout(() => {
+                speak(`Delete ${task.task}? Say yes or no.`, function() {
+                    setTimeout(() => startVoiceListening(), 300);
+                });
+            }, 300);
         }
 
         // Handle mark bill as paid command - HYBRID OPTIMIZATION!
@@ -7807,15 +7846,16 @@
                 bill: bill
             };
             
-            // Stop recognition before speaking
             if (recognition && isListening) {
                 recognition.stop();
                 isListening = false;
             }
             
-            speak(`Mark ${bill.name} as paid? Say yes or no.`, function() {
-                setTimeout(() => startVoiceListening(), 200);
-            });
+            setTimeout(() => {
+                speak(`Mark ${bill.name} as paid? Say yes or no.`, function() {
+                    setTimeout(() => startVoiceListening(), 300);
+                });
+            }, 300);
         }
 
         // Handle delete bill command - HYBRID OPTIMIZATION!
@@ -7864,15 +7904,16 @@
                 bill: bill
             };
             
-            // Stop recognition before speaking
             if (recognition && isListening) {
                 recognition.stop();
                 isListening = false;
             }
             
-            speak(`Delete ${bill.name}? Say yes or no.`, function() {
-                setTimeout(() => startVoiceListening(), 200);
-            });
+            setTimeout(() => {
+                speak(`Delete ${bill.name}? Say yes or no.`, function() {
+                    setTimeout(() => startVoiceListening(), 300);
+                });
+            }, 300);
         }
 
         // Handle mark activity as done command - HYBRID OPTIMIZATION!
@@ -7921,15 +7962,16 @@
                 activity: activity
             };
             
-            // Stop recognition before speaking
             if (recognition && isListening) {
                 recognition.stop();
                 isListening = false;
             }
             
-            speak(`Mark ${activity.activity}? Say yes or no.`, function() {
-                setTimeout(() => startVoiceListening(), 200);
-            });
+            setTimeout(() => {
+                speak(`Mark ${activity.activity}? Say yes or no.`, function() {
+                    setTimeout(() => startVoiceListening(), 300);
+                });
+            }, 300);
         }
 
         // Handle delete activity command - HYBRID OPTIMIZATION!
@@ -7978,15 +8020,16 @@
                 activity: activity
             };
             
-            // Stop recognition before speaking
             if (recognition && isListening) {
                 recognition.stop();
                 isListening = false;
             }
             
-            speak(`Delete ${activity.activity}? Say yes or no.`, function() {
-                setTimeout(() => startVoiceListening(), 200);
-            });
+            setTimeout(() => {
+                speak(`Delete ${activity.activity}? Say yes or no.`, function() {
+                    setTimeout(() => startVoiceListening(), 300);
+                });
+            }, 300);
         }
 
         // Handle delete contact command - HYBRID OPTIMIZATION!
@@ -8035,15 +8078,16 @@
                 contact: contact
             };
             
-            // Stop recognition before speaking
             if (recognition && isListening) {
                 recognition.stop();
                 isListening = false;
             }
             
-            speak(`Delete ${contact.name}? Say yes or no.`, function() {
-                setTimeout(() => startVoiceListening(), 200);
-            });
+            setTimeout(() => {
+                speak(`Delete ${contact.name}? Say yes or no.`, function() {
+                    setTimeout(() => startVoiceListening(), 300);
+                });
+            }, 300);
         }
 
         // Handle confirmation responses
