@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-28-2102 UTC - Task Property Fix (name vs task)
-    BUILD DATE: January 28, 2026 at 9:02 PM UTC
-    CHANGES: Fixed task search to use 'name' property instead of 'task'
+    VERSION: 2026-01-29-0234 UTC - Execution Functions Fix
+    BUILD DATE: January 29, 2026 at 2:34 AM UTC
+    CHANGES: Fixed execution functions to handle categorized structure for all sections
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -2566,10 +2566,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-28-2102 UTC
+                        <strong>App Version:</strong> 2026-01-29-0234 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Fix: Tasks Use 'name' Property (NOT 'task')
+                        Fix: All Execution Functions Handle Categorized Data
                     </p>
                 </div>
             </div>
@@ -8723,17 +8723,48 @@
                 const task = pendingConfirmation.task;
                 console.log('   - Task:', task);
                 
-                speak(`Marked ${task.task} as done`);
+                speak(`Marked ${task.name} as done`);
                 
                 const taskId = task.id;
                 pendingConfirmation = null;
                 
                 const users = loadData('users');
-                const t = users[currentUser].tasks.find(t => t.id === taskId);
-                if (t) {
-                    t.completed = true;
+                
+                // Handle both flat array and categorized structure
+                let tasksData = users[currentUser].tasks;
+                let taskFound = false;
+                
+                if (typeof tasksData === 'object' && !Array.isArray(tasksData)) {
+                    // Categorized structure - search through categories
+                    console.log('   - Tasks are categorized, searching categories...');
+                    const categories = Object.keys(tasksData);
+                    for (const category of categories) {
+                        if (tasksData[category] && Array.isArray(tasksData[category])) {
+                            const t = tasksData[category].find(t => t.id === taskId);
+                            if (t) {
+                                console.log(`   - Found in category: ${category}`);
+                                t.completed = true;
+                                taskFound = true;
+                                break;
+                            }
+                        }
+                    }
+                } else if (Array.isArray(tasksData)) {
+                    // Flat array structure
+                    console.log('   - Tasks are flat array');
+                    const t = tasksData.find(t => t.id === taskId);
+                    if (t) {
+                        t.completed = true;
+                        taskFound = true;
+                    }
+                }
+                
+                if (taskFound) {
                     saveData('users', users);
                     loadTasks(users[currentUser].tasks);
+                    console.log('   ✅ Task marked as completed');
+                } else {
+                    console.error('   ❌ Task not found in data structure');
                 }
                 
                 loadHomeReminders();
@@ -8745,15 +8776,44 @@
                 const task = pendingConfirmation.task;
                 console.log('   - Task:', task);
                 
-                speak(`Deleted ${task.task}`);
+                speak(`Deleted ${task.name}`);
                 
                 const taskId = task.id;
                 pendingConfirmation = null;
                 
                 const users = loadData('users');
-                users[currentUser].tasks = users[currentUser].tasks.filter(t => t.id !== taskId);
-                saveData('users', users);
-                loadTasks(users[currentUser].tasks);
+                let tasksData = users[currentUser].tasks;
+                let taskDeleted = false;
+                
+                if (typeof tasksData === 'object' && !Array.isArray(tasksData)) {
+                    // Categorized structure - delete from the right category
+                    console.log('   - Tasks are categorized, searching categories to delete...');
+                    const categories = Object.keys(tasksData);
+                    for (const category of categories) {
+                        if (tasksData[category] && Array.isArray(tasksData[category])) {
+                            const originalLength = tasksData[category].length;
+                            tasksData[category] = tasksData[category].filter(t => t.id !== taskId);
+                            if (tasksData[category].length < originalLength) {
+                                console.log(`   - Deleted from category: ${category}`);
+                                taskDeleted = true;
+                                break;
+                            }
+                        }
+                    }
+                } else if (Array.isArray(tasksData)) {
+                    // Flat array structure
+                    console.log('   - Tasks are flat array');
+                    users[currentUser].tasks = tasksData.filter(t => t.id !== taskId);
+                    taskDeleted = true;
+                }
+                
+                if (taskDeleted) {
+                    saveData('users', users);
+                    loadTasks(users[currentUser].tasks);
+                    console.log('   ✅ Task deleted');
+                } else {
+                    console.error('   ❌ Task not found for deletion');
+                }
                 
                 loadHomeReminders();
                 updateDashboard();
@@ -8770,15 +8830,47 @@
                 pendingConfirmation = null;
                 
                 const users = loadData('users');
-                const b = users[currentUser].bills.find(b => b.id === billId);
-                if (b) {
-                    const todayDate = new Date().toISOString().split('T')[0];
-                    if (!b.paidDates) b.paidDates = [];
-                    if (!b.paidDates.includes(todayDate)) {
-                        b.paidDates.push(todayDate);
+                let billsData = users[currentUser].bills;
+                let billFound = false;
+                
+                if (typeof billsData === 'object' && !Array.isArray(billsData)) {
+                    // Categorized structure
+                    console.log('   - Bills are categorized, searching categories...');
+                    const categories = Object.keys(billsData);
+                    for (const category of categories) {
+                        if (billsData[category] && Array.isArray(billsData[category])) {
+                            const b = billsData[category].find(b => b.id === billId);
+                            if (b) {
+                                console.log(`   - Found in category: ${category}`);
+                                const todayDate = new Date().toISOString().split('T')[0];
+                                if (!b.paidDates) b.paidDates = [];
+                                if (!b.paidDates.includes(todayDate)) {
+                                    b.paidDates.push(todayDate);
+                                }
+                                billFound = true;
+                                break;
+                            }
+                        }
                     }
+                } else if (Array.isArray(billsData)) {
+                    // Flat array structure
+                    const b = billsData.find(b => b.id === billId);
+                    if (b) {
+                        const todayDate = new Date().toISOString().split('T')[0];
+                        if (!b.paidDates) b.paidDates = [];
+                        if (!b.paidDates.includes(todayDate)) {
+                            b.paidDates.push(todayDate);
+                        }
+                        billFound = true;
+                    }
+                }
+                
+                if (billFound) {
                     saveData('users', users);
                     loadBills(users[currentUser].bills);
+                    console.log('   ✅ Bill marked as paid');
+                } else {
+                    console.error('   ❌ Bill not found');
                 }
                 
                 loadHomeReminders();
@@ -8796,9 +8888,37 @@
                 pendingConfirmation = null;
                 
                 const users = loadData('users');
-                users[currentUser].bills = users[currentUser].bills.filter(b => b.id !== billId);
-                saveData('users', users);
-                loadBills(users[currentUser].bills);
+                let billsData = users[currentUser].bills;
+                let billDeleted = false;
+                
+                if (typeof billsData === 'object' && !Array.isArray(billsData)) {
+                    // Categorized structure
+                    console.log('   - Bills are categorized, searching categories to delete...');
+                    const categories = Object.keys(billsData);
+                    for (const category of categories) {
+                        if (billsData[category] && Array.isArray(billsData[category])) {
+                            const originalLength = billsData[category].length;
+                            billsData[category] = billsData[category].filter(b => b.id !== billId);
+                            if (billsData[category].length < originalLength) {
+                                console.log(`   - Deleted from category: ${category}`);
+                                billDeleted = true;
+                                break;
+                            }
+                        }
+                    }
+                } else if (Array.isArray(billsData)) {
+                    // Flat array structure
+                    users[currentUser].bills = billsData.filter(b => b.id !== billId);
+                    billDeleted = true;
+                }
+                
+                if (billDeleted) {
+                    saveData('users', users);
+                    loadBills(users[currentUser].bills);
+                    console.log('   ✅ Bill deleted');
+                } else {
+                    console.error('   ❌ Bill not found for deletion');
+                }
                 
                 loadHomeReminders();
                 updateDashboard();
@@ -8815,15 +8935,47 @@
                 pendingConfirmation = null;
                 
                 const users = loadData('users');
-                const a = users[currentUser].activities.find(a => a.id === activityId);
-                if (a) {
-                    const todayDate = new Date().toISOString().split('T')[0];
-                    if (!a.completedDates) a.completedDates = [];
-                    if (!a.completedDates.includes(todayDate)) {
-                        a.completedDates.push(todayDate);
+                let activitiesData = users[currentUser].activities;
+                let activityFound = false;
+                
+                if (typeof activitiesData === 'object' && !Array.isArray(activitiesData)) {
+                    // Categorized structure
+                    console.log('   - Activities are categorized, searching categories...');
+                    const categories = Object.keys(activitiesData);
+                    for (const category of categories) {
+                        if (activitiesData[category] && Array.isArray(activitiesData[category])) {
+                            const a = activitiesData[category].find(a => a.id === activityId);
+                            if (a) {
+                                console.log(`   - Found in category: ${category}`);
+                                const todayDate = new Date().toISOString().split('T')[0];
+                                if (!a.completedDates) a.completedDates = [];
+                                if (!a.completedDates.includes(todayDate)) {
+                                    a.completedDates.push(todayDate);
+                                }
+                                activityFound = true;
+                                break;
+                            }
+                        }
                     }
+                } else if (Array.isArray(activitiesData)) {
+                    // Flat array structure
+                    const a = activitiesData.find(a => a.id === activityId);
+                    if (a) {
+                        const todayDate = new Date().toISOString().split('T')[0];
+                        if (!a.completedDates) a.completedDates = [];
+                        if (!a.completedDates.includes(todayDate)) {
+                            a.completedDates.push(todayDate);
+                        }
+                        activityFound = true;
+                    }
+                }
+                
+                if (activityFound) {
                     saveData('users', users);
                     loadActivities(users[currentUser].activities);
+                    console.log('   ✅ Activity marked as done');
+                } else {
+                    console.error('   ❌ Activity not found');
                 }
                 
                 loadHomeReminders();
@@ -8841,9 +8993,37 @@
                 pendingConfirmation = null;
                 
                 const users = loadData('users');
-                users[currentUser].activities = users[currentUser].activities.filter(a => a.id !== activityId);
-                saveData('users', users);
-                loadActivities(users[currentUser].activities);
+                let activitiesData = users[currentUser].activities;
+                let activityDeleted = false;
+                
+                if (typeof activitiesData === 'object' && !Array.isArray(activitiesData)) {
+                    // Categorized structure
+                    console.log('   - Activities are categorized, searching categories to delete...');
+                    const categories = Object.keys(activitiesData);
+                    for (const category of categories) {
+                        if (activitiesData[category] && Array.isArray(activitiesData[category])) {
+                            const originalLength = activitiesData[category].length;
+                            activitiesData[category] = activitiesData[category].filter(a => a.id !== activityId);
+                            if (activitiesData[category].length < originalLength) {
+                                console.log(`   - Deleted from category: ${category}`);
+                                activityDeleted = true;
+                                break;
+                            }
+                        }
+                    }
+                } else if (Array.isArray(activitiesData)) {
+                    // Flat array structure
+                    users[currentUser].activities = activitiesData.filter(a => a.id !== activityId);
+                    activityDeleted = true;
+                }
+                
+                if (activityDeleted) {
+                    saveData('users', users);
+                    loadActivities(users[currentUser].activities);
+                    console.log('   ✅ Activity deleted');
+                } else {
+                    console.error('   ❌ Activity not found for deletion');
+                }
                 
                 loadHomeReminders();
                 updateDashboard();
