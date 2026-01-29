@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-29-0320 UTC - Activity Property Fix
-    BUILD DATE: January 29, 2026 at 3:20 AM UTC
-    CHANGES: Fixed activities to work with both 'activity' and 'name' properties
+    VERSION: 2026-01-29-1750 UTC - Task Execution Debug Logging
+    BUILD DATE: January 29, 2026 at 5:50 PM UTC
+    CHANGES: Added extensive logging to debug task marking/deletion execution
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -2566,10 +2566,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-29-0320 UTC
+                        <strong>App Version:</strong> 2026-01-29-1750 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Fix: Activities Support Both 'activity' & 'name' Properties
+                        Debug: Extensive Logging for Task Execution
                     </p>
                 </div>
             </div>
@@ -8765,57 +8765,104 @@
                 console.log('   ✅ Delete appointment complete');
             } else if (action === 'mark-task-done') {
                 const task = pendingConfirmation.task;
-                console.log('   - Task:', task);
+                console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+                console.log('⚡ MARK TASK DONE EXECUTION');
+                console.log('   - Task object:', task);
+                console.log('   - Task name:', task.name);
+                console.log('   - Task ID:', task.id);
+                console.log('   - Task completed?:', task.completed);
                 
                 speak(`Marked ${task.name} as done`);
                 
                 const taskId = task.id;
                 pendingConfirmation = null;
                 
+                console.log('   - Loading users data...');
                 const users = loadData('users');
+                console.log('   - Users loaded');
                 
                 // Handle both flat array and categorized structure
                 let tasksData = users[currentUser].tasks;
+                console.log('   - Tasks data:', tasksData);
+                console.log('   - Tasks data type:', typeof tasksData);
+                console.log('   - Is array?:', Array.isArray(tasksData));
+                
                 let taskFound = false;
                 
                 if (typeof tasksData === 'object' && !Array.isArray(tasksData)) {
                     // Categorized structure - search through categories
                     console.log('   - Tasks are categorized, searching categories...');
                     const categories = Object.keys(tasksData);
+                    console.log('   - Categories:', categories);
+                    
                     for (const category of categories) {
+                        console.log(`   - Checking category: ${category}`);
                         if (tasksData[category] && Array.isArray(tasksData[category])) {
+                            console.log(`   - Category ${category} has ${tasksData[category].length} tasks`);
+                            
+                            // Log all tasks in this category
+                            tasksData[category].forEach((t, idx) => {
+                                console.log(`      Task ${idx}: name="${t.name}", id="${t.id}", completed=${t.completed}`);
+                            });
+                            
                             const t = tasksData[category].find(t => t.id === taskId);
                             if (t) {
-                                console.log(`   - Found in category: ${category}`);
+                                console.log(`   ✅ FOUND TASK in category: ${category}`);
+                                console.log(`   - Before: completed = ${t.completed}`);
                                 t.completed = true;
+                                console.log(`   - After: completed = ${t.completed}`);
                                 taskFound = true;
                                 break;
+                            } else {
+                                console.log(`   ❌ Task ID ${taskId} not found in ${category}`);
                             }
                         }
                     }
                 } else if (Array.isArray(tasksData)) {
                     // Flat array structure
                     console.log('   - Tasks are flat array');
+                    console.log(`   - Array has ${tasksData.length} tasks`);
+                    
+                    // Log all tasks
+                    tasksData.forEach((t, idx) => {
+                        console.log(`      Task ${idx}: name="${t.name}", id="${t.id}", completed=${t.completed}`);
+                    });
+                    
                     const t = tasksData.find(t => t.id === taskId);
                     if (t) {
+                        console.log('   ✅ FOUND TASK in flat array');
+                        console.log(`   - Before: completed = ${t.completed}`);
                         t.completed = true;
+                        console.log(`   - After: completed = ${t.completed}`);
                         taskFound = true;
+                    } else {
+                        console.log(`   ❌ Task ID ${taskId} not found in array`);
                     }
                 }
                 
                 if (taskFound) {
+                    console.log('   - Saving users data...');
                     saveData('users', users);
+                    console.log('   - Data saved');
+                    
+                    console.log('   - Calling loadTasks...');
                     loadTasks(users[currentUser].tasks);
+                    console.log('   - loadTasks complete');
+                    
                     console.log('   ✅ Task marked as completed');
                 } else {
-                    console.error('   ❌ Task not found in data structure');
+                    console.error('   ❌❌❌ TASK NOT FOUND IN DATA STRUCTURE!');
+                    console.error('   ❌ Searched for ID:', taskId);
+                    console.error('   ❌ In data:', tasksData);
                 }
                 
+                console.log('   - Updating home page...');
                 loadHomeReminders();
                 updateDashboard();
                 stopVoiceListening();
                 
                 console.log('   ✅ Mark task complete');
+                console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
             } else if (action === 'delete-task') {
                 const task = pendingConfirmation.task;
                 console.log('   - Task:', task);
