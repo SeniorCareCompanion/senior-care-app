@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-29-0234 UTC - Execution Functions Fix
-    BUILD DATE: January 29, 2026 at 2:34 AM UTC
-    CHANGES: Fixed execution functions to handle categorized structure for all sections
+    VERSION: 2026-01-29-0320 UTC - Activity Property Fix
+    BUILD DATE: January 29, 2026 at 3:20 AM UTC
+    CHANGES: Fixed activities to work with both 'activity' and 'name' properties
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -2566,10 +2566,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-29-0234 UTC
+                        <strong>App Version:</strong> 2026-01-29-0320 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Fix: All Execution Functions Handle Categorized Data
+                        Fix: Activities Support Both 'activity' & 'name' Properties
                     </p>
                 </div>
             </div>
@@ -8322,9 +8322,45 @@
                 return;
             }
             
-            let activity = allActivities.find(a => a && a.activity && a.activity.toLowerCase().includes(activityName.toLowerCase()));
+            console.log('🔍 SEARCHING FOR ACTIVITY');
+            console.log('🔍 Looking for:', activityName);
+            console.log('🔍 All activities:', allActivities);
+            
+            // Log each activity
+            for (let i = 0; i < allActivities.length; i++) {
+                const a = allActivities[i];
+                console.log(`🔍 Activity ${i}:`, a);
+                if (a.activity) {
+                    console.log(`   - Has 'activity' property: "${a.activity}"`);
+                }
+                if (a.name) {
+                    console.log(`   - Has 'name' property: "${a.name}"`);
+                }
+            }
+            
+            // Try both 'activity' and 'name' properties (different data may use different properties)
+            let activity = allActivities.find(a => {
+                if (!a) return false;
+                
+                // Try 'activity' property first
+                if (a.activity && a.activity.toLowerCase().includes(activityName.toLowerCase())) {
+                    console.log(`✅ Found using 'activity' property: ${a.activity}`);
+                    return true;
+                }
+                
+                // Try 'name' property as fallback
+                if (a.name && a.name.toLowerCase().includes(activityName.toLowerCase())) {
+                    console.log(`✅ Found using 'name' property: ${a.name}`);
+                    return true;
+                }
+                
+                return false;
+            });
+            
+            console.log('🔍 Search result:', activity);
             
             if (!activity) {
+                console.error('❌ Activity not found');
                 speak(`I couldn't find an activity named ${activityName}. Please check your activities.`);
                 stopVoiceListening();
                 return;
@@ -8343,7 +8379,8 @@
             }
             
             setTimeout(() => {
-                speak(`Mark ${activity.activity}? Say yes or no.`, function() {
+                const activityName = activity.activity || activity.name || 'this activity';
+                speak(`Mark ${activityName}? Say yes or no.`, function() {
                     setTimeout(() => startVoiceListening(), 300);
                 });
             }, 300);
@@ -8414,7 +8451,13 @@
                 return;
             }
             
-            let activity = allActivities.find(a => a && a.activity && a.activity.toLowerCase().includes(activityName.toLowerCase()));
+            // Try both 'activity' and 'name' properties
+            let activity = allActivities.find(a => {
+                if (!a) return false;
+                if (a.activity && a.activity.toLowerCase().includes(activityName.toLowerCase())) return true;
+                if (a.name && a.name.toLowerCase().includes(activityName.toLowerCase())) return true;
+                return false;
+            });
             
             if (!activity) {
                 speak(`I couldn't find an activity named ${activityName}. Please check your activities.`);
@@ -8435,7 +8478,8 @@
             }
             
             setTimeout(() => {
-                speak(`Delete ${activity.activity}? Say yes or no.`, function() {
+                const activityName = activity.activity || activity.name || 'this activity';
+                speak(`Delete ${activityName}? Say yes or no.`, function() {
                     setTimeout(() => startVoiceListening(), 300);
                 });
             }, 300);
@@ -8929,7 +8973,8 @@
                 const activity = pendingConfirmation.activity;
                 console.log('   - Activity:', activity);
                 
-                speak(`Marked ${activity.activity} as done`);
+                const activityName = activity.activity || activity.name || 'activity';
+                speak(`Marked ${activityName} as done`);
                 
                 const activityId = activity.id;
                 pendingConfirmation = null;
@@ -8987,7 +9032,8 @@
                 const activity = pendingConfirmation.activity;
                 console.log('   - Activity:', activity);
                 
-                speak(`Deleted ${activity.activity}`);
+                const activityName = activity.activity || activity.name || 'activity';
+                speak(`Deleted ${activityName}`);
                 
                 const activityId = activity.id;
                 pendingConfirmation = null;
