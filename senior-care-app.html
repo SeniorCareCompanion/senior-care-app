@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-29-1956 UTC - Profile Minimize/Maximize
-    BUILD DATE: January 29, 2026 at 7:56 PM UTC
-    CHANGES: Added expand/collapse to all Profile sections + Expand/Collapse All buttons
+    VERSION: 2026-01-29-2148 UTC - Profile Arrow Buttons Fixed
+    BUILD DATE: January 29, 2026 at 9:48 PM UTC
+    CHANGES: Fixed arrow buttons to toggle Profile sections (not just headers)
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -2402,7 +2402,7 @@
                 <div class="card">
                     <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="toggleProfileCard('personalInfo')">
                         <span>Personal Information</span>
-                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;" title="Expand/Collapse" onclick="event.stopPropagation();">
+                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;" title="Expand/Collapse" onclick="toggleProfileCard('personalInfo'); event.stopPropagation();">
                             <span id="toggle-icon-personalInfo">▲</span>
                         </button>
                     </div>
@@ -2414,7 +2414,7 @@
                 <div class="card">
                     <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="toggleProfileCard('voiceSettings')">
                         <span>🔊 Voice Settings</span>
-                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;" title="Expand/Collapse" onclick="event.stopPropagation();">
+                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;" title="Expand/Collapse" onclick="toggleProfileCard('voiceSettings'); event.stopPropagation();">
                             <span id="toggle-icon-voiceSettings">▲</span>
                         </button>
                     </div>
@@ -2463,7 +2463,7 @@
                 <div class="card">
                     <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="toggleProfileCard('notifications')">
                         <span>🔔 Notification Settings</span>
-                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;" title="Expand/Collapse" onclick="event.stopPropagation();">
+                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;" title="Expand/Collapse" onclick="toggleProfileCard('notifications'); event.stopPropagation();">
                             <span id="toggle-icon-notifications">▲</span>
                         </button>
                     </div>
@@ -2498,7 +2498,7 @@
                 <div class="card">
                     <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="toggleProfileCard('dataManagement')">
                         <span>💾 Data Management</span>
-                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;" title="Expand/Collapse" onclick="event.stopPropagation();">
+                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;" title="Expand/Collapse" onclick="toggleProfileCard('dataManagement'); event.stopPropagation();">
                             <span id="toggle-icon-dataManagement">▲</span>
                         </button>
                     </div>
@@ -2548,7 +2548,7 @@
                 <div class="form-section">
                     <h3 style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; margin: 0; padding: 15px; background: #f8f9fa; border-radius: 8px 8px 0 0; margin-bottom: -1px;" onclick="toggleProfileCard('updateProfile')">
                         <span>Update Profile</span>
-                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;" title="Expand/Collapse" onclick="event.stopPropagation();">
+                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;" title="Expand/Collapse" onclick="toggleProfileCard('updateProfile'); event.stopPropagation();">
                             <span id="toggle-icon-updateProfile">▲</span>
                         </button>
                     </h3>
@@ -2573,7 +2573,7 @@
                 <div class="form-section">
                     <h3 style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; margin: 0; padding: 15px; background: #f8f9fa; border-radius: 8px 8px 0 0; margin-bottom: -1px;" onclick="toggleProfileCard('changePassword')">
                         <span>🔐 Change Password</span>
-                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;" title="Expand/Collapse" onclick="event.stopPropagation();">
+                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;" title="Expand/Collapse" onclick="toggleProfileCard('changePassword'); event.stopPropagation();">
                             <span id="toggle-icon-changePassword">▲</span>
                         </button>
                     </h3>
@@ -2612,10 +2612,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-29-1956 UTC
+                        <strong>App Version:</strong> 2026-01-29-2148 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Profile: Collapsible Sections + Expand/Collapse All
+                        Fix: Profile Arrow Buttons Now Work Correctly
                     </p>
                 </div>
             </div>
