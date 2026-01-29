@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-29-2148 UTC - Profile Arrow Buttons Fixed
-    BUILD DATE: January 29, 2026 at 9:48 PM UTC
-    CHANGES: Fixed arrow buttons to toggle Profile sections (not just headers)
+    VERSION: 2026-01-29-2230 UTC - Expand/Collapse All on Every Page
+    BUILD DATE: January 29, 2026 at 10:30 PM UTC
+    CHANGES: Added Expand All / Collapse All buttons to Medications, Appointments, Tasks, Bills, Contacts, and Profile
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -1164,6 +1164,17 @@
             <!-- Medications Section -->
             <div id="medications" class="section">
                 <h2 class="section-title">💊 Medications</h2>
+                
+                <!-- Expand/Collapse All Controls -->
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button class="btn btn-secondary" onclick="expandAllMedications()" style="flex: 1; padding: 10px; font-size: 14px;">
+                        ▲ Expand All
+                    </button>
+                    <button class="btn btn-secondary" onclick="collapseAllMedications()" style="flex: 1; padding: 10px; font-size: 14px;">
+                        ▼ Collapse All
+                    </button>
+                </div>
+                
                 <div id="medicationList"></div>
                 
                 <div class="form-section">
@@ -1272,6 +1283,17 @@
             <!-- Appointments Section -->
             <div id="appointments" class="section">
                 <h2 class="section-title">📅 Appointments</h2>
+                
+                <!-- Expand/Collapse All Controls -->
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button class="btn btn-secondary" onclick="expandAllAppointments()" style="flex: 1; padding: 10px; font-size: 14px;">
+                        ▲ Expand All
+                    </button>
+                    <button class="btn btn-secondary" onclick="collapseAllAppointments()" style="flex: 1; padding: 10px; font-size: 14px;">
+                        ▼ Collapse All
+                    </button>
+                </div>
+                
                 <div id="appointmentList"></div>
                 
                 <div class="form-section">
@@ -1340,6 +1362,16 @@
             <!-- Tasks Section -->
             <div id="tasks" class="section">
                 <h2 class="section-title">✅ Daily Tasks</h2>
+                
+                <!-- Expand/Collapse All Controls -->
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button class="btn btn-secondary" onclick="expandAllTasks()" style="flex: 1; padding: 10px; font-size: 14px;">
+                        ▲ Expand All
+                    </button>
+                    <button class="btn btn-secondary" onclick="collapseAllTasks()" style="flex: 1; padding: 10px; font-size: 14px;">
+                        ▼ Collapse All
+                    </button>
+                </div>
                 
                 <div class="card task">
                     <div class="card-header">🍽️ Meals</div>
@@ -1449,6 +1481,17 @@
             <!-- Bills Section -->
             <div id="bills" class="section">
                 <h2 class="section-title">💰 Bills</h2>
+                
+                <!-- Expand/Collapse All Controls -->
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button class="btn btn-secondary" onclick="expandAllBills()" style="flex: 1; padding: 10px; font-size: 14px;">
+                        ▲ Expand All
+                    </button>
+                    <button class="btn btn-secondary" onclick="collapseAllBills()" style="flex: 1; padding: 10px; font-size: 14px;">
+                        ▼ Collapse All
+                    </button>
+                </div>
+                
                 <div id="billList"></div>
                 
                 <div class="form-section">
@@ -1621,6 +1664,16 @@
             <!-- Contacts Section -->
             <div id="contacts" class="section">
                 <h2 class="section-title">📞 Contacts</h2>
+
+                <!-- Expand/Collapse All Controls -->
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button class="btn btn-secondary" onclick="expandAllContacts()" style="flex: 1; padding: 10px; font-size: 14px;">
+                        ▲ Expand All
+                    </button>
+                    <button class="btn btn-secondary" onclick="collapseAllContacts()" style="flex: 1; padding: 10px; font-size: 14px;">
+                        ▼ Collapse All
+                    </button>
+                </div>
 
                 <div id="contactList"></div>
                 
@@ -2612,10 +2665,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-29-2148 UTC
+                        <strong>App Version:</strong> 2026-01-29-2230 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Fix: Profile Arrow Buttons Now Work Correctly
+                        Feature: Expand/Collapse All on Every Page
                     </p>
                 </div>
             </div>
@@ -4217,6 +4270,54 @@
         // Make function globally accessible
         window.toggleMedicationCard = toggleMedicationCard;
 
+        // Expand all medications
+        function expandAllMedications() {
+            const users = loadData('users');
+            if (!users || !users[currentUser] || !users[currentUser].medications) return;
+            
+            const medications = users[currentUser].medications;
+            const minimizedMeds = {};
+            
+            medications.forEach(med => {
+                const detailsDiv = document.getElementById(`med-details-${med.id}`);
+                const toggleIcon = document.getElementById(`toggle-icon-${med.id}`);
+                
+                if (detailsDiv && toggleIcon) {
+                    detailsDiv.style.display = '';
+                    toggleIcon.textContent = '▲';
+                    minimizedMeds[med.id] = false;
+                }
+            });
+            
+            localStorage.setItem('minimizedMeds', JSON.stringify(minimizedMeds));
+            speak('Expanded all medications');
+        }
+        window.expandAllMedications = expandAllMedications;
+
+        // Collapse all medications
+        function collapseAllMedications() {
+            const users = loadData('users');
+            if (!users || !users[currentUser] || !users[currentUser].medications) return;
+            
+            const medications = users[currentUser].medications;
+            const minimizedMeds = {};
+            
+            medications.forEach(med => {
+                const detailsDiv = document.getElementById(`med-details-${med.id}`);
+                const toggleIcon = document.getElementById(`toggle-icon-${med.id}`);
+                
+                if (detailsDiv && toggleIcon) {
+                    detailsDiv.style.display = 'none';
+                    toggleIcon.textContent = '▼';
+                    minimizedMeds[med.id] = true;
+                }
+            });
+            
+            localStorage.setItem('minimizedMeds', JSON.stringify(minimizedMeds));
+            speak('Collapsed all medications');
+        }
+        window.collapseAllMedications = collapseAllMedications;
+
         // Make medication delete function globally accessible
         window.deleteMedicationById = function(id) {
             console.log('Delete medication clicked:', id);
@@ -4925,6 +5026,54 @@
         }
         window.toggleAppointmentCard = toggleAppointmentCard;
 
+        // Expand all appointments
+        function expandAllAppointments() {
+            const users = loadData('users');
+            if (!users || !users[currentUser] || !users[currentUser].appointments) return;
+            
+            const appointments = users[currentUser].appointments;
+            const minimizedAppts = {};
+            
+            appointments.forEach(appt => {
+                const detailsDiv = document.getElementById(`appt-details-${appt.id}`);
+                const toggleIcon = document.getElementById(`toggle-icon-${appt.id}`);
+                
+                if (detailsDiv && toggleIcon) {
+                    detailsDiv.style.display = '';
+                    toggleIcon.textContent = '▲';
+                    minimizedAppts[appt.id] = false;
+                }
+            });
+            
+            localStorage.setItem('minimizedAppts', JSON.stringify(minimizedAppts));
+            speak('Expanded all appointments');
+        }
+        window.expandAllAppointments = expandAllAppointments;
+
+        // Collapse all appointments
+        function collapseAllAppointments() {
+            const users = loadData('users');
+            if (!users || !users[currentUser] || !users[currentUser].appointments) return;
+            
+            const appointments = users[currentUser].appointments;
+            const minimizedAppts = {};
+            
+            appointments.forEach(appt => {
+                const detailsDiv = document.getElementById(`appt-details-${appt.id}`);
+                const toggleIcon = document.getElementById(`toggle-icon-${appt.id}`);
+                
+                if (detailsDiv && toggleIcon) {
+                    detailsDiv.style.display = 'none';
+                    toggleIcon.textContent = '▼';
+                    minimizedAppts[appt.id] = true;
+                }
+            });
+            
+            localStorage.setItem('minimizedAppts', JSON.stringify(minimizedAppts));
+            speak('Collapsed all appointments');
+        }
+        window.collapseAllAppointments = collapseAllAppointments;
+
         // Make appointment delete function globally accessible
         window.deleteAppointmentById = function(id) {
             console.log('Delete appointment clicked:', id);
@@ -5331,6 +5480,64 @@
         }
         window.toggleTaskCard = toggleTaskCard;
 
+        // Expand all tasks
+        function expandAllTasks() {
+            const users = loadData('users');
+            if (!users || !users[currentUser] || !users[currentUser].tasks) return;
+            
+            const tasksData = users[currentUser].tasks;
+            const minimizedTasks = {};
+            
+            ['meals', 'hydration', 'hygiene', 'safety'].forEach(category => {
+                if (tasksData[category] && Array.isArray(tasksData[category])) {
+                    tasksData[category].forEach((task, index) => {
+                        const taskKey = `${category}-${index}`;
+                        const detailsDiv = document.getElementById(`task-details-${taskKey}`);
+                        const toggleIcon = document.getElementById(`toggle-icon-task-${taskKey}`);
+                        
+                        if (detailsDiv && toggleIcon) {
+                            detailsDiv.style.display = '';
+                            toggleIcon.textContent = '▲';
+                            minimizedTasks[taskKey] = false;
+                        }
+                    });
+                }
+            });
+            
+            localStorage.setItem('minimizedTasks', JSON.stringify(minimizedTasks));
+            speak('Expanded all tasks');
+        }
+        window.expandAllTasks = expandAllTasks;
+
+        // Collapse all tasks
+        function collapseAllTasks() {
+            const users = loadData('users');
+            if (!users || !users[currentUser] || !users[currentUser].tasks) return;
+            
+            const tasksData = users[currentUser].tasks;
+            const minimizedTasks = {};
+            
+            ['meals', 'hydration', 'hygiene', 'safety'].forEach(category => {
+                if (tasksData[category] && Array.isArray(tasksData[category])) {
+                    tasksData[category].forEach((task, index) => {
+                        const taskKey = `${category}-${index}`;
+                        const detailsDiv = document.getElementById(`task-details-${taskKey}`);
+                        const toggleIcon = document.getElementById(`toggle-icon-task-${taskKey}`);
+                        
+                        if (detailsDiv && toggleIcon) {
+                            detailsDiv.style.display = 'none';
+                            toggleIcon.textContent = '▼';
+                            minimizedTasks[taskKey] = true;
+                        }
+                    });
+                }
+            });
+            
+            localStorage.setItem('minimizedTasks', JSON.stringify(minimizedTasks));
+            speak('Collapsed all tasks');
+        }
+        window.collapseAllTasks = collapseAllTasks;
+
         // Make these functions available globally
         window.deleteTaskByIndex = function(category, index) {
             console.log('Delete clicked:', category, index);
@@ -5657,6 +5864,54 @@
         }
         window.toggleBillCard = toggleBillCard;
 
+        // Expand all bills
+        function expandAllBills() {
+            const users = loadData('users');
+            if (!users || !users[currentUser] || !users[currentUser].bills) return;
+            
+            const bills = users[currentUser].bills;
+            const minimizedBills = {};
+            
+            bills.forEach(bill => {
+                const detailsDiv = document.getElementById(`bill-details-${bill.id}`);
+                const toggleIcon = document.getElementById(`toggle-icon-${bill.id}`);
+                
+                if (detailsDiv && toggleIcon) {
+                    detailsDiv.style.display = '';
+                    toggleIcon.textContent = '▲';
+                    minimizedBills[bill.id] = false;
+                }
+            });
+            
+            localStorage.setItem('minimizedBills', JSON.stringify(minimizedBills));
+            speak('Expanded all bills');
+        }
+        window.expandAllBills = expandAllBills;
+
+        // Collapse all bills
+        function collapseAllBills() {
+            const users = loadData('users');
+            if (!users || !users[currentUser] || !users[currentUser].bills) return;
+            
+            const bills = users[currentUser].bills;
+            const minimizedBills = {};
+            
+            bills.forEach(bill => {
+                const detailsDiv = document.getElementById(`bill-details-${bill.id}`);
+                const toggleIcon = document.getElementById(`toggle-icon-${bill.id}`);
+                
+                if (detailsDiv && toggleIcon) {
+                    detailsDiv.style.display = 'none';
+                    toggleIcon.textContent = '▼';
+                    minimizedBills[bill.id] = true;
+                }
+            });
+            
+            localStorage.setItem('minimizedBills', JSON.stringify(minimizedBills));
+            speak('Collapsed all bills');
+        }
+        window.collapseAllBills = collapseAllBills;
+
         // Make bill delete function globally accessible
         window.deleteBillById = function(id) {
             console.log('Delete bill clicked:', id);
@@ -5868,6 +6123,54 @@
             speak(isMinimized ? 'Expanded' : 'Minimized');
         }
         window.toggleContactCard = toggleContactCard;
+
+        // Expand all contacts
+        function expandAllContacts() {
+            const users = loadData('users');
+            if (!users || !users[currentUser] || !users[currentUser].contacts) return;
+            
+            const contacts = users[currentUser].contacts;
+            const minimizedContacts = {};
+            
+            contacts.forEach(contact => {
+                const detailsDiv = document.getElementById(`contact-details-${contact.id}`);
+                const toggleIcon = document.getElementById(`toggle-icon-${contact.id}`);
+                
+                if (detailsDiv && toggleIcon) {
+                    detailsDiv.style.display = '';
+                    toggleIcon.textContent = '▲';
+                    minimizedContacts[contact.id] = false;
+                }
+            });
+            
+            localStorage.setItem('minimizedContacts', JSON.stringify(minimizedContacts));
+            speak('Expanded all contacts');
+        }
+        window.expandAllContacts = expandAllContacts;
+
+        // Collapse all contacts
+        function collapseAllContacts() {
+            const users = loadData('users');
+            if (!users || !users[currentUser] || !users[currentUser].contacts) return;
+            
+            const contacts = users[currentUser].contacts;
+            const minimizedContacts = {};
+            
+            contacts.forEach(contact => {
+                const detailsDiv = document.getElementById(`contact-details-${contact.id}`);
+                const toggleIcon = document.getElementById(`toggle-icon-${contact.id}`);
+                
+                if (detailsDiv && toggleIcon) {
+                    detailsDiv.style.display = 'none';
+                    toggleIcon.textContent = '▼';
+                    minimizedContacts[contact.id] = true;
+                }
+            });
+            
+            localStorage.setItem('minimizedContacts', JSON.stringify(minimizedContacts));
+            speak('Collapsed all contacts');
+        }
+        window.collapseAllContacts = collapseAllContacts;
 
         function callContact(name, phone) {
             speak(`Calling ${name}`);
