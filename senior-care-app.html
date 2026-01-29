@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-29-1819 UTC - Task Category/Index Fix
-    BUILD DATE: January 29, 2026 at 6:19 PM UTC
-    CHANGES: Fixed tasks to use category+index instead of undefined IDs
+    VERSION: 2026-01-29-1931 UTC - Enhanced Yes/No Recognition
+    BUILD DATE: January 29, 2026 at 7:31 PM UTC
+    CHANGES: Improved confirmation with 25+ yes/no variations and phonetic matching
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -2566,10 +2566,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-29-1819 UTC
+                        <strong>App Version:</strong> 2026-01-29-1931 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Fix: Tasks Use Category+Index (Not Undefined IDs)
+                        Enhanced: 25+ Yes/No Variations + Phonetic Matching
                     </p>
                 </div>
             </div>
@@ -8583,23 +8583,77 @@
 
         // Handle confirmation responses
         function handleConfirmation(command) {
-            const lowerCommand = command.toLowerCase();
+            const lowerCommand = command.toLowerCase().trim();
             console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
             console.log('✅ HANDLE CONFIRMATION');
             console.log('   - Command:', command);
             console.log('   - Lower:', lowerCommand);
             console.log('   - Pending confirmation:', pendingConfirmation);
             
-            if (lowerCommand.includes('yes') || lowerCommand.includes('yeah') || lowerCommand.includes('sure') || lowerCommand.includes('confirm')) {
+            // Expanded YES variations - much more forgiving!
+            const yesWords = [
+                'yes', 'yeah', 'yep', 'yup', 'sure', 'ok', 'okay', 'confirm',
+                'correct', 'right', 'affirmative', 'go', 'do it', 'proceed',
+                'uh-huh', 'yea', 'ya', 'yas', 'absolutely', 'definitely',
+                'indeed', 'please', 'let\'s go', 'continue', 'accept'
+            ];
+            
+            // Expanded NO variations
+            const noWords = [
+                'no', 'nope', 'nah', 'cancel', 'stop', 'don\'t', 'never',
+                'negative', 'nevermind', 'nay', 'decline', 'reject',
+                'uh-uh', 'no way', 'not now', 'abort'
+            ];
+            
+            // Check for YES
+            let isYes = false;
+            for (const word of yesWords) {
+                if (lowerCommand.includes(word)) {
+                    console.log(`   ✅ Detected YES via: "${word}"`);
+                    isYes = true;
+                    break;
+                }
+                // Also check phonetically
+                if (phoneticMatch(lowerCommand, word)) {
+                    console.log(`   ✅ Detected YES via phonetic match: "${word}"`);
+                    isYes = true;
+                    break;
+                }
+            }
+            
+            // Check for NO
+            let isNo = false;
+            for (const word of noWords) {
+                if (lowerCommand.includes(word)) {
+                    console.log(`   ❌ Detected NO via: "${word}"`);
+                    isNo = true;
+                    break;
+                }
+                // Also check phonetically
+                if (phoneticMatch(lowerCommand, word)) {
+                    console.log(`   ❌ Detected NO via phonetic match: "${word}"`);
+                    isNo = true;
+                    break;
+                }
+            }
+            
+            if (isYes && !isNo) {
                 console.log('   ✅ User said YES - executing action');
                 executeConfirmedAction();
-            } else if (lowerCommand.includes('no') || lowerCommand.includes('cancel') || lowerCommand.includes('nope')) {
+            } else if (isNo && !isYes) {
                 console.log('   ❌ User said NO - cancelling');
                 speak('Cancelled');
                 pendingConfirmation = null;
                 stopVoiceListening();
+            } else if (isYes && isNo) {
+                // Ambiguous - both detected, ask again
+                console.log('   ⚠️ Ambiguous response (both yes and no detected) - asking again');
+                speak('I heard both yes and no. Please say yes to confirm or no to cancel');
+                startVoiceListening();
             } else {
+                // Neither detected clearly
                 console.log('   ❓ Unclear response - asking again');
+                console.log('   ❓ Heard:', lowerCommand);
                 speak('Please say yes to confirm or no to cancel');
                 startVoiceListening();
             }
