@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-29-1931 UTC - Enhanced Yes/No Recognition
-    BUILD DATE: January 29, 2026 at 7:31 PM UTC
-    CHANGES: Improved confirmation with 25+ yes/no variations and phonetic matching
+    VERSION: 2026-01-29-1956 UTC - Profile Minimize/Maximize
+    BUILD DATE: January 29, 2026 at 7:56 PM UTC
+    CHANGES: Added expand/collapse to all Profile sections + Expand/Collapse All buttons
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -2389,14 +2389,36 @@
             <div id="profile" class="section">
                 <h2 class="section-title">👤 Profile</h2>
                 
+                <!-- Expand/Collapse All Controls -->
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button class="btn btn-secondary" onclick="expandAllProfileCards()" style="flex: 1; padding: 10px; font-size: 14px;">
+                        ▲ Expand All
+                    </button>
+                    <button class="btn btn-secondary" onclick="collapseAllProfileCards()" style="flex: 1; padding: 10px; font-size: 14px;">
+                        ▼ Collapse All
+                    </button>
+                </div>
+                
                 <div class="card">
-                    <div class="card-header">Personal Information</div>
-                    <div class="card-content" id="profileInfo"></div>
+                    <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="toggleProfileCard('personalInfo')">
+                        <span>Personal Information</span>
+                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;" title="Expand/Collapse" onclick="event.stopPropagation();">
+                            <span id="toggle-icon-personalInfo">▲</span>
+                        </button>
+                    </div>
+                    <div id="profileCard-personalInfo" class="card-content">
+                        <div id="profileInfo"></div>
+                    </div>
                 </div>
 
                 <div class="card">
-                    <div class="card-header">🔊 Voice Settings</div>
-                    <div class="card-content">
+                    <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="toggleProfileCard('voiceSettings')">
+                        <span>🔊 Voice Settings</span>
+                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;" title="Expand/Collapse" onclick="event.stopPropagation();">
+                            <span id="toggle-icon-voiceSettings">▲</span>
+                        </button>
+                    </div>
+                    <div id="profileCard-voiceSettings" class="card-content">
                         <h4 style="margin: 0 0 10px 0;">Voice Announcements</h4>
                         <p style="margin-bottom: 15px;">Enable voice announcements for confirmations and reminders</p>
                         <button id="voiceToggleBtn" class="btn" onclick="toggleVoice()" style="width: 100%; max-width: 100%; margin-bottom: 15px;">
@@ -2439,8 +2461,13 @@
                 </div>
 
                 <div class="card">
-                    <div class="card-header">🔔 Notification Settings</div>
-                    <div class="card-content">
+                    <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="toggleProfileCard('notifications')">
+                        <span>🔔 Notification Settings</span>
+                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;" title="Expand/Collapse" onclick="event.stopPropagation();">
+                            <span id="toggle-icon-notifications">▲</span>
+                        </button>
+                    </div>
+                    <div id="profileCard-notifications" class="card-content">
                         <p style="margin-bottom: 15px;">Enable push notifications to receive reminders even when the app is in the background</p>
                         
                         <button id="notificationToggleBtn" class="btn btn-primary" onclick="requestNotificationPermission()" style="width: 100%; max-width: 100%; margin-bottom: 15px;">
@@ -2469,8 +2496,13 @@
                 </div>
 
                 <div class="card">
-                    <div class="card-header">💾 Data Management</div>
-                    <div class="card-content">
+                    <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="toggleProfileCard('dataManagement')">
+                        <span>💾 Data Management</span>
+                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;" title="Expand/Collapse" onclick="event.stopPropagation();">
+                            <span id="toggle-icon-dataManagement">▲</span>
+                        </button>
+                    </div>
+                    <div id="profileCard-dataManagement" class="card-content">
                         <p style="margin-bottom: 15px;">Backup and restore your data</p>
                         
                         <div id="lastBackupInfo" style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 14px;">
@@ -2514,7 +2546,13 @@
                 </div>
 
                 <div class="form-section">
-                    <h3>Update Profile</h3>
+                    <h3 style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; margin: 0; padding: 15px; background: #f8f9fa; border-radius: 8px 8px 0 0; margin-bottom: -1px;" onclick="toggleProfileCard('updateProfile')">
+                        <span>Update Profile</span>
+                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;" title="Expand/Collapse" onclick="event.stopPropagation();">
+                            <span id="toggle-icon-updateProfile">▲</span>
+                        </button>
+                    </h3>
+                    <div id="profileCard-updateProfile" style="padding: 20px; background: white; border: 1px solid #ddd; border-radius: 0 0 8px 8px;">
                     <div class="input-group">
                         <label>Full Name</label>
                         <input type="text" id="updateName">
@@ -2529,10 +2567,17 @@
                         <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">📧 Used to send backup files to your inbox</p>
                     </div>
                     <button class="btn btn-primary" onclick="updateProfile()">Update Profile</button>
+                    </div>
                 </div>
 
                 <div class="form-section">
-                    <h3>🔐 Change Password</h3>
+                    <h3 style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; margin: 0; padding: 15px; background: #f8f9fa; border-radius: 8px 8px 0 0; margin-bottom: -1px;" onclick="toggleProfileCard('changePassword')">
+                        <span>🔐 Change Password</span>
+                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;" title="Expand/Collapse" onclick="event.stopPropagation();">
+                            <span id="toggle-icon-changePassword">▲</span>
+                        </button>
+                    </h3>
+                    <div id="profileCard-changePassword" style="padding: 20px; background: white; border: 1px solid #ddd; border-radius: 0 0 8px 8px;">
                     <div class="input-group">
                         <label>Current Password</label>
                         <div style="position: relative;">
@@ -2561,15 +2606,16 @@
                         </div>
                     </div>
                     <button class="btn btn-primary" onclick="changePassword()">Change Password</button>
+                    </div>
                 </div>
                 
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-29-1931 UTC
+                        <strong>App Version:</strong> 2026-01-29-1956 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Enhanced: 25+ Yes/No Variations + Phonetic Matching
+                        Profile: Collapsible Sections + Expand/Collapse All
                     </p>
                 </div>
             </div>
@@ -6291,7 +6337,91 @@
             
             // Load backup reminder settings
             loadBackupReminderSettings();
+            
+            // Initialize profile card states
+            initializeProfileCards();
         }
+
+        // Toggle profile card expand/collapse
+        function toggleProfileCard(cardKey) {
+            const contentDiv = document.getElementById(`profileCard-${cardKey}`);
+            const toggleIcon = document.getElementById(`toggle-icon-${cardKey}`);
+            
+            if (!contentDiv || !toggleIcon) {
+                console.warn(`Profile card not found: ${cardKey}`);
+                return;
+            }
+            
+            const isMinimized = contentDiv.style.display === 'none';
+            contentDiv.style.display = isMinimized ? '' : 'none';
+            toggleIcon.textContent = isMinimized ? '▲' : '▼';
+            
+            // Save state to localStorage
+            const minimizedProfile = JSON.parse(localStorage.getItem('minimizedProfile') || '{}');
+            minimizedProfile[cardKey] = !isMinimized;
+            localStorage.setItem('minimizedProfile', JSON.stringify(minimizedProfile));
+            
+            speak(isMinimized ? 'Expanded' : 'Minimized');
+        }
+        window.toggleProfileCard = toggleProfileCard;
+
+        // Initialize profile cards from saved state
+        function initializeProfileCards() {
+            const minimizedProfile = JSON.parse(localStorage.getItem('minimizedProfile') || '{}');
+            const cardKeys = ['personalInfo', 'voiceSettings', 'notifications', 'dataManagement', 'updateProfile', 'changePassword'];
+            
+            cardKeys.forEach(cardKey => {
+                const contentDiv = document.getElementById(`profileCard-${cardKey}`);
+                const toggleIcon = document.getElementById(`toggle-icon-${cardKey}`);
+                
+                if (contentDiv && toggleIcon && minimizedProfile[cardKey]) {
+                    contentDiv.style.display = 'none';
+                    toggleIcon.textContent = '▼';
+                }
+            });
+        }
+
+        // Expand all profile cards
+        function expandAllProfileCards() {
+            const cardKeys = ['personalInfo', 'voiceSettings', 'notifications', 'dataManagement', 'updateProfile', 'changePassword'];
+            const minimizedProfile = {};
+            
+            cardKeys.forEach(cardKey => {
+                const contentDiv = document.getElementById(`profileCard-${cardKey}`);
+                const toggleIcon = document.getElementById(`toggle-icon-${cardKey}`);
+                
+                if (contentDiv && toggleIcon) {
+                    contentDiv.style.display = '';
+                    toggleIcon.textContent = '▲';
+                    minimizedProfile[cardKey] = false;
+                }
+            });
+            
+            localStorage.setItem('minimizedProfile', JSON.stringify(minimizedProfile));
+            speak('Expanded all sections');
+        }
+        window.expandAllProfileCards = expandAllProfileCards;
+
+        // Collapse all profile cards
+        function collapseAllProfileCards() {
+            const cardKeys = ['personalInfo', 'voiceSettings', 'notifications', 'dataManagement', 'updateProfile', 'changePassword'];
+            const minimizedProfile = {};
+            
+            cardKeys.forEach(cardKey => {
+                const contentDiv = document.getElementById(`profileCard-${cardKey}`);
+                const toggleIcon = document.getElementById(`toggle-icon-${cardKey}`);
+                
+                if (contentDiv && toggleIcon) {
+                    contentDiv.style.display = 'none';
+                    toggleIcon.textContent = '▼';
+                    minimizedProfile[cardKey] = true;
+                }
+            });
+            
+            localStorage.setItem('minimizedProfile', JSON.stringify(minimizedProfile));
+            speak('Collapsed all sections');
+        }
+        window.collapseAllProfileCards = collapseAllProfileCards;
 
         function updateProfile() {
             const name = document.getElementById('updateName').value;
