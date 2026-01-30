@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-29-2230 UTC - Expand/Collapse All on Every Page
-    BUILD DATE: January 29, 2026 at 10:30 PM UTC
-    CHANGES: Added Expand All / Collapse All buttons to Medications, Appointments, Tasks, Bills, Contacts, and Profile
+    VERSION: 2026-01-30-0252 UTC - Expand/Collapse Bugfixes + Activities
+    BUILD DATE: January 30, 2026 at 2:52 AM UTC
+    CHANGES: Fixed Appointments/Bills/Contacts expand/collapse + Added Activities expand/collapse + Enhanced debugging
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -1543,6 +1543,16 @@
             <div id="activities" class="section">
                 <h2 class="section-title">🎉 Activities</h2>
 
+                <!-- Expand/Collapse All Controls -->
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button class="btn btn-secondary" onclick="expandAllActivities()" style="flex: 1; padding: 10px; font-size: 14px;">
+                        ▲ Expand All
+                    </button>
+                    <button class="btn btn-secondary" onclick="collapseAllActivities()" style="flex: 1; padding: 10px; font-size: 14px;">
+                        ▼ Collapse All
+                    </button>
+                </div>
+
                 <div id="activityList"></div>
                 
                 <div class="form-section">
@@ -2665,10 +2675,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-29-2230 UTC
+                        <strong>App Version:</strong> 2026-01-30-0252 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Feature: Expand/Collapse All on Every Page
+                        Fix: All Pages Expand/Collapse + Enhanced Debugging
                     </p>
                 </div>
             </div>
@@ -5028,35 +5038,66 @@
 
         // Expand all appointments
         function expandAllAppointments() {
+            console.log('🔍 expandAllAppointments called');
             const users = loadData('users');
-            if (!users || !users[currentUser] || !users[currentUser].appointments) return;
+            if (!users || !users[currentUser]) {
+                console.error('❌ No user data found');
+                return;
+            }
             
             const appointments = users[currentUser].appointments;
+            console.log('📅 Appointments data:', appointments);
+            console.log('📅 Is array?:', Array.isArray(appointments));
+            
+            if (!appointments || !Array.isArray(appointments)) {
+                console.error('❌ Appointments is not an array');
+                return;
+            }
+            
             const minimizedAppts = {};
+            let expandedCount = 0;
             
             appointments.forEach(appt => {
+                console.log(`  - Processing appt ID: ${appt.id}`);
                 const detailsDiv = document.getElementById(`appt-details-${appt.id}`);
                 const toggleIcon = document.getElementById(`toggle-icon-${appt.id}`);
+                
+                console.log(`    detailsDiv:`, detailsDiv ? 'found' : 'NOT FOUND');
+                console.log(`    toggleIcon:`, toggleIcon ? 'found' : 'NOT FOUND');
                 
                 if (detailsDiv && toggleIcon) {
                     detailsDiv.style.display = '';
                     toggleIcon.textContent = '▲';
                     minimizedAppts[appt.id] = false;
+                    expandedCount++;
                 }
             });
             
             localStorage.setItem('minimizedAppts', JSON.stringify(minimizedAppts));
+            console.log(`✅ Expanded ${expandedCount} appointments`);
             speak('Expanded all appointments');
         }
         window.expandAllAppointments = expandAllAppointments;
 
         // Collapse all appointments
         function collapseAllAppointments() {
+            console.log('🔍 collapseAllAppointments called');
             const users = loadData('users');
-            if (!users || !users[currentUser] || !users[currentUser].appointments) return;
+            if (!users || !users[currentUser]) {
+                console.error('❌ No user data found');
+                return;
+            }
             
             const appointments = users[currentUser].appointments;
+            console.log('📅 Appointments data:', appointments);
+            
+            if (!appointments || !Array.isArray(appointments)) {
+                console.error('❌ Appointments is not an array');
+                return;
+            }
+            
             const minimizedAppts = {};
+            let collapsedCount = 0;
             
             appointments.forEach(appt => {
                 const detailsDiv = document.getElementById(`appt-details-${appt.id}`);
@@ -5066,10 +5107,12 @@
                     detailsDiv.style.display = 'none';
                     toggleIcon.textContent = '▼';
                     minimizedAppts[appt.id] = true;
+                    collapsedCount++;
                 }
             });
             
             localStorage.setItem('minimizedAppts', JSON.stringify(minimizedAppts));
+            console.log(`✅ Collapsed ${collapsedCount} appointments`);
             speak('Collapsed all appointments');
         }
         window.collapseAllAppointments = collapseAllAppointments;
@@ -5866,35 +5909,66 @@
 
         // Expand all bills
         function expandAllBills() {
+            console.log('🔍 expandAllBills called');
             const users = loadData('users');
-            if (!users || !users[currentUser] || !users[currentUser].bills) return;
+            if (!users || !users[currentUser]) {
+                console.error('❌ No user data found');
+                return;
+            }
             
             const bills = users[currentUser].bills;
+            console.log('📋 Bills data:', bills);
+            console.log('📋 Is array?:', Array.isArray(bills));
+            
+            if (!bills || !Array.isArray(bills)) {
+                console.error('❌ Bills is not an array');
+                return;
+            }
+            
             const minimizedBills = {};
+            let expandedCount = 0;
             
             bills.forEach(bill => {
+                console.log(`  - Processing bill ID: ${bill.id}`);
                 const detailsDiv = document.getElementById(`bill-details-${bill.id}`);
                 const toggleIcon = document.getElementById(`toggle-icon-${bill.id}`);
+                
+                console.log(`    detailsDiv:`, detailsDiv ? 'found' : 'NOT FOUND');
+                console.log(`    toggleIcon:`, toggleIcon ? 'found' : 'NOT FOUND');
                 
                 if (detailsDiv && toggleIcon) {
                     detailsDiv.style.display = '';
                     toggleIcon.textContent = '▲';
                     minimizedBills[bill.id] = false;
+                    expandedCount++;
                 }
             });
             
             localStorage.setItem('minimizedBills', JSON.stringify(minimizedBills));
+            console.log(`✅ Expanded ${expandedCount} bills`);
             speak('Expanded all bills');
         }
         window.expandAllBills = expandAllBills;
 
         // Collapse all bills
         function collapseAllBills() {
+            console.log('🔍 collapseAllBills called');
             const users = loadData('users');
-            if (!users || !users[currentUser] || !users[currentUser].bills) return;
+            if (!users || !users[currentUser]) {
+                console.error('❌ No user data found');
+                return;
+            }
             
             const bills = users[currentUser].bills;
+            console.log('📋 Bills data:', bills);
+            
+            if (!bills || !Array.isArray(bills)) {
+                console.error('❌ Bills is not an array');
+                return;
+            }
+            
             const minimizedBills = {};
+            let collapsedCount = 0;
             
             bills.forEach(bill => {
                 const detailsDiv = document.getElementById(`bill-details-${bill.id}`);
@@ -5904,10 +5978,12 @@
                     detailsDiv.style.display = 'none';
                     toggleIcon.textContent = '▼';
                     minimizedBills[bill.id] = true;
+                    collapsedCount++;
                 }
             });
             
             localStorage.setItem('minimizedBills', JSON.stringify(minimizedBills));
+            console.log(`✅ Collapsed ${collapsedCount} bills`);
             speak('Collapsed all bills');
         }
         window.collapseAllBills = collapseAllBills;
@@ -6126,35 +6202,66 @@
 
         // Expand all contacts
         function expandAllContacts() {
+            console.log('🔍 expandAllContacts called');
             const users = loadData('users');
-            if (!users || !users[currentUser] || !users[currentUser].contacts) return;
+            if (!users || !users[currentUser]) {
+                console.error('❌ No user data found');
+                return;
+            }
             
             const contacts = users[currentUser].contacts;
+            console.log('📞 Contacts data:', contacts);
+            console.log('📞 Is array?:', Array.isArray(contacts));
+            
+            if (!contacts || !Array.isArray(contacts)) {
+                console.error('❌ Contacts is not an array');
+                return;
+            }
+            
             const minimizedContacts = {};
+            let expandedCount = 0;
             
             contacts.forEach(contact => {
+                console.log(`  - Processing contact ID: ${contact.id}`);
                 const detailsDiv = document.getElementById(`contact-details-${contact.id}`);
                 const toggleIcon = document.getElementById(`toggle-icon-${contact.id}`);
+                
+                console.log(`    detailsDiv:`, detailsDiv ? 'found' : 'NOT FOUND');
+                console.log(`    toggleIcon:`, toggleIcon ? 'found' : 'NOT FOUND');
                 
                 if (detailsDiv && toggleIcon) {
                     detailsDiv.style.display = '';
                     toggleIcon.textContent = '▲';
                     minimizedContacts[contact.id] = false;
+                    expandedCount++;
                 }
             });
             
             localStorage.setItem('minimizedContacts', JSON.stringify(minimizedContacts));
+            console.log(`✅ Expanded ${expandedCount} contacts`);
             speak('Expanded all contacts');
         }
         window.expandAllContacts = expandAllContacts;
 
         // Collapse all contacts
         function collapseAllContacts() {
+            console.log('🔍 collapseAllContacts called');
             const users = loadData('users');
-            if (!users || !users[currentUser] || !users[currentUser].contacts) return;
+            if (!users || !users[currentUser]) {
+                console.error('❌ No user data found');
+                return;
+            }
             
             const contacts = users[currentUser].contacts;
+            console.log('📞 Contacts data:', contacts);
+            
+            if (!contacts || !Array.isArray(contacts)) {
+                console.error('❌ Contacts is not an array');
+                return;
+            }
+            
             const minimizedContacts = {};
+            let collapsedCount = 0;
             
             contacts.forEach(contact => {
                 const detailsDiv = document.getElementById(`contact-details-${contact.id}`);
@@ -6164,10 +6271,12 @@
                     detailsDiv.style.display = 'none';
                     toggleIcon.textContent = '▼';
                     minimizedContacts[contact.id] = true;
+                    collapsedCount++;
                 }
             });
             
             localStorage.setItem('minimizedContacts', JSON.stringify(minimizedContacts));
+            console.log(`✅ Collapsed ${collapsedCount} contacts`);
             speak('Collapsed all contacts');
         }
         window.collapseAllContacts = collapseAllContacts;
@@ -6520,6 +6629,54 @@
             speak(isMinimized ? 'Expanded' : 'Minimized');
         }
         window.toggleActivityCard = toggleActivityCard;
+
+        // Expand all activities
+        function expandAllActivities() {
+            const users = loadData('users');
+            if (!users || !users[currentUser] || !users[currentUser].activities) return;
+            
+            const activities = users[currentUser].activities;
+            const minimizedActivities = {};
+            
+            activities.forEach(activity => {
+                const detailsDiv = document.getElementById(`activity-details-${activity.id}`);
+                const toggleIcon = document.getElementById(`toggle-icon-activity-${activity.id}`);
+                
+                if (detailsDiv && toggleIcon) {
+                    detailsDiv.style.display = '';
+                    toggleIcon.textContent = '▲';
+                    minimizedActivities[activity.id] = false;
+                }
+            });
+            
+            localStorage.setItem('minimizedActivities', JSON.stringify(minimizedActivities));
+            speak('Expanded all activities');
+        }
+        window.expandAllActivities = expandAllActivities;
+
+        // Collapse all activities
+        function collapseAllActivities() {
+            const users = loadData('users');
+            if (!users || !users[currentUser] || !users[currentUser].activities) return;
+            
+            const activities = users[currentUser].activities;
+            const minimizedActivities = {};
+            
+            activities.forEach(activity => {
+                const detailsDiv = document.getElementById(`activity-details-${activity.id}`);
+                const toggleIcon = document.getElementById(`toggle-icon-activity-${activity.id}`);
+                
+                if (detailsDiv && toggleIcon) {
+                    detailsDiv.style.display = 'none';
+                    toggleIcon.textContent = '▼';
+                    minimizedActivities[activity.id] = true;
+                }
+            });
+            
+            localStorage.setItem('minimizedActivities', JSON.stringify(minimizedActivities));
+            speak('Collapsed all activities');
+        }
+        window.collapseAllActivities = collapseAllActivities;
 
         function editActivity(activityId) {
             const users = loadData('users');
