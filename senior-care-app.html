@@ -4,17 +4,15 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-30-1638 UTC - Production Ready Release
-    BUILD DATE: January 30, 2026 at 4:38 PM UTC
-    CHANGES: Complete professional release with Help updates, Installation modal, Release Notes
+    VERSION: 2026-01-30-2007 UTC - Mobile Modal Fix
+    BUILD DATE: January 30, 2026 at 8:07 PM UTC
+    CHANGES: Fixed Add to Home Screen modal to fit iPhone screen (scrollable, smaller, buttons always visible)
     
     ✨ NEW IN THIS VERSION:
-    - 📱 Add to Home Screen modal (shows after first login)
-    - 📰 Release Notes section in Profile
-    - 📚 Comprehensive Help section update (all features documented)
-    - 🎤 Updated Voice Commands reference (50+ commands)
-    - ⚙️ Documented all Profile settings
-    - 📖 Installation guide added to Help
+    - 🐛 Fixed modal size for iPhone (was too large)
+    - 📱 Made content scrollable
+    - ✅ Buttons now always visible at bottom
+    - 🎨 Reduced padding/fonts for mobile
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -1107,49 +1105,55 @@
         </div>
 
         <!-- Add to Home Screen Modal (shown after first login) -->
-        <div id="addToHomeModal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;">
-            <div style="background: white; border-radius: 16px; max-width: 500px; width: 100%; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
-                <div style="text-align: center; margin-bottom: 25px;">
-                    <div style="font-size: 60px; margin-bottom: 15px;">🎉</div>
-                    <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 26px;">Welcome to Senior Care!</h2>
-                    <p style="color: #718096; font-size: 16px; margin: 0;">Your account is ready to use</p>
+        <div id="addToHomeModal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 15px; overflow-y: auto;">
+            <div style="background: white; border-radius: 12px; max-width: 450px; width: 100%; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 10px 40px rgba(0,0,0,0.3); margin: auto;">
+                
+                <!-- Header (fixed) -->
+                <div style="text-align: center; padding: 20px 20px 15px 20px; border-bottom: 2px solid #e2e8f0;">
+                    <div style="font-size: 48px; margin-bottom: 8px;">🎉</div>
+                    <h2 style="margin: 0 0 5px 0; color: #2d3748; font-size: 22px;">Welcome to Senior Care!</h2>
+                    <p style="color: #718096; font-size: 14px; margin: 0;">Your account is ready to use</p>
                 </div>
 
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 12px; margin-bottom: 20px;">
-                    <h3 style="margin: 0 0 15px 0; font-size: 20px;">📱 IMPORTANT FIRST STEP:</h3>
-                    <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.6;">
-                        <strong>Add this app to your home screen</strong> so you can access it like any other app on your phone!
-                    </p>
+                <!-- Scrollable Content -->
+                <div style="overflow-y: auto; padding: 20px; flex: 1;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px;">
+                        <h3 style="margin: 0 0 12px 0; font-size: 18px;">📱 IMPORTANT FIRST STEP:</h3>
+                        <p style="margin: 0 0 15px 0; font-size: 15px; line-height: 1.5;">
+                            <strong>Add this app to your home screen</strong> so you can access it like any other app!
+                        </p>
 
-                    <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 8px; backdrop-filter: blur(10px);">
-                        <h4 style="margin: 0 0 15px 0; font-size: 18px;">📱 For iPhone (Safari):</h4>
-                        <ol style="margin: 0; padding-left: 20px; line-height: 2; font-size: 15px;">
-                            <li>Tap the <strong>Share button ⬆️</strong> at the bottom of Safari</li>
-                            <li>Scroll down in the menu</li>
-                            <li>Tap <strong>"Add to Home Screen"</strong></li>
-                            <li>Tap <strong>"Add"</strong> in the top right</li>
-                        </ol>
-                    </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; backdrop-filter: blur(10px);">
+                            <h4 style="margin: 0 0 10px 0; font-size: 16px;">📱 Quick Steps (iPhone):</h4>
+                            <ol style="margin: 0; padding-left: 20px; line-height: 1.8; font-size: 14px;">
+                                <li>Tap <strong>Share ⬆️</strong> at bottom</li>
+                                <li>Scroll down in menu</li>
+                                <li>Tap <strong>"Add to Home Screen"</strong></li>
+                                <li>Tap <strong>"Add"</strong></li>
+                            </ol>
+                        </div>
 
-                    <div style="margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.15); border-radius: 8px; font-size: 14px;">
-                        <strong>✅ Benefits:</strong>
-                        <ul style="margin: 10px 0 0 0; padding-left: 20px; line-height: 1.8;">
-                            <li>Access app instantly from home screen</li>
-                            <li>Works like a native app</li>
-                            <li>Better notifications and reminders</li>
-                            <li>No need to open Safari each time</li>
-                        </ul>
+                        <div style="margin-top: 12px; padding: 12px; background: rgba(255,255,255,0.15); border-radius: 8px; font-size: 13px;">
+                            <strong>✅ Benefits:</strong>
+                            <ul style="margin: 8px 0 0 0; padding-left: 20px; line-height: 1.6;">
+                                <li>Instant access from home screen</li>
+                                <li>Works like a native app</li>
+                                <li>Better notifications</li>
+                                <li>No Safari needed</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
 
-                <div style="display: flex; gap: 10px; flex-direction: column;">
-                    <button class="btn btn-primary" onclick="closeAddToHomeModal(); showHelpTopic('installation'); showSection('help');" style="width: 100%; padding: 15px; font-size: 16px;">
-                        📖 Show Me Detailed Instructions
+                <!-- Buttons (fixed at bottom) -->
+                <div style="padding: 15px 20px 20px 20px; border-top: 2px solid #e2e8f0; display: flex; flex-direction: column; gap: 10px;">
+                    <button class="btn btn-primary" onclick="closeAddToHomeModal(); showHelpTopic('installation'); showSection('help');" style="width: 100%; padding: 12px; font-size: 15px;">
+                        📖 Detailed Instructions
                     </button>
-                    <button class="btn btn-secondary" onclick="closeAddToHomeModal()" style="width: 100%; padding: 15px; font-size: 16px;">
+                    <button class="btn btn-success" onclick="closeAddToHomeModal()" style="width: 100%; padding: 12px; font-size: 15px;">
                         ✓ I'll Do This Now
                     </button>
-                    <button class="btn" onclick="closeAddToHomeModal(); remindMeLater();" style="width: 100%; padding: 12px; font-size: 14px; background: transparent; color: #718096;">
+                    <button class="btn" onclick="closeAddToHomeModal(); remindMeLater();" style="width: 100%; padding: 10px; font-size: 13px; background: transparent; color: #718096; border: none;">
                         Remind Me Later
                     </button>
                 </div>
@@ -2982,28 +2986,41 @@
                         <!-- Latest Version -->
                         <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #667eea;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                                <h4 style="margin: 0; color: #667eea;">Version 2026-01-30-1638 UTC</h4>
+                                <h4 style="margin: 0; color: #667eea;">Version 2026-01-30-2007 UTC</h4>
                                 <span style="background: #667eea; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">CURRENT</span>
                             </div>
-                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">January 30, 2026 at 4:38 PM - Production Ready Release 🎉</p>
+                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">January 30, 2026 at 8:07 PM</p>
                             <div style="line-height: 1.8;">
-                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px;">✨ New Features:</p>
+                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px;">🐛 Bug Fixes:</p>
                                 <ul style="margin: 5px 0; padding-left: 20px; font-size: 14px;">
-                                    <li><strong>Add to Home Screen Modal</strong> - Shows after first login with step-by-step installation instructions</li>
-                                    <li><strong>Release Notes Section</strong> - View all updates and changes (this section!)</li>
-                                    <li><strong>Installation Help Topic</strong> - Complete guide added to Help section</li>
-                                </ul>
-                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px;">📚 Documentation Updates:</p>
-                                <ul style="margin: 5px 0; padding-left: 20px; font-size: 14px;">
-                                    <li><strong>Voice Commands Reference</strong> - Comprehensive list of 50+ commands</li>
-                                    <li><strong>Profile Settings Guide</strong> - All settings documented</li>
-                                    <li><strong>Expand/Collapse Info</strong> - Added to Getting Started</li>
-                                    <li>Removed "Coming Soon" - all listed features are now live!</li>
+                                    <li>Fixed Add to Home Screen modal size for iPhone</li>
+                                    <li>Made modal content scrollable (was too large for screen)</li>
+                                    <li>Buttons now always visible at bottom</li>
+                                    <li>Reduced padding and font sizes for mobile screens</li>
                                 </ul>
                             </div>
                         </div>
 
                         <!-- Previous Versions -->
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-01-30-1638 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">January 30, 2026 at 4:38 PM - Production Ready Release 🎉</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">✨ New Features:</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Add to Home Screen Modal - Shows after first login</li>
+                                    <li>Release Notes Section - View all updates</li>
+                                    <li>Installation Help Topic - Complete guide</li>
+                                </ul>
+                                <p style="margin: 10px 0 5px 0; font-weight: 600;">📚 Documentation Updates:</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Voice Commands Reference - 50+ commands</li>
+                                    <li>Profile Settings Guide - All settings documented</li>
+                                    <li>Expand/Collapse Info added</li>
+                                </ul>
+                            </div>
+                        </div>
+
                         <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
                             <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-01-30-0346 UTC</h4>
                             <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">January 30, 2026 at 3:46 AM</p>
@@ -3077,10 +3094,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-30-1638 UTC
+                        <strong>App Version:</strong> 2026-01-30-2007 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Production Ready: Help Updated, Installation Modal, Release Notes
+                        Fix: Mobile Modal Size (Scrollable & Buttons Visible)
                     </p>
                 </div>
             </div>
