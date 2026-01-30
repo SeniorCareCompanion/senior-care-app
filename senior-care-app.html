@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-30-0252 UTC - Expand/Collapse Bugfixes + Activities
-    BUILD DATE: January 30, 2026 at 2:52 AM UTC
-    CHANGES: Fixed Appointments/Bills/Contacts expand/collapse + Added Activities expand/collapse + Enhanced debugging
+    VERSION: 2026-01-30-0311 UTC - Toggle Icon ID Fixes
+    BUILD DATE: January 30, 2026 at 3:11 AM UTC
+    CHANGES: Fixed toggle icon IDs for Appointments, Bills, Contacts (added missing prefixes)
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -2675,10 +2675,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-30-0252 UTC
+                        <strong>App Version:</strong> 2026-01-30-0311 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Fix: All Pages Expand/Collapse + Enhanced Debugging
+                        Fix: Toggle Icon IDs (Appointments/Bills/Contacts)
                     </p>
                 </div>
             </div>
@@ -5060,7 +5060,7 @@
             appointments.forEach(appt => {
                 console.log(`  - Processing appt ID: ${appt.id}`);
                 const detailsDiv = document.getElementById(`appt-details-${appt.id}`);
-                const toggleIcon = document.getElementById(`toggle-icon-${appt.id}`);
+                const toggleIcon = document.getElementById(`toggle-icon-appt-${appt.id}`); // FIXED: Added 'appt-'
                 
                 console.log(`    detailsDiv:`, detailsDiv ? 'found' : 'NOT FOUND');
                 console.log(`    toggleIcon:`, toggleIcon ? 'found' : 'NOT FOUND');
@@ -5101,7 +5101,7 @@
             
             appointments.forEach(appt => {
                 const detailsDiv = document.getElementById(`appt-details-${appt.id}`);
-                const toggleIcon = document.getElementById(`toggle-icon-${appt.id}`);
+                const toggleIcon = document.getElementById(`toggle-icon-appt-${appt.id}`); // FIXED: Added 'appt-'
                 
                 if (detailsDiv && toggleIcon) {
                     detailsDiv.style.display = 'none';
@@ -5931,7 +5931,7 @@
             bills.forEach(bill => {
                 console.log(`  - Processing bill ID: ${bill.id}`);
                 const detailsDiv = document.getElementById(`bill-details-${bill.id}`);
-                const toggleIcon = document.getElementById(`toggle-icon-${bill.id}`);
+                const toggleIcon = document.getElementById(`toggle-icon-bill-${bill.id}`); // FIXED: Added 'bill-'
                 
                 console.log(`    detailsDiv:`, detailsDiv ? 'found' : 'NOT FOUND');
                 console.log(`    toggleIcon:`, toggleIcon ? 'found' : 'NOT FOUND');
@@ -5972,7 +5972,7 @@
             
             bills.forEach(bill => {
                 const detailsDiv = document.getElementById(`bill-details-${bill.id}`);
-                const toggleIcon = document.getElementById(`toggle-icon-${bill.id}`);
+                const toggleIcon = document.getElementById(`toggle-icon-bill-${bill.id}`); // FIXED: Added 'bill-'
                 
                 if (detailsDiv && toggleIcon) {
                     detailsDiv.style.display = 'none';
@@ -6224,7 +6224,7 @@
             contacts.forEach(contact => {
                 console.log(`  - Processing contact ID: ${contact.id}`);
                 const detailsDiv = document.getElementById(`contact-details-${contact.id}`);
-                const toggleIcon = document.getElementById(`toggle-icon-${contact.id}`);
+                const toggleIcon = document.getElementById(`toggle-icon-contact-${contact.id}`); // FIXED: Added 'contact-'
                 
                 console.log(`    detailsDiv:`, detailsDiv ? 'found' : 'NOT FOUND');
                 console.log(`    toggleIcon:`, toggleIcon ? 'found' : 'NOT FOUND');
@@ -6265,7 +6265,7 @@
             
             contacts.forEach(contact => {
                 const detailsDiv = document.getElementById(`contact-details-${contact.id}`);
-                const toggleIcon = document.getElementById(`toggle-icon-${contact.id}`);
+                const toggleIcon = document.getElementById(`toggle-icon-contact-${contact.id}`); // FIXED: Added 'contact-'
                 
                 if (detailsDiv && toggleIcon) {
                     detailsDiv.style.display = 'none';
