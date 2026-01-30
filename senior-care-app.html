@@ -4,9 +4,17 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-30-0346 UTC - Verbose Help Toggle
-    BUILD DATE: January 30, 2026 at 3:46 AM UTC
-    CHANGES: Added toggle in Profile to control verbose help messages (short vs. detailed error messages)
+    VERSION: 2026-01-30-1638 UTC - Production Ready Release
+    BUILD DATE: January 30, 2026 at 4:38 PM UTC
+    CHANGES: Complete professional release with Help updates, Installation modal, Release Notes
+    
+    ✨ NEW IN THIS VERSION:
+    - 📱 Add to Home Screen modal (shows after first login)
+    - 📰 Release Notes section in Profile
+    - 📚 Comprehensive Help section update (all features documented)
+    - 🎤 Updated Voice Commands reference (50+ commands)
+    - ⚙️ Documented all Profile settings
+    - 📖 Installation guide added to Help
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -1098,6 +1106,56 @@
             <button class="btn btn-secondary" onclick="showLogin()">Back to Login</button>
         </div>
 
+        <!-- Add to Home Screen Modal (shown after first login) -->
+        <div id="addToHomeModal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;">
+            <div style="background: white; border-radius: 16px; max-width: 500px; width: 100%; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+                <div style="text-align: center; margin-bottom: 25px;">
+                    <div style="font-size: 60px; margin-bottom: 15px;">🎉</div>
+                    <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 26px;">Welcome to Senior Care!</h2>
+                    <p style="color: #718096; font-size: 16px; margin: 0;">Your account is ready to use</p>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 12px; margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 15px 0; font-size: 20px;">📱 IMPORTANT FIRST STEP:</h3>
+                    <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.6;">
+                        <strong>Add this app to your home screen</strong> so you can access it like any other app on your phone!
+                    </p>
+
+                    <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 8px; backdrop-filter: blur(10px);">
+                        <h4 style="margin: 0 0 15px 0; font-size: 18px;">📱 For iPhone (Safari):</h4>
+                        <ol style="margin: 0; padding-left: 20px; line-height: 2; font-size: 15px;">
+                            <li>Tap the <strong>Share button ⬆️</strong> at the bottom of Safari</li>
+                            <li>Scroll down in the menu</li>
+                            <li>Tap <strong>"Add to Home Screen"</strong></li>
+                            <li>Tap <strong>"Add"</strong> in the top right</li>
+                        </ol>
+                    </div>
+
+                    <div style="margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.15); border-radius: 8px; font-size: 14px;">
+                        <strong>✅ Benefits:</strong>
+                        <ul style="margin: 10px 0 0 0; padding-left: 20px; line-height: 1.8;">
+                            <li>Access app instantly from home screen</li>
+                            <li>Works like a native app</li>
+                            <li>Better notifications and reminders</li>
+                            <li>No need to open Safari each time</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; flex-direction: column;">
+                    <button class="btn btn-primary" onclick="closeAddToHomeModal(); showHelpTopic('installation'); showSection('help');" style="width: 100%; padding: 15px; font-size: 16px;">
+                        📖 Show Me Detailed Instructions
+                    </button>
+                    <button class="btn btn-secondary" onclick="closeAddToHomeModal()" style="width: 100%; padding: 15px; font-size: 16px;">
+                        ✓ I'll Do This Now
+                    </button>
+                    <button class="btn" onclick="closeAddToHomeModal(); remindMeLater();" style="width: 100%; padding: 12px; font-size: 14px; background: transparent; color: #718096;">
+                        Remind Me Later
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Main App -->
         <div id="mainApp" class="hidden">
             <div class="app-header">
@@ -1761,6 +1819,10 @@
                                     <strong>🚀 Getting Started</strong><br>
                                     <span style="font-size: 14px; color: #666;">First time using the app? Start here!</span>
                                 </div>
+                                <div onclick="showHelpTopic('installation')" style="padding: 12px; margin: 5px 0; background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); border-radius: 8px; cursor: pointer; border-left: 4px solid #667eea;">
+                                    <strong>📱 Add to Home Screen</strong><br>
+                                    <span style="font-size: 14px; color: #666;">Install the app on your iPhone for best experience</span>
+                                </div>
                                 <div onclick="showHelpTopic('medications')" style="padding: 12px; margin: 5px 0; background: #f7fafc; border-radius: 8px; cursor: pointer; border-left: 4px solid #9f7aea;">
                                     <strong>💊 Medications</strong><br>
                                     <span style="font-size: 14px; color: #666;">Add, track, and manage medications</span>
@@ -1816,18 +1878,21 @@
                                 
                                 <h3>📱 Your First Steps:</h3>
                                 <ol style="line-height: 2;">
+                                    <li><strong>Add to Home Screen:</strong> Follow the Installation guide (most important first step!)</li>
                                     <li><strong>Home Screen:</strong> See today's overview - medications to take, upcoming appointments, tasks to complete</li>
                                     <li><strong>Navigation Tabs:</strong> Tap the tabs at the top to switch between sections (Meds, Appts, Tasks, etc.)</li>
                                     <li><strong>Add Your First Item:</strong> Go to any section and fill in the form at the bottom</li>
                                     <li><strong>Set Reminders:</strong> Check the "Enable Reminder" box to get notifications</li>
-                                    <li><strong>Minimize Cards:</strong> Click the ▲ button to collapse items you don't need to see</li>
+                                    <li><strong>Use Expand/Collapse:</strong> Each page has "Expand All" and "Collapse All" buttons at the top</li>
                                 </ol>
 
                                 <h3>🎯 Quick Tips:</h3>
                                 <ul style="line-height: 2;">
+                                    <li>📱 <strong>Add to home screen</strong> for best experience (see Installation guide)</li>
                                     <li>🔔 <strong>Enable notifications</strong> in your Profile to never miss a reminder</li>
                                     <li>🎤 <strong>Turn on Voice Assistant</strong> in Profile to use voice commands</li>
                                     <li>💾 <strong>Backup your data</strong> regularly using Export Data in Profile</li>
+                                    <li>🔼 <strong>Use Expand/Collapse All</strong> buttons to show/hide all cards at once</li>
                                     <li>❓ <strong>Use this Help tab</strong> anytime you need assistance</li>
                                 </ul>
 
@@ -1840,10 +1905,116 @@
                                     <li>🎉 = Activities</li>
                                     <li>📞 = Contacts</li>
                                     <li>🔔 = Reminder is ON</li>
-                                    <li>▼ = Click to expand</li>
-                                    <li>▲ = Click to minimize</li>
-                                    <li>✓ = Completed</li>
+                                    <li>▼ = Click to expand (collapsed)</li>
+                                    <li>▲ = Click to minimize (expanded)</li>
+                                    <li>▲ Expand All = Show all cards</li>
+                                    <li>▼ Collapse All = Hide all cards</li>
+                                    <li>✓ = Completed/Taken/Paid</li>
                                 </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Installation / Add to Home Screen Topic -->
+                    <div id="help-installation" class="help-topic-section hidden">
+                        <button class="btn" onclick="showHelpTopic('all-topics')" style="margin-bottom: 15px;">
+                            ← Back to All Topics
+                        </button>
+                        <div class="card">
+                            <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                                📱 Add to Home Screen - Installation Guide
+                            </div>
+                            <div class="card-content" style="line-height: 1.8; font-size: 16px;">
+                                <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid #667eea;">
+                                    <h3 style="margin-top: 0;">🌟 Why Add to Home Screen?</h3>
+                                    <p><strong>This is the #1 most important step!</strong> Adding the app to your home screen makes it work like a real app on your phone.</p>
+                                    <ul style="line-height: 2;">
+                                        <li>✅ Access instantly from home screen (no Safari needed)</li>
+                                        <li>✅ Works like a native app</li>
+                                        <li>✅ Better notifications and reminders</li>
+                                        <li>✅ Faster loading and performance</li>
+                                        <li>✅ No browser bars taking up space</li>
+                                    </ul>
+                                </div>
+
+                                <h3>📱 For iPhone Users (Safari):</h3>
+                                <div style="background: #f7fafc; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 2px solid #cbd5e0;">
+                                    <h4 style="color: #667eea; margin-top: 0;">Step-by-Step Instructions:</h4>
+                                    <ol style="line-height: 2.5; font-size: 16px;">
+                                        <li style="margin-bottom: 15px;">
+                                            <strong>Open Safari</strong> (this app MUST be opened in Safari, not Chrome)
+                                            <div style="background: #fff3cd; padding: 10px; margin-top: 8px; border-radius: 6px; font-size: 14px;">
+                                                ⚠️ Important: If you're using Chrome or another browser, copy the URL and open it in Safari first!
+                                            </div>
+                                        </li>
+                                        <li style="margin-bottom: 15px;">
+                                            <strong>Tap the Share button ⬆️</strong> at the bottom of Safari
+                                            <div style="margin-top: 8px; font-size: 14px; color: #666;">
+                                                (It looks like a box with an arrow pointing up)
+                                            </div>
+                                        </li>
+                                        <li style="margin-bottom: 15px;">
+                                            <strong>Scroll down</strong> in the menu that appears
+                                        </li>
+                                        <li style="margin-bottom: 15px;">
+                                            <strong>Tap "Add to Home Screen"</strong>
+                                            <div style="margin-top: 8px; font-size: 14px; color: #666;">
+                                                (You might need to scroll to find it)
+                                            </div>
+                                        </li>
+                                        <li style="margin-bottom: 15px;">
+                                            <strong>Tap "Add"</strong> in the top right corner
+                                        </li>
+                                        <li>
+                                            <strong>Done! 🎉</strong> The app icon will appear on your home screen
+                                        </li>
+                                    </ol>
+                                </div>
+
+                                <div style="background: #e6fffa; padding: 20px; border-radius: 12px; border-left: 4px solid #38b2ac; margin-bottom: 20px;">
+                                    <h4 style="margin-top: 0; color: #38b2ac;">💡 Pro Tips:</h4>
+                                    <ul style="line-height: 2;">
+                                        <li><strong>Move the icon:</strong> Long-press the app icon and drag it to your desired location</li>
+                                        <li><strong>Create a folder:</strong> Drag the app icon onto another app to create a folder</li>
+                                        <li><strong>Delete and reinstall:</strong> If you ever want to remove it, long-press the icon and tap "Remove App", then add it back anytime</li>
+                                        <li><strong>Works offline:</strong> Once installed, the app will load even without internet (your data is saved locally)</li>
+                                    </ul>
+                                </div>
+
+                                <h3>🔧 Troubleshooting:</h3>
+                                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                                    <h4 style="margin-top: 0;">Don't see "Add to Home Screen" option?</h4>
+                                    <ol style="line-height: 2;">
+                                        <li><strong>Make sure you're in Safari</strong> (not Chrome, Firefox, or another browser)</li>
+                                        <li><strong>Update Safari:</strong> Make sure your iPhone is running the latest iOS version</li>
+                                        <li><strong>Scroll in the Share menu:</strong> The option might be hidden below - scroll down!</li>
+                                        <li><strong>Enable JavaScript:</strong> Go to iPhone Settings → Safari → Advanced → Enable JavaScript</li>
+                                    </ol>
+                                </div>
+
+                                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                                    <h4 style="margin-top: 0;">App icon disappeared from home screen?</h4>
+                                    <ol style="line-height: 2;">
+                                        <li><strong>Search for it:</strong> Swipe down on home screen and type "Senior Care"</li>
+                                        <li><strong>Check App Library:</strong> Swipe left past your last home screen page</li>
+                                        <li><strong>Re-add it:</strong> If lost, just follow the installation steps again</li>
+                                    </ol>
+                                </div>
+
+                                <h3>🤔 Frequently Asked Questions:</h3>
+                                <div style="background: #f7fafc; padding: 15px; border-radius: 8px;">
+                                    <p style="margin-top: 0;"><strong>Q: Will I lose my data if I delete the icon?</strong></p>
+                                    <p style="margin-bottom: 20px;">A: No! Your data is stored in Safari's storage, not in the icon. Deleting and re-adding the icon won't affect your data.</p>
+
+                                    <p><strong>Q: Can I use this on Android?</strong></p>
+                                    <p style="margin-bottom: 20px;">A: Yes! In Chrome on Android, tap the menu (⋮) → "Add to Home screen"</p>
+
+                                    <p><strong>Q: Do I need an app store account?</strong></p>
+                                    <p style="margin-bottom: 20px;">A: No! This is a web app, so no App Store needed. Just add directly to your home screen.</p>
+
+                                    <p><strong>Q: Will it use my phone's storage?</strong></p>
+                                    <p style="margin-bottom: 0;">A: Very minimal storage (just a few MB for the icon and your data).</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1936,75 +2107,165 @@
                                     <li>Say "yes" to confirm actions</li>
                                 </ol>
 
-                                <h3>🗣️ Voice Commands You Can Use:</h3>
+                                <h3>🗣️ Complete Voice Commands Reference:</h3>
                                 
-                                <h4>💊 Add Medications:</h4>
-                                <ul style="line-height: 2;">
-                                    <li><strong>"Add medication Aspirin 81mg at 8 AM"</strong></li>
-                                    <li>"Add medication" (app will ask for details)</li>
-                                    <li>App will confirm before adding</li>
-                                    <li>Say "yes" to confirm or "no" to cancel</li>
-                                </ul>
-                                <p style="margin: 10px 0; padding: 10px; background: #e6fffa; border-left: 4px solid #38b2ac; border-radius: 4px; font-size: 15px;">
-                                    <strong>Example:</strong><br>
-                                    You: "Add medication Aspirin 81 milligrams at 8 AM"<br>
-                                    App: "I will add Aspirin 81mg at 8:00 AM daily. Is this correct?"<br>
-                                    You: "Yes"<br>
-                                    App: "Added Aspirin 81mg at 8:00 AM"
-                                </p>
+                                <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #38b2ac;">
+                                    <p style="margin: 0; font-weight: 600;">✨ Over 50+ voice commands available! The app uses advanced fuzzy matching and phonetic recognition, so it understands many variations of each command.</p>
+                                </div>
 
-                                <h4>✓ Mark as Taken:</h4>
-                                <ul style="line-height: 2;">
-                                    <li><strong>"Mark Aspirin as taken"</strong></li>
-                                    <li>"Mark taken" (app will ask which one)</li>
-                                    <li>App will confirm before marking</li>
-                                </ul>
-                                <p style="margin: 10px 0; padding: 10px; background: #e6fffa; border-left: 4px solid #38b2ac; border-radius: 4px; font-size: 15px;">
-                                    <strong>Example:</strong><br>
-                                    You: "Mark Aspirin as taken"<br>
-                                    App: "Mark Aspirin as taken? Say yes to confirm."<br>
-                                    You: "Yes"<br>
-                                    App: "Marked Aspirin as taken"
-                                </p>
+                                <h4>💊 Medication Commands:</h4>
+                                <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                                    <p style="margin-top: 0; font-weight: 600;">✅ Mark as Taken:</p>
+                                    <ul style="line-height: 2;">
+                                        <li>"Mark Aspirin as taken"</li>
+                                        <li>"Medication Aspirin taken"</li>
+                                        <li>"I took my Aspirin"</li>
+                                        <li>"Aspirin done"</li>
+                                    </ul>
+                                    
+                                    <p style="font-weight: 600;">❌ Delete Medication:</p>
+                                    <ul style="line-height: 2;">
+                                        <li>"Delete medication Aspirin"</li>
+                                        <li>"Remove Aspirin"</li>
+                                        <li>"Delete my Aspirin"</li>
+                                    </ul>
+                                    
+                                    <p style="font-weight: 600;">➕ Add Medication:</p>
+                                    <ul style="line-height: 2;">
+                                        <li>"Add medication Aspirin 81mg at 8 AM"</li>
+                                        <li>"Add medication" (app will ask for details)</li>
+                                    </ul>
+                                </div>
 
-                                <h4>📞 Call Contacts:</h4>
-                                <ul style="line-height: 2;">
-                                    <li><strong>"Call Cathy"</strong></li>
-                                    <li>"Call my daughter"</li>
-                                    <li>"Phone John"</li>
-                                    <li>App will confirm before calling</li>
-                                </ul>
-                                <p style="margin: 10px 0; padding: 10px; background: #e6fffa; border-left: 4px solid #38b2ac; border-radius: 4px; font-size: 15px;">
-                                    <strong>Example:</strong><br>
-                                    You: "Call Cathy"<br>
-                                    App: "Call Cathy at 555-123-4567? Say yes to confirm."<br>
-                                    You: "Yes"<br>
-                                    App: "Calling Cathy" (phone starts dialing)
-                                </p>
+                                <h4>📅 Appointment Commands:</h4>
+                                <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                                    <p style="margin-top: 0; font-weight: 600;">✅ Mark as Complete:</p>
+                                    <ul style="line-height: 2;">
+                                        <li>"Mark appointment done"</li>
+                                        <li>"Appointment complete"</li>
+                                        <li>"Mark Dentist appointment complete"</li>
+                                    </ul>
+                                    
+                                    <p style="font-weight: 600;">❌ Delete Appointment:</p>
+                                    <ul style="line-height: 2;">
+                                        <li>"Delete appointment"</li>
+                                        <li>"Remove Dentist appointment"</li>
+                                        <li>"Cancel appointment"</li>
+                                    </ul>
+                                </div>
 
-                                <h4>🧭 Navigation:</h4>
-                                <ul style="line-height: 2;">
-                                    <li>"Go to medications"</li>
-                                    <li>"Show my appointments"</li>
-                                    <li>"Open tasks"</li>
-                                    <li>"Go to activities"</li>
-                                    <li>"Show contacts"</li>
-                                    <li>"Take me home"</li>
-                                </ul>
+                                <h4>✅ Task Commands:</h4>
+                                <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                                    <p style="margin-top: 0; font-weight: 600;">✅ Mark as Done:</p>
+                                    <ul style="line-height: 2;">
+                                        <li>"Task Laundry done"</li>
+                                        <li>"Mark Laundry as done"</li>
+                                        <li>"I finished Laundry"</li>
+                                        <li>"Complete task Laundry"</li>
+                                    </ul>
+                                    
+                                    <p style="font-weight: 600;">❌ Delete Task:</p>
+                                    <ul style="line-height: 2;">
+                                        <li>"Delete task Laundry"</li>
+                                        <li>"Remove Laundry task"</li>
+                                        <li>"Delete Laundry"</li>
+                                    </ul>
+                                </div>
 
-                                <h4>❓ Getting Help:</h4>
-                                <ul style="line-height: 2;">
-                                    <li>"How do I add a medication?"</li>
-                                    <li>"Help with reminders"</li>
-                                    <li>"How do I add an appointment?"</li>
-                                    <li>"Help with voice commands"</li>
-                                </ul>
+                                <h4>💰 Bill Commands:</h4>
+                                <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                                    <p style="margin-top: 0; font-weight: 600;">✅ Mark as Paid:</p>
+                                    <ul style="line-height: 2;">
+                                        <li>"Bill Electric paid"</li>
+                                        <li>"Mark Electric bill as paid"</li>
+                                        <li>"I paid the Electric bill"</li>
+                                        <li>"Electric bill done"</li>
+                                    </ul>
+                                    
+                                    <p style="font-weight: 600;">❌ Delete Bill:</p>
+                                    <ul style="line-height: 2;">
+                                        <li>"Delete bill Electric"</li>
+                                        <li>"Remove Electric bill"</li>
+                                        <li>"Delete Electric"</li>
+                                    </ul>
+                                </div>
 
-                                <h4>📖 Reading Content:</h4>
-                                <ul style="line-height: 2;">
-                                    <li>"Read this to me"</li>
-                                    <li>"Read the page"</li>
-                                </ul>
+                                <h4>🎉 Activity Commands:</h4>
+                                <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                                    <p style="margin-top: 0; font-weight: 600;">✅ Mark as Done:</p>
+                                    <ul style="line-height: 2;">
+                                        <li>"Activity Bingo done"</li>
+                                        <li>"Mark Bingo as done"</li>
+                                        <li>"I finished Bingo"</li>
+                                    </ul>
+                                    
+                                    <p style="font-weight: 600;">❌ Delete Activity:</p>
+                                    <ul style="line-height: 2;">
+                                        <li>"Delete activity Bingo"</li>
+                                        <li>"Remove Bingo"</li>
+                                    </ul>
+                                </div>
+
+                                <h4>📞 Contact Commands:</h4>
+                                <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                                    <p style="margin-top: 0; font-weight: 600;">📞 Call Contact:</p>
+                                    <ul style="line-height: 2;">
+                                        <li>"Call Cathy"</li>
+                                        <li>"Phone my daughter"</li>
+                                        <li>"Call John"</li>
+                                        <li>"Dial Bob"</li>
+                                    </ul>
+                                    
+                                    <p style="font-weight: 600;">➕ Add Contact:</p>
+                                    <ul style="line-height: 2;">
+                                        <li>"Add contact Sarah"</li>
+                                        <li>"Create new contact"</li>
+                                    </ul>
+                                    
+                                    <p style="font-weight: 600;">❌ Delete Contact:</p>
+                                    <ul style="line-height: 2;">
+                                        <li>"Delete contact Bob"</li>
+                                        <li>"Remove Bob"</li>
+                                    </ul>
+                                </div>
+
+                                <h4>🧭 Navigation Commands:</h4>
+                                <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                                    <ul style="line-height: 2; margin: 0;">
+                                        <li>"Go to medications" / "Show meds"</li>
+                                        <li>"Go to appointments" / "Show appointments"</li>
+                                        <li>"Go to tasks" / "Open tasks"</li>
+                                        <li>"Go to bills" / "Show bills"</li>
+                                        <li>"Go to activities" / "Show activities"</li>
+                                        <li>"Go to contacts" / "Show contacts"</li>
+                                        <li>"Go to profile" / "Open profile"</li>
+                                        <li>"Go to help" / "Show help"</li>
+                                        <li>"Go home" / "Take me home"</li>
+                                    </ul>
+                                </div>
+
+                                <h4>❓ Help & Information Commands:</h4>
+                                <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                                    <ul style="line-height: 2; margin: 0;">
+                                        <li>"Help" / "I need help"</li>
+                                        <li>"How do I add a medication?"</li>
+                                        <li>"How do I add an appointment?"</li>
+                                        <li>"Help with reminders"</li>
+                                        <li>"Help with voice commands"</li>
+                                        <li>"Read this to me" / "Read the page"</li>
+                                    </ul>
+                                </div>
+
+                                <h3>🎯 Understanding Confirmations:</h3>
+                                <div style="background: #e6fffa; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #38b2ac;">
+                                    <p style="margin-top: 0;"><strong>The app recognizes 25+ ways to say YES and NO!</strong></p>
+                                    
+                                    <p style="font-weight: 600; margin-bottom: 5px;">✅ YES variations:</p>
+                                    <p style="margin: 0 0 15px 0; font-size: 14px;">yes, yeah, yep, yup, sure, ok, okay, confirm, correct, right, affirmative, go, do it, proceed, uh-huh, absolutely, definitely, indeed, please, continue, accept</p>
+                                    
+                                    <p style="font-weight: 600; margin-bottom: 5px;">❌ NO variations:</p>
+                                    <p style="margin: 0; font-size: 14px;">no, nope, nah, cancel, stop, don't, never, negative, nevermind, decline, reject, no way, not now, abort</p>
+                                </div>
 
                                 <h3>🎯 How Voice Commands Work:</h3>
                                 <p><strong>Smart Parsing:</strong> The app tries to understand everything you say in one command.</p>
@@ -2039,16 +2300,38 @@
                                     <li>Voice assistant always confirms before taking actions</li>
                                     <li>You can say "cancel" or "no" at any time</li>
                                     <li>Works best in quiet environments</li>
-                                    <li>Some features may require multiple steps</li>
+                                    <li>Uses fuzzy and phonetic matching to understand variations</li>
                                 </ul>
 
-                                <h3>🚀 Coming Soon:</h3>
-                                <ul style="line-height: 2;">
-                                    <li>Add appointments by voice</li>
-                                    <li>Add tasks by voice</li>
-                                    <li>Delete items by voice</li>
-                                    <li>List and query items by voice</li>
-                                </ul>
+                                <h3>⚙️ Voice Assistant Settings:</h3>
+                                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #ffc107;">
+                                    <p style="margin-top: 0; font-weight: 600;">📍 Found in: Profile → Voice Settings</p>
+                                    
+                                    <p style="font-weight: 600; margin-bottom: 5px;">🔊 Voice Announcements:</p>
+                                    <p style="margin: 0 0 15px 0; font-size: 14px;">Turn voice feedback on/off (confirmations and responses)</p>
+                                    
+                                    <p style="font-weight: 600; margin-bottom: 5px;">🔄 Auto-Enable Voice on Login:</p>
+                                    <p style="margin: 0 0 15px 0; font-size: 14px;">Automatically turn voice ON when you log in</p>
+                                    
+                                    <p style="font-weight: 600; margin-bottom: 5px;">💬 Verbose Help Messages:</p>
+                                    <p style="margin: 0 0 10px 0; font-size: 14px;">Control error message verbosity:</p>
+                                    <ul style="margin: 0 0 0 20px; font-size: 14px; line-height: 1.8;">
+                                        <li><strong>ON:</strong> "I didn't understand 'X'. Try saying 'Medication Aspirin Taken'..." (detailed with examples)</li>
+                                        <li><strong>OFF:</strong> "I didn't understand 'X'" (short and simple)</li>
+                                    </ul>
+                                </div>
+
+                                <h3>🔍 Advanced Features:</h3>
+                                <div style="background: #e6fffa; padding: 15px; border-radius: 8px; border-left: 4px solid #38b2ac;">
+                                    <p style="margin-top: 0; font-weight: 600;">Fuzzy & Phonetic Matching:</p>
+                                    <p style="margin: 0 0 10px 0; font-size: 14px;">The app uses Soundex algorithm to match similar-sounding words. This means:</p>
+                                    <ul style="margin: 0 0 10px 0; font-size: 14px; line-height: 1.8;">
+                                        <li>"Asprin" will match "Aspirin"</li>
+                                        <li>"Jon" will match "John"</li>
+                                        <li>"Lantry" will match "Laundry"</li>
+                                    </ul>
+                                    <p style="margin: 0; font-size: 14px; font-style: italic;">No need to pronounce things perfectly!</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2686,13 +2969,118 @@
                     </div>
                 </div>
                 
+                <!-- Release Notes / What's New -->
+                <div class="card" style="margin-top: 30px;">
+                    <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;" onclick="toggleProfileCard('releaseNotes')">
+                        <span>📰 Release Notes & What's New</span>
+                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: rgba(255,255,255,0.2); color: white;" title="Expand/Collapse" onclick="toggleProfileCard('releaseNotes'); event.stopPropagation();">
+                            <span id="toggle-icon-releaseNotes">▲</span>
+                        </button>
+                    </div>
+                    <div id="profileCard-releaseNotes" class="card-content" style="max-height: 600px; overflow-y: auto;">
+                        
+                        <!-- Latest Version -->
+                        <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #667eea;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                                <h4 style="margin: 0; color: #667eea;">Version 2026-01-30-1638 UTC</h4>
+                                <span style="background: #667eea; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">CURRENT</span>
+                            </div>
+                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">January 30, 2026 at 4:38 PM - Production Ready Release 🎉</p>
+                            <div style="line-height: 1.8;">
+                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px;">✨ New Features:</p>
+                                <ul style="margin: 5px 0; padding-left: 20px; font-size: 14px;">
+                                    <li><strong>Add to Home Screen Modal</strong> - Shows after first login with step-by-step installation instructions</li>
+                                    <li><strong>Release Notes Section</strong> - View all updates and changes (this section!)</li>
+                                    <li><strong>Installation Help Topic</strong> - Complete guide added to Help section</li>
+                                </ul>
+                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px;">📚 Documentation Updates:</p>
+                                <ul style="margin: 5px 0; padding-left: 20px; font-size: 14px;">
+                                    <li><strong>Voice Commands Reference</strong> - Comprehensive list of 50+ commands</li>
+                                    <li><strong>Profile Settings Guide</strong> - All settings documented</li>
+                                    <li><strong>Expand/Collapse Info</strong> - Added to Getting Started</li>
+                                    <li>Removed "Coming Soon" - all listed features are now live!</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Previous Versions -->
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-01-30-0346 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">January 30, 2026 at 3:46 AM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">✨ New Features:</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Added Verbose Help Toggle in Profile → Voice Settings</li>
+                                    <li>Choose between short or detailed voice error messages</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-01-30-0311 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">January 30, 2026 at 3:11 AM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">🐛 Bug Fixes:</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Fixed Expand/Collapse All for Appointments, Bills, Contacts</li>
+                                    <li>Corrected toggle icon IDs (added missing prefixes)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-01-29-2230 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">January 29, 2026 at 10:30 PM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">✨ New Features:</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Added Expand All / Collapse All buttons to every page</li>
+                                    <li>Unified UX across Medications, Appointments, Tasks, Bills, Activities, Contacts, Profile</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-01-29-1931 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">January 29, 2026 at 7:31 PM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">🔧 Improvements:</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Enhanced Yes/No recognition with 25+ variations</li>
+                                    <li>Added phonetic matching for voice confirmations</li>
+                                    <li>Improved voice command accuracy</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-01-29-1819 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">January 29, 2026 at 6:19 PM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">🐛 Bug Fixes:</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Fixed voice commands for Tasks (mark done, delete)</li>
+                                    <li>Resolved category+index handling for task operations</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- View More -->
+                        <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #e2e8f0;">
+                            <p style="margin: 0; font-size: 13px; color: #718096;">
+                                <strong>Note:</strong> These are the most recent updates. The app is actively maintained and improved based on user feedback.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-30-0346 UTC
+                        <strong>App Version:</strong> 2026-01-30-1638 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Feature: Verbose Help Toggle (Short vs Detailed Errors)
+                        Production Ready: Help Updated, Installation Modal, Release Notes
                     </p>
                 </div>
             </div>
@@ -3530,6 +3918,9 @@
             speak(`Welcome back, ${users[username].name}`);
             startReminderChecker(); // Start checking for reminders
             
+            // Check if we should show "Add to Home Screen" modal
+            checkAndShowAddToHomeModal();
+            
             // Check if backup reminder is due (after a short delay to let app load)
             setTimeout(() => {
                 checkBackupReminder();
@@ -3554,6 +3945,42 @@
             document.getElementById('loginUsername').value = '';
             document.getElementById('loginPassword').value = '';
             speak('Logged out successfully');
+        }
+
+        // Add to Home Screen Modal Functions
+        function showAddToHomeModal() {
+            document.getElementById('addToHomeModal').classList.remove('hidden');
+        }
+
+        function closeAddToHomeModal() {
+            document.getElementById('addToHomeModal').classList.add('hidden');
+            
+            // Mark as shown so we don't show it again
+            const users = loadData('users');
+            if (users && users[currentUser]) {
+                users[currentUser].hasSeenAddToHomeModal = true;
+                saveData('users', users);
+            }
+        }
+
+        function remindMeLater() {
+            // Don't mark as permanently seen, so it shows next login
+            speak('Reminder set. You can add to home screen anytime from Profile.');
+        }
+
+        function checkAndShowAddToHomeModal() {
+            const users = loadData('users');
+            if (users && users[currentUser]) {
+                const hasSeenModal = users[currentUser].hasSeenAddToHomeModal;
+                
+                // Show modal if user hasn't seen it before
+                if (!hasSeenModal) {
+                    // Delay slightly so user sees the main app first
+                    setTimeout(() => {
+                        showAddToHomeModal();
+                    }, 1000);
+                }
+            }
         }
 
         // Forgot Password Functions
@@ -6878,7 +7305,7 @@
         // Initialize profile cards from saved state
         function initializeProfileCards() {
             const minimizedProfile = JSON.parse(localStorage.getItem('minimizedProfile') || '{}');
-            const cardKeys = ['personalInfo', 'voiceSettings', 'notifications', 'dataManagement', 'updateProfile', 'changePassword'];
+            const cardKeys = ['personalInfo', 'voiceSettings', 'notifications', 'dataManagement', 'releaseNotes', 'updateProfile', 'changePassword'];
             
             cardKeys.forEach(cardKey => {
                 const contentDiv = document.getElementById(`profileCard-${cardKey}`);
@@ -6893,7 +7320,7 @@
 
         // Expand all profile cards
         function expandAllProfileCards() {
-            const cardKeys = ['personalInfo', 'voiceSettings', 'notifications', 'dataManagement', 'updateProfile', 'changePassword'];
+            const cardKeys = ['personalInfo', 'voiceSettings', 'notifications', 'dataManagement', 'releaseNotes', 'updateProfile', 'changePassword'];
             const minimizedProfile = {};
             
             cardKeys.forEach(cardKey => {
@@ -6914,7 +7341,7 @@
 
         // Collapse all profile cards
         function collapseAllProfileCards() {
-            const cardKeys = ['personalInfo', 'voiceSettings', 'notifications', 'dataManagement', 'updateProfile', 'changePassword'];
+            const cardKeys = ['personalInfo', 'voiceSettings', 'notifications', 'dataManagement', 'releaseNotes', 'updateProfile', 'changePassword'];
             const minimizedProfile = {};
             
             cardKeys.forEach(cardKey => {
