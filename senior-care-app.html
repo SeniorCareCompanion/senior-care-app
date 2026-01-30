@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-30-0311 UTC - Toggle Icon ID Fixes
-    BUILD DATE: January 30, 2026 at 3:11 AM UTC
-    CHANGES: Fixed toggle icon IDs for Appointments, Bills, Contacts (added missing prefixes)
+    VERSION: 2026-01-30-0346 UTC - Verbose Help Toggle
+    BUILD DATE: January 30, 2026 at 3:46 AM UTC
+    CHANGES: Added toggle in Profile to control verbose help messages (short vs. detailed error messages)
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -2520,6 +2520,20 @@
                                 📖 View Full Voice Commands Guide
                             </button>
                         </div>
+
+                        <hr style="margin: 20px 0; border: none; border-top: 2px solid #e9ecef;">
+
+                        <h4 style="margin: 0 0 10px 0;">💬 Voice Error Messages</h4>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 2px solid #e9ecef;">
+                            <label class="reminder-checkbox" style="margin: 0; cursor: pointer;">
+                                <input type="checkbox" id="verboseHelpEnabled" onchange="saveVerboseHelpPreference()" style="width: 20px; height: 20px; margin: 0;">
+                                <span style="font-size: 15px;">📚 Show detailed help when command not understood</span>
+                            </label>
+                            <p style="margin: 10px 0 0 30px; font-size: 13px; color: #6c757d;">
+                                <strong>When OFF:</strong> "I didn't understand that"<br>
+                                <strong>When ON:</strong> "I didn't understand 'X'. Try saying 'Medication Aspirin Taken', 'Task Laundry Done'..." (with examples)
+                            </p>
+                        </div>
                     </div>
                 </div>
 
@@ -2675,10 +2689,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-30-0311 UTC
+                        <strong>App Version:</strong> 2026-01-30-0346 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Fix: Toggle Icon IDs (Appointments/Bills/Contacts)
+                        Feature: Verbose Help Toggle (Short vs Detailed Errors)
                     </p>
                 </div>
             </div>
@@ -3362,6 +3376,39 @@
                     }
                 }
             }
+        }
+
+        // Verbose help preference functions
+        function saveVerboseHelpPreference() {
+            const verboseEnabled = document.getElementById('verboseHelpEnabled').checked;
+            const users = loadData('users');
+            if (users && users[currentUser]) {
+                users[currentUser].verboseHelpEnabled = verboseEnabled;
+                saveData('users', users);
+                
+                if (verboseEnabled) {
+                    speak('Detailed help messages enabled');
+                } else {
+                    speak('Detailed help messages disabled. You will only hear short error messages.');
+                }
+            }
+        }
+
+        function loadVerboseHelpPreference() {
+            const users = loadData('users');
+            if (users && users[currentUser]) {
+                // Default to true (verbose help ON by default for better UX)
+                const verboseEnabled = users[currentUser].verboseHelpEnabled !== undefined ? users[currentUser].verboseHelpEnabled : true;
+                
+                // Set checkbox state
+                const checkbox = document.getElementById('verboseHelpEnabled');
+                if (checkbox) {
+                    checkbox.checked = verboseEnabled;
+                }
+                
+                return verboseEnabled;
+            }
+            return true; // Default to verbose help enabled
         }
 
         // Storage functions
@@ -6795,6 +6842,9 @@
             // Load voice preference checkbox state
             loadVoicePreference();
             
+            // Load verbose help preference checkbox state
+            loadVerboseHelpPreference();
+            
             // Load backup reminder settings
             loadBackupReminderSettings();
             
@@ -7997,7 +8047,21 @@
                 console.log('❌ Command not understood');
                 console.log('❌ Detected section:', detectedSection);
                 console.log('❌ Lower command:', lowerCommand);
-                speak(`I didn't understand "${command}". Try saying "Medication Aspirin Taken", "Task Laundry Done", "Bill Electric Paid", or "Delete Contact Bob"`);
+                
+                // Check if user wants verbose help messages
+                const users = loadData('users');
+                const verboseHelpEnabled = users && users[currentUser] && users[currentUser].verboseHelpEnabled !== undefined 
+                    ? users[currentUser].verboseHelpEnabled 
+                    : true; // Default to verbose help enabled
+                
+                if (verboseHelpEnabled) {
+                    // Verbose message with examples
+                    speak(`I didn't understand "${command}". Try saying "Medication Aspirin Taken", "Task Laundry Done", "Bill Electric Paid", or "Delete Contact Bob"`);
+                } else {
+                    // Short message
+                    speak(`I didn't understand "${command}"`);
+                }
+                
                 stopVoiceListening();
             }
             
