@@ -4,15 +4,25 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-05-0047 UTC - Automatic Updates Info Added
-    BUILD DATE: February 5, 2026 at 12:47 AM UTC
-    CHANGES: Added automatic update information in 3 locations for seniors
+    VERSION: 2026-02-05-1703 UTC - Critical Bug Fixes (3 Builds)
+    BUILD DATE: February 5, 2026 at 5:03 PM UTC
+    CHANGES: Fixed 3 critical bugs in separate builds for testing
     
-    ✨ NEW IN THIS VERSION:
-    - 📱 Added "Updates Automatically" note to installation modal
-    - 📚 Added automatic updates to Help Installation Pro Tips
-    - 🔄 Added "How Updates Work" section to Profile Release Notes
-    - ✅ Seniors now know they just need to logout/login for updates
+    ✨ BUILD 1: Tasks Auto-Refresh Daily
+    - Added date tracking to tasks (lastCompletedDate)
+    - Tasks now automatically reset each day
+    - Works like medications - no manual unchecking needed
+    
+    ✨ BUILD 2: Multi-Dose Medication Buttons
+    - Added individual "Mark as Taken" buttons for each dose
+    - Users can now manually mark each dose in multi-dose medications
+    - Voice feedback for each dose marked
+    
+    ✨ BUILD 3: Session Persistence (No More Logout After Sleep)
+    - User session now persists in localStorage
+    - App stays logged in when iPhone sleeps
+    - Notifications continue working after sleep/wake
+    - Auto-restores session on page reload
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -3072,32 +3082,67 @@
                         <!-- Latest Version -->
                         <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #667eea;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-05-0047 UTC</h4>
+                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-05-1703 UTC</h4>
                                 <span style="background: #667eea; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">CURRENT</span>
                             </div>
-                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 5, 2026 at 12:47 AM</p>
+                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 5, 2026 at 5:03 PM - Critical Bug Fixes 🔧</p>
                             <div style="line-height: 1.8;">
-                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px;">✨ New Features:</p>
-                                <ul style="margin: 5px 0; padding-left: 20px; font-size: 14px;">
-                                    <li>Added automatic updates information in 3 locations</li>
-                                    <li>Modal now shows "Updates Automatically" note</li>
-                                    <li>Help Installation has automatic updates in Pro Tips</li>
-                                    <li>Release Notes has "How Updates Work" guide at top</li>
-                                    <li>Seniors now know to just logout/login for updates</li>
-                                </ul>
+                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px;">🐛 Bug Fixes (3 Builds):</p>
+                                
+                                <div style="background: #e6fffa; padding: 12px; border-radius: 6px; margin: 10px 0; border-left: 3px solid #38b2ac;">
+                                    <p style="margin: 0 0 8px 0; font-weight: 600; font-size: 14px;">BUILD 1: Tasks Auto-Refresh Daily</p>
+                                    <ul style="margin: 0; padding-left: 20px; font-size: 13px;">
+                                        <li>Tasks now automatically reset each day</li>
+                                        <li>Added date tracking (lastCompletedDate)</li>
+                                        <li>No more manual unchecking needed</li>
+                                        <li>Works like medications refresh system</li>
+                                    </ul>
+                                </div>
+
+                                <div style="background: #fff3cd; padding: 12px; border-radius: 6px; margin: 10px 0; border-left: 3px solid #ffc107;">
+                                    <p style="margin: 0 0 8px 0; font-weight: 600; font-size: 14px;">BUILD 2: Multi-Dose Medication Buttons</p>
+                                    <ul style="margin: 0; padding-left: 20px; font-size: 13px;">
+                                        <li>Added individual "Mark as Taken" buttons for each dose</li>
+                                        <li>Users can now manually mark each dose in multi-dose meds</li>
+                                        <li>Voice feedback for each dose marked</li>
+                                        <li>Shows completion status (e.g., "2/3 doses taken")</li>
+                                    </ul>
+                                </div>
+
+                                <div style="background: #d4edda; padding: 12px; border-radius: 6px; margin: 10px 0; border-left: 3px solid #28a745;">
+                                    <p style="margin: 0 0 8px 0; font-weight: 600; font-size: 14px;">BUILD 3: Session Persistence (No Logout After Sleep)</p>
+                                    <ul style="margin: 0; padding-left: 20px; font-size: 13px;">
+                                        <li>User session now persists across iPhone sleep</li>
+                                        <li>App stays logged in when screen sleeps</li>
+                                        <li>Notifications continue working after wake</li>
+                                        <li>Auto-restores session on page reload</li>
+                                        <li><strong>Critical fix for senior users!</strong></li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Previous Versions -->
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-05-0047 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 5, 2026 at 12:47 AM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">✨ New Features:</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Added automatic updates information in 3 locations</li>
+                                    <li>Seniors now know to logout/login for updates</li>
+                                </ul>
+                            </div>
+                        </div>
+
                         <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
                             <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-05-0037 UTC</h4>
                             <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 5, 2026 at 12:37 AM</p>
                             <div style="line-height: 1.6; font-size: 13px;">
                                 <p style="margin: 5px 0; font-weight: 600;">🔧 Improvements:</p>
                                 <ul style="margin: 5px 0; padding-left: 20px;">
-                                    <li>Enhanced Add to Home Screen instructions for better clarity</li>
-                                    <li>Added detailed steps for copying link and opening in Safari</li>
-                                    <li>Simplified language for senior comprehension</li>
+                                    <li>Enhanced Add to Home Screen instructions</li>
+                                    <li>Added detailed steps for copying link to Safari</li>
                                 </ul>
                             </div>
                         </div>
@@ -3207,10 +3252,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-02-05-0047 UTC
+                        <strong>App Version:</strong> 2026-02-05-1703 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Added Automatic Updates Info (3 Locations)
+                        Critical Bug Fixes: Tasks, Multi-Dose, Session Persistence
                     </p>
                 </div>
             </div>
@@ -4011,6 +4056,52 @@
         }
 
 
+        // Session Restoration - Auto-login if session exists
+        function restoreSession() {
+            const savedUser = localStorage.getItem('currentUser');
+            
+            if (!savedUser) {
+                console.log('No saved session found');
+                return false;
+            }
+            
+            const users = loadData('users') || {};
+            
+            // Validate that the saved user still exists
+            if (!users[savedUser]) {
+                console.log('Saved user no longer exists, clearing session');
+                localStorage.removeItem('currentUser');
+                return false;
+            }
+            
+            console.log('✅ Restoring session for:', savedUser);
+            
+            // Restore the session
+            currentUser = savedUser;
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('userName').textContent = users[savedUser].name;
+            
+            // Show floating help button
+            document.getElementById('floatingHelpBtn').classList.remove('hidden');
+            
+            // Initialize voice button
+            const voiceBtn = document.getElementById('voiceToggleBtn');
+            if (voiceBtn) {
+                voiceBtn.textContent = '🔇 Voice OFF';
+                voiceBtn.classList.add('btn-primary');
+            }
+            
+            // Load all user data
+            loadAllData();
+            loadVoicePreference();
+            initializeNotifications();
+            startReminderChecker();
+            
+            console.log('✅ Session restored successfully');
+            return true;
+        }
+
         function login() {
             const username = document.getElementById('loginUsername').value;
             const password = document.getElementById('loginPassword').value;
@@ -4028,6 +4119,10 @@
             }
 
             currentUser = username;
+            
+            // Persist session to localStorage to survive page reloads/sleep
+            localStorage.setItem('currentUser', username);
+            
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
             document.getElementById('userName').textContent = users[username].name;
@@ -4059,6 +4154,10 @@
 
         function logout() {
             currentUser = null;
+            
+            // Clear persisted session
+            localStorage.removeItem('currentUser');
+            
             voiceEnabled = false;
             if (reminderCheckInterval) {
                 clearInterval(reminderCheckInterval); // Stop reminder checker
@@ -4799,8 +4898,15 @@
                         const dosesList = med.times.map((time, idx) => {
                             const isTaken = med.takenTimes?.includes(time);
                             const checkmark = isTaken ? '✅' : '⏳';
-                            return `<div style="display: flex; justify-content: space-between; align-items: center; padding: 6px; background: ${isTaken ? '#d4edda' : '#f8f9fa'}; border-radius: 4px; margin: 4px 0;">
-                                <span>${checkmark} ${formatTime(time)} dose</span>
+                            const buttonText = isTaken ? '✓ Taken' : 'Mark Taken';
+                            const buttonClass = isTaken ? 'btn-success' : 'btn-info';
+                            return `<div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: ${isTaken ? '#d4edda' : '#f8f9fa'}; border-radius: 4px; margin: 4px 0;">
+                                <span style="font-size: 15px;">${checkmark} ${formatTime(time)} dose</span>
+                                <button class="action-btn ${buttonClass}" 
+                                        onclick="markMedicationTaken(${med.id}, '${time}')"
+                                        style="padding: 6px 12px; font-size: 13px; min-width: 100px;">
+                                    ${buttonText}
+                                </button>
                             </div>`;
                         }).join('');
                         
@@ -5106,7 +5212,7 @@
                 med.takenTimes = [];
             }
             
-            // If doseTime is provided (from voice), mark that specific dose
+            // If doseTime is provided (from voice or button), mark that specific dose
             if (doseTime) {
                 if (!med.takenTimes.includes(doseTime)) {
                     med.takenTimes.push(doseTime);
@@ -5117,7 +5223,12 @@
                         if (!med.takenDates.includes(todayDate)) {
                             med.takenDates.push(todayDate);
                         }
+                        speak(`Marked ${formatTime(doseTime)} dose of ${med.name} as taken. All doses complete for today!`);
+                    } else {
+                        speak(`Marked ${formatTime(doseTime)} dose of ${med.name} as taken`);
                     }
+                } else {
+                    speak(`${formatTime(doseTime)} dose of ${med.name} was already marked as taken`);
                 }
             } else {
                 // Manual toggle (from UI checkbox) - toggle whole day
@@ -6027,6 +6138,29 @@
         function loadTasks(tasks) {
             console.log('loadTasks called with:', tasks);
             const minimizedTasks = JSON.parse(localStorage.getItem('minimizedTasks') || '{}');
+            const todayDate = new Date().toISOString().split('T')[0];
+            
+            // Reset completed tasks if it's a new day
+            let tasksUpdated = false;
+            ['meals', 'hydration', 'hygiene', 'safety'].forEach(category => {
+                if (tasks[category]) {
+                    tasks[category].forEach(task => {
+                        // Reset task if it was completed on a previous day
+                        if (task.completed && task.lastCompletedDate && task.lastCompletedDate !== todayDate) {
+                            task.completed = false;
+                            tasksUpdated = true;
+                        }
+                    });
+                }
+            });
+            
+            // Save if any tasks were reset
+            if (tasksUpdated && currentUser) {
+                const users = loadData('users');
+                users[currentUser].tasks = tasks;
+                saveData('users', users);
+                console.log('✅ Tasks reset for new day');
+            }
             
             ['meals', 'hydration', 'hygiene', 'safety'].forEach(category => {
                 const container = document.getElementById(`${category}Tasks`);
@@ -6220,12 +6354,28 @@
 
         function toggleTask(category, index) {
             const users = loadData('users');
-            users[currentUser].tasks[category][index].completed = !users[currentUser].tasks[category][index].completed;
+            const task = users[currentUser].tasks[category][index];
+            
+            // Get today's date
+            const todayDate = new Date().toISOString().split('T')[0];
+            
+            // Reset task if it's a new day and it was marked complete yesterday
+            if (task.lastCompletedDate && task.lastCompletedDate !== todayDate && task.completed) {
+                task.completed = false;
+            }
+            
+            // Toggle the task
+            task.completed = !task.completed;
+            
+            // Update lastCompletedDate if marking as complete
+            if (task.completed) {
+                task.lastCompletedDate = todayDate;
+            }
+            
             saveData('users', users);
             loadTasks(users[currentUser].tasks);
             updateDashboard();
             
-            const task = users[currentUser].tasks[category][index];
             speak(task.completed ? `Task completed: ${task.name}` : `Task uncompleted: ${task.name}`);
         }
 
@@ -10467,6 +10617,17 @@
             }, 100);
             return result;
         };
+
+        // Restore session on page load (prevents logout after sleep/reload)
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📱 Page loaded - checking for saved session...');
+            const sessionRestored = restoreSession();
+            if (sessionRestored) {
+                console.log('✅ User automatically logged in from saved session');
+            } else {
+                console.log('ℹ️ No session to restore - showing login screen');
+            }
+        });
     </script>
 </body>
 </html>
