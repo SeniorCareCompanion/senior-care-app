@@ -4,15 +4,15 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-01-30-2007 UTC - Mobile Modal Fix
-    BUILD DATE: January 30, 2026 at 8:07 PM UTC
-    CHANGES: Fixed Add to Home Screen modal to fit iPhone screen (scrollable, smaller, buttons always visible)
+    VERSION: 2026-02-05-0047 UTC - Automatic Updates Info Added
+    BUILD DATE: February 5, 2026 at 12:47 AM UTC
+    CHANGES: Added automatic update information in 3 locations for seniors
     
     ✨ NEW IN THIS VERSION:
-    - 🐛 Fixed modal size for iPhone (was too large)
-    - 📱 Made content scrollable
-    - ✅ Buttons now always visible at bottom
-    - 🎨 Reduced padding/fonts for mobile
+    - 📱 Added "Updates Automatically" note to installation modal
+    - 📚 Added automatic updates to Help Installation Pro Tips
+    - 🔄 Added "How Updates Work" section to Profile Release Notes
+    - ✅ Seniors now know they just need to logout/login for updates
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -1124,12 +1124,17 @@
                         </p>
 
                         <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; backdrop-filter: blur(10px);">
-                            <h4 style="margin: 0 0 10px 0; font-size: 16px;">📱 Quick Steps (iPhone):</h4>
-                            <ol style="margin: 0; padding-left: 20px; line-height: 1.8; font-size: 14px;">
-                                <li>Tap <strong>Share ⬆️</strong> at bottom</li>
-                                <li>Scroll down in menu</li>
-                                <li>Tap <strong>"Add to Home Screen"</strong></li>
-                                <li>Tap <strong>"Add"</strong></li>
+                            <h4 style="margin: 0 0 10px 0; font-size: 16px;">📱 Follow These Steps:</h4>
+                            <ol style="margin: 0; padding-left: 20px; line-height: 2.2; font-size: 14px;">
+                                <li><strong>Tap the Share button ⬆️</strong> at the bottom of Safari<br>
+                                    <span style="font-size: 12px; opacity: 0.9;">(Looks like a box with an arrow pointing up)</span>
+                                </li>
+                                <li><strong>Scroll down</strong> in the menu that appears</li>
+                                <li><strong>Tap "Add to Home Screen"</strong><br>
+                                    <span style="font-size: 12px; opacity: 0.9;">(You might need to scroll to find it)</span>
+                                </li>
+                                <li><strong>Tap "Add"</strong> in the top right corner</li>
+                                <li><strong>Done! 🎉</strong> The app icon appears on your home screen</li>
                             </ol>
                         </div>
 
@@ -1139,8 +1144,15 @@
                                 <li>Instant access from home screen</li>
                                 <li>Works like a native app</li>
                                 <li>Better notifications</li>
-                                <li>No Safari needed</li>
+                                <li>No Safari needed each time</li>
                             </ul>
+                        </div>
+
+                        <div style="margin-top: 12px; padding: 12px; background: rgba(255,255,255,0.25); border-radius: 8px; font-size: 13px; border: 1px solid rgba(255,255,255,0.3);">
+                            <strong>✨ Updates Automatically!</strong>
+                            <p style="margin: 5px 0 0 0; line-height: 1.5;">
+                                The app updates itself automatically. Just log out and back in to see new features - no need to reinstall!
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -1942,28 +1954,66 @@
                                 </div>
 
                                 <h3>📱 For iPhone Users (Safari):</h3>
-                                <div style="background: #f7fafc; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 2px solid #cbd5e0;">
-                                    <h4 style="color: #667eea; margin-top: 0;">Step-by-Step Instructions:</h4>
+                                
+                                <!-- If You Received a Link -->
+                                <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid #667eea;">
+                                    <h4 style="color: #667eea; margin-top: 0;">📧 If You Received a Link (Email/Text):</h4>
+                                    <div style="background: #fff3cd; padding: 12px; margin-bottom: 15px; border-radius: 6px; font-size: 14px;">
+                                        ⚠️ <strong>IMPORTANT:</strong> This app MUST be opened in Safari, not Chrome!
+                                    </div>
+                                    <p style="margin: 0 0 15px 0; font-size: 15px;">Follow these steps to open the link in Safari:</p>
                                     <ol style="line-height: 2.5; font-size: 16px;">
-                                        <li style="margin-bottom: 15px;">
-                                            <strong>Open Safari</strong> (this app MUST be opened in Safari, not Chrome)
-                                            <div style="background: #fff3cd; padding: 10px; margin-top: 8px; border-radius: 6px; font-size: 14px;">
-                                                ⚠️ Important: If you're using Chrome or another browser, copy the URL and open it in Safari first!
+                                        <li style="margin-bottom: 12px;">
+                                            <strong>Copy the Senior Care Companion link</strong>
+                                            <div style="margin-top: 8px; font-size: 14px; color: #666;">
+                                                Long-press on the link, then tap "Copy"
                                             </div>
                                         </li>
+                                        <li style="margin-bottom: 12px;">
+                                            <strong>Open Safari</strong> on your iPhone
+                                            <div style="margin-top: 8px; font-size: 14px; color: #666;">
+                                                Look for the blue compass icon
+                                            </div>
+                                        </li>
+                                        <li style="margin-bottom: 12px;">
+                                            <strong>Open a new tab</strong> (if needed)
+                                            <div style="margin-top: 8px; font-size: 14px; color: #666;">
+                                                Tap the tabs icon (two squares) at bottom right, then tap "+"
+                                            </div>
+                                        </li>
+                                        <li style="margin-bottom: 12px;">
+                                            <strong>Tap the address bar</strong> at the top
+                                        </li>
+                                        <li style="margin-bottom: 12px;">
+                                            <strong>Paste the link</strong> and press Go
+                                            <div style="margin-top: 8px; font-size: 14px; color: #666;">
+                                                Long-press in address bar, tap "Paste and Go" or "Paste" then "Go"
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <strong>✅ Continue</strong> with the installation steps below
+                                        </li>
+                                    </ol>
+                                </div>
+
+                                <!-- Main Installation Steps -->
+                                <div style="background: #f7fafc; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 2px solid #cbd5e0;">
+                                    <h4 style="color: #667eea; margin-top: 0;">📲 Installation Steps (Once in Safari):</h4>
+                                    <p style="margin: 0 0 15px 0; font-size: 14px; color: #666;">Once the app is open in Safari, follow these steps:</p>
+                                    <ol style="line-height: 2.5; font-size: 16px;">
                                         <li style="margin-bottom: 15px;">
                                             <strong>Tap the Share button ⬆️</strong> at the bottom of Safari
                                             <div style="margin-top: 8px; font-size: 14px; color: #666;">
-                                                (It looks like a box with an arrow pointing up)
+                                                It looks like a box with an arrow pointing up
                                             </div>
                                         </li>
                                         <li style="margin-bottom: 15px;">
                                             <strong>Scroll down</strong> in the menu that appears
                                         </li>
                                         <li style="margin-bottom: 15px;">
-                                            <strong>Tap "Add to Home Screen"</strong>
+                                            <strong>Find and tap "Add to Home Screen"</strong>
                                             <div style="margin-top: 8px; font-size: 14px; color: #666;">
-                                                (You might need to scroll to find it)
+                                                You might need to scroll to find it
                                             </div>
                                         </li>
                                         <li style="margin-bottom: 15px;">
@@ -1982,6 +2032,14 @@
                                         <li><strong>Create a folder:</strong> Drag the app icon onto another app to create a folder</li>
                                         <li><strong>Delete and reinstall:</strong> If you ever want to remove it, long-press the icon and tap "Remove App", then add it back anytime</li>
                                         <li><strong>Works offline:</strong> Once installed, the app will load even without internet (your data is saved locally)</li>
+                                        <li><strong>🔄 Automatic Updates:</strong> Once installed, the app updates automatically! When we release new features or improvements:
+                                            <ul style="margin-top: 8px; line-height: 1.8;">
+                                                <li>You don't need to reinstall or re-add to home screen</li>
+                                                <li>Simply log out and log back in to get the latest version</li>
+                                                <li>Check Profile → Release Notes to see what's new</li>
+                                                <li>Your data is always safe during updates</li>
+                                            </ul>
+                                        </li>
                                     </ul>
                                 </div>
 
@@ -2983,25 +3041,80 @@
                     </div>
                     <div id="profileCard-releaseNotes" class="card-content" style="max-height: 600px; overflow-y: auto;">
                         
+                        <!-- How Updates Work (Info Box) -->
+                        <div style="background: linear-gradient(135deg, #48bb7815 0%, #38b2ac15 100%); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 2px solid #38b2ac;">
+                            <h3 style="margin: 0 0 12px 0; color: #38b2ac; font-size: 18px;">🔄 How Updates Work</h3>
+                            <p style="margin: 0 0 15px 0; font-size: 15px; line-height: 1.6; color: #2d3748;">
+                                This app updates automatically - no app store needed!
+                            </p>
+                            
+                            <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                                <p style="margin: 0 0 10px 0; font-weight: 600; color: #2d3748; font-size: 15px;">When we release a new version:</p>
+                                <ol style="margin: 0; padding-left: 20px; line-height: 2; font-size: 14px; color: #2d3748;">
+                                    <li>The update downloads automatically in the background</li>
+                                    <li>Log out of the app (tap the <strong>Logout</strong> button at the top)</li>
+                                    <li>Log back in with your username and password</li>
+                                    <li>You'll now have the latest version with new features! 🎉</li>
+                                </ol>
+                            </div>
+
+                            <div style="background: #e6fffa; padding: 12px; border-radius: 8px; border-left: 3px solid #38b2ac;">
+                                <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #2d3748;">
+                                    <strong>✅ Your data is never affected by updates.</strong> Everything stays exactly where it is - your medications, appointments, contacts, tasks, bills, and all your settings remain safe and unchanged.
+                                </p>
+                            </div>
+
+                            <p style="margin: 15px 0 0 0; font-size: 13px; color: #666; font-style: italic;">
+                                💡 Check this Release Notes section below to see what's new in each version!
+                            </p>
+                        </div>
+                        
                         <!-- Latest Version -->
                         <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #667eea;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                                <h4 style="margin: 0; color: #667eea;">Version 2026-01-30-2007 UTC</h4>
+                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-05-0047 UTC</h4>
                                 <span style="background: #667eea; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">CURRENT</span>
                             </div>
-                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">January 30, 2026 at 8:07 PM</p>
+                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 5, 2026 at 12:47 AM</p>
                             <div style="line-height: 1.8;">
-                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px;">🐛 Bug Fixes:</p>
+                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px;">✨ New Features:</p>
                                 <ul style="margin: 5px 0; padding-left: 20px; font-size: 14px;">
-                                    <li>Fixed Add to Home Screen modal size for iPhone</li>
-                                    <li>Made modal content scrollable (was too large for screen)</li>
-                                    <li>Buttons now always visible at bottom</li>
-                                    <li>Reduced padding and font sizes for mobile screens</li>
+                                    <li>Added automatic updates information in 3 locations</li>
+                                    <li>Modal now shows "Updates Automatically" note</li>
+                                    <li>Help Installation has automatic updates in Pro Tips</li>
+                                    <li>Release Notes has "How Updates Work" guide at top</li>
+                                    <li>Seniors now know to just logout/login for updates</li>
                                 </ul>
                             </div>
                         </div>
 
                         <!-- Previous Versions -->
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-05-0037 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 5, 2026 at 12:37 AM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">🔧 Improvements:</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Enhanced Add to Home Screen instructions for better clarity</li>
+                                    <li>Added detailed steps for copying link and opening in Safari</li>
+                                    <li>Simplified language for senior comprehension</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-01-30-2007 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">January 30, 2026 at 8:07 PM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">🐛 Bug Fixes:</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Fixed Add to Home Screen modal size for iPhone</li>
+                                    <li>Made modal content scrollable</li>
+                                    <li>Buttons now always visible at bottom</li>
+                                </ul>
+                            </div>
+                        </div>
+
                         <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
                             <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-01-30-1638 UTC</h4>
                             <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">January 30, 2026 at 4:38 PM - Production Ready Release 🎉</p>
@@ -3094,10 +3207,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-01-30-2007 UTC
+                        <strong>App Version:</strong> 2026-02-05-0047 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Fix: Mobile Modal Size (Scrollable & Buttons Visible)
+                        Added Automatic Updates Info (3 Locations)
                     </p>
                 </div>
             </div>
