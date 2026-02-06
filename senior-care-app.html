@@ -4,17 +4,16 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-06-0300 UTC - Dashboard Update Fix
-    BUILD DATE: February 6, 2026 at 3:00 AM UTC
-    CHANGES: Fixed medication dashboard not updating on home page
+    VERSION: 2026-02-06-0323 UTC - Added "About This App" Section
+    BUILD DATE: February 6, 2026 at 3:23 AM UTC
+    CHANGES: Added About section to Profile explaining why app was created
     
-    🐛 BUG FIX:
-    - Fixed home page dashboard not updating when medication marked as taken
-    - Dashboard now refreshes immediately after marking doses
-    - "X taken / Y total" counter now accurate in real-time
-    
-    📚 PREVIOUS VERSION:
-    - Emergency 911 comprehensive documentation (3 Help sections)
+    ✨ NEW IN THIS VERSION:
+    - ℹ️ "About This App" section added to Profile
+    - Explains the problem we're solving
+    - Highlights key features and benefits
+    - Perfect for testers to understand the app's purpose
+    - Collapsible section like other Profile cards
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -3142,24 +3141,33 @@
                         <!-- Latest Version -->
                         <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #667eea;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-06-0300 UTC</h4>
+                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-06-0323 UTC</h4>
                                 <span style="background: #667eea; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">CURRENT</span>
                             </div>
-                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 6, 2026 at 3:00 AM</p>
+                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 6, 2026 at 3:23 AM</p>
                             <div style="line-height: 1.8;">
-                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px;">🐛 Bug Fix:</p>
+                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px;">✨ New Feature:</p>
                                 <ul style="margin: 5px 0; padding-left: 20px; font-size: 14px;">
-                                    <li>Fixed home page dashboard not updating when medication marked as taken</li>
-                                    <li>Dashboard now refreshes immediately after marking doses</li>
-                                    <li>"X taken / Y total" counter now accurate in real-time</li>
+                                    <li>Added "About This App" section to Profile</li>
+                                    <li>Explains why the app was created</li>
+                                    <li>Highlights key features and benefits</li>
+                                    <li>Perfect for testers to understand the app's mission</li>
                                 </ul>
-                                <p style="margin: 10px 0 0 0; font-size: 13px; color: #666;">
-                                    <strong>Technical:</strong> Added missing <code>updateDashboard()</code> call in <code>markMedicationTaken()</code> function.
-                                </p>
                             </div>
                         </div>
 
                         <!-- Previous Versions -->
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-06-0300 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 6, 2026 at 3:00 AM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">🐛 Bug Fix:</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Dashboard now updates when medication marked taken</li>
+                                </ul>
+                            </div>
+                        </div>
+
                         <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
                             <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-06-0241 UTC</h4>
                             <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 6, 2026 at 2:41 AM</p>
@@ -3311,13 +3319,76 @@
                     </div>
                 </div>
                 
+                <!-- About This App Section -->
+                <div class="card" style="margin-top: 30px;">
+                    <div class="card-header" onclick="toggleProfileCard('aboutApp')" style="cursor: pointer; user-select: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <span>ℹ️ About This App</span>
+                            <span id="toggle-icon-aboutApp" style="font-size: 18px;">▼</span>
+                        </div>
+                    </div>
+                    <div id="profileCard-aboutApp" class="card-content" style="display: none; line-height: 1.6;">
+                        <h3 style="margin-top: 0; color: #667eea;">Why Senior Care Companion Exists</h3>
+                        
+                        <p style="font-size: 15px; margin-bottom: 15px;">
+                            <strong>Senior Care Companion</strong> was created to solve a simple but important problem: helping seniors manage their health and daily life without the complexity, cost, or privacy concerns of traditional apps.
+                        </p>
+
+                        <h4 style="color: #667eea; margin: 20px 0 10px 0;">The Problem We're Solving:</h4>
+                        <p style="font-size: 14px;">Many seniors are managing:</p>
+                        <ul style="line-height: 2; font-size: 14px;">
+                            <li>Multiple medications with different schedules (some 2-3 times daily)</li>
+                            <li>Regular doctor appointments, lab visits, and therapy sessions</li>
+                            <li>Daily tasks like meals, hydration, and safety checks</li>
+                            <li>Bills and payments to track</li>
+                            <li>Social activities to stay engaged</li>
+                        </ul>
+                        <p style="font-size: 14px; margin-top: 10px;">
+                            Existing solutions are either too complicated, require expensive subscriptions, need constant internet, or collect and sell personal health data.
+                        </p>
+
+                        <h4 style="color: #667eea; margin: 20px 0 10px 0;">Our Solution:</h4>
+                        <p style="font-size: 14px;">An all-in-one app that's:</p>
+                        <ul style="line-height: 2; font-size: 14px;">
+                            <li><strong>✅ Simple</strong> - Designed specifically for seniors, not tech experts</li>
+                            <li><strong>🎤 Voice-enabled</strong> - 50+ commands for hands-free use</li>
+                            <li><strong>🔒 Private</strong> - All data stays on your phone, never sent anywhere</li>
+                            <li><strong>📴 Offline-first</strong> - Works without internet after installation</li>
+                            <li><strong>🆓 Free forever</strong> - No subscriptions, no ads, no hidden costs</li>
+                            <li><strong>📱 iPhone optimized</strong> - Add to home screen, works like a native app</li>
+                        </ul>
+
+                        <h4 style="color: #667eea; margin: 20px 0 10px 0;">Key Features:</h4>
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; font-size: 14px;">
+                            <p style="margin: 0 0 10px 0;"><strong>💊 Medications:</strong> Track unlimited meds, multi-dose support, automatic daily reset</p>
+                            <p style="margin: 0 0 10px 0;"><strong>📅 Appointments:</strong> Never miss a doctor visit with reminders</p>
+                            <p style="margin: 0 0 10px 0;"><strong>✅ Tasks:</strong> Daily routines organized by category (meals, hydration, hygiene, safety)</p>
+                            <p style="margin: 0 0 10px 0;"><strong>💰 Bills:</strong> Track payments and recurring bills</p>
+                            <p style="margin: 0 0 10px 0;"><strong>🎉 Activities:</strong> Stay socially engaged with event tracking</p>
+                            <p style="margin: 0 0 10px 0;"><strong>📞 Contacts:</strong> Important numbers with one-tap calling</p>
+                            <p style="margin: 0;"><strong>🚨 Emergency:</strong> Prominent 911 button on home screen</p>
+                        </div>
+
+                        <h4 style="color: #667eea; margin: 20px 0 10px 0;">Built With Care:</h4>
+                        <p style="font-size: 14px;">
+                            Every feature was designed with seniors in mind. Large text, simple navigation, voice commands for accessibility, comprehensive help documentation, and no frustrating re-logins. This app stays logged in even when your phone sleeps, so it's always ready when you need it.
+                        </p>
+
+                        <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #667eea;">
+                            <p style="margin: 0; font-size: 14px; font-weight: 600; color: #667eea;">
+                                💜 Thank you for being a beta tester! Your feedback helps make this app better for seniors everywhere.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-02-06-0300 UTC
+                        <strong>App Version:</strong> 2026-02-06-0323 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Fix: Dashboard Updates When Medication Marked Taken
+                        New: "About This App" Section in Profile
                     </p>
                 </div>
             </div>
@@ -7648,7 +7719,7 @@
         // Initialize profile cards from saved state
         function initializeProfileCards() {
             const minimizedProfile = JSON.parse(localStorage.getItem('minimizedProfile') || '{}');
-            const cardKeys = ['personalInfo', 'voiceSettings', 'notifications', 'dataManagement', 'releaseNotes', 'updateProfile', 'changePassword'];
+            const cardKeys = ['personalInfo', 'voiceSettings', 'notifications', 'dataManagement', 'releaseNotes', 'aboutApp', 'updateProfile', 'changePassword'];
             
             cardKeys.forEach(cardKey => {
                 const contentDiv = document.getElementById(`profileCard-${cardKey}`);
@@ -7663,7 +7734,7 @@
 
         // Expand all profile cards
         function expandAllProfileCards() {
-            const cardKeys = ['personalInfo', 'voiceSettings', 'notifications', 'dataManagement', 'releaseNotes', 'updateProfile', 'changePassword'];
+            const cardKeys = ['personalInfo', 'voiceSettings', 'notifications', 'dataManagement', 'releaseNotes', 'aboutApp', 'updateProfile', 'changePassword'];
             const minimizedProfile = {};
             
             cardKeys.forEach(cardKey => {
@@ -7684,7 +7755,7 @@
 
         // Collapse all profile cards
         function collapseAllProfileCards() {
-            const cardKeys = ['personalInfo', 'voiceSettings', 'notifications', 'dataManagement', 'releaseNotes', 'updateProfile', 'changePassword'];
+            const cardKeys = ['personalInfo', 'voiceSettings', 'notifications', 'dataManagement', 'releaseNotes', 'aboutApp', 'updateProfile', 'changePassword'];
             const minimizedProfile = {};
             
             cardKeys.forEach(cardKey => {
