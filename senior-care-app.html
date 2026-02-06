@@ -4,25 +4,20 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-05-1703 UTC - Critical Bug Fixes (3 Builds)
-    BUILD DATE: February 5, 2026 at 5:03 PM UTC
-    CHANGES: Fixed 3 critical bugs in separate builds for testing
+    VERSION: 2026-02-06-0241 UTC - Emergency 911 Documentation Added
+    BUILD DATE: February 6, 2026 at 2:41 AM UTC
+    CHANGES: Comprehensive Emergency 911 documentation in 3 Help sections
     
-    ✨ BUILD 1: Tasks Auto-Refresh Daily
-    - Added date tracking to tasks (lastCompletedDate)
-    - Tasks now automatically reset each day
-    - Works like medications - no manual unchecking needed
+    ✨ NEW IN THIS VERSION:
+    - 📚 Expanded Emergency 911 info in Contacts Help (detailed guide)
+    - 🚨 Added "Safety First" section to Getting Started
+    - ❓ Added Emergency 911 FAQ to Common Questions
+    - 🎯 Easy to find emergency information in multiple places
     
-    ✨ BUILD 2: Multi-Dose Medication Buttons
-    - Added individual "Mark as Taken" buttons for each dose
-    - Users can now manually mark each dose in multi-dose medications
-    - Voice feedback for each dose marked
-    
-    ✨ BUILD 3: Session Persistence (No More Logout After Sleep)
-    - User session now persists in localStorage
-    - App stays logged in when iPhone sleeps
-    - Notifications continue working after sleep/wake
-    - Auto-restores session on page reload
+    🔧 PREVIOUS VERSION FIXES:
+    - Tasks auto-refresh daily
+    - Multi-dose medication buttons
+    - Session persistence (no logout after sleep)
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -1912,6 +1907,33 @@
                                     <li><strong>Use Expand/Collapse:</strong> Each page has "Expand All" and "Collapse All" buttons at the top</li>
                                 </ol>
 
+                                <h3>🚨 SAFETY FIRST - Emergency 911:</h3>
+                                <div style="background: #fee; padding: 20px; border-radius: 12px; border-left: 4px solid #e53e3e; margin: 15px 0;">
+                                    <p style="margin: 0 0 15px 0; font-weight: 600; font-size: 16px; color: #e53e3e;">
+                                        ⚠️ IMPORTANT: There is a large red <strong>"🚨 CALL 911 EMERGENCY"</strong> button on the Home screen.
+                                    </p>
+                                    
+                                    <h4 style="margin: 0 0 10px 0; color: #e53e3e;">How to Call 911:</h4>
+                                    <ol style="line-height: 2; margin: 0 0 15px 0;">
+                                        <li>Go to <strong>Home</strong> tab (🏠)</li>
+                                        <li>Tap the red <strong>"🚨 CALL 911 EMERGENCY"</strong> button at the top</li>
+                                        <li>Confirm when asked</li>
+                                        <li>Your phone dials 911 immediately</li>
+                                    </ol>
+
+                                    <h4 style="margin: 0 0 10px 0; color: #e53e3e;">Use in Real Emergencies Only:</h4>
+                                    <ul style="line-height: 2; margin: 0;">
+                                        <li>Medical emergencies (heart attack, stroke, severe bleeding)</li>
+                                        <li>Safety emergencies (fire, break-in, assault)</li>
+                                        <li>Life-threatening situations</li>
+                                        <li>⚠️ Confirmation prevents accidental calls</li>
+                                    </ul>
+                                    
+                                    <p style="margin: 15px 0 0 0; font-size: 14px; font-style: italic; color: #666;">
+                                        💡 For more details, see Help → Contacts → Emergency Call section
+                                    </p>
+                                </div>
+
                                 <h3>🎯 Quick Tips:</h3>
                                 <ul style="line-height: 2;">
                                     <li>📱 <strong>Add to home screen</strong> for best experience (see Installation guide)</li>
@@ -2642,13 +2664,37 @@
                                     <li>Your phone will start calling them</li>
                                 </ol>
 
-                                <h3>Emergency Call:</h3>
-                                <p>On the home screen, there's a big red <strong>"🚨 CALL 911 EMERGENCY"</strong> button.</p>
-                                <ul style="line-height: 2;">
-                                    <li>Only use in real emergencies</li>
-                                    <li>App will ask you to confirm</li>
-                                    <li>Then calls 911 immediately</li>
-                                </ul>
+                                <h3>🚨 Emergency Call (911):</h3>
+                                <div style="background: #fee; padding: 15px; border-radius: 8px; border-left: 4px solid #e53e3e; margin: 15px 0;">
+                                    <p style="margin: 0 0 10px 0; font-weight: 600; color: #e53e3e; font-size: 16px;">
+                                        ⚠️ IMPORTANT: On the home screen, there's a big red <strong>"🚨 CALL 911 EMERGENCY"</strong> button.
+                                    </p>
+                                    
+                                    <h4 style="margin: 15px 0 10px 0; color: #e53e3e;">How to Use Emergency Button:</h4>
+                                    <ol style="line-height: 2; margin: 0 0 15px 0;">
+                                        <li>Go to the <strong>Home</strong> tab (🏠 at the top)</li>
+                                        <li>Find the large red <strong>"🚨 CALL 911 EMERGENCY"</strong> button at the top</li>
+                                        <li>Tap the button</li>
+                                        <li>A confirmation will ask: <em>"Are you sure you want to call 911?"</em></li>
+                                        <li>Tap <strong>"YES - CALL 911 NOW"</strong></li>
+                                        <li>Your phone will immediately dial 911</li>
+                                    </ol>
+
+                                    <h4 style="margin: 15px 0 10px 0; color: #e53e3e;">When to Use:</h4>
+                                    <ul style="line-height: 2; margin: 0 0 15px 0;">
+                                        <li><strong>Medical emergencies:</strong> Heart attack, stroke, severe bleeding, difficulty breathing</li>
+                                        <li><strong>Safety emergencies:</strong> Fire, break-in, assault</li>
+                                        <li><strong>Life-threatening situations:</strong> Any time someone's life is in danger</li>
+                                    </ul>
+
+                                    <h4 style="margin: 15px 0 10px 0; color: #e53e3e;">Safety Features:</h4>
+                                    <ul style="line-height: 2; margin: 0;">
+                                        <li>✅ <strong>Confirmation required:</strong> Prevents accidental calls</li>
+                                        <li>✅ <strong>Always accessible:</strong> Available on home screen</li>
+                                        <li>✅ <strong>One-tap calling:</strong> Fast in real emergencies</li>
+                                        <li>⚠️ <strong>Only use for real emergencies:</strong> Misuse of 911 is illegal</li>
+                                    </ul>
+                                </div>
 
                                 <h3>💡 Tips:</h3>
                                 <ul style="line-height: 2;">
@@ -2671,6 +2717,23 @@
                                 ❓ Common Questions
                             </div>
                             <div class="card-content" style="line-height: 1.8; font-size: 16px;">
+                                <h3>🚨 How do I call 911 in an emergency?</h3>
+                                <div style="background: #fee; padding: 15px; border-radius: 8px; border-left: 4px solid #e53e3e; margin-bottom: 20px;">
+                                    <p style="margin: 0 0 10px 0; font-weight: 600; color: #e53e3e;">
+                                        There's a large red <strong>"🚨 CALL 911 EMERGENCY"</strong> button on the Home screen.
+                                    </p>
+                                    <p style="margin: 0 0 10px 0;"><strong>Steps:</strong></p>
+                                    <ol style="line-height: 2; margin: 0 0 10px 0;">
+                                        <li>Go to the <strong>Home</strong> tab (🏠 at top)</li>
+                                        <li>Tap the red emergency button at the top</li>
+                                        <li>Confirm "YES - CALL 911 NOW"</li>
+                                        <li>Your phone immediately dials 911</li>
+                                    </ol>
+                                    <p style="margin: 0; font-size: 14px; color: #666;">
+                                        ⚠️ Only use for real emergencies. The app asks for confirmation to prevent accidental calls.
+                                    </p>
+                                </div>
+
                                 <h3>❓ I forgot my password. What do I do?</h3>
                                 <ol style="line-height: 2;">
                                     <li>On the login screen, tap <strong>"Forgot Password?"</strong></li>
@@ -3082,47 +3145,36 @@
                         <!-- Latest Version -->
                         <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #667eea;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-05-1703 UTC</h4>
+                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-06-0241 UTC</h4>
                                 <span style="background: #667eea; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">CURRENT</span>
                             </div>
-                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 5, 2026 at 5:03 PM - Critical Bug Fixes 🔧</p>
+                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 6, 2026 at 2:41 AM</p>
                             <div style="line-height: 1.8;">
-                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px;">🐛 Bug Fixes (3 Builds):</p>
-                                
-                                <div style="background: #e6fffa; padding: 12px; border-radius: 6px; margin: 10px 0; border-left: 3px solid #38b2ac;">
-                                    <p style="margin: 0 0 8px 0; font-weight: 600; font-size: 14px;">BUILD 1: Tasks Auto-Refresh Daily</p>
-                                    <ul style="margin: 0; padding-left: 20px; font-size: 13px;">
-                                        <li>Tasks now automatically reset each day</li>
-                                        <li>Added date tracking (lastCompletedDate)</li>
-                                        <li>No more manual unchecking needed</li>
-                                        <li>Works like medications refresh system</li>
-                                    </ul>
-                                </div>
-
-                                <div style="background: #fff3cd; padding: 12px; border-radius: 6px; margin: 10px 0; border-left: 3px solid #ffc107;">
-                                    <p style="margin: 0 0 8px 0; font-weight: 600; font-size: 14px;">BUILD 2: Multi-Dose Medication Buttons</p>
-                                    <ul style="margin: 0; padding-left: 20px; font-size: 13px;">
-                                        <li>Added individual "Mark as Taken" buttons for each dose</li>
-                                        <li>Users can now manually mark each dose in multi-dose meds</li>
-                                        <li>Voice feedback for each dose marked</li>
-                                        <li>Shows completion status (e.g., "2/3 doses taken")</li>
-                                    </ul>
-                                </div>
-
-                                <div style="background: #d4edda; padding: 12px; border-radius: 6px; margin: 10px 0; border-left: 3px solid #28a745;">
-                                    <p style="margin: 0 0 8px 0; font-weight: 600; font-size: 14px;">BUILD 3: Session Persistence (No Logout After Sleep)</p>
-                                    <ul style="margin: 0; padding-left: 20px; font-size: 13px;">
-                                        <li>User session now persists across iPhone sleep</li>
-                                        <li>App stays logged in when screen sleeps</li>
-                                        <li>Notifications continue working after wake</li>
-                                        <li>Auto-restores session on page reload</li>
-                                        <li><strong>Critical fix for senior users!</strong></li>
-                                    </ul>
-                                </div>
+                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px;">📚 Documentation:</p>
+                                <ul style="margin: 5px 0; padding-left: 20px; font-size: 14px;">
+                                    <li>Comprehensive Emergency 911 documentation added</li>
+                                    <li>Expanded Contacts Help with detailed emergency guide</li>
+                                    <li>Added "Safety First" section to Getting Started</li>
+                                    <li>Added Emergency 911 FAQ to Common Questions</li>
+                                    <li>Emergency info now easy to find in 3 Help sections</li>
+                                </ul>
                             </div>
                         </div>
 
                         <!-- Previous Versions -->
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-05-1703 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 5, 2026 at 5:03 PM - Critical Bug Fixes</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">🐛 Bug Fixes:</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Tasks auto-refresh daily</li>
+                                    <li>Multi-dose medication buttons added</li>
+                                    <li>Session persistence (no logout after sleep)</li>
+                                </ul>
+                            </div>
+                        </div>
+
                         <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
                             <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-05-0047 UTC</h4>
                             <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 5, 2026 at 12:47 AM</p>
@@ -3252,10 +3304,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-02-05-1703 UTC
+                        <strong>App Version:</strong> 2026-02-06-0241 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Critical Bug Fixes: Tasks, Multi-Dose, Session Persistence
+                        Emergency 911 Documentation (3 Help Sections)
                     </p>
                 </div>
             </div>
