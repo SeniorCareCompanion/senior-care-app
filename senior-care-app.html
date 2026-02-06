@@ -4,20 +4,17 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-06-0241 UTC - Emergency 911 Documentation Added
-    BUILD DATE: February 6, 2026 at 2:41 AM UTC
-    CHANGES: Comprehensive Emergency 911 documentation in 3 Help sections
+    VERSION: 2026-02-06-0300 UTC - Dashboard Update Fix
+    BUILD DATE: February 6, 2026 at 3:00 AM UTC
+    CHANGES: Fixed medication dashboard not updating on home page
     
-    ✨ NEW IN THIS VERSION:
-    - 📚 Expanded Emergency 911 info in Contacts Help (detailed guide)
-    - 🚨 Added "Safety First" section to Getting Started
-    - ❓ Added Emergency 911 FAQ to Common Questions
-    - 🎯 Easy to find emergency information in multiple places
+    🐛 BUG FIX:
+    - Fixed home page dashboard not updating when medication marked as taken
+    - Dashboard now refreshes immediately after marking doses
+    - "X taken / Y total" counter now accurate in real-time
     
-    🔧 PREVIOUS VERSION FIXES:
-    - Tasks auto-refresh daily
-    - Multi-dose medication buttons
-    - Session persistence (no logout after sleep)
+    📚 PREVIOUS VERSION:
+    - Emergency 911 comprehensive documentation (3 Help sections)
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -3145,23 +3142,36 @@
                         <!-- Latest Version -->
                         <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #667eea;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-06-0241 UTC</h4>
+                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-06-0300 UTC</h4>
                                 <span style="background: #667eea; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">CURRENT</span>
                             </div>
-                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 6, 2026 at 2:41 AM</p>
+                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 6, 2026 at 3:00 AM</p>
                             <div style="line-height: 1.8;">
-                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px;">📚 Documentation:</p>
+                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px;">🐛 Bug Fix:</p>
                                 <ul style="margin: 5px 0; padding-left: 20px; font-size: 14px;">
-                                    <li>Comprehensive Emergency 911 documentation added</li>
-                                    <li>Expanded Contacts Help with detailed emergency guide</li>
-                                    <li>Added "Safety First" section to Getting Started</li>
-                                    <li>Added Emergency 911 FAQ to Common Questions</li>
-                                    <li>Emergency info now easy to find in 3 Help sections</li>
+                                    <li>Fixed home page dashboard not updating when medication marked as taken</li>
+                                    <li>Dashboard now refreshes immediately after marking doses</li>
+                                    <li>"X taken / Y total" counter now accurate in real-time</li>
                                 </ul>
+                                <p style="margin: 10px 0 0 0; font-size: 13px; color: #666;">
+                                    <strong>Technical:</strong> Added missing <code>updateDashboard()</code> call in <code>markMedicationTaken()</code> function.
+                                </p>
                             </div>
                         </div>
 
                         <!-- Previous Versions -->
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-06-0241 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 6, 2026 at 2:41 AM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">📚 Documentation:</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Comprehensive Emergency 911 documentation</li>
+                                    <li>Added to 3 Help sections</li>
+                                </ul>
+                            </div>
+                        </div>
+
                         <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
                             <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-05-1703 UTC</h4>
                             <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 5, 2026 at 5:03 PM - Critical Bug Fixes</p>
@@ -3304,10 +3314,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-02-06-0241 UTC
+                        <strong>App Version:</strong> 2026-02-06-0300 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Emergency 911 Documentation (3 Help Sections)
+                        Fix: Dashboard Updates When Medication Marked Taken
                     </p>
                 </div>
             </div>
@@ -5306,6 +5316,7 @@
 
             saveData('users', users);
             loadMedications(users[currentUser].medications);
+            updateDashboard(); // Update home page dashboard
             loadHomeReminders();
         }
 
