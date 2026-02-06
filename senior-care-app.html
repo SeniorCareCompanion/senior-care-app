@@ -4,16 +4,17 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-06-0323 UTC - Added "About This App" Section
-    BUILD DATE: February 6, 2026 at 3:23 AM UTC
-    CHANGES: Added About section to Profile explaining why app was created
+    VERSION: 2026-02-06-1805 UTC - CRITICAL FIX: Medication Daily Reset
+    BUILD DATE: February 6, 2026 at 6:05 PM UTC
+    CHANGES: Fixed medications not resetting daily (missing save after reset)
     
-    ✨ NEW IN THIS VERSION:
-    - ℹ️ "About This App" section added to Profile
-    - Explains the problem we're solving
-    - Highlights key features and benefits
-    - Perfect for testers to understand the app's purpose
-    - Collapsible section like other Profile cards
+    🐛 CRITICAL BUG FIX:
+    - Fixed medications not resetting on new day
+    - Medications were resetting in memory but not being saved to localStorage
+    - Now medications properly reset and save when date changes
+    - Tasks already worked correctly (had save logic)
+    
+    ⚠️ NOTE: Bills do NOT reset daily by design (they stay paid)
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -3141,22 +3142,41 @@
                         <!-- Latest Version -->
                         <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #667eea;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-06-0323 UTC</h4>
-                                <span style="background: #667eea; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">CURRENT</span>
+                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-06-1805 UTC</h4>
+                                <span style="background: #e53e3e; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">CRITICAL FIX</span>
                             </div>
-                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 6, 2026 at 3:23 AM</p>
+                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 6, 2026 at 6:05 PM</p>
                             <div style="line-height: 1.8;">
-                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px;">✨ New Feature:</p>
+                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px; color: #e53e3e;">🐛 CRITICAL BUG FIX:</p>
                                 <ul style="margin: 5px 0; padding-left: 20px; font-size: 14px;">
-                                    <li>Added "About This App" section to Profile</li>
-                                    <li>Explains why the app was created</li>
-                                    <li>Highlights key features and benefits</li>
-                                    <li>Perfect for testers to understand the app's mission</li>
+                                    <li><strong>Fixed medications not resetting on new day</strong></li>
+                                    <li>Medications were resetting in memory but not being saved to localStorage</li>
+                                    <li>Now medications properly reset and save when date changes</li>
+                                    <li>Tasks already worked correctly (had save logic)</li>
                                 </ul>
+                                <div style="background: #fff3cd; padding: 10px; border-radius: 6px; margin-top: 10px; border-left: 3px solid #ffc107;">
+                                    <p style="margin: 0; font-size: 13px; color: #856404;">
+                                        <strong>⚠️ NOTE:</strong> Bills do NOT reset daily by design. When you pay a bill, it stays paid. If it's a recurring bill, a new bill is created for the next period.
+                                    </p>
+                                </div>
+                                <p style="margin: 10px 0 0 0; font-size: 13px; color: #666;">
+                                    <strong>Technical:</strong> Added save logic to <code>loadMedications()</code> function to persist daily reset to localStorage.
+                                </p>
                             </div>
                         </div>
 
                         <!-- Previous Versions -->
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-06-0323 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 6, 2026 at 3:23 AM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">✨ New Feature:</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Added "About This App" section to Profile</li>
+                                </ul>
+                            </div>
+                        </div>
+
                         <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
                             <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-06-0300 UTC</h4>
                             <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 6, 2026 at 3:00 AM</p>
@@ -3385,10 +3405,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-02-06-0323 UTC
+                        <strong>App Version:</strong> 2026-02-06-1805 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        New: "About This App" Section in Profile
+                        CRITICAL FIX: Medications Now Reset Daily
                     </p>
                 </div>
             </div>
@@ -4985,6 +5005,9 @@
             });
 
             const todayDate = new Date().toISOString().split('T')[0];
+            
+            // Track if any medications need to be reset
+            let medicationsUpdated = false;
 
             medications.forEach(med => {
                 try {
@@ -4998,6 +5021,7 @@
                     // Reset takenTimes if new day
                     if (med.lastTakenDate !== todayDate) {
                         med.takenTimes = [];
+                        medicationsUpdated = true;
                     }
                     
                     const shouldTakeToday = shouldTakeMedicationToday(med);
@@ -5096,6 +5120,14 @@
                     console.error('Error loading medication:', med, error);
                 }
             });
+            
+            // Save if any medications were reset
+            if (medicationsUpdated && currentUser) {
+                const users = loadData('users');
+                users[currentUser].medications = medications;
+                saveData('users', users);
+                console.log('✅ Medications reset for new day');
+            }
         }
 
         // Toggle medication card minimize/maximize
