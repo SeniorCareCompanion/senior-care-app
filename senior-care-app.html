@@ -4,20 +4,25 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-07-0051 UTC - Tasks Daily Reset + Removed Pricing
-    BUILD DATE: February 7, 2026 at 12:51 AM UTC
-    CHANGES: Fixed tasks not resetting daily + Removed "free forever" claims
+    VERSION: 2026-02-07-1825 UTC - CRITICAL: Installation Fix + Clickable Links
+    BUILD DATE: February 7, 2026 at 6:25 PM UTC
+    CHANGES: Fixed account loss issue + Made installation guide clickable
     
-    🐛 CRITICAL BUG FIX:
-    - Fixed tasks not resetting daily (same bug as medications)
-    - Tasks completed BEFORE the reset feature was added never reset
-    - Now resets any completed task without lastCompletedDate
-    - Both medications AND tasks now reset properly on new day
+    🚨 CRITICAL FIX #1: PREVENT ACCOUNT LOSS!
+    - Added prominent warning in Installation Guide
+    - Users MUST add to home screen BEFORE creating account
+    - Explains iOS localStorage limitation (Safari ≠ Home Screen App)
+    - Prevents data loss when adding to home screen
     
-    📝 BUSINESS UPDATE:
-    - Removed "Free Forever" and "No Subscriptions" claims
-    - App may have affordable subscription pricing in future
-    - Currently free for beta testers
+    🔗 FIX #2: CLICKABLE INSTALLATION LINKS
+    - Made all "Installation guide" references clickable
+    - Click to navigate directly to installation help
+    - Two locations fixed in Getting Started
+    
+    📝 PREVIOUS VERSION:
+    - Tasks daily reset fixed
+    - Medications daily reset fixed
+    - Removed "Free Forever" pricing claims
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -1899,7 +1904,7 @@
                                 
                                 <h3>📱 Your First Steps:</h3>
                                 <ol style="line-height: 2;">
-                                    <li><strong>Add to Home Screen:</strong> Follow the Installation guide (most important first step!)</li>
+                                    <li><strong>Add to Home Screen:</strong> <span onclick="showHelpTopic('installation'); showSection('help');" style="color: #667eea; cursor: pointer; text-decoration: underline; font-weight: 600;">Tap here for Installation Guide</span> (most important first step!)</li>
                                     <li><strong>Home Screen:</strong> See today's overview - medications to take, upcoming appointments, tasks to complete</li>
                                     <li><strong>Navigation Tabs:</strong> Tap the tabs at the top to switch between sections (Meds, Appts, Tasks, etc.)</li>
                                     <li><strong>Add Your First Item:</strong> Go to any section and fill in the form at the bottom</li>
@@ -1936,7 +1941,7 @@
 
                                 <h3>🎯 Quick Tips:</h3>
                                 <ul style="line-height: 2;">
-                                    <li>📱 <strong>Add to home screen</strong> for best experience (see Installation guide)</li>
+                                    <li>📱 <strong>Add to home screen</strong> for best experience (<span onclick="showHelpTopic('installation'); showSection('help');" style="color: #667eea; cursor: pointer; text-decoration: underline;">tap for Installation Guide</span>)</li>
                                     <li>🔔 <strong>Enable notifications</strong> in your Profile to never miss a reminder</li>
                                     <li>🎤 <strong>Turn on Voice Assistant</strong> in Profile to use voice commands</li>
                                     <li>💾 <strong>Backup your data</strong> regularly using Export Data in Profile</li>
@@ -1968,6 +1973,37 @@
                         <button class="btn" onclick="showHelpTopic('all-topics')" style="margin-bottom: 15px;">
                             ← Back to All Topics
                         </button>
+                        
+                        <!-- CRITICAL: Account Loss Prevention -->
+                        <div style="background: #fee; padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid #e53e3e;">
+                            <h3 style="margin-top: 0; color: #e53e3e;">🚨 CRITICAL: Prevent Account Loss!</h3>
+                            <p style="font-size: 16px; font-weight: 600; margin-bottom: 15px;">
+                                <strong>⚠️ YOU MUST FOLLOW THIS ORDER OR YOU WILL LOSE YOUR ACCOUNT!</strong>
+                            </p>
+                            <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                                <p style="margin: 0 0 10px 0; font-size: 15px; font-weight: 600; color: #e53e3e;">❌ WRONG WAY (Causes Account Loss):</p>
+                                <ol style="font-size: 14px; color: #666; line-height: 1.8;">
+                                    <li>Open app in Safari</li>
+                                    <li>Create account ❌ <em>(Your data will be lost!)</em></li>
+                                    <li>Add to Home Screen</li>
+                                    <li>Account is gone when you open from home screen</li>
+                                </ol>
+                            </div>
+                            <div style="background: #d4edda; padding: 15px; border-radius: 8px; border: 2px solid #28a745;">
+                                <p style="margin: 0 0 10px 0; font-size: 15px; font-weight: 600; color: #28a745;">✅ CORRECT WAY (Saves Your Account):</p>
+                                <ol style="font-size: 16px; line-height: 2; font-weight: 600;">
+                                    <li>Open app in Safari</li>
+                                    <li>⭐ Add to Home Screen FIRST (don't create account yet!)</li>
+                                    <li>Close Safari completely</li>
+                                    <li>Open app from Home Screen icon</li>
+                                    <li>NOW create your account ✅ <em>(Data will be saved!)</em></li>
+                                </ol>
+                            </div>
+                            <p style="margin: 15px 0 0 0; font-size: 13px; color: #666;">
+                                <strong>Why?</strong> Safari and Home Screen apps use different storage. If you create an account in Safari, then add to home screen, the Home Screen app won't see your account. You must create the account in the Home Screen app!
+                            </p>
+                        </div>
+                        
                         <div class="card">
                             <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
                                 📱 Add to Home Screen - Installation Guide
@@ -3145,33 +3181,51 @@
                         <!-- Latest Version -->
                         <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #667eea;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-07-0051 UTC</h4>
+                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-07-1825 UTC</h4>
                                 <span style="background: #e53e3e; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">CRITICAL FIX</span>
                             </div>
-                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 7, 2026 at 12:51 AM</p>
+                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 7, 2026 at 6:25 PM</p>
                             <div style="line-height: 1.8;">
-                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px; color: #e53e3e;">🐛 CRITICAL BUG FIX:</p>
+                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px; color: #e53e3e;">🚨 CRITICAL FIX #1: ACCOUNT LOSS PREVENTION</p>
                                 <ul style="margin: 5px 0; padding-left: 20px; font-size: 14px;">
-                                    <li><strong>Fixed tasks not resetting daily</strong> (same issue as medications)</li>
-                                    <li>Tasks completed BEFORE the reset feature was added never reset</li>
-                                    <li>Now resets any completed task without lastCompletedDate</li>
-                                    <li><strong>Both medications AND tasks now reset properly!</strong></li>
+                                    <li><strong>Added prominent warning in Installation Guide</strong></li>
+                                    <li>Users MUST add to home screen BEFORE creating account</li>
+                                    <li>Explains iOS localStorage limitation (Safari ≠ Home Screen App)</li>
+                                    <li>Prevents account/data loss when installing to home screen</li>
                                 </ul>
                                 
-                                <p style="margin: 15px 0 5px 0; font-weight: 600; font-size: 14px;">📝 Business Update:</p>
+                                <div style="background: #fff3cd; padding: 10px; border-radius: 6px; margin: 10px 0; border-left: 3px solid #ffc107;">
+                                    <p style="margin: 0; font-size: 13px; color: #856404;">
+                                        <strong>⚠️ For Beta Testers:</strong> If you already created an account in Safari BEFORE adding to home screen, you'll need to export your data, add to home screen, create new account, then import data. See Installation Guide for details.
+                                    </p>
+                                </div>
+                                
+                                <p style="margin: 15px 0 5px 0; font-weight: 600; font-size: 14px;">🔗 FIX #2: CLICKABLE LINKS</p>
                                 <ul style="margin: 5px 0; padding-left: 20px; font-size: 14px;">
-                                    <li>Removed "Free Forever" and "No Subscriptions" claims from app</li>
-                                    <li>May introduce affordable subscription pricing in future</li>
-                                    <li>Currently free for beta testers</li>
+                                    <li>Made all "Installation guide" references clickable</li>
+                                    <li>Click to navigate directly to installation help</li>
+                                    <li>Fixed in 2 locations (Getting Started, Quick Tips)</li>
                                 </ul>
                                 
                                 <p style="margin: 10px 0 0 0; font-size: 13px; color: #666;">
-                                    <strong>Technical:</strong> Modified reset logic in <code>loadTasks()</code> to handle tasks without <code>lastCompletedDate</code> property.
+                                    <strong>Technical:</strong> Added critical warning section to installation guide. Updated references in Help → Getting Started with clickable links using <code>onclick</code> handlers.
                                 </p>
                             </div>
                         </div>
 
                         <!-- Previous Versions -->
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-07-0051 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 7, 2026 at 12:51 AM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">🐛 Bug Fixes:</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Fixed tasks not resetting daily</li>
+                                    <li>Removed "Free Forever" pricing claims</li>
+                                </ul>
+                            </div>
+                        </div>
+
                         <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
                             <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-06-1805 UTC</h4>
                             <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 6, 2026 at 6:05 PM</p>
@@ -3421,15 +3475,13 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-02-07-0051 UTC
+                        <strong>App Version:</strong> 2026-02-07-1825 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        CRITICAL: Tasks Daily Reset Fixed + Pricing Updated
+                        CRITICAL: Account Loss Prevention + Clickable Links
                     </p>
                 </div>
             </div>
-        </div>
-    </div>
 
     <!-- Floating Help Button (hidden until login) -->
     <div id="floatingHelpBtn" class="floating-help-btn hidden" onclick="showSection('help')" title="Get Help">
