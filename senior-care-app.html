@@ -4,17 +4,20 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-06-1805 UTC - CRITICAL FIX: Medication Daily Reset
-    BUILD DATE: February 6, 2026 at 6:05 PM UTC
-    CHANGES: Fixed medications not resetting daily (missing save after reset)
+    VERSION: 2026-02-07-0051 UTC - Tasks Daily Reset + Removed Pricing
+    BUILD DATE: February 7, 2026 at 12:51 AM UTC
+    CHANGES: Fixed tasks not resetting daily + Removed "free forever" claims
     
     🐛 CRITICAL BUG FIX:
-    - Fixed medications not resetting on new day
-    - Medications were resetting in memory but not being saved to localStorage
-    - Now medications properly reset and save when date changes
-    - Tasks already worked correctly (had save logic)
+    - Fixed tasks not resetting daily (same bug as medications)
+    - Tasks completed BEFORE the reset feature was added never reset
+    - Now resets any completed task without lastCompletedDate
+    - Both medications AND tasks now reset properly on new day
     
-    ⚠️ NOTE: Bills do NOT reset daily by design (they stay paid)
+    📝 BUSINESS UPDATE:
+    - Removed "Free Forever" and "No Subscriptions" claims
+    - App may have affordable subscription pricing in future
+    - Currently free for beta testers
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -3142,30 +3145,44 @@
                         <!-- Latest Version -->
                         <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #667eea;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-06-1805 UTC</h4>
+                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-07-0051 UTC</h4>
                                 <span style="background: #e53e3e; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">CRITICAL FIX</span>
                             </div>
-                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 6, 2026 at 6:05 PM</p>
+                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 7, 2026 at 12:51 AM</p>
                             <div style="line-height: 1.8;">
                                 <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px; color: #e53e3e;">🐛 CRITICAL BUG FIX:</p>
                                 <ul style="margin: 5px 0; padding-left: 20px; font-size: 14px;">
-                                    <li><strong>Fixed medications not resetting on new day</strong></li>
-                                    <li>Medications were resetting in memory but not being saved to localStorage</li>
-                                    <li>Now medications properly reset and save when date changes</li>
-                                    <li>Tasks already worked correctly (had save logic)</li>
+                                    <li><strong>Fixed tasks not resetting daily</strong> (same issue as medications)</li>
+                                    <li>Tasks completed BEFORE the reset feature was added never reset</li>
+                                    <li>Now resets any completed task without lastCompletedDate</li>
+                                    <li><strong>Both medications AND tasks now reset properly!</strong></li>
                                 </ul>
-                                <div style="background: #fff3cd; padding: 10px; border-radius: 6px; margin-top: 10px; border-left: 3px solid #ffc107;">
-                                    <p style="margin: 0; font-size: 13px; color: #856404;">
-                                        <strong>⚠️ NOTE:</strong> Bills do NOT reset daily by design. When you pay a bill, it stays paid. If it's a recurring bill, a new bill is created for the next period.
-                                    </p>
-                                </div>
+                                
+                                <p style="margin: 15px 0 5px 0; font-weight: 600; font-size: 14px;">📝 Business Update:</p>
+                                <ul style="margin: 5px 0; padding-left: 20px; font-size: 14px;">
+                                    <li>Removed "Free Forever" and "No Subscriptions" claims from app</li>
+                                    <li>May introduce affordable subscription pricing in future</li>
+                                    <li>Currently free for beta testers</li>
+                                </ul>
+                                
                                 <p style="margin: 10px 0 0 0; font-size: 13px; color: #666;">
-                                    <strong>Technical:</strong> Added save logic to <code>loadMedications()</code> function to persist daily reset to localStorage.
+                                    <strong>Technical:</strong> Modified reset logic in <code>loadTasks()</code> to handle tasks without <code>lastCompletedDate</code> property.
                                 </p>
                             </div>
                         </div>
 
                         <!-- Previous Versions -->
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-06-1805 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 6, 2026 at 6:05 PM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">🐛 Bug Fix:</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Fixed medications not resetting daily</li>
+                                </ul>
+                            </div>
+                        </div>
+
                         <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
                             <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-06-0323 UTC</h4>
                             <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 6, 2026 at 3:23 AM</p>
@@ -3374,7 +3391,6 @@
                             <li><strong>🎤 Voice-enabled</strong> - 50+ commands for hands-free use</li>
                             <li><strong>🔒 Private</strong> - All data stays on your phone, never sent anywhere</li>
                             <li><strong>📴 Offline-first</strong> - Works without internet after installation</li>
-                            <li><strong>🆓 Free forever</strong> - No subscriptions, no ads, no hidden costs</li>
                             <li><strong>📱 iPhone optimized</strong> - Add to home screen, works like a native app</li>
                         </ul>
 
@@ -3405,10 +3421,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-02-06-1805 UTC
+                        <strong>App Version:</strong> 2026-02-07-0051 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        CRITICAL FIX: Medications Now Reset Daily
+                        CRITICAL: Tasks Daily Reset Fixed + Pricing Updated
                     </p>
                 </div>
             </div>
@@ -6311,9 +6327,12 @@
             ['meals', 'hydration', 'hygiene', 'safety'].forEach(category => {
                 if (tasks[category]) {
                     tasks[category].forEach(task => {
-                        // Reset task if it was completed on a previous day
-                        if (task.completed && task.lastCompletedDate && task.lastCompletedDate !== todayDate) {
+                        // Reset task if:
+                        // 1. It's completed AND has no lastCompletedDate (old task from before this feature)
+                        // 2. It's completed AND lastCompletedDate is from a previous day
+                        if (task.completed && (!task.lastCompletedDate || task.lastCompletedDate !== todayDate)) {
                             task.completed = false;
+                            task.lastCompletedDate = null; // Clear it so it gets set fresh next time
                             tasksUpdated = true;
                         }
                     });
