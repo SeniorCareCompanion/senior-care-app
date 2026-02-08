@@ -4,25 +4,22 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-07-1825 UTC - CRITICAL: Installation Fix + Clickable Links
-    BUILD DATE: February 7, 2026 at 6:25 PM UTC
-    CHANGES: Fixed account loss issue + Made installation guide clickable
+    VERSION: 2026-02-08-1820 UTC - CRITICAL: Installation Instructions Always Visible
+    BUILD DATE: February 8, 2026 at 6:20 PM UTC
+    CHANGES: Made installation instructions ALWAYS VISIBLE on login screen
     
-    🚨 CRITICAL FIX #1: PREVENT ACCOUNT LOSS!
-    - Added prominent warning in Installation Guide
-    - Users MUST add to home screen BEFORE creating account
-    - Explains iOS localStorage limitation (Safari ≠ Home Screen App)
-    - Prevents data loss when adding to home screen
-    
-    🔗 FIX #2: CLICKABLE INSTALLATION LINKS
-    - Made all "Installation guide" references clickable
-    - Click to navigate directly to installation help
-    - Two locations fixed in Getting Started
+    🚨 CRITICAL FIX: INSTALLATION INSTRUCTIONS NOW ALWAYS VISIBLE!
+    - Removed collapsed <details> element on login screen
+    - Installation instructions now ALWAYS shown (can't be missed!)
+    - Seniors don't have to click "Tap to Expand" anymore
+    - Instructions are prominent with step-by-step guide
+    - Warning about data loss is highlighted in red
     
     📝 PREVIOUS VERSION:
-    - Tasks daily reset fixed
-    - Medications daily reset fixed
-    - Removed "Free Forever" pricing claims
+    - Installation instructions were on login screen but COLLAPSED
+    - Users had to click to expand (many didn't know to click)
+    - Account loss prevention warning
+    - Clickable installation links in Help
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -1018,6 +1015,49 @@
         <div id="loginScreen" class="login-screen">
             <div class="logo-emoji">🏥</div>
             <h1>Senior Care Companion</h1>
+            
+            <!-- CRITICAL: Install First Warning -->
+            <div style="background: linear-gradient(135deg, #fee 0%, #ffc107 100%); padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid #e53e3e; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <div style="font-size: 48px; margin-bottom: 8px;">⚠️</div>
+                    <h2 style="margin: 0; color: #e53e3e; font-size: 20px;">FIRST TIME USER?</h2>
+                    <p style="margin: 5px 0 0 0; font-size: 16px; font-weight: 600; color: #333;">READ THIS BEFORE CREATING AN ACCOUNT!</p>
+                </div>
+                
+                <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <p style="margin: 0 0 12px 0; font-size: 15px; font-weight: 600; color: #e53e3e;">
+                        🚨 YOU MUST DO THIS IN THE CORRECT ORDER OR YOU WILL LOSE YOUR ACCOUNT!
+                    </p>
+                    <div style="background: #d4edda; padding: 12px; border-radius: 6px; border: 2px solid #28a745;">
+                        <p style="margin: 0 0 8px 0; font-size: 14px; font-weight: 600; color: #28a745;">✅ CORRECT ORDER:</p>
+                        <ol style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 2; color: #333;">
+                            <li><strong>Add to Home Screen FIRST</strong> (instructions below)</li>
+                            <li><strong>Close Safari completely</strong></li>
+                            <li><strong>Open app from Home Screen icon</strong></li>
+                            <li><strong>THEN create your account</strong></li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(255,255,255,0.95); padding: 15px; border-radius: 8px; border: 2px solid #667eea;">
+                    <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #667eea; text-align: center;">
+                        📱 HOW TO ADD TO HOME SCREEN:
+                    </h3>
+                    <ol style="margin: 0; padding-left: 20px; line-height: 2.2; font-size: 14px; color: #333; font-weight: 500;">
+                        <li>Tap the <strong>Share button ⬆️</strong> at the bottom of Safari</li>
+                        <li>Scroll down in the menu</li>
+                        <li>Tap <strong>"Add to Home Screen"</strong></li>
+                        <li>Tap <strong>"Add"</strong> in the top right</li>
+                        <li>Close Safari</li>
+                        <li>Open the app from your home screen icon</li>
+                        <li><strong style="color: #28a745;">NOW you can create your account!</strong></li>
+                    </ol>
+                    <p style="margin: 12px 0 0 0; font-size: 13px; color: #e53e3e; font-weight: 600; text-align: center; padding: 10px; background: #fee; border-radius: 6px;">
+                        ⚠️ Why? Safari and Home Screen apps use different storage. If you create an account here first, it will be LOST when you add to home screen!
+                    </p>
+                </div>
+            </div>
+            
             <div class="input-group">
                 <label for="loginUsername">Username</label>
                 <input type="text" id="loginUsername" placeholder="Enter your username" autocomplete="username">
@@ -1084,6 +1124,34 @@
         <div id="registerScreen" class="register-screen hidden">
             <div class="logo-emoji">👤</div>
             <h1>Create New Account</h1>
+            
+            <!-- CRITICAL: Install First Warning -->
+            <div style="background: linear-gradient(135deg, #fee 0%, #ffc107 100%); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 3px solid #e53e3e;">
+                <div style="text-align: center;">
+                    <div style="font-size: 36px; margin-bottom: 5px;">⚠️</div>
+                    <h3 style="margin: 0; color: #e53e3e; font-size: 16px;">STOP! DID YOU ADD TO HOME SCREEN FIRST?</h3>
+                </div>
+                
+                <div style="background: white; padding: 12px; border-radius: 6px; margin-top: 12px;">
+                    <p style="margin: 0 0 10px 0; font-size: 13px; font-weight: 600; color: #e53e3e;">
+                        If you create an account NOW (in Safari), you will LOSE IT when you add to home screen!
+                    </p>
+                    <div style="background: #d4edda; padding: 10px; border-radius: 6px; border: 2px solid #28a745;">
+                        <p style="margin: 0 0 8px 0; font-size: 13px; font-weight: 600; color: #28a745;">✅ You MUST:</p>
+                        <ol style="margin: 0; padding-left: 18px; font-size: 12px; line-height: 1.8; color: #333;">
+                            <li>Go back to login screen</li>
+                            <li>Add to Home Screen FIRST (see instructions there)</li>
+                            <li>Open from home screen icon</li>
+                            <li>THEN create account</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <button onclick="showLogin()" style="width: 100%; margin-top: 12px; padding: 10px; background: #667eea; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                    ← Go Back & Add to Home Screen First
+                </button>
+            </div>
+            
             <div class="input-group">
                 <label for="regName">Full Name</label>
                 <input type="text" id="regName" placeholder="Enter your full name" autocomplete="name">
@@ -3181,39 +3249,56 @@
                         <!-- Latest Version -->
                         <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #667eea;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-07-1825 UTC</h4>
-                                <span style="background: #e53e3e; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">CRITICAL FIX</span>
+                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-08-1820 UTC</h4>
+                                <span style="background: #28a745; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">UX FIX</span>
                             </div>
-                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 7, 2026 at 6:25 PM</p>
+                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 8, 2026 at 6:20 PM</p>
                             <div style="line-height: 1.8;">
-                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px; color: #e53e3e;">🚨 CRITICAL FIX #1: ACCOUNT LOSS PREVENTION</p>
+                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px; color: #28a745;">✅ INSTALLATION INSTRUCTIONS NOW ALWAYS VISIBLE!</p>
                                 <ul style="margin: 5px 0; padding-left: 20px; font-size: 14px;">
-                                    <li><strong>Added prominent warning in Installation Guide</strong></li>
-                                    <li>Users MUST add to home screen BEFORE creating account</li>
-                                    <li>Explains iOS localStorage limitation (Safari ≠ Home Screen App)</li>
-                                    <li>Prevents account/data loss when installing to home screen</li>
+                                    <li><strong>Removed collapsed instructions</strong> - No more "Tap to Expand"!</li>
+                                    <li>Installation steps now <strong>ALWAYS visible</strong> on login screen</li>
+                                    <li>Seniors don't have to click anything to see instructions</li>
+                                    <li>Step-by-step guide is prominent and impossible to miss</li>
                                 </ul>
                                 
                                 <div style="background: #fff3cd; padding: 10px; border-radius: 6px; margin: 10px 0; border-left: 3px solid #ffc107;">
                                     <p style="margin: 0; font-size: 13px; color: #856404;">
-                                        <strong>⚠️ For Beta Testers:</strong> If you already created an account in Safari BEFORE adding to home screen, you'll need to export your data, add to home screen, create new account, then import data. See Installation Guide for details.
+                                        <strong>⚠️ WHY THIS MATTERS:</strong> Previous version had instructions in a collapsed <code>&lt;details&gt;</code> element. Many seniors didn't know to click "Tap to Expand" so they missed the critical installation steps!
                                     </p>
                                 </div>
                                 
-                                <p style="margin: 15px 0 5px 0; font-weight: 600; font-size: 14px;">🔗 FIX #2: CLICKABLE LINKS</p>
-                                <ul style="margin: 5px 0; padding-left: 20px; font-size: 14px;">
-                                    <li>Made all "Installation guide" references clickable</li>
-                                    <li>Click to navigate directly to installation help</li>
-                                    <li>Fixed in 2 locations (Getting Started, Quick Tips)</li>
-                                </ul>
-                                
                                 <p style="margin: 10px 0 0 0; font-size: 13px; color: #666;">
-                                    <strong>Technical:</strong> Added critical warning section to installation guide. Updated references in Help → Getting Started with clickable links using <code>onclick</code> handlers.
+                                    <strong>Technical:</strong> Replaced <code>&lt;details&gt;</code> element with always-visible div. Instructions now display by default with clear formatting and highlighted warning about data loss.
                                 </p>
                             </div>
                         </div>
 
                         <!-- Previous Versions -->
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-07-1900 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 7, 2026 at 7:00 PM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">🚨 UX Fix:</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Added installation warning to login/register screens</li>
+                                    <li>Instructions were collapsible (required clicking)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-07-1825 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 7, 2026 at 6:25 PM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">🐛 Fixes:</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Installation warning in Help section</li>
+                                    <li>Clickable installation guide links</li>
+                                </ul>
+                            </div>
+                        </div>
+
                         <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
                             <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-07-0051 UTC</h4>
                             <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 7, 2026 at 12:51 AM</p>
@@ -3475,10 +3560,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-02-07-1825 UTC
+                        <strong>App Version:</strong> 2026-02-08-1820 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        CRITICAL: Account Loss Prevention + Clickable Links
+                        Installation Instructions Always Visible!
                     </p>
                 </div>
             </div>
