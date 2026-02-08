@@ -4,29 +4,27 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-08-1840 UTC - CRITICAL: Exact iPhone Installation Steps
-    BUILD DATE: February 8, 2026 at 6:40 PM UTC
-    CHANGES: Updated with EXACT iPhone installation steps (tested on real device)
+    VERSION: 2026-02-08-2043 UTC - UX: Auto-Hide First Time Warning
+    BUILD DATE: February 8, 2026 at 8:43 PM UTC
+    CHANGES: First time user warning now auto-hides after registration/login
     
-    🎯 CRITICAL UPDATE: EXACT INSTALLATION STEPS!
-    - Updated installation steps to match EXACT iPhone behavior
-    - Key addition: Step 5 "Select 3 dots … (bottom right of page)"
-    - This is critical - the 3 dots menu must be tapped BEFORE Share button appears!
-    - All 13 steps now match real-world iPhone testing
-    - Updated in BOTH login screen AND Help section
+    ✨ UX IMPROVEMENT: CLEAN LOGIN SCREEN FOR RETURNING USERS!
+    - First time visitors: See big installation warning ✅
+    - After registration/login: Warning automatically disappears ✅
+    - Uses localStorage flag 'appInstalled' to track setup completion
+    - Login screen is now clean and simple for returning users
+    - No more giant warning box cluttering the interface!
     
-    📝 THE EXACT STEPS (13 Total):
-    1-4: Open link from text/email in Safari
-    5: Select 3 dots … (bottom right) ← CRITICAL NEW STEP!
-    6: Tap Share button ⬆️
-    7-10: Add to Home Screen process
-    11: Close Safari completely
-    12: Open from home screen icon
-    13: NOW create account!
+    📝 HOW IT WORKS:
+    - On page load: Check if localStorage.getItem('appInstalled') === 'true'
+    - If true: Hide #firstTimeUserWarning div
+    - On successful login: Set localStorage.setItem('appInstalled', 'true')
+    - On successful registration: Set localStorage.setItem('appInstalled', 'true')
     
-    📝 PREVIOUS VERSION:
-    - Installation instructions always visible (not collapsed)
-    - But missing the "3 dots" step which caused confusion
+    📝 PREVIOUS VERSION (2026-02-08-1840 UTC):
+    - Exact iPhone installation steps (13 steps including "3 dots" menu)
+    - Instructions always visible (not collapsed)
+    - Account loss prevention warning
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -1016,7 +1014,7 @@
             <h1>Senior Care Companion</h1>
             
             <!-- CRITICAL: Install First Warning -->
-            <div style="background: linear-gradient(135deg, #fee 0%, #ffc107 100%); padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid #e53e3e; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <div id="firstTimeUserWarning" style="background: linear-gradient(135deg, #fee 0%, #ffc107 100%); padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid #e53e3e; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                 <div style="text-align: center; margin-bottom: 15px;">
                     <div style="font-size: 48px; margin-bottom: 8px;">⚠️</div>
                     <h2 style="margin: 0; color: #e53e3e; font-size: 20px;">FIRST TIME USER?</h2>
@@ -3281,33 +3279,44 @@
                         <!-- Latest Version -->
                         <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #667eea;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-08-1840 UTC</h4>
-                                <span style="background: #667eea; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">INSTRUCTIONS UPDATE</span>
+                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-08-2043 UTC</h4>
+                                <span style="background: #38b2ac; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">UX IMPROVEMENT</span>
                             </div>
-                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 8, 2026 at 6:40 PM</p>
+                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 8, 2026 at 8:43 PM</p>
                             <div style="line-height: 1.8;">
-                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px; color: #667eea;">📱 EXACT IPHONE INSTALLATION STEPS!</p>
+                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px; color: #38b2ac;">✨ FIRST TIME WARNING AUTO-HIDES AFTER SETUP!</p>
                                 <ul style="margin: 5px 0; padding-left: 20px; font-size: 14px;">
-                                    <li><strong>Updated with exact steps tested on real iPhone</strong></li>
-                                    <li>Key addition: <strong>"Select 3 dots … (bottom right)"</strong> step</li>
-                                    <li>This step is CRITICAL - must tap 3 dots menu before Share button appears!</li>
-                                    <li>All 13 steps now match real-world iPhone behavior</li>
-                                    <li>Updated in BOTH login screen AND Help section</li>
+                                    <li><strong>First visit:</strong> Big installation warning is displayed ✅</li>
+                                    <li><strong>After registration/login:</strong> Warning automatically disappears ✅</li>
+                                    <li>Login screen is now clean and simple for returning users</li>
+                                    <li>Uses localStorage flag to track if setup is complete</li>
                                 </ul>
                                 
                                 <div style="background: #d4edda; padding: 10px; border-radius: 6px; margin: 10px 0; border-left: 3px solid #28a745;">
                                     <p style="margin: 0; font-size: 13px; color: #28a745;">
-                                        <strong>✅ TESTED ON REAL DEVICE:</strong> These steps were tested step-by-step on an actual iPhone to ensure they're 100% accurate for seniors!
+                                        <strong>✅ BETTER UX:</strong> The installation warning is critical for first-time users but clutters the login screen for returning users. Now it automatically disappears after you complete setup - best of both worlds!
                                     </p>
                                 </div>
                                 
                                 <p style="margin: 10px 0 0 0; font-size: 13px; color: #666;">
-                                    <strong>Technical:</strong> Updated installation instructions in <code>loginScreen</code> and Help section's installation guide to include all 13 steps including the critical "3 dots menu" step that was missing before.
+                                    <strong>Technical:</strong> Added <code>appInstalled</code> flag to localStorage. Set after successful login/registration. Checked on page load to hide <code>#firstTimeUserWarning</code> div.
                                 </p>
                             </div>
                         </div>
 
                         <!-- Previous Versions -->
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-08-1840 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 8, 2026 at 6:40 PM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">📱 Updates:</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Exact iPhone installation steps (13 steps tested on real device)</li>
+                                    <li>Added critical "3 dots menu" step</li>
+                                </ul>
+                            </div>
+                        </div>
+
                         <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
                             <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-08-1820 UTC</h4>
                             <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 8, 2026 at 6:20 PM</p>
@@ -3604,10 +3613,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-02-08-1840 UTC
+                        <strong>App Version:</strong> 2026-02-08-2043 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Exact iPhone Installation Steps (Real Device Tested!)
+                        First Time Warning Auto-Hides After Setup!
                     </p>
                 </div>
             </div>
@@ -4387,6 +4396,10 @@
             };
 
             saveData('users', users);
+            
+            // Mark that app has been successfully installed/setup
+            localStorage.setItem('appInstalled', 'true');
+            
             alert('Account created successfully!');
             speak('Account created successfully');
             showLogin();
@@ -4472,6 +4485,9 @@
             
             // Persist session to localStorage to survive page reloads/sleep
             localStorage.setItem('currentUser', username);
+            
+            // Mark that app has been successfully installed/setup
+            localStorage.setItem('appInstalled', 'true');
             
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
@@ -10987,6 +11003,17 @@
         // Restore session on page load (prevents logout after sleep/reload)
         document.addEventListener('DOMContentLoaded', function() {
             console.log('📱 Page loaded - checking for saved session...');
+            
+            // Check if user has completed setup (hide first time warning)
+            const appInstalled = localStorage.getItem('appInstalled');
+            if (appInstalled === 'true') {
+                const warningDiv = document.getElementById('firstTimeUserWarning');
+                if (warningDiv) {
+                    warningDiv.style.display = 'none';
+                    console.log('✅ Hiding first-time user warning (app already installed)');
+                }
+            }
+            
             const sessionRestored = restoreSession();
             if (sessionRestored) {
                 console.log('✅ User automatically logged in from saved session');
