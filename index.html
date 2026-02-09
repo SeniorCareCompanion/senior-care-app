@@ -4,23 +4,28 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-09-2226 UTC - MAJOR: Profile/Settings Split Complete!
-    BUILD DATE: February 9, 2026 at 10:26 PM UTC
-    CHANGES: Split Profile into Profile + Settings for cleaner UX
+    VERSION: 2026-02-09-2247 UTC - BUGFIX: Profile/Settings Tabs Now Display
+    BUILD DATE: February 9, 2026 at 10:47 PM UTC
+    CHANGES: Fixed Profile/Settings tabs not displaying content
     
-    ✨ MAJOR UX IMPROVEMENT: PROFILE/SETTINGS SPLIT!
-    - Added new Settings tab (separate from Profile)
-    - Moved Voice, Notifications, Data, Release Notes, About to Settings
-    - Profile now only has: Personal Info, Update Profile, Change Password
-    - Top navigation with Profile & Settings tabs
-    - Each section has its own expand/collapse controls
-    - Cleaner, more organized interface for seniors!
+    🐛 CRITICAL BUGFIX: PROFILE/SETTINGS TABS NOW WORK!
+    - Fixed showTopSection() to use 'active' class (was using 'hidden')
+    - Profile and Settings tabs now properly display their content
+    - Fixed conflict between showSection() and showTopSection()
+    - Top tab styling now resets when clicking main navigation tabs
     
-    📝 WHAT'S WHERE:
-    Profile Tab: Personal Information, Update Profile, Change Password
-    Settings Tab: Voice Settings, Notifications, Data Management, Release Notes, About This App
+    📝 WHAT WAS WRONG:
+    - showSection() uses 'active' class to show sections
+    - showTopSection() was using 'hidden' class
+    - They conflicted - sections wouldn't show!
     
-    📝 PREVIOUS VERSION (2026-02-08-2043 UTC):
+    ✅ NOW FIXED:
+    - Both functions use the same 'active' class system
+    - showTopSection() hides all sections, then shows the selected one
+    - showSection() resets top tab styling
+    - Everything works perfectly!
+    
+    📝 PREVIOUS VERSION (2026-02-09-2226 UTC):
     - First time warning auto-hides after setup
     - Exact iPhone installation steps
     - Account loss prevention
@@ -3304,33 +3309,43 @@
                         <!-- Latest Version -->
                         <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #667eea;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-09-2226 UTC</h4>
-                                <span style="background: #667eea; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">MAJOR UPDATE</span>
+                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-09-2247 UTC</h4>
+                                <span style="background: #e53e3e; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">CRITICAL BUGFIX</span>
                             </div>
-                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 9, 2026 at 10:26 PM</p>
+                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 9, 2026 at 10:47 PM</p>
                             <div style="line-height: 1.8;">
-                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px; color: #667eea;">✨ PROFILE/SETTINGS SPLIT - CLEANER INTERFACE!</p>
+                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px; color: #e53e3e;">🐛 FIXED: PROFILE/SETTINGS TABS NOW DISPLAY!</p>
                                 <ul style="margin: 5px 0; padding-left: 20px; font-size: 14px;">
-                                    <li><strong>Added new Settings tab</strong> (separate from Profile)</li>
-                                    <li><strong>Profile tab</strong> now only has: Personal Info, Update Profile, Change Password</li>
-                                    <li><strong>Settings tab</strong> now has: Voice, Notifications, Data, Release Notes, About</li>
-                                    <li>Top navigation with Profile & Settings buttons</li>
-                                    <li>Each section has its own Expand/Collapse controls</li>
+                                    <li><strong>Fixed tabs not showing content</strong> when clicked</li>
+                                    <li>Problem: showTopSection() was using 'hidden' class instead of 'active'</li>
+                                    <li>Both functions now use the same 'active' class system</li>
+                                    <li>Profile and Settings tabs now work perfectly!</li>
                                 </ul>
                                 
-                                <div style="background: #d4edda; padding: 10px; border-radius: 6px; margin: 10px 0; border-left: 3px solid #28a745;">
-                                    <p style="margin: 0; font-size: 13px; color: #28a745;">
-                                        <strong>✅ MUCH CLEANER:</strong> Profile was too busy with 8 different cards. Now it's split into Profile (3 cards for personal info) and Settings (5 cards for app configuration). Easier for seniors to find what they need!
+                                <div style="background: #fff3cd; padding: 10px; border-radius: 6px; margin: 10px 0; border-left: 3px solid #ffc107;">
+                                    <p style="margin: 0; font-size: 13px; color: #856404;">
+                                        <strong>⚠️ WHAT HAPPENED:</strong> The voice announcements worked ("Showing profile", "Showing settings"), but the content didn't display because of a CSS class mismatch. Now fixed!
                                     </p>
                                 </div>
                                 
                                 <p style="margin: 10px 0 0 0; font-size: 13px; color: #666;">
-                                    <strong>Technical:</strong> Created separate <code>settings</code> section. Added <code>showTopSection()</code> function, <code>toggleSettingsCard()</code>, <code>expandAllSettingsCards()</code>, and <code>collapseAllSettingsCards()</code> functions. Moved 6 cards from Profile to Settings.
+                                    <strong>Technical:</strong> Updated <code>showTopSection()</code> to use <code>classList.add('active')</code> instead of <code>classList.remove('hidden')</code>. Updated <code>showSection()</code> to reset top tab styling.
                                 </p>
                             </div>
                         </div>
 
                         <!-- Previous Versions -->
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-09-2226 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 9, 2026 at 10:26 PM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">✨ Major:</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Profile/Settings split (but tabs didn't work - fixed in next version)</li>
+                                </ul>
+                            </div>
+                        </div>
+
                         <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
                             <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-08-2043 UTC</h4>
                             <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 8, 2026 at 8:43 PM</p>
@@ -3653,10 +3668,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-02-09-2226 UTC
+                        <strong>App Version:</strong> 2026-02-09-2247 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Profile/Settings Split - Cleaner Interface!
+                        Profile/Settings Tabs Fixed!
                     </p>
                 </div>
             </div>
@@ -4855,6 +4870,14 @@
                 if (tab.textContent.toLowerCase().includes(sectionName.split('-')[0])) {
                     tab.classList.add('active');
                 }
+            });
+            
+            // Reset top tab styling when showing main sections
+            const topTabs = document.querySelectorAll('.top-nav-tab');
+            topTabs.forEach(tab => {
+                tab.style.background = 'rgba(255,255,255,0.25)';
+                tab.style.color = 'white';
+                tab.style.boxShadow = 'none';
             });
             
             // Simplified voice announcements - just say the section name
@@ -8128,14 +8151,24 @@
 
         // Show top section (Profile or Settings)
         function showTopSection(sectionName) {
-            // Hide all top sections
-            document.getElementById('profile').classList.add('hidden');
-            document.getElementById('settings').classList.add('hidden');
+            // Hide ALL sections (both main tabs and top tabs)
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
             
-            // Show selected section
-            document.getElementById(sectionName).classList.remove('hidden');
+            // Remove active from all main navigation tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
             
-            // Update tab styling
+            // Show the selected top section
+            const section = document.getElementById(sectionName);
+            if (section) {
+                section.classList.add('active');
+                section.classList.remove('hidden');  // Remove hidden class too, just in case
+            }
+            
+            // Update top tab styling
             const tabs = document.querySelectorAll('.top-nav-tab');
             tabs.forEach(tab => {
                 const tabId = tab.id.replace('topTab-', '');
