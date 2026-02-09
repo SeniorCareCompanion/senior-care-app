@@ -4,28 +4,30 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-09-2247 UTC - BUGFIX: Profile/Settings Tabs Now Display
-    BUILD DATE: February 9, 2026 at 10:47 PM UTC
-    CHANGES: Fixed Profile/Settings tabs not displaying content
+    VERSION: 2026-02-09-2303 UTC - FIXED: Settings Cards Now Initialize + Thinner Tabs
+    BUILD DATE: February 9, 2026 at 11:03 PM UTC
+    CHANGES: Settings cards now properly initialize and display + Thinner top navigation
     
-    🐛 CRITICAL BUGFIX: PROFILE/SETTINGS TABS NOW WORK!
-    - Fixed showTopSection() to use 'active' class (was using 'hidden')
-    - Profile and Settings tabs now properly display their content
-    - Fixed conflict between showSection() and showTopSection()
-    - Top tab styling now resets when clicking main navigation tabs
+    ✅ FIX #1: SETTINGS CARDS NOW INITIALIZE!
+    - Added initialization code in showTopSection() for Settings
+    - On first view, all Settings cards default to expanded
+    - Respects saved state from localStorage if available
+    - Cards now properly display when Settings tab is clicked
+    
+    ✨ FIX #2: THINNER TOP NAVIGATION!
+    - Reduced Profile/Settings section padding: 10px → 6px
+    - Reduced button padding: 12px 24px → 8px 16px  
+    - Reduced font size: 17px → 14px (matches Logout button)
+    - Reduced border radius: 25px → 20px
+    - Buttons look cleaner and don't crowd main navigation tabs
     
     📝 WHAT WAS WRONG:
-    - showSection() uses 'active' class to show sections
-    - showTopSection() was using 'hidden' class
-    - They conflicted - sections wouldn't show!
+    - Settings cards weren't being initialized on first display
+    - Unlike Profile (which gets loaded with data), Settings just appeared
+    - Card content divs had no explicit display style set
+    - Now explicitly sets display: '' (visible) or 'none' based on saved state
     
-    ✅ NOW FIXED:
-    - Both functions use the same 'active' class system
-    - showTopSection() hides all sections, then shows the selected one
-    - showSection() resets top tab styling
-    - Everything works perfectly!
-    
-    📝 PREVIOUS VERSION (2026-02-09-2226 UTC):
+    📝 PREVIOUS VERSION (2026-02-09-2300 UTC):
     - First time warning auto-hides after setup
     - Exact iPhone installation steps
     - Account loss prevention
@@ -1270,11 +1272,11 @@
             </div>
 
             <!-- Top Section: Profile & Settings -->
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 10px 15px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                <button class="top-nav-tab" onclick="showTopSection('profile')" id="topTab-profile" style="background: white; color: #667eea; border: none; padding: 12px 24px; border-radius: 25px; font-size: 17px; font-weight: 600; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.15);">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 6px 15px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <button class="top-nav-tab" onclick="showTopSection('profile')" id="topTab-profile" style="background: white; color: #667eea; border: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.15);">
                     👤 Profile
                 </button>
-                <button class="top-nav-tab" onclick="showTopSection('settings')" id="topTab-settings" style="background: rgba(255,255,255,0.25); color: white; border: none; padding: 12px 24px; border-radius: 25px; font-size: 17px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                <button class="top-nav-tab" onclick="showTopSection('settings')" id="topTab-settings" style="background: rgba(255,255,255,0.25); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
                     ⚙️ Settings
                 </button>
             </div>
@@ -3105,7 +3107,7 @@
                 
                 <!-- Release Notes / What's New -->
             <!-- Settings Section -->
-            <div id="settings" class="section hidden">
+            <div id="settings" class="section">
                 <h2 class="section-title">⚙️ Settings</h2>
                 
                 <!-- Expand/Collapse All Controls -->
@@ -3668,10 +3670,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-02-09-2247 UTC
+                        <strong>App Version:</strong> 2026-02-09-2303 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Profile/Settings Tabs Fixed!
+                        Settings Cards Initialize + Thinner Navigation!
                     </p>
                 </div>
             </div>
@@ -8166,6 +8168,33 @@
             if (section) {
                 section.classList.add('active');
                 section.classList.remove('hidden');  // Remove hidden class too, just in case
+            }
+            
+            // If showing Settings for the first time, ensure all cards are visible
+            if (sectionName === 'settings') {
+                // Check if we need to initialize Settings cards
+                const voiceCard = document.getElementById('settingsCard-voiceSettings');
+                if (voiceCard && !voiceCard.style.display) {
+                    // First time showing Settings - make sure all cards are expanded
+                    const settingsCards = ['voiceSettings', 'notifications', 'dataManagement', 'releaseNotes', 'aboutApp'];
+                    const minimizedSettings = JSON.parse(localStorage.getItem('minimizedSettings') || '{}');
+                    
+                    settingsCards.forEach(cardKey => {
+                        const contentDiv = document.getElementById(`settingsCard-${cardKey}`);
+                        const toggleIcon = document.getElementById(`settings-toggle-icon-${cardKey}`);
+                        
+                        if (contentDiv && toggleIcon) {
+                            // Respect saved state, or default to expanded
+                            if (minimizedSettings[cardKey]) {
+                                contentDiv.style.display = 'none';
+                                toggleIcon.textContent = '▼';
+                            } else {
+                                contentDiv.style.display = '';
+                                toggleIcon.textContent = '▲';
+                            }
+                        }
+                    });
+                }
             }
             
             // Update top tab styling
