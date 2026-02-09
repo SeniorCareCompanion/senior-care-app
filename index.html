@@ -4,27 +4,26 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-08-2043 UTC - UX: Auto-Hide First Time Warning
-    BUILD DATE: February 8, 2026 at 8:43 PM UTC
-    CHANGES: First time user warning now auto-hides after registration/login
+    VERSION: 2026-02-09-2226 UTC - MAJOR: Profile/Settings Split Complete!
+    BUILD DATE: February 9, 2026 at 10:26 PM UTC
+    CHANGES: Split Profile into Profile + Settings for cleaner UX
     
-    ✨ UX IMPROVEMENT: CLEAN LOGIN SCREEN FOR RETURNING USERS!
-    - First time visitors: See big installation warning ✅
-    - After registration/login: Warning automatically disappears ✅
-    - Uses localStorage flag 'appInstalled' to track setup completion
-    - Login screen is now clean and simple for returning users
-    - No more giant warning box cluttering the interface!
+    ✨ MAJOR UX IMPROVEMENT: PROFILE/SETTINGS SPLIT!
+    - Added new Settings tab (separate from Profile)
+    - Moved Voice, Notifications, Data, Release Notes, About to Settings
+    - Profile now only has: Personal Info, Update Profile, Change Password
+    - Top navigation with Profile & Settings tabs
+    - Each section has its own expand/collapse controls
+    - Cleaner, more organized interface for seniors!
     
-    📝 HOW IT WORKS:
-    - On page load: Check if localStorage.getItem('appInstalled') === 'true'
-    - If true: Hide #firstTimeUserWarning div
-    - On successful login: Set localStorage.setItem('appInstalled', 'true')
-    - On successful registration: Set localStorage.setItem('appInstalled', 'true')
+    📝 WHAT'S WHERE:
+    Profile Tab: Personal Information, Update Profile, Change Password
+    Settings Tab: Voice Settings, Notifications, Data Management, Release Notes, About This App
     
-    📝 PREVIOUS VERSION (2026-02-08-1840 UTC):
-    - Exact iPhone installation steps (13 steps including "3 dots" menu)
-    - Instructions always visible (not collapsed)
-    - Account loss prevention warning
+    📝 PREVIOUS VERSION (2026-02-08-2043 UTC):
+    - First time warning auto-hides after setup
+    - Exact iPhone installation steps
+    - Account loss prevention
     
     ✅ THIS IS A SINGLE-FILE VERSION!
     ✅ No other files needed (no manifest.json, no service-worker.js)
@@ -1260,10 +1259,19 @@
                 <div class="user-info">
                     <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                         <span id="userName">Welcome!</span>
-                        <button class="btn btn-secondary" onclick="showSection('profile')" style="padding: 8px 16px; font-size: 14px; margin: 0;">👤 Profile</button>
                     </div>
                     <button class="btn btn-danger" onclick="logout()" style="padding: 10px 20px; font-size: 14px; margin: 0;">Logout</button>
                 </div>
+            </div>
+
+            <!-- Top Section: Profile & Settings -->
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 10px 15px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <button class="top-nav-tab" onclick="showTopSection('profile')" id="topTab-profile" style="background: white; color: #667eea; border: none; padding: 12px 24px; border-radius: 25px; font-size: 17px; font-weight: 600; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.15);">
+                    👤 Profile
+                </button>
+                <button class="top-nav-tab" onclick="showTopSection('settings')" id="topTab-settings" style="background: rgba(255,255,255,0.25); color: white; border: none; padding: 12px 24px; border-radius: 25px; font-size: 17px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                    ⚙️ Settings
+                </button>
             </div>
 
             <div class="nav-tabs">
@@ -3026,154 +3034,6 @@
                     </div>
                 </div>
 
-                <div class="card">
-                    <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="toggleProfileCard('voiceSettings')">
-                        <span>🔊 Voice Settings</span>
-                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;" title="Expand/Collapse" onclick="toggleProfileCard('voiceSettings'); event.stopPropagation();">
-                            <span id="toggle-icon-voiceSettings">▲</span>
-                        </button>
-                    </div>
-                    <div id="profileCard-voiceSettings" class="card-content">
-                        <h4 style="margin: 0 0 10px 0;">Voice Announcements</h4>
-                        <p style="margin-bottom: 15px;">Enable voice announcements for confirmations and reminders</p>
-                        <button id="voiceToggleBtn" class="btn" onclick="toggleVoice()" style="width: 100%; max-width: 100%; margin-bottom: 15px;">
-                            🔇 Voice OFF
-                        </button>
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 2px solid #e9ecef; margin-bottom: 20px;">
-                            <label class="reminder-checkbox" style="margin: 0; cursor: pointer;">
-                                <input type="checkbox" id="voiceAutoEnable" onchange="saveVoicePreference()" style="width: 20px; height: 20px; margin: 0;">
-                                <span style="font-size: 15px;">🔄 Always enable voice when I log in</span>
-                            </label>
-                            <p style="margin: 10px 0 0 30px; font-size: 13px; color: #6c757d;">
-                                When checked, voice will automatically turn on each time you open the app
-                            </p>
-                        </div>
-
-                        <hr style="margin: 20px 0; border: none; border-top: 2px solid #e9ecef;">
-
-                        <h4 style="margin: 0 0 10px 0;">🎤 Voice Assistant</h4>
-                        <p style="margin-bottom: 15px;">Use voice commands to control the app hands-free!</p>
-                        
-                        <button id="voiceAssistantToggleBtn" class="btn" onclick="toggleVoiceAssistant()" style="width: 100%; max-width: 100%; margin-bottom: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; font-size: 18px;">
-                            🎤 Voice Assistant OFF
-                        </button>
-
-                        <div id="voiceAssistantInfo" class="hidden" style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 15px; border-radius: 8px; border: 2px solid #667eea;">
-                            <p style="margin: 0 0 10px 0; font-weight: 600;">✅ Voice Assistant is Active!</p>
-                            <p style="margin: 0 0 10px 0; font-size: 14px;">Look for the 🎤 VOICE button at the bottom-right of your screen.</p>
-                            <p style="margin: 0 0 10px 0; font-size: 14px; font-weight: 600;">Try saying:</p>
-                            <ul style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.8;">
-                                <li>"Go to medications"</li>
-                                <li>"Show my appointments"</li>
-                                <li>"Help with reminders"</li>
-                                <li>"How do I add a medication?"</li>
-                            </ul>
-                            <button class="btn btn-info" onclick="showHelpTopic('voice'); showSection('help');" style="width: 100%; margin-top: 10px;">
-                                📖 View Full Voice Commands Guide
-                            </button>
-                        </div>
-
-                        <hr style="margin: 20px 0; border: none; border-top: 2px solid #e9ecef;">
-
-                        <h4 style="margin: 0 0 10px 0;">💬 Voice Error Messages</h4>
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 2px solid #e9ecef;">
-                            <label class="reminder-checkbox" style="margin: 0; cursor: pointer;">
-                                <input type="checkbox" id="verboseHelpEnabled" onchange="saveVerboseHelpPreference()" style="width: 20px; height: 20px; margin: 0;">
-                                <span style="font-size: 15px;">📚 Show detailed help when command not understood</span>
-                            </label>
-                            <p style="margin: 10px 0 0 30px; font-size: 13px; color: #6c757d;">
-                                <strong>When OFF:</strong> "I didn't understand that"<br>
-                                <strong>When ON:</strong> "I didn't understand 'X'. Try saying 'Medication Aspirin Taken', 'Task Laundry Done'..." (with examples)
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="toggleProfileCard('notifications')">
-                        <span>🔔 Notification Settings</span>
-                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;" title="Expand/Collapse" onclick="toggleProfileCard('notifications'); event.stopPropagation();">
-                            <span id="toggle-icon-notifications">▲</span>
-                        </button>
-                    </div>
-                    <div id="profileCard-notifications" class="card-content">
-                        <p style="margin-bottom: 15px;">Enable push notifications to receive reminders even when the app is in the background</p>
-                        
-                        <button id="notificationToggleBtn" class="btn btn-primary" onclick="requestNotificationPermission()" style="width: 100%; max-width: 100%; margin-bottom: 15px;">
-                            🔔 Enable Notifications
-                        </button>
-                        
-                        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border: 2px solid #ffc107; margin-bottom: 15px;">
-                            <p style="margin: 0; font-size: 14px; color: #856404;">
-                                <strong>📱 iOS Users:</strong> For best results:
-                            </p>
-                            <ol style="margin: 10px 0 0 20px; font-size: 13px; color: #856404;">
-                                <li>Tap the Share button (in Safari)</li>
-                                <li>Select "Add to Home Screen"</li>
-                                <li>Open the app from your home screen</li>
-                                <li>Enable notifications when prompted</li>
-                            </ol>
-                            <p style="margin: 10px 0 0 0; font-size: 12px; color: #856404;">
-                                <em>Note: iOS has limitations for web app notifications. They work best when the phone is unlocked.</em>
-                            </p>
-                        </div>
-                        
-                        <button class="btn btn-secondary" onclick="testNotification()" style="width: 100%; max-width: 100%;">
-                            🧪 Test Notification
-                        </button>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="toggleProfileCard('dataManagement')">
-                        <span>💾 Data Management</span>
-                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;" title="Expand/Collapse" onclick="toggleProfileCard('dataManagement'); event.stopPropagation();">
-                            <span id="toggle-icon-dataManagement">▲</span>
-                        </button>
-                    </div>
-                    <div id="profileCard-dataManagement" class="card-content">
-                        <p style="margin-bottom: 15px;">Backup and restore your data</p>
-                        
-                        <div id="lastBackupInfo" style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 14px;">
-                            <strong>📅 Last Backup:</strong> <span id="lastBackupDate">Never</span>
-                        </div>
-                        
-                        <button class="btn btn-success" onclick="exportData()" style="width: 100%; max-width: 100%; margin-bottom: 10px;">
-                            📥 Export All Data
-                        </button>
-                        <p style="font-size: 13px; color: #6c757d; margin: 0 0 15px 0;">
-                            Download a backup file with all your medications, appointments, tasks, and bills
-                        </p>
-                        
-                        <button class="btn btn-info" onclick="document.getElementById('importFile').click()" style="width: 100%; max-width: 100%; margin-bottom: 10px;">
-                            📤 Import Data
-                        </button>
-                        <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
-                        <p style="font-size: 13px; color: #6c757d; margin: 0 0 20px 0;">
-                            Restore data from a previously exported backup file
-                        </p>
-
-                        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border: 2px solid #ffc107;">
-                            <label class="reminder-checkbox" style="margin: 0 0 10px 0; cursor: pointer;">
-                                <input type="checkbox" id="backupReminderEnabled" onchange="saveBackupReminderSettings()" style="width: 20px; height: 20px; margin: 0;">
-                                <span style="font-size: 15px;">⏰ Remind me to backup regularly</span>
-                            </label>
-                            <div id="backupReminderOptions" class="hidden" style="margin-top: 10px;">
-                                <label style="font-size: 14px; color: #495057; display: block; margin-bottom: 5px;">Remind me every:</label>
-                                <select id="backupReminderDays" onchange="saveBackupReminderSettings()" style="width: 100%; padding: 10px; font-size: 14px; border: 1px solid #ddd; border-radius: 5px;">
-                                    <option value="3">3 days</option>
-                                    <option value="7" selected>7 days</option>
-                                    <option value="14">14 days</option>
-                                    <option value="30">30 days</option>
-                                </select>
-                            </div>
-                            <p style="margin: 10px 0 0 30px; font-size: 13px; color: #856404;">
-                                Get reminded to backup your data regularly - protects against phone loss!
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="form-section">
                     <h3 style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; margin: 0; padding: 15px; background: #f8f9fa; border-radius: 8px 8px 0 0; margin-bottom: -1px;" onclick="toggleProfileCard('updateProfile')">
                         <span>Update Profile</span>
@@ -3239,14 +3099,179 @@
                 </div>
                 
                 <!-- Release Notes / What's New -->
-                <div class="card" style="margin-top: 30px;">
-                    <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;" onclick="toggleProfileCard('releaseNotes')">
-                        <span>📰 Release Notes & What's New</span>
-                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: rgba(255,255,255,0.2); color: white;" title="Expand/Collapse" onclick="toggleProfileCard('releaseNotes'); event.stopPropagation();">
-                            <span id="toggle-icon-releaseNotes">▲</span>
+            <!-- Settings Section -->
+            <div id="settings" class="section hidden">
+                <h2 class="section-title">⚙️ Settings</h2>
+                
+                <!-- Expand/Collapse All Controls -->
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button class="btn btn-secondary" onclick="expandAllSettingsCards()" style="flex: 1; padding: 10px; font-size: 14px;">
+                        ▲ Expand All
+                    </button>
+                    <button class="btn btn-secondary" onclick="collapseAllSettingsCards()" style="flex: 1; padding: 10px; font-size: 14px;">
+                        ▼ Collapse All
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="toggleSettingsCard('voiceSettings')">
+                        <span>🔊 Voice Settings</span>
+                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;" title="Expand/Collapse" onclick="toggleSettingsCard('voiceSettings'); event.stopPropagation();">
+                            <span id="settings-toggle-icon-voiceSettings">▲</span>
                         </button>
                     </div>
-                    <div id="profileCard-releaseNotes" class="card-content" style="max-height: 600px; overflow-y: auto;">
+                    <div id="settingsCard-voiceSettings" class="card-content">
+                        <h4 style="margin: 0 0 10px 0;">Voice Announcements</h4>
+                        <p style="margin-bottom: 15px;">Enable voice announcements for confirmations and reminders</p>
+                        <button id="voiceToggleBtn" class="btn" onclick="toggleVoice()" style="width: 100%; max-width: 100%; margin-bottom: 15px;">
+                            🔇 Voice OFF
+                        </button>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 2px solid #e9ecef; margin-bottom: 20px;">
+                            <label class="reminder-checkbox" style="margin: 0; cursor: pointer;">
+                                <input type="checkbox" id="voiceAutoEnable" onchange="saveVoicePreference()" style="width: 20px; height: 20px; margin: 0;">
+                                <span style="font-size: 15px;">🔄 Always enable voice when I log in</span>
+                            </label>
+                            <p style="margin: 10px 0 0 30px; font-size: 13px; color: #6c757d;">
+                                When checked, voice will automatically turn on each time you open the app
+                            </p>
+                        </div>
+
+                        <hr style="margin: 20px 0; border: none; border-top: 2px solid #e9ecef;">
+
+                        <h4 style="margin: 0 0 10px 0;">🎤 Voice Assistant</h4>
+                        <p style="margin-bottom: 15px;">Use voice commands to control the app hands-free!</p>
+                        
+                        <button id="voiceAssistantToggleBtn" class="btn" onclick="toggleVoiceAssistant()" style="width: 100%; max-width: 100%; margin-bottom: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; font-size: 18px;">
+                            🎤 Voice Assistant OFF
+                        </button>
+
+                        <div id="voiceAssistantInfo" class="hidden" style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 15px; border-radius: 8px; border: 2px solid #667eea;">
+                            <p style="margin: 0 0 10px 0; font-weight: 600;">✅ Voice Assistant is Active!</p>
+                            <p style="margin: 0 0 10px 0; font-size: 14px;">Look for the 🎤 VOICE button at the bottom-right of your screen.</p>
+                            <p style="margin: 0 0 10px 0; font-size: 14px; font-weight: 600;">Try saying:</p>
+                            <ul style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.8;">
+                                <li>"Go to medications"</li>
+                                <li>"Show my appointments"</li>
+                                <li>"Help with reminders"</li>
+                                <li>"How do I add a medication?"</li>
+                            </ul>
+                            <button class="btn btn-info" onclick="showHelpTopic('voice'); showSection('help');" style="width: 100%; margin-top: 10px;">
+                                📖 View Full Voice Commands Guide
+                            </button>
+                        </div>
+
+                        <hr style="margin: 20px 0; border: none; border-top: 2px solid #e9ecef;">
+
+                        <h4 style="margin: 0 0 10px 0;">💬 Voice Error Messages</h4>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 2px solid #e9ecef;">
+                            <label class="reminder-checkbox" style="margin: 0; cursor: pointer;">
+                                <input type="checkbox" id="verboseHelpEnabled" onchange="saveVerboseHelpPreference()" style="width: 20px; height: 20px; margin: 0;">
+                                <span style="font-size: 15px;">📚 Show detailed help when command not understood</span>
+                            </label>
+                            <p style="margin: 10px 0 0 30px; font-size: 13px; color: #6c757d;">
+                                <strong>When OFF:</strong> "I didn't understand that"<br>
+                                <strong>When ON:</strong> "I didn't understand 'X'. Try saying 'Medication Aspirin Taken', 'Task Laundry Done'..." (with examples)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="card">
+                    <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="toggleSettingsCard('notifications')">
+                        <span>🔔 Notification Settings</span>
+                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;" title="Expand/Collapse" onclick="toggleSettingsCard('notifications'); event.stopPropagation();">
+                            <span id="settings-toggle-icon-notifications">▲</span>
+                        </button>
+                    </div>
+                    <div id="settingsCard-notifications" class="card-content">
+                        <p style="margin-bottom: 15px;">Enable push notifications to receive reminders even when the app is in the background</p>
+                        
+                        <button id="notificationToggleBtn" class="btn btn-primary" onclick="requestNotificationPermission()" style="width: 100%; max-width: 100%; margin-bottom: 15px;">
+                            🔔 Enable Notifications
+                        </button>
+                        
+                        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border: 2px solid #ffc107; margin-bottom: 15px;">
+                            <p style="margin: 0; font-size: 14px; color: #856404;">
+                                <strong>📱 iOS Users:</strong> For best results:
+                            </p>
+                            <ol style="margin: 10px 0 0 20px; font-size: 13px; color: #856404;">
+                                <li>Tap the Share button (in Safari)</li>
+                                <li>Select "Add to Home Screen"</li>
+                                <li>Open the app from your home screen</li>
+                                <li>Enable notifications when prompted</li>
+                            </ol>
+                            <p style="margin: 10px 0 0 0; font-size: 12px; color: #856404;">
+                                <em>Note: iOS has limitations for web app notifications. They work best when the phone is unlocked.</em>
+                            </p>
+                        </div>
+                        
+                        <button class="btn btn-secondary" onclick="testNotification()" style="width: 100%; max-width: 100%;">
+                            🧪 Test Notification
+                        </button>
+                    </div>
+                </div>
+
+
+                <div class="card">
+                    <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="toggleSettingsCard('dataManagement')">
+                        <span>💾 Data Management</span>
+                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;" title="Expand/Collapse" onclick="toggleSettingsCard('dataManagement'); event.stopPropagation();">
+                            <span id="settings-toggle-icon-dataManagement">▲</span>
+                        </button>
+                    </div>
+                    <div id="settingsCard-dataManagement" class="card-content">
+                        <p style="margin-bottom: 15px;">Backup and restore your data</p>
+                        
+                        <div id="lastBackupInfo" style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 14px;">
+                            <strong>📅 Last Backup:</strong> <span id="lastBackupDate">Never</span>
+                        </div>
+                        
+                        <button class="btn btn-success" onclick="exportData()" style="width: 100%; max-width: 100%; margin-bottom: 10px;">
+                            📥 Export All Data
+                        </button>
+                        <p style="font-size: 13px; color: #6c757d; margin: 0 0 15px 0;">
+                            Download a backup file with all your medications, appointments, tasks, and bills
+                        </p>
+                        
+                        <button class="btn btn-info" onclick="document.getElementById('importFile').click()" style="width: 100%; max-width: 100%; margin-bottom: 10px;">
+                            📤 Import Data
+                        </button>
+                        <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+                        <p style="font-size: 13px; color: #6c757d; margin: 0 0 20px 0;">
+                            Restore data from a previously exported backup file
+                        </p>
+
+                        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border: 2px solid #ffc107;">
+                            <label class="reminder-checkbox" style="margin: 0 0 10px 0; cursor: pointer;">
+                                <input type="checkbox" id="backupReminderEnabled" onchange="saveBackupReminderSettings()" style="width: 20px; height: 20px; margin: 0;">
+                                <span style="font-size: 15px;">⏰ Remind me to backup regularly</span>
+                            </label>
+                            <div id="backupReminderOptions" class="hidden" style="margin-top: 10px;">
+                                <label style="font-size: 14px; color: #495057; display: block; margin-bottom: 5px;">Remind me every:</label>
+                                <select id="backupReminderDays" onchange="saveBackupReminderSettings()" style="width: 100%; padding: 10px; font-size: 14px; border: 1px solid #ddd; border-radius: 5px;">
+                                    <option value="3">3 days</option>
+                                    <option value="7" selected>7 days</option>
+                                    <option value="14">14 days</option>
+                                    <option value="30">30 days</option>
+                                </select>
+                            </div>
+                            <p style="margin: 10px 0 0 30px; font-size: 13px; color: #856404;">
+                                Get reminded to backup your data regularly - protects against phone loss!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="card" style="margin-top: 30px;">
+                    <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;" onclick="toggleSettingsCard('releaseNotes')">
+                        <span>📰 Release Notes & What's New</span>
+                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: rgba(255,255,255,0.2); color: white;" title="Expand/Collapse" onclick="toggleSettingsCard('releaseNotes'); event.stopPropagation();">
+                            <span id="settings-toggle-icon-releaseNotes">▲</span>
+                        </button>
+                    </div>
+                    <div id="settingsCard-releaseNotes" class="card-content" style="max-height: 600px; overflow-y: auto;">
                         
                         <!-- How Updates Work (Info Box) -->
                         <div style="background: linear-gradient(135deg, #48bb7815 0%, #38b2ac15 100%); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 2px solid #38b2ac;">
@@ -3279,32 +3304,44 @@
                         <!-- Latest Version -->
                         <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #667eea;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-08-2043 UTC</h4>
-                                <span style="background: #38b2ac; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">UX IMPROVEMENT</span>
+                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-09-2226 UTC</h4>
+                                <span style="background: #667eea; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">MAJOR UPDATE</span>
                             </div>
-                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 8, 2026 at 8:43 PM</p>
+                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 9, 2026 at 10:26 PM</p>
                             <div style="line-height: 1.8;">
-                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px; color: #38b2ac;">✨ FIRST TIME WARNING AUTO-HIDES AFTER SETUP!</p>
+                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px; color: #667eea;">✨ PROFILE/SETTINGS SPLIT - CLEANER INTERFACE!</p>
                                 <ul style="margin: 5px 0; padding-left: 20px; font-size: 14px;">
-                                    <li><strong>First visit:</strong> Big installation warning is displayed ✅</li>
-                                    <li><strong>After registration/login:</strong> Warning automatically disappears ✅</li>
-                                    <li>Login screen is now clean and simple for returning users</li>
-                                    <li>Uses localStorage flag to track if setup is complete</li>
+                                    <li><strong>Added new Settings tab</strong> (separate from Profile)</li>
+                                    <li><strong>Profile tab</strong> now only has: Personal Info, Update Profile, Change Password</li>
+                                    <li><strong>Settings tab</strong> now has: Voice, Notifications, Data, Release Notes, About</li>
+                                    <li>Top navigation with Profile & Settings buttons</li>
+                                    <li>Each section has its own Expand/Collapse controls</li>
                                 </ul>
                                 
                                 <div style="background: #d4edda; padding: 10px; border-radius: 6px; margin: 10px 0; border-left: 3px solid #28a745;">
                                     <p style="margin: 0; font-size: 13px; color: #28a745;">
-                                        <strong>✅ BETTER UX:</strong> The installation warning is critical for first-time users but clutters the login screen for returning users. Now it automatically disappears after you complete setup - best of both worlds!
+                                        <strong>✅ MUCH CLEANER:</strong> Profile was too busy with 8 different cards. Now it's split into Profile (3 cards for personal info) and Settings (5 cards for app configuration). Easier for seniors to find what they need!
                                     </p>
                                 </div>
                                 
                                 <p style="margin: 10px 0 0 0; font-size: 13px; color: #666;">
-                                    <strong>Technical:</strong> Added <code>appInstalled</code> flag to localStorage. Set after successful login/registration. Checked on page load to hide <code>#firstTimeUserWarning</code> div.
+                                    <strong>Technical:</strong> Created separate <code>settings</code> section. Added <code>showTopSection()</code> function, <code>toggleSettingsCard()</code>, <code>expandAllSettingsCards()</code>, and <code>collapseAllSettingsCards()</code> functions. Moved 6 cards from Profile to Settings.
                                 </p>
                             </div>
                         </div>
 
                         <!-- Previous Versions -->
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-08-2043 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 8, 2026 at 8:43 PM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">✨ UX:</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>First time warning auto-hides after setup</li>
+                                </ul>
+                            </div>
+                        </div>
+
                         <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
                             <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-08-1840 UTC</h4>
                             <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 8, 2026 at 6:40 PM</p>
@@ -3550,13 +3587,15 @@
                 
                 <!-- About This App Section -->
                 <div class="card" style="margin-top: 30px;">
-                    <div class="card-header" onclick="toggleProfileCard('aboutApp')" style="cursor: pointer; user-select: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+
+                <div class="card" style="margin-top: 30px;">
+                    <div class="card-header" onclick="toggleSettingsCard('aboutApp')" style="cursor: pointer; user-select: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
                         <div style="display: flex; align-items: center; justify-content: space-between;">
                             <span>ℹ️ About This App</span>
-                            <span id="toggle-icon-aboutApp" style="font-size: 18px;">▼</span>
+                            <span id="settings-toggle-icon-aboutApp" style="font-size: 18px;">▼</span>
                         </div>
                     </div>
-                    <div id="profileCard-aboutApp" class="card-content" style="display: none; line-height: 1.6;">
+                    <div id="settingsCard-aboutApp" class="card-content" style="display: none; line-height: 1.6;">
                         <h3 style="margin-top: 0; color: #667eea;">Why Senior Care Companion Exists</h3>
                         
                         <p style="font-size: 15px; margin-bottom: 15px;">
@@ -3610,15 +3649,20 @@
                     </div>
                 </div>
 
+
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-02-08-2043 UTC
+                        <strong>App Version:</strong> 2026-02-09-2226 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        First Time Warning Auto-Hides After Setup!
+                        Profile/Settings Split - Cleaner Interface!
                     </p>
                 </div>
+            </div>
+
+                                <!-- Settings cards will be inserted here -->
+                
             </div>
 
     <!-- Floating Help Button (hidden until login) -->
@@ -7982,7 +8026,7 @@
 
         // Expand all profile cards
         function expandAllProfileCards() {
-            const cardKeys = ['personalInfo', 'voiceSettings', 'notifications', 'dataManagement', 'releaseNotes', 'aboutApp', 'updateProfile', 'changePassword'];
+            const cardKeys = ['personalInfo', 'updateProfile', 'changePassword'];  // Only cards remaining in Profile
             const minimizedProfile = {};
             
             cardKeys.forEach(cardKey => {
@@ -8003,7 +8047,7 @@
 
         // Collapse all profile cards
         function collapseAllProfileCards() {
-            const cardKeys = ['personalInfo', 'voiceSettings', 'notifications', 'dataManagement', 'releaseNotes', 'aboutApp', 'updateProfile', 'changePassword'];
+            const cardKeys = ['personalInfo', 'updateProfile', 'changePassword'];  // Only cards remaining in Profile
             const minimizedProfile = {};
             
             cardKeys.forEach(cardKey => {
@@ -8021,6 +8065,95 @@
             speak('Collapsed all sections');
         }
         window.collapseAllProfileCards = collapseAllProfileCards;
+
+        // Settings card toggle function
+        function toggleSettingsCard(cardKey) {
+            const contentDiv = document.getElementById(`settingsCard-${cardKey}`);
+            const toggleIcon = document.getElementById(`settings-toggle-icon-${cardKey}`);
+            
+            if (!contentDiv || !toggleIcon) return;
+            
+            const isHidden = contentDiv.style.display === 'none';
+            contentDiv.style.display = isHidden ? '' : 'none';
+            toggleIcon.textContent = isHidden ? '▲' : '▼';
+            
+            // Save state
+            const minimizedSettings = JSON.parse(localStorage.getItem('minimizedSettings') || '{}');
+            minimizedSettings[cardKey] = !isHidden;
+            localStorage.setItem('minimizedSettings', JSON.stringify(minimizedSettings));
+        }
+        window.toggleSettingsCard = toggleSettingsCard;
+
+        // Expand all settings cards
+        function expandAllSettingsCards() {
+            const cardKeys = ['voiceSettings', 'notifications', 'dataManagement', 'releaseNotes', 'aboutApp'];
+            const minimizedSettings = {};
+            
+            cardKeys.forEach(cardKey => {
+                const contentDiv = document.getElementById(`settingsCard-${cardKey}`);
+                const toggleIcon = document.getElementById(`settings-toggle-icon-${cardKey}`);
+                
+                if (contentDiv && toggleIcon) {
+                    contentDiv.style.display = '';
+                    toggleIcon.textContent = '▲';
+                    minimizedSettings[cardKey] = false;
+                }
+            });
+            
+            localStorage.setItem('minimizedSettings', JSON.stringify(minimizedSettings));
+            speak('Expanded all settings');
+        }
+        window.expandAllSettingsCards = expandAllSettingsCards;
+
+        // Collapse all settings cards
+        function collapseAllSettingsCards() {
+            const cardKeys = ['voiceSettings', 'notifications', 'dataManagement', 'releaseNotes', 'aboutApp'];
+            const minimizedSettings = {};
+            
+            cardKeys.forEach(cardKey => {
+                const contentDiv = document.getElementById(`settingsCard-${cardKey}`);
+                const toggleIcon = document.getElementById(`settings-toggle-icon-${cardKey}`);
+                
+                if (contentDiv && toggleIcon) {
+                    contentDiv.style.display = 'none';
+                    toggleIcon.textContent = '▼';
+                    minimizedSettings[cardKey] = true;
+                }
+            });
+            
+            localStorage.setItem('minimizedSettings', JSON.stringify(minimizedSettings));
+            speak('Collapsed all settings');
+        }
+        window.collapseAllSettingsCards = collapseAllSettingsCards;
+
+        // Show top section (Profile or Settings)
+        function showTopSection(sectionName) {
+            // Hide all top sections
+            document.getElementById('profile').classList.add('hidden');
+            document.getElementById('settings').classList.add('hidden');
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.remove('hidden');
+            
+            // Update tab styling
+            const tabs = document.querySelectorAll('.top-nav-tab');
+            tabs.forEach(tab => {
+                const tabId = tab.id.replace('topTab-', '');
+                if (tabId === sectionName) {
+                    tab.style.background = 'white';
+                    tab.style.color = '#667eea';
+                    tab.style.boxShadow = '0 2px 4px rgba(0,0,0,0.15)';
+                } else {
+                    tab.style.background = 'rgba(255,255,255,0.25)';
+                    tab.style.color = 'white';
+                    tab.style.boxShadow = 'none';
+                }
+            });
+            
+            speak(`Showing ${sectionName}`);
+        }
+        window.showTopSection = showTopSection;
+
 
         function updateProfile() {
             const name = document.getElementById('updateName').value;
