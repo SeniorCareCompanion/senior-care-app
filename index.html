@@ -4,32 +4,27 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-10-0205 UTC - UI: Fixed About This App + Added Navigation Spacing
-    BUILD DATE: February 10, 2026 at 2:05 AM UTC
-    CHANGES: Fixed About This App arrow position + Added spacing between sections
+    VERSION: 2026-02-10-0221 UTC - MOBILE: Shortened Title + Fixed Double Box
+    BUILD DATE: February 10, 2026 at 2:21 AM UTC
+    CHANGES: Fixed Release Notes title wrapping + Removed double box on About This App
     
-    ✨ UI FIX #1: ABOUT THIS APP CARD FIXED!
-    - Fixed expand/collapse arrow position (was on left, now on right)
-    - Changed structure to match other cards (Voice, Notifications, etc.)
-    - Now has proper action-btn button with consistent styling
-    - Arrow behaves the same as all other Settings cards
+    ✨ MOBILE FIX #1: RELEASE NOTES TITLE SHORTENED!
+    - Changed "📰 Release Notes & What's New" → "📰 Release Notes"
+    - Prevents word wrap on mobile screens
+    - Arrow stays on the right (no more left-side wrapping!)
+    - Title fits on one line on iPhone
     
-    ✨ UI FIX #2: BETTER NAVIGATION SPACING!
-    - Added 15px margin-bottom to Profile/Settings section
-    - Creates visual separation from main navigation tabs
-    - No more crowding - looks clean and professional!
-    - Same spacing as between other navigation sections
+    ✨ FIX #2: ABOUT THIS APP DOUBLE BOX REMOVED!
+    - Found duplicate <div class="card"> tag
+    - Removed extra opening div that caused double box effect
+    - Now looks consistent with all other cards
+    - Single clean box like Voice Settings, Notifications, etc.
     
-    📝 WHAT CHANGED:
-    About This App:
-    - Before: Arrow in nested div, different structure
-    - After: Standard card-header with action-btn, arrow on right
+    📝 WHAT WAS WRONG:
+    - Release Notes: Title too long, wrapped to 2 lines on mobile, pushing arrow left
+    - About This App: Had TWO opening <div class="card"> tags creating nested boxes
     
-    Navigation:
-    - Before: Profile/Settings directly touching main tabs
-    - After: 15px gap for visual breathing room
-    
-    📝 PREVIOUS VERSION (2026-02-09-2314 UTC):
+    📝 PREVIOUS VERSION (2026-02-10-0205 UTC):
     - First time warning auto-hides after setup
     - Exact iPhone installation steps
     - Account loss prevention
@@ -3110,10 +3105,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-02-10-0205 UTC
+                        <strong>App Version:</strong> 2026-02-10-0221 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        UI Fixes: About App Arrow + Navigation Spacing!
+                        Mobile Fixes: Short Title + No Double Box!
                     </p>
                 </div>
             </div>
@@ -3286,7 +3281,7 @@
 
                 <div class="card" style="margin-top: 30px;">
                     <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;" onclick="toggleSettingsCard('releaseNotes')">
-                        <span>📰 Release Notes & What's New</span>
+                        <span>📰 Release Notes</span>
                         <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: rgba(255,255,255,0.2); color: white;" title="Expand/Collapse" onclick="toggleSettingsCard('releaseNotes'); event.stopPropagation();">
                             <span id="settings-toggle-icon-releaseNotes">▲</span>
                         </button>
@@ -3616,8 +3611,6 @@
                 </div>
                 
                 <!-- About This App Section -->
-                <div class="card" style="margin-top: 30px;">
-
                 <div class="card" style="margin-top: 30px;">
                     <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;" onclick="toggleSettingsCard('aboutApp')">
                         <span>ℹ️ About This App</span>
