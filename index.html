@@ -4,30 +4,30 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-09-2303 UTC - FIXED: Settings Cards Now Initialize + Thinner Tabs
-    BUILD DATE: February 9, 2026 at 11:03 PM UTC
-    CHANGES: Settings cards now properly initialize and display + Thinner top navigation
+    VERSION: 2026-02-09-2314 UTC - DEBUG: Added Logging + Version Now in Profile
+    BUILD DATE: February 9, 2026 at 11:14 PM UTC
+    CHANGES: Added comprehensive logging to debug Settings + Moved version to Profile
     
-    ✅ FIX #1: SETTINGS CARDS NOW INITIALIZE!
-    - Added initialization code in showTopSection() for Settings
-    - On first view, all Settings cards default to expanded
-    - Respects saved state from localStorage if available
-    - Cards now properly display when Settings tab is clicked
+    🔍 DEBUG MODE ENABLED:
+    - Added detailed console logging to showTopSection() function
+    - Logs section switching, card initialization, display states
+    - Changed display from '' to 'block' for Settings cards
+    - ALWAYS initialize Settings cards (not just first time)
     
-    ✨ FIX #2: THINNER TOP NAVIGATION!
-    - Reduced Profile/Settings section padding: 10px → 6px
-    - Reduced button padding: 12px 24px → 8px 16px  
-    - Reduced font size: 17px → 14px (matches Logout button)
-    - Reduced border radius: 25px → 20px
-    - Buttons look cleaner and don't crowd main navigation tabs
+    📍 VERSION INFO MOVED:
+    - App Version now shows in Profile (bottom of Profile tab)
+    - No longer in Settings (since Settings wasn't working)
+    - Now you can see what version you're running!
     
-    📝 WHAT WAS WRONG:
-    - Settings cards weren't being initialized on first display
-    - Unlike Profile (which gets loaded with data), Settings just appeared
-    - Card content divs had no explicit display style set
-    - Now explicitly sets display: '' (visible) or 'none' based on saved state
+    📝 WHAT TO CHECK IN CONSOLE:
+    When you click Settings, you should see:
+    - "🔧 showTopSection called with: settings"
+    - "📍 Found section element: YES"
+    - "⚙️ Initializing Settings cards..."
+    - Details for each card (voiceSettings, notifications, etc.)
+    - "✅ Settings cards initialization complete"
     
-    📝 PREVIOUS VERSION (2026-02-09-2300 UTC):
+    📝 PREVIOUS VERSION (2026-02-09-2303 UTC):
     - First time warning auto-hides after setup
     - Exact iPhone installation steps
     - Account loss prevention
@@ -3105,6 +3105,17 @@
                     </div>
                 </div>
                 
+                <!-- App Version Info -->
+                <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
+                    <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
+                        <strong>App Version:</strong> 2026-02-09-2314 UTC
+                    </p>
+                    <p style="font-size: 11px; color: #6c757d; margin: 0;">
+                        Debug Logging + Version in Profile!
+                    </p>
+                </div>
+            </div>
+                
                 <!-- Release Notes / What's New -->
             <!-- Settings Section -->
             <div id="settings" class="section">
@@ -3666,17 +3677,6 @@
                     </div>
                 </div>
 
-
-                <!-- App Version Info -->
-                <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
-                    <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-02-09-2303 UTC
-                    </p>
-                    <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Settings Cards Initialize + Thinner Navigation!
-                    </p>
-                </div>
-            </div>
 
                                 <!-- Settings cards will be inserted here -->
                 
@@ -8153,9 +8153,13 @@
 
         // Show top section (Profile or Settings)
         function showTopSection(sectionName) {
+            console.log('═══════════════════════════════════════');
+            console.log('🔧 showTopSection called with:', sectionName);
+            
             // Hide ALL sections (both main tabs and top tabs)
             document.querySelectorAll('.section').forEach(section => {
                 section.classList.remove('active');
+                console.log('  Removed active from section:', section.id);
             });
             
             // Remove active from all main navigation tabs
@@ -8165,36 +8169,48 @@
             
             // Show the selected top section
             const section = document.getElementById(sectionName);
+            console.log('📍 Found section element:', section ? 'YES' : 'NO');
             if (section) {
                 section.classList.add('active');
                 section.classList.remove('hidden');  // Remove hidden class too, just in case
+                console.log('  ✅ Added active class to:', sectionName);
+                console.log('  ✅ Section classes now:', section.className);
+                console.log('  ✅ Section display style:', window.getComputedStyle(section).display);
             }
             
-            // If showing Settings for the first time, ensure all cards are visible
+            // ALWAYS initialize Settings cards when showing Settings
             if (sectionName === 'settings') {
-                // Check if we need to initialize Settings cards
-                const voiceCard = document.getElementById('settingsCard-voiceSettings');
-                if (voiceCard && !voiceCard.style.display) {
-                    // First time showing Settings - make sure all cards are expanded
-                    const settingsCards = ['voiceSettings', 'notifications', 'dataManagement', 'releaseNotes', 'aboutApp'];
-                    const minimizedSettings = JSON.parse(localStorage.getItem('minimizedSettings') || '{}');
+                console.log('⚙️ Initializing Settings cards...');
+                const settingsCards = ['voiceSettings', 'notifications', 'dataManagement', 'releaseNotes', 'aboutApp'];
+                const minimizedSettings = JSON.parse(localStorage.getItem('minimizedSettings') || '{}');
+                console.log('  Saved minimized state:', minimizedSettings);
+                
+                settingsCards.forEach(cardKey => {
+                    const contentDiv = document.getElementById(`settingsCard-${cardKey}`);
+                    const toggleIcon = document.getElementById(`settings-toggle-icon-${cardKey}`);
                     
-                    settingsCards.forEach(cardKey => {
-                        const contentDiv = document.getElementById(`settingsCard-${cardKey}`);
-                        const toggleIcon = document.getElementById(`settings-toggle-icon-${cardKey}`);
-                        
-                        if (contentDiv && toggleIcon) {
-                            // Respect saved state, or default to expanded
-                            if (minimizedSettings[cardKey]) {
-                                contentDiv.style.display = 'none';
-                                toggleIcon.textContent = '▼';
-                            } else {
-                                contentDiv.style.display = '';
-                                toggleIcon.textContent = '▲';
-                            }
-                        }
+                    console.log(`  Card ${cardKey}:`, {
+                        contentDiv: contentDiv ? 'FOUND' : 'NOT FOUND',
+                        toggleIcon: toggleIcon ? 'FOUND' : 'NOT FOUND',
+                        currentDisplay: contentDiv ? contentDiv.style.display : 'N/A'
                     });
-                }
+                    
+                    if (contentDiv && toggleIcon) {
+                        // Always set display explicitly
+                        if (minimizedSettings[cardKey]) {
+                            contentDiv.style.display = 'none';
+                            toggleIcon.textContent = '▼';
+                            console.log(`    → Set to COLLAPSED`);
+                        } else {
+                            contentDiv.style.display = 'block';  // Changed from '' to 'block'
+                            toggleIcon.textContent = '▲';
+                            console.log(`    → Set to EXPANDED (display: block)`);
+                        }
+                        console.log(`    Final display:`, contentDiv.style.display);
+                    }
+                });
+                
+                console.log('✅ Settings cards initialization complete');
             }
             
             // Update top tab styling
@@ -8212,6 +8228,7 @@
                 }
             });
             
+            console.log('═══════════════════════════════════════');
             speak(`Showing ${sectionName}`);
         }
         window.showTopSection = showTopSection;
