@@ -4,30 +4,32 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-09-2314 UTC - DEBUG: Added Logging + Version Now in Profile
-    BUILD DATE: February 9, 2026 at 11:14 PM UTC
-    CHANGES: Added comprehensive logging to debug Settings + Moved version to Profile
+    VERSION: 2026-02-10-0205 UTC - UI: Fixed About This App + Added Navigation Spacing
+    BUILD DATE: February 10, 2026 at 2:05 AM UTC
+    CHANGES: Fixed About This App arrow position + Added spacing between sections
     
-    🔍 DEBUG MODE ENABLED:
-    - Added detailed console logging to showTopSection() function
-    - Logs section switching, card initialization, display states
-    - Changed display from '' to 'block' for Settings cards
-    - ALWAYS initialize Settings cards (not just first time)
+    ✨ UI FIX #1: ABOUT THIS APP CARD FIXED!
+    - Fixed expand/collapse arrow position (was on left, now on right)
+    - Changed structure to match other cards (Voice, Notifications, etc.)
+    - Now has proper action-btn button with consistent styling
+    - Arrow behaves the same as all other Settings cards
     
-    📍 VERSION INFO MOVED:
-    - App Version now shows in Profile (bottom of Profile tab)
-    - No longer in Settings (since Settings wasn't working)
-    - Now you can see what version you're running!
+    ✨ UI FIX #2: BETTER NAVIGATION SPACING!
+    - Added 15px margin-bottom to Profile/Settings section
+    - Creates visual separation from main navigation tabs
+    - No more crowding - looks clean and professional!
+    - Same spacing as between other navigation sections
     
-    📝 WHAT TO CHECK IN CONSOLE:
-    When you click Settings, you should see:
-    - "🔧 showTopSection called with: settings"
-    - "📍 Found section element: YES"
-    - "⚙️ Initializing Settings cards..."
-    - Details for each card (voiceSettings, notifications, etc.)
-    - "✅ Settings cards initialization complete"
+    📝 WHAT CHANGED:
+    About This App:
+    - Before: Arrow in nested div, different structure
+    - After: Standard card-header with action-btn, arrow on right
     
-    📝 PREVIOUS VERSION (2026-02-09-2303 UTC):
+    Navigation:
+    - Before: Profile/Settings directly touching main tabs
+    - After: 15px gap for visual breathing room
+    
+    📝 PREVIOUS VERSION (2026-02-09-2314 UTC):
     - First time warning auto-hides after setup
     - Exact iPhone installation steps
     - Account loss prevention
@@ -1272,7 +1274,7 @@
             </div>
 
             <!-- Top Section: Profile & Settings -->
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 6px 15px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 6px 15px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 15px;">
                 <button class="top-nav-tab" onclick="showTopSection('profile')" id="topTab-profile" style="background: white; color: #667eea; border: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.15);">
                     👤 Profile
                 </button>
@@ -3108,10 +3110,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-02-09-2314 UTC
+                        <strong>App Version:</strong> 2026-02-10-0205 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Debug Logging + Version in Profile!
+                        UI Fixes: About App Arrow + Navigation Spacing!
                     </p>
                 </div>
             </div>
@@ -3617,11 +3619,11 @@
                 <div class="card" style="margin-top: 30px;">
 
                 <div class="card" style="margin-top: 30px;">
-                    <div class="card-header" onclick="toggleSettingsCard('aboutApp')" style="cursor: pointer; user-select: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-                        <div style="display: flex; align-items: center; justify-content: space-between;">
-                            <span>ℹ️ About This App</span>
-                            <span id="settings-toggle-icon-aboutApp" style="font-size: 18px;">▼</span>
-                        </div>
+                    <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;" onclick="toggleSettingsCard('aboutApp')">
+                        <span>ℹ️ About This App</span>
+                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: rgba(255,255,255,0.2); color: white;" title="Expand/Collapse" onclick="toggleSettingsCard('aboutApp'); event.stopPropagation();">
+                            <span id="settings-toggle-icon-aboutApp">▲</span>
+                        </button>
                     </div>
                     <div id="settingsCard-aboutApp" class="card-content" style="display: none; line-height: 1.6;">
                         <h3 style="margin-top: 0; color: #667eea;">Why Senior Care Companion Exists</h3>
