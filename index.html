@@ -4,37 +4,51 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-11-1803 UTC - HELP: Fixed All Profile→Settings References
-    BUILD DATE: February 11, 2026 at 6:03 PM UTC
-    CHANGES: Updated all Help section references - Settings features now correctly documented
+    VERSION: 2026-02-11-1927 UTC - HELP SEARCH: Fixed to Jump to Specific Questions
+    BUILD DATE: February 11, 2026 at 7:27 PM UTC
+    CHANGES: Help search now jumps to exact questions, not just sections
     
-    📚 HELP SECTION UPDATES - ALL PROFILE→SETTINGS FIXED:
+    🔍 HELP SEARCH - MAJOR FIX:
     
-    ✅ Voice Assistant:
-    - "Tap Profile button" → "Tap Settings button"
-    - "Profile → Voice Settings" → "Settings → Voice Settings"
-    - "Voice Assistant ON in Profile" → "in Settings"
+    **THE PROBLEM:**
+    - Search for "notifications" → Clicked result
+    - Showed entire "Common Questions" section
+    - User saw 911, passwords, etc. - NOT the notification question!
     
-    ✅ Notifications:
-    - "Profile → Notification Settings" → "Settings → Notification Settings"
-    - "Profile → Enable Notifications" → "Settings → Notification Settings"
+    **THE FIX:**
+    ✅ Added unique IDs to every question in Common Questions:
+    - help-q-emergency (911 emergency)
+    - help-q-forgot-password (forgot password)
+    - help-q-change-password (change password)  
+    - help-q-notifications (notifications/reminders) ← THE KEY ONE
+    - help-q-backup (backup data)
+    - help-q-phone (phone compatibility)
+    - help-q-delete (delete recovery)
     
-    ✅ Data Management:
-    - "Go to Profile" → "Go to Settings"
-    - "Data Backup" → "Data Management" (correct card name)
-    - "Profile → Import Data" → "Settings → Data Management → Import Data"
+    ✅ Updated search mapping to point to specific questions:
+    - 'notification' → 'q-notifications' (not 'common-questions')
+    - 'password' → 'q-change-password'
+    - 'forgot password' → 'q-forgot-password'
+    - 'backup' → 'q-backup'
+    - 'delete' → 'q-delete'
+    - 'phone' → 'q-phone'
+    - 'emergency' → 'q-emergency'
+    - '911' → 'q-emergency'
     
-    ✅ Other Updates:
-    - "Profile → Release Notes" → "Settings → Release Notes"
-    - Old release note updated to reflect Settings location
+    ✅ Enhanced showHelpTopic() function:
+    - Detects if searching for specific question (starts with 'q-')
+    - Shows parent section (Common Questions)
+    - Scrolls directly to the exact question heading
+    - Smooth scroll animation
     
-    📝 TOTAL CHANGES: 9 help references updated
+    📝 HOW IT WORKS NOW:
+    1. Search for "notifications"
+    2. Click "Why am I not getting reminders/notifications?"
+    3. Opens Common Questions section
+    4. Auto-scrolls to notification question
+    5. User sees EXACTLY what they searched for! ✅
     
-    📝 WHAT STAYED IN PROFILE:
-    - "Change Password" instructions (correctly in Profile)
-    - "Update Profile" references (correctly in Profile)
-    
-    📝 PREVIOUS VERSION (2026-02-10-0221 UTC):
+    📝 PREVIOUS VERSION (2026-02-11-1803 UTC):
     - First time warning auto-hides after setup
     - Exact iPhone installation steps
     - Account loss prevention
@@ -2873,7 +2887,7 @@
                                 ❓ Common Questions
                             </div>
                             <div class="card-content" style="line-height: 1.8; font-size: 16px;">
-                                <h3>🚨 How do I call 911 in an emergency?</h3>
+                                <h3 id="help-q-emergency">🚨 How do I call 911 in an emergency?</h3>
                                 <div style="background: #fee; padding: 15px; border-radius: 8px; border-left: 4px solid #e53e3e; margin-bottom: 20px;">
                                     <p style="margin: 0 0 10px 0; font-weight: 600; color: #e53e3e;">
                                         There's a large red <strong>"🚨 CALL 911 EMERGENCY"</strong> button on the Home screen.
@@ -2890,14 +2904,14 @@
                                     </p>
                                 </div>
 
-                                <h3>❓ I forgot my password. What do I do?</h3>
+                                <h3 id="help-q-forgot-password">❓ I forgot my password. What do I do?</h3>
                                 <ol style="line-height: 2;">
                                     <li>On the login screen, tap <strong>"Forgot Password?"</strong></li>
                                     <li>Enter your username and email address</li>
                                     <li>If they match, you can set a new password</li>
                                 </ol>
 
-                                <h3>❓ How do I change my password?</h3>
+                                <h3 id="help-q-change-password">❓ How do I change my password?</h3>
                                 <ol style="line-height: 2;">
                                     <li>Go to <strong>Profile</strong> (top right)</li>
                                     <li>Scroll to "Change Password"</li>
@@ -2906,7 +2920,7 @@
                                     <li>Tap <strong>"Change Password"</strong></li>
                                 </ol>
 
-                                <h3>❓ Why am I not getting reminders?</h3>
+                                <h3 id="help-q-notifications">❓ Why am I not getting reminders?</h3>
                                 <ol style="line-height: 2;">
                                     <li>Make sure you enabled reminders when adding items</li>
                                     <li>Go to Settings → Notification Settings</li>
@@ -2915,7 +2929,7 @@
                                     <li>On iPhone: Must "Add to Home Screen" first</li>
                                 </ol>
 
-                                <h3>❓ How do I backup my data?</h3>
+                                <h3 id="help-q-backup">❓ How do I backup my data?</h3>
                                 <ol style="line-height: 2;">
                                     <li>Go to <strong>Settings</strong></li>
                                     <li>Scroll to "Data Management"</li>
@@ -2929,7 +2943,7 @@
                                 <p><strong>▲ (Up arrow):</strong> Click to minimize and save space</p>
                                 <p>This helps you see more items on one screen!</p>
 
-                                <h3>❓ Can I use this app on my phone?</h3>
+                                <h3 id="help-q-phone">❓ Can I use this app on my phone?</h3>
                                 <p>Yes! This app works on all devices:</p>
                                 <ul style="line-height: 2;">
                                     <li>iPhone (Safari)</li>
@@ -2939,7 +2953,7 @@
                                 </ul>
                                 <p>For best results on phones, tap "Add to Home Screen" in your browser menu.</p>
 
-                                <h3>❓ How do I delete something by accident?</h3>
+                                <h3 id="help-q-delete">❓ How do I delete something by accident?</h3>
                                 <p>Unfortunately, once deleted, items cannot be recovered. That's why the app always asks "Are you sure?" before deleting. Always double-check before confirming!</p>
                                 <p><strong>Tip:</strong> Backup your data regularly so you have a copy.</p>
                             </div>
@@ -3115,10 +3129,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-02-11-1803 UTC
+                        <strong>App Version:</strong> 2026-02-11-1927 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Help: All Profile→Settings References Fixed!
+                        Help Search: Jumps to Exact Questions Now!
                     </p>
                 </div>
             </div>
@@ -8723,40 +8737,75 @@
                 section.classList.add('hidden');
             });
             
-            // Show selected topic
-            const targetId = `help-${topicId}`;
-            console.log('🔍 Looking for element with ID:', targetId);
-            
-            const topic = document.getElementById(targetId);
-            
-            if (topic) {
-                console.log('✅ Topic element found!');
-                console.log('   - Element ID:', topic.id);
-                console.log('   - Element classes:', topic.className);
-                console.log('   - Is hidden before:', topic.classList.contains('hidden'));
+            // Check if this is a specific question ID (starts with q-)
+            if (topicId.startsWith('q-')) {
+                console.log('🎯 This is a specific question, not a section');
+                const questionId = `help-${topicId}`;
+                console.log('🔍 Looking for question element with ID:', questionId);
                 
-                topic.classList.remove('hidden');
+                const questionElement = document.getElementById(questionId);
                 
-                console.log('   - Is hidden after:', topic.classList.contains('hidden'));
-                console.log('👁️ Topic made visible');
-                console.log('📍 Scrolling to topic content');
-                
-                // Scroll to the topic content, not the top of the page
-                setTimeout(() => {
-                    topic.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }, 100);
-                
-                console.log('✅ Successfully showed topic:', topicId);
+                if (questionElement) {
+                    console.log('✅ Question element found!');
+                    
+                    // Find the parent section
+                    let parentSection = questionElement.closest('.help-topic-section');
+                    
+                    if (parentSection) {
+                        console.log('📂 Found parent section:', parentSection.id);
+                        parentSection.classList.remove('hidden');
+                        console.log('👁️ Parent section made visible');
+                        
+                        // Scroll to the specific question
+                        setTimeout(() => {
+                            questionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            console.log('📍 Scrolled to question:', questionId);
+                        }, 150);
+                        
+                        console.log('✅ Successfully showed specific question:', topicId);
+                    } else {
+                        console.error('❌ ERROR: Could not find parent section for question');
+                    }
+                } else {
+                    console.error('❌ ERROR: Question element NOT found!');
+                    console.error('   - Searched for ID:', questionId);
+                }
             } else {
-                console.error('❌ ERROR: Topic element NOT found!');
-                console.error('   - Searched for ID:', targetId);
-                console.error('   - Available help sections:');
+                // Original behavior for section IDs
+                const targetId = `help-${topicId}`;
+                console.log('🔍 Looking for section with ID:', targetId);
                 
-                document.querySelectorAll('.help-topic-section').forEach(section => {
-                    console.error(`     - ${section.id}`);
-                });
+                const topic = document.getElementById(targetId);
                 
-                console.error('⚠️ This topic does not exist in the HTML!');
+                if (topic) {
+                    console.log('✅ Topic section found!');
+                    console.log('   - Element ID:', topic.id);
+                    console.log('   - Element classes:', topic.className);
+                    console.log('   - Is hidden before:', topic.classList.contains('hidden'));
+                    
+                    topic.classList.remove('hidden');
+                    
+                    console.log('   - Is hidden after:', topic.classList.contains('hidden'));
+                    console.log('👁️ Topic made visible');
+                    console.log('📍 Scrolling to topic content');
+                    
+                    // Scroll to the topic content, not the top of the page
+                    setTimeout(() => {
+                        topic.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 100);
+                    
+                    console.log('✅ Successfully showed topic:', topicId);
+                } else {
+                    console.error('❌ ERROR: Topic element NOT found!');
+                    console.error('   - Searched for ID:', targetId);
+                    console.error('   - Available help sections:');
+                    
+                    document.querySelectorAll('.help-topic-section').forEach(section => {
+                        console.error(`     - ${section.id}`);
+                    });
+                    
+                    console.error('⚠️ This topic does not exist in the HTML!');
+                }
             }
             
             console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
@@ -8773,17 +8822,19 @@
             'activity': ['activities', 'How to add yoga, bingo, and other activities'],
             'contact': ['contacts', 'How to save important phone numbers'],
             'voice': ['voice', 'How to use voice commands and voice assistant'],
-            'password': ['common-questions', 'Forgot password or change password'],
-            'forgot password': ['common-questions', 'How to reset your password'],
-            'backup': ['common-questions', 'How to backup and restore your data'],
-            'notification': ['common-questions', 'How to enable notifications and reminders'],
+            'password': ['q-change-password', 'How to change your password'],
+            'forgot password': ['q-forgot-password', 'I forgot my password - how to reset'],
+            'backup': ['q-backup', 'How to backup and restore your data'],
+            'notification': ['q-notifications', 'Why am I not getting reminders/notifications?'],
             'slow': ['troubleshooting', 'App running slow - troubleshooting'],
             'not working': ['troubleshooting', 'Common problems and solutions'],
             'minimize': ['getting-started', 'How to use minimize/maximize buttons'],
             'expand': ['getting-started', 'How to expand and collapse cards'],
-            'delete': ['common-questions', 'How to delete items'],
-            'edit': ['medications', 'How to edit existing items'],
-            'help': ['getting-started', 'Getting started with the app']
+            'delete': ['q-delete', 'What happens if I delete something by accident?'],
+            'phone': ['q-phone', 'Can I use this app on my phone?'],
+            'help': ['getting-started', 'Getting started with the app'],
+            'emergency': ['q-emergency', 'How to call 911 in an emergency'],
+            '911': ['q-emergency', 'How to call 911 in an emergency']
         };
 
         // Debug: Log all available help content on load
