@@ -4,27 +4,37 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-10-0221 UTC - MOBILE: Shortened Title + Fixed Double Box
-    BUILD DATE: February 10, 2026 at 2:21 AM UTC
-    CHANGES: Fixed Release Notes title wrapping + Removed double box on About This App
+    VERSION: 2026-02-11-1803 UTC - HELP: Fixed All Profile→Settings References
+    BUILD DATE: February 11, 2026 at 6:03 PM UTC
+    CHANGES: Updated all Help section references - Settings features now correctly documented
     
-    ✨ MOBILE FIX #1: RELEASE NOTES TITLE SHORTENED!
-    - Changed "📰 Release Notes & What's New" → "📰 Release Notes"
-    - Prevents word wrap on mobile screens
-    - Arrow stays on the right (no more left-side wrapping!)
-    - Title fits on one line on iPhone
+    📚 HELP SECTION UPDATES - ALL PROFILE→SETTINGS FIXED:
     
-    ✨ FIX #2: ABOUT THIS APP DOUBLE BOX REMOVED!
-    - Found duplicate <div class="card"> tag
-    - Removed extra opening div that caused double box effect
-    - Now looks consistent with all other cards
-    - Single clean box like Voice Settings, Notifications, etc.
+    ✅ Voice Assistant:
+    - "Tap Profile button" → "Tap Settings button"
+    - "Profile → Voice Settings" → "Settings → Voice Settings"
+    - "Voice Assistant ON in Profile" → "in Settings"
     
-    📝 WHAT WAS WRONG:
-    - Release Notes: Title too long, wrapped to 2 lines on mobile, pushing arrow left
-    - About This App: Had TWO opening <div class="card"> tags creating nested boxes
+    ✅ Notifications:
+    - "Profile → Notification Settings" → "Settings → Notification Settings"
+    - "Profile → Enable Notifications" → "Settings → Notification Settings"
     
-    📝 PREVIOUS VERSION (2026-02-10-0205 UTC):
+    ✅ Data Management:
+    - "Go to Profile" → "Go to Settings"
+    - "Data Backup" → "Data Management" (correct card name)
+    - "Profile → Import Data" → "Settings → Data Management → Import Data"
+    
+    ✅ Other Updates:
+    - "Profile → Release Notes" → "Settings → Release Notes"
+    - Old release note updated to reflect Settings location
+    
+    📝 TOTAL CHANGES: 9 help references updated
+    
+    📝 WHAT STAYED IN PROFILE:
+    - "Change Password" instructions (correctly in Profile)
+    - "Update Profile" references (correctly in Profile)
+    
+    📝 PREVIOUS VERSION (2026-02-10-0221 UTC):
     - First time warning auto-hides after setup
     - Exact iPhone installation steps
     - Account loss prevention
@@ -2214,7 +2224,7 @@
                                             <ul style="margin-top: 8px; line-height: 1.8;">
                                                 <li>You don't need to reinstall or re-add to home screen</li>
                                                 <li>Simply log out and log back in to get the latest version</li>
-                                                <li>Check Profile → Release Notes to see what's new</li>
+                                                <li>Check Settings → Release Notes to see what's new</li>
                                                 <li>Your data is always safe during updates</li>
                                             </ul>
                                         </li>
@@ -2332,8 +2342,8 @@
                             <div class="card-content" style="line-height: 1.8; font-size: 16px;">
                                 <h3>How to Enable Voice Assistant:</h3>
                                 <ol style="line-height: 2;">
-                                    <li>Tap <strong>👤 Profile</strong> button (top right)</li>
-                                    <li>Scroll to "Voice Assistant Settings"</li>
+                                    <li>Tap <strong>⚙️ Settings</strong> button (top navigation)</li>
+                                    <li>Scroll to "Voice Settings"</li>
                                     <li>Tap the toggle to turn it <strong>ON</strong></li>
                                     <li>A floating 🎤 button will appear at the bottom right</li>
                                 </ol>
@@ -2545,7 +2555,7 @@
 
                                 <h3>⚙️ Voice Assistant Settings:</h3>
                                 <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #ffc107;">
-                                    <p style="margin-top: 0; font-weight: 600;">📍 Found in: Profile → Voice Settings</p>
+                                    <p style="margin-top: 0; font-weight: 600;">📍 Found in: Settings → Voice Settings</p>
                                     
                                     <p style="font-weight: 600; margin-bottom: 5px;">🔊 Voice Announcements:</p>
                                     <p style="margin: 0 0 15px 0; font-size: 14px;">Turn voice feedback on/off (confirmations and responses)</p>
@@ -2899,7 +2909,7 @@
                                 <h3>❓ Why am I not getting reminders?</h3>
                                 <ol style="line-height: 2;">
                                     <li>Make sure you enabled reminders when adding items</li>
-                                    <li>Go to Profile → Notification Settings</li>
+                                    <li>Go to Settings → Notification Settings</li>
                                     <li>Tap <strong>"Enable Notifications"</strong></li>
                                     <li>Allow notifications when your browser asks</li>
                                     <li>On iPhone: Must "Add to Home Screen" first</li>
@@ -2907,8 +2917,8 @@
 
                                 <h3>❓ How do I backup my data?</h3>
                                 <ol style="line-height: 2;">
-                                    <li>Go to <strong>Profile</strong></li>
-                                    <li>Scroll to "Data Backup"</li>
+                                    <li>Go to <strong>Settings</strong></li>
+                                    <li>Scroll to "Data Management"</li>
                                     <li>Tap <strong>"Export Data"</strong></li>
                                     <li>Save the file somewhere safe</li>
                                     <li>Do this monthly for safety!</li>
@@ -2958,7 +2968,7 @@
                                 <h3>🔕 Not Getting Notifications</h3>
                                 <ol style="line-height: 2;">
                                     <li>Check: Did you enable reminders on the item?</li>
-                                    <li>Go to Profile → Enable Notifications</li>
+                                    <li>Go to Settings → Notification Settings</li>
                                     <li>Allow when browser asks for permission</li>
                                     <li>On iPhone: Must use "Add to Home Screen" first</li>
                                     <li>Check phone's notification settings (System Settings)</li>
@@ -2966,7 +2976,7 @@
 
                                 <h3>🔊 Voice Not Working</h3>
                                 <ol style="line-height: 2;">
-                                    <li>Make sure Voice Assistant is ON in Profile</li>
+                                    <li>Make sure Voice Assistant is ON in Settings</li>
                                     <li>Allow microphone access when browser asks</li>
                                     <li>Check microphone isn't muted on device</li>
                                     <li>Try closing and reopening the app</li>
@@ -2993,7 +3003,7 @@
                                 <p>Data is saved locally on your device. If you:</p>
                                 <ul style="line-height: 2;">
                                     <li><strong>Cleared browser data:</strong> Data may be gone 😞</li>
-                                    <li><strong>Have a backup file:</strong> Go to Profile → Import Data</li>
+                                    <li><strong>Have a backup file:</strong> Go to Settings → Data Management → Import Data</li>
                                     <li><strong>Used different device:</strong> Data doesn't sync between devices</li>
                                 </ul>
                                 <p><strong>Prevention:</strong> Export data monthly and save the backup file!</p>
@@ -3105,10 +3115,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-02-10-0221 UTC
+                        <strong>App Version:</strong> 2026-02-11-1803 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Mobile Fixes: Short Title + No Double Box!
+                        Help: All Profile→Settings References Fixed!
                     </p>
                 </div>
             </div>
@@ -3546,7 +3556,7 @@
                             <div style="line-height: 1.6; font-size: 13px;">
                                 <p style="margin: 5px 0; font-weight: 600;">✨ New Features:</p>
                                 <ul style="margin: 5px 0; padding-left: 20px;">
-                                    <li>Added Verbose Help Toggle in Profile → Voice Settings</li>
+                                    <li>Added Verbose Help Toggle in Settings → Voice Settings</li>
                                     <li>Choose between short or detailed voice error messages</li>
                                 </ul>
                             </div>
