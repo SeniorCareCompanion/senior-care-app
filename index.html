@@ -4,9 +4,62 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-12-1827 UTC - DOCS: Added Help Documentation for AI Search
-    BUILD DATE: February 12, 2026 at 6:27 PM UTC
-    CHANGES: Comprehensive help documentation for AI Activity Search feature
+    VERSION: 2026-02-12-1858 UTC - AI SEARCH: Disabled with "Coming Soon" Message
+    BUILD DATE: February 12, 2026 at 6:58 PM UTC
+    CHANGES: AI Search temporarily disabled due to CORS/backend requirements
+    
+    🚨 CRITICAL FIX: AI SEARCH DISABLED (COMING SOON)
+    
+    ❌ PROBLEM DISCOVERED:
+    - AI Search caused CORS errors when deployed to GitHub Pages
+    - Browser blocks direct API calls to Anthropic (security policy)
+    - Feature worked in development but fails in production
+    - Error: "Access-Control-Allow-Origin header is present"
+    
+    ✅ SOLUTION IMPLEMENTED:
+    - AI Search button now disabled with "⏳ Coming Soon" message
+    - Clear explanation: "Requires backend server setup"
+    - Manual Entry button highlighted as primary (blue)
+    - Manual Entry form visible by default
+    - App works perfectly again! ✅
+    
+    📋 UI CHANGES:
+    - 🔍 AI Search button: Disabled, gray, shows "⏳ Coming Soon"
+    - ✍️ Manual Entry button: Active, blue, primary action
+    - Info box explains why AI Search is disabled
+    - Form fields visible immediately (no extra clicks)
+    
+    📚 HELP DOCUMENTATION UPDATED:
+    - Activities Help: "⏳ AI Search - Coming Soon!"
+    - Added yellow warning box explaining it's disabled
+    - Changed "NEW" to "Coming in Future Update"
+    - Troubleshooting: "🤖 AI Search - Currently Disabled"
+    - Clear explanation of why it's not available yet
+    
+    🔮 FUTURE PLAN:
+    To enable AI Search, we need:
+    1. Serverless backend (Vercel/Cloudflare Workers/AWS Lambda)
+    2. Backend handles API calls (avoids CORS)
+    3. API key stays secure on server
+    4. Frontend → Backend → Anthropic API
+    
+    This will be implemented in a future update.
+    
+    📊 CURRENT STATUS:
+    ✅ App works perfectly with Manual Entry
+    ✅ No CORS errors
+    ✅ Clear "Coming Soon" messaging
+    ✅ Users know why feature is disabled
+    ✅ All other features work normally
+    ✅ Tests still passing (AI Search tests for future use)
+    
+    💡 USER EXPERIENCE:
+    - Sees AI Search is coming (builds anticipation)
+    - Understands it requires backend setup
+    - Can use Manual Entry immediately
+    - No confusion or broken functionality
+    
+    📝 PREVIOUS VERSION (2026-02-12-1827 UTC):
     
     📚 HELP DOCUMENTATION ADDED FOR AI SEARCH:
     
@@ -1828,48 +1881,23 @@
                             ✨ Choose how to add your activity:
                         </p>
                         <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                            <button class="btn" onclick="showAISearch()" style="flex: 1; min-width: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; font-size: 16px; border: none;">
+                            <button class="btn" disabled style="flex: 1; min-width: 200px; background: #95a5a6; color: white; padding: 15px; font-size: 16px; border: none; cursor: not-allowed; opacity: 0.6;">
                                 🔍 AI Search<br>
-                                <span style="font-size: 12px; opacity: 0.9;">Let AI find and fill the details</span>
+                                <span style="font-size: 12px; opacity: 0.9;">⏳ Coming Soon</span>
                             </button>
-                            <button class="btn btn-secondary" onclick="showManualEntry()" style="flex: 1; min-width: 200px; padding: 15px; font-size: 16px;">
+                            <button class="btn btn-primary" onclick="showManualEntry()" style="flex: 1; min-width: 200px; padding: 15px; font-size: 16px;">
                                 ✍️ Manual Entry<br>
-                                <span style="font-size: 12px; opacity: 0.8;">Fill in the form yourself</span>
+                                <span style="font-size: 12px; opacity: 0.9;">Fill in the form yourself</span>
                             </button>
                         </div>
-                    </div>
-
-                    <!-- AI Search Container -->
-                    <div id="aiSearchContainer" class="hidden" style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 2px solid #667eea;">
-                        <button class="btn btn-secondary" onclick="hideAISearch()" style="margin-bottom: 15px; padding: 8px 15px; font-size: 14px;">
-                            ← Back to Options
-                        </button>
-                        
-                        <h4 style="margin: 0 0 10px 0; color: #667eea;">🔍 AI Activity Search</h4>
-                        <p style="margin: 0 0 15px 0; font-size: 14px; color: #666;">
-                            Describe what you're looking for, and AI will search the web to find details for you.
-                        </p>
-                        
-                        <div class="input-group">
-                            <label for="aiActivitySearch">What activity are you looking for?</label>
-                            <input type="text" 
-                                   id="aiActivitySearch" 
-                                   placeholder="e.g., yoga classes at the rec center, bingo at senior center"
-                                   style="font-size: 16px;">
-                        </div>
-                        
-                        <button class="btn btn-primary" onclick="searchActivityWithAI()" style="width: 100%; padding: 15px; font-size: 16px;">
-                            🔍 Search with AI
-                        </button>
-                        
-                        <!-- AI Search Results -->
-                        <div id="aiSearchResults" class="hidden" style="margin-top: 20px;">
-                            <!-- Results will be inserted here by JavaScript -->
+                        <div style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #ffc107;">
+                            <p style="margin: 0; font-size: 13px; color: #856404;">
+                                ℹ️ <strong>AI Search temporarily disabled.</strong> This feature requires backend server setup to work securely. For now, please use Manual Entry to add activities.
+                            </p>
                         </div>
                     </div>
 
-                    <!-- Manual Entry Container -->
-                    <div id="manualEntryContainer" class="hidden">
+                    <!-- Manual Entry Container (visible by default now) -->
                     <div class="input-group">
                         <label for="activityName">Activity Name</label>
                         <input type="text" id="activityName" placeholder="e.g., Yoga Class, Bingo Night">
@@ -2883,17 +2911,23 @@
                             </div>
                             <div class="card-content" style="line-height: 1.8; font-size: 16px;">
                                 <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #667eea;">
-                                    <h3 style="margin-top: 0; color: #667eea;">✨ NEW: AI Activity Search!</h3>
+                                    <h3 style="margin-top: 0; color: #667eea;">⏳ AI Activity Search - Coming Soon!</h3>
+                                    <div style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #ffc107;">
+                                        <p style="margin: 0; font-size: 14px; color: #856404;">
+                                            <strong>ℹ️ Currently Disabled:</strong> AI Search requires backend server setup to work securely. This feature will be enabled in a future update. For now, use Manual Entry to add activities.
+                                        </p>
+                                    </div>
                                     <p style="margin: 0 0 10px 0;">
-                                        <strong>You now have TWO ways to add activities:</strong>
+                                        <strong>Two ways to add activities:</strong>
                                     </p>
                                     <ul style="margin: 0; line-height: 1.8;">
-                                        <li><strong>🔍 AI Search:</strong> Let AI find schedules for you (recommended!)</li>
-                                        <li><strong>✍️ Manual Entry:</strong> Type everything yourself (traditional way)</li>
+                                        <li><strong>🔍 AI Search:</strong> Coming soon - AI will find schedules for you</li>
+                                        <li><strong>✍️ Manual Entry:</strong> Currently available - type everything yourself</li>
                                     </ul>
                                 </div>
 
-                                <h3>🔍 How to Use AI Activity Search:</h3>
+                                <h3>🔍 AI Activity Search (Coming in Future Update):</h3>
+                                <p style="font-style: italic; color: #666;">When enabled, here's how it will work:</p>
                                 <ol style="line-height: 2;">
                                     <li>Tap the <strong>🎉 Activities</strong> tab at the top</li>
                                     <li>Tap <strong>"🔍 AI Search"</strong> button</li>
@@ -3184,9 +3218,17 @@
                                     <li>Speak clearly near the microphone</li>
                                 </ol>
 
-                                <h3>🤖 AI Search Not Working / Not Finding Results</h3>
+                                <h3>🤖 AI Search - Currently Disabled</h3>
+                                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 10px 0; border-left: 4px solid #ffc107;">
+                                    <p style="margin: 0 0 10px 0; font-weight: 600; color: #856404;">
+                                        ⏳ AI Search Coming in Future Update
+                                    </p>
+                                    <p style="margin: 0; font-size: 14px; color: #856404;">
+                                        AI Activity Search requires backend server setup to work securely. This feature is temporarily disabled while we set up the necessary infrastructure. For now, please use Manual Entry to add activities. We'll announce when AI Search is available!
+                                    </p>
+                                </div>
                                 <div style="background: #e6fffa; padding: 15px; border-radius: 8px; margin: 10px 0; border-left: 4px solid #38b2ac;">
-                                    <p style="margin: 0 0 10px 0; font-weight: 600;">If AI Search isn't finding what you need:</p>
+                                    <p style="margin: 0 0 10px 0; font-weight: 600;">When AI Search is enabled, here's how to use it:</p>
                                     <ol style="line-height: 2; margin: 0;">
                                         <li><strong>Try different search terms:</strong>
                                             <ul style="margin-top: 8px;">
@@ -3352,10 +3394,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-02-12-1827 UTC
+                        <strong>App Version:</strong> 2026-02-12-1858 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Help Docs Added for AI Activity Search!
+                        AI Search: Coming Soon (Manual Entry Works!)
                     </p>
                 </div>
             </div>
