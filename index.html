@@ -4,51 +4,124 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-11-1927 UTC - HELP SEARCH: Fixed to Jump to Specific Questions
-    BUILD DATE: February 11, 2026 at 7:27 PM UTC
-    CHANGES: Help search now jumps to exact questions, not just sections
+    VERSION: 2026-02-12-1827 UTC - DOCS: Added Help Documentation for AI Search
+    BUILD DATE: February 12, 2026 at 6:27 PM UTC
+    CHANGES: Comprehensive help documentation for AI Activity Search feature
     
-    🔍 HELP SEARCH - MAJOR FIX:
+    📚 HELP DOCUMENTATION ADDED FOR AI SEARCH:
     
-    **THE PROBLEM:**
-    - Search for "notifications" → Clicked result
-    - Showed entire "Common Questions" section
-    - User saw 911, passwords, etc. - NOT the notification question!
+    ✅ ACTIVITIES HELP SECTION UPDATED:
+    - Added "NEW: AI Activity Search" highlight box
+    - Step-by-step instructions for using AI Search
+    - Example search queries (yoga, bingo, etc.)
+    - Verification reminder with warning box
+    - When to use AI vs Manual guide
+    - Manual entry instructions (updated)
+    - Tips for both methods
     
-    **THE FIX:**
-    ✅ Added unique IDs to every question in Common Questions:
-    - help-q-emergency (911 emergency)
-    - help-q-forgot-password (forgot password)
-    - help-q-change-password (change password)  
-    - help-q-notifications (notifications/reminders) ← THE KEY ONE
-    - help-q-backup (backup data)
-    - help-q-phone (phone compatibility)
-    - help-q-delete (delete recovery)
+    ✅ TROUBLESHOOTING SECTION UPDATED:
+    - New "🤖 AI Search Not Working" section
+    - Tips for better search terms with examples
+    - What AI Search works best for
+    - What AI may not find
+    - When to use Manual Entry instead
+    - Common solutions for search issues
     
-    ✅ Updated search mapping to point to specific questions:
-    - 'notification' → 'q-notifications' (not 'common-questions')
-    - 'password' → 'q-change-password'
-    - 'forgot password' → 'q-forgot-password'
-    - 'backup' → 'q-backup'
-    - 'delete' → 'q-delete'
-    - 'phone' → 'q-phone'
-    - 'emergency' → 'q-emergency'
-    - '911' → 'q-emergency'
+    ✅ HELP SEARCH KEYWORDS ADDED:
+    - "ai search" → Activities help
+    - "ai" → AI Activity Search
+    - "find activities" → AI search guide
+    Users can now search for AI help directly!
     
-    ✅ Enhanced showHelpTopic() function:
-    - Detects if searching for specific question (starts with 'q-')
-    - Shows parent section (Common Questions)
-    - Scrolls directly to the exact question heading
-    - Smooth scroll animation
+    📝 HELP CONTENT INCLUDES:
+    - ✨ Highlighted "NEW" feature callout
+    - 📋 12-step AI Search walkthrough
+    - ⚠️ Verification disclaimer prominently displayed
+    - 💡 When to use AI vs Manual decision guide
+    - 🔧 Troubleshooting with specific examples
+    - 🎯 What works best / what doesn't
     
-    📝 HOW IT WORKS NOW:
-    1. Search for "notifications"
-    2. Click "Why am I not getting reminders/notifications?"
-    3. Opens Common Questions section
-    4. Auto-scrolls to notification question
-    5. User sees EXACTLY what they searched for! ✅
+    🎯 USER BENEFIT:
+    Seniors now have clear, step-by-step documentation explaining:
+    - How to use the AI Search feature
+    - What to type in the search box
+    - How to verify AI results
+    - When AI might not work
+    - How to fall back to manual entry
     
-    📝 PREVIOUS VERSION (2026-02-11-1803 UTC):
+    📝 PREVIOUS VERSION (2026-02-12-1818 UTC):
+    
+    🤖 MAJOR NEW FEATURE: AI ACTIVITY SEARCH - PHASE 1!
+    
+    ✨ WHAT IT DOES:
+    Seniors can now use AI to search the web for activity information instead of
+    manually typing everything. AI finds schedules, locations, times, and costs
+    automatically!
+    
+    🎯 HOW IT WORKS:
+    1. Click "Activities" tab
+    2. Choose "🔍 AI Search" (or "✍️ Manual Entry")
+    3. Type what you're looking for: "yoga at the rec center"
+    4. AI searches the web for current schedules
+    5. AI extracts: name, location, days, times, duration, cost
+    6. User reviews AI results with source URL shown
+    7. Click "✓ Use This Info" to auto-fill the form
+    8. User reviews, adjusts recurrence preference, and saves!
+    
+    ✅ FEATURES INCLUDED:
+    - 🌐 Real-time web search using Anthropic API
+    - 📋 Structured data extraction (days, times, locations)
+    - 🔗 Source URLs shown for verification
+    - ⚠️ Clear disclaimer: "AI-suggested - please verify"
+    - ✍️ Manual entry still available (both options work)
+    - 🎯 Auto-fills form fields intelligently
+    - 📍 Uses user's location (Colorado Springs, CO)
+    - 🔄 "Search Again" option if results aren't right
+    - ✅ Success notification when form is filled
+    - 🗣️ Voice confirmation when data is loaded
+    
+    🛡️ SAFETY & VERIFICATION:
+    - Always shows source URL where info was found
+    - Disclaimer reminds users to verify times/details
+    - Manual editing available before saving
+    - Traditional manual entry always available as backup
+    
+    📝 TECHNICAL IMPLEMENTATION:
+    - Uses Claude Sonnet 4 with web_search tool
+    - Async API calls with error handling
+    - JSON structured output from AI
+    - Graceful fallback on errors
+    - Comprehensive logging for debugging
+    
+    🧪 TESTS ADDED:
+    - 15 new tests for AI Search feature
+    - Total tests: 49 (was 34)
+    - All tests passing ✅
+    
+    Tests cover:
+    - UI elements (buttons, containers, inputs)
+    - JavaScript functions (search, display, auto-fill)
+    - API integration (Anthropic endpoint, web_search)
+    - Safety features (disclaimer, source URLs)
+    - Regression check (manual entry still works)
+    
+    📊 BENEFITS FOR SENIORS:
+    ✅ Reduces typing burden
+    ✅ Finds accurate, current information
+    ✅ Eliminates data entry errors
+    ✅ Natural language: just describe what you want
+    ✅ Shows where information came from
+    ✅ Easy to use - just type and click
+    
+    🎯 EXAMPLE USAGE:
+    User types: "bingo at senior center"
+    AI finds: "Senior Bingo Night at Meadows Park Senior Center, 
+              Wednesdays 2:00 PM - 4:00 PM, Free admission"
+    User clicks: "✓ Use This Info"
+    Form auto-fills: All fields populated correctly!
+    User reviews and saves: Done! ✅
+    
+    📝 PREVIOUS VERSION (2026-02-11-1927 UTC):
     - First time warning auto-hides after setup
     - Exact iPhone installation steps
     - Account loss prevention
@@ -1748,6 +1821,55 @@
                 
                 <div class="form-section">
                     <h3>Add New Activity</h3>
+                    
+                    <!-- AI Search vs Manual Entry Choice -->
+                    <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 2px solid #667eea;">
+                        <p style="margin: 0 0 15px 0; font-weight: 600; font-size: 16px; color: #667eea;">
+                            ✨ Choose how to add your activity:
+                        </p>
+                        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                            <button class="btn" onclick="showAISearch()" style="flex: 1; min-width: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; font-size: 16px; border: none;">
+                                🔍 AI Search<br>
+                                <span style="font-size: 12px; opacity: 0.9;">Let AI find and fill the details</span>
+                            </button>
+                            <button class="btn btn-secondary" onclick="showManualEntry()" style="flex: 1; min-width: 200px; padding: 15px; font-size: 16px;">
+                                ✍️ Manual Entry<br>
+                                <span style="font-size: 12px; opacity: 0.8;">Fill in the form yourself</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- AI Search Container -->
+                    <div id="aiSearchContainer" class="hidden" style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 2px solid #667eea;">
+                        <button class="btn btn-secondary" onclick="hideAISearch()" style="margin-bottom: 15px; padding: 8px 15px; font-size: 14px;">
+                            ← Back to Options
+                        </button>
+                        
+                        <h4 style="margin: 0 0 10px 0; color: #667eea;">🔍 AI Activity Search</h4>
+                        <p style="margin: 0 0 15px 0; font-size: 14px; color: #666;">
+                            Describe what you're looking for, and AI will search the web to find details for you.
+                        </p>
+                        
+                        <div class="input-group">
+                            <label for="aiActivitySearch">What activity are you looking for?</label>
+                            <input type="text" 
+                                   id="aiActivitySearch" 
+                                   placeholder="e.g., yoga classes at the rec center, bingo at senior center"
+                                   style="font-size: 16px;">
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="searchActivityWithAI()" style="width: 100%; padding: 15px; font-size: 16px;">
+                            🔍 Search with AI
+                        </button>
+                        
+                        <!-- AI Search Results -->
+                        <div id="aiSearchResults" class="hidden" style="margin-top: 20px;">
+                            <!-- Results will be inserted here by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Manual Entry Container -->
+                    <div id="manualEntryContainer" class="hidden">
                     <div class="input-group">
                         <label for="activityName">Activity Name</label>
                         <input type="text" id="activityName" placeholder="e.g., Yoga Class, Bingo Night">
@@ -1859,6 +1981,8 @@
 
                     <button id="addActivityBtn" class="btn btn-primary" onclick="addActivity()">Add Activity</button>
                     <button id="cancelEditActivityBtn" class="btn hidden" onclick="cancelEditActivity()" style="background: #95a5a6; margin-top: 10px;">Cancel Editing</button>
+                    </div>
+                    <!-- End Manual Entry Container -->
                 </div>
             </div>
 
@@ -2758,10 +2882,52 @@
                                 🎉 Activities Help
                             </div>
                             <div class="card-content" style="line-height: 1.8; font-size: 16px;">
-                                <h3>How to Add an Activity:</h3>
+                                <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #667eea;">
+                                    <h3 style="margin-top: 0; color: #667eea;">✨ NEW: AI Activity Search!</h3>
+                                    <p style="margin: 0 0 10px 0;">
+                                        <strong>You now have TWO ways to add activities:</strong>
+                                    </p>
+                                    <ul style="margin: 0; line-height: 1.8;">
+                                        <li><strong>🔍 AI Search:</strong> Let AI find schedules for you (recommended!)</li>
+                                        <li><strong>✍️ Manual Entry:</strong> Type everything yourself (traditional way)</li>
+                                    </ul>
+                                </div>
+
+                                <h3>🔍 How to Use AI Activity Search:</h3>
                                 <ol style="line-height: 2;">
                                     <li>Tap the <strong>🎉 Activities</strong> tab at the top</li>
-                                    <li>Scroll down to "Add New Activity"</li>
+                                    <li>Tap <strong>"🔍 AI Search"</strong> button</li>
+                                    <li>Type what you're looking for in plain English:
+                                        <ul style="margin-top: 8px;">
+                                            <li>"yoga classes at the rec center"</li>
+                                            <li>"bingo at senior center"</li>
+                                            <li>"water aerobics"</li>
+                                            <li>"painting class for seniors"</li>
+                                        </ul>
+                                    </li>
+                                    <li>Tap <strong>"🔍 Search with AI"</strong></li>
+                                    <li>Wait while AI searches the web for current schedules</li>
+                                    <li>Review the results AI found (times, location, cost, etc.)</li>
+                                    <li>Check the <strong>source URL</strong> to verify information</li>
+                                    <li>Tap <strong>"✓ Use This Info"</strong> to auto-fill the form</li>
+                                    <li>Review the filled-in details and adjust if needed</li>
+                                    <li>Choose if it's recurring or one-time</li>
+                                    <li>Tap <strong>"Add Activity"</strong> to save</li>
+                                </ol>
+
+                                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #ffc107;">
+                                    <p style="margin: 0 0 10px 0; font-weight: 600; color: #856404;">
+                                        ⚠️ Important: Verify AI Results
+                                    </p>
+                                    <p style="margin: 0; font-size: 14px; color: #856404;">
+                                        AI searches the web for you, but schedules can change. Always check the source link and verify times are current before saving. Call the location if unsure!
+                                    </p>
+                                </div>
+
+                                <h3>✍️ How to Add Manually:</h3>
+                                <ol style="line-height: 2;">
+                                    <li>Tap the <strong>🎉 Activities</strong> tab at the top</li>
+                                    <li>Tap <strong>"✍️ Manual Entry"</strong> button</li>
                                     <li>Fill in:
                                         <ul>
                                             <li><strong>Activity Name:</strong> e.g., "Yoga Class"</li>
@@ -2774,6 +2940,25 @@
                                     <li>Check <strong>"Enable Reminder"</strong> to get notified before</li>
                                     <li>Tap <strong>"Add Activity"</strong></li>
                                 </ol>
+
+                                <h3>💡 When to Use AI Search vs Manual:</h3>
+                                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                                    <p style="margin: 0 0 10px 0;"><strong>Use AI Search when:</strong></p>
+                                    <ul style="margin: 0 0 15px 0; line-height: 1.8;">
+                                        <li>Looking for public classes/events (yoga, bingo, etc.)</li>
+                                        <li>Don't know the schedule yet</li>
+                                        <li>Want to find times and locations quickly</li>
+                                        <li>Activity is at a rec center, senior center, etc.</li>
+                                    </ul>
+                                    
+                                    <p style="margin: 0 0 10px 0;"><strong>Use Manual Entry when:</strong></p>
+                                    <ul style="margin: 0; line-height: 1.8;">
+                                        <li>Private events (family gatherings, etc.)</li>
+                                        <li>You already know all the details</li>
+                                        <li>Personal activities (doctor visits, etc.)</li>
+                                        <li>AI didn't find what you need</li>
+                                    </ul>
+                                </div>
 
                                 <h3>How to Mark as Attended:</h3>
                                 <ol style="line-height: 2;">
@@ -2793,10 +2978,12 @@
 
                                 <h3>💡 Tips:</h3>
                                 <ul style="line-height: 2;">
+                                    <li>Try AI Search first - it's faster than typing everything!</li>
                                     <li>Add all your regular classes and events once</li>
                                     <li>Set reminders 30-60 minutes before</li>
                                     <li>Track attendance to see which activities you enjoy most</li>
                                     <li>Minimize activities you don't attend regularly</li>
+                                    <li>Always verify AI-found schedules are current</li>
                                 </ul>
                             </div>
                         </div>
@@ -2997,6 +3184,42 @@
                                     <li>Speak clearly near the microphone</li>
                                 </ol>
 
+                                <h3>🤖 AI Search Not Working / Not Finding Results</h3>
+                                <div style="background: #e6fffa; padding: 15px; border-radius: 8px; margin: 10px 0; border-left: 4px solid #38b2ac;">
+                                    <p style="margin: 0 0 10px 0; font-weight: 600;">If AI Search isn't finding what you need:</p>
+                                    <ol style="line-height: 2; margin: 0;">
+                                        <li><strong>Try different search terms:</strong>
+                                            <ul style="margin-top: 8px;">
+                                                <li>Instead of: "exercise" → Try: "yoga classes" or "water aerobics"</li>
+                                                <li>Instead of: "games" → Try: "bingo at senior center"</li>
+                                                <li>Be specific: Include location (rec center, senior center, etc.)</li>
+                                            </ul>
+                                        </li>
+                                        <li><strong>Check your internet connection</strong> - AI needs internet to search</li>
+                                        <li><strong>Wait a moment</strong> - AI search takes 5-10 seconds</li>
+                                        <li><strong>Click "🔄 Search Again"</strong> if first results aren't right</li>
+                                        <li><strong>Use Manual Entry</strong> if AI can't find what you need</li>
+                                    </ol>
+                                </div>
+                                
+                                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 10px 0; border-left: 4px solid #ffc107;">
+                                    <p style="margin: 0 0 10px 0; font-weight: 600; color: #856404;">💡 AI Search Works Best For:</p>
+                                    <ul style="margin: 0; line-height: 1.8; color: #856404;">
+                                        <li>Public classes at rec centers, senior centers, community centers</li>
+                                        <li>Regular activities (yoga, bingo, exercise classes, etc.)</li>
+                                        <li>Events with published schedules online</li>
+                                    </ul>
+                                    <p style="margin: 10px 0 0 0; font-weight: 600; color: #856404;">❌ AI May Not Find:</p>
+                                    <ul style="margin: 0; line-height: 1.8; color: #856404;">
+                                        <li>Private/family events</li>
+                                        <li>Activities without online schedules</li>
+                                        <li>Very new classes (not posted online yet)</li>
+                                    </ul>
+                                    <p style="margin: 10px 0 0 0; font-size: 14px; color: #856404;">
+                                        For these, use "✍️ Manual Entry" instead!
+                                    </p>
+                                </div>
+
                                 <h3>📱 Can't See All My Data</h3>
                                 <ol style="line-height: 2;">
                                     <li>Check if items are minimized (▼ arrow)</li>
@@ -3129,10 +3352,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-02-11-1927 UTC
+                        <strong>App Version:</strong> 2026-02-12-1827 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Help Search: Jumps to Exact Questions Now!
+                        Help Docs Added for AI Activity Search!
                     </p>
                 </div>
             </div>
@@ -7757,6 +7980,283 @@
             updateDashboard();
         }
 
+        // ═══════════════════════════════════════════════════════════════════
+        // AI ACTIVITY SEARCH FUNCTIONS
+        // ═══════════════════════════════════════════════════════════════════
+
+        function showAISearch() {
+            console.log('🤖 Showing AI Search');
+            document.getElementById('aiSearchContainer').classList.remove('hidden');
+            document.getElementById('manualEntryContainer').classList.add('hidden');
+            // Clear previous search
+            document.getElementById('aiActivitySearch').value = '';
+            document.getElementById('aiSearchResults').classList.add('hidden');
+            document.getElementById('aiSearchResults').innerHTML = '';
+        }
+
+        function showManualEntry() {
+            console.log('✍️ Showing Manual Entry');
+            document.getElementById('aiSearchContainer').classList.add('hidden');
+            document.getElementById('manualEntryContainer').classList.remove('hidden');
+        }
+
+        function hideAISearch() {
+            console.log('← Hiding AI Search');
+            document.getElementById('aiSearchContainer').classList.add('hidden');
+            document.getElementById('manualEntryContainer').classList.add('hidden');
+        }
+
+        async function searchActivityWithAI() {
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('🔍 AI ACTIVITY SEARCH - Starting...');
+            
+            const searchQuery = document.getElementById('aiActivitySearch').value.trim();
+            const resultsContainer = document.getElementById('aiSearchResults');
+            
+            if (!searchQuery) {
+                alert('Please enter what you\'re looking for');
+                return;
+            }
+
+            console.log('📝 Search query:', searchQuery);
+            console.log('📍 User location: Colorado Springs, Colorado');
+
+            // Show loading state
+            resultsContainer.classList.remove('hidden');
+            resultsContainer.innerHTML = `
+                <div style="background: white; padding: 20px; border-radius: 8px; text-align: center; border: 2px solid #667eea;">
+                    <p style="margin: 0; font-size: 16px; color: #667eea;">
+                        🔍 Searching the web for "${searchQuery}"...
+                    </p>
+                    <p style="margin: 10px 0 0 0; font-size: 14px; color: #999;">
+                        AI is finding schedules, times, and locations for you
+                    </p>
+                </div>
+            `;
+
+            try {
+                console.log('📡 Calling Anthropic API with web search...');
+                
+                const prompt = `Find information about "${searchQuery}" in Colorado Springs, Colorado. 
+
+Search the web for current schedules, times, locations, and costs. Extract:
+- Activity name
+- Location/venue name
+- Days of week (if recurring)
+- Specific date (if one-time event)
+- Time
+- Duration
+- Cost (if mentioned)
+- Any other relevant details
+
+Return ONLY a JSON object with this exact structure (no markdown, no code blocks):
+{
+  "activityName": "...",
+  "location": "...",
+  "description": "...",
+  "recurrence": "one-time|daily|weekly|specific-days|monthly",
+  "date": "YYYY-MM-DD (if one-time)",
+  "days": [0-6] (if specific-days, 0=Sun, 6=Sat),
+  "weeklyDay": 0-6 (if weekly),
+  "time": "HH:MM AM/PM",
+  "duration": "... minutes",
+  "cost": "$...",
+  "source": "URL where you found this info"
+}`;
+
+                const response = await fetch("https://api.anthropic.com/v1/messages", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        model: "claude-sonnet-4-20250514",
+                        max_tokens: 2000,
+                        messages: [{
+                            role: "user",
+                            content: prompt
+                        }],
+                        tools: [{
+                            type: "web_search_20250305",
+                            name: "web_search"
+                        }]
+                    })
+                });
+
+                console.log('📥 Response received from API');
+                
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status} ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log('📦 API response data:', data);
+
+                // Extract text from response (handle multiple content blocks)
+                let aiText = '';
+                if (data.content && Array.isArray(data.content)) {
+                    aiText = data.content
+                        .filter(block => block.type === 'text')
+                        .map(block => block.text)
+                        .join('\n');
+                }
+
+                console.log('💬 AI response text:', aiText);
+
+                // Try to parse JSON from the response
+                let activityData;
+                try {
+                    // Clean the response - remove markdown code blocks if present
+                    const jsonMatch = aiText.match(/\{[\s\S]*\}/);
+                    if (jsonMatch) {
+                        activityData = JSON.parse(jsonMatch[0]);
+                        console.log('✅ Parsed activity data:', activityData);
+                    } else {
+                        throw new Error('No JSON found in response');
+                    }
+                } catch (parseError) {
+                    console.error('❌ JSON parse error:', parseError);
+                    throw new Error('AI response was not in the expected format');
+                }
+
+                // Display results
+                displayAIResults(activityData);
+                
+            } catch (error) {
+                console.error('❌ Error during AI search:', error);
+                resultsContainer.innerHTML = `
+                    <div style="background: #fee; padding: 20px; border-radius: 8px; border: 2px solid #e53e3e;">
+                        <p style="margin: 0 0 10px 0; font-weight: 600; color: #e53e3e;">
+                            ❌ Search Failed
+                        </p>
+                        <p style="margin: 0; font-size: 14px; color: #666;">
+                            ${error.message}
+                        </p>
+                        <button class="btn btn-secondary" onclick="searchActivityWithAI()" style="margin-top: 15px;">
+                            🔄 Try Again
+                        </button>
+                    </div>
+                `;
+            }
+
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        }
+
+        function displayAIResults(data) {
+            console.log('📊 Displaying AI results:', data);
+            
+            const resultsContainer = document.getElementById('aiSearchResults');
+            
+            // Format days of week
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            let scheduleText = '';
+            
+            if (data.recurrence === 'specific-days' && data.days) {
+                scheduleText = data.days.map(d => dayNames[d]).join(', ');
+            } else if (data.recurrence === 'weekly' && data.weeklyDay !== undefined) {
+                scheduleText = dayNames[data.weeklyDay] + 's';
+            } else if (data.recurrence === 'one-time' && data.date) {
+                scheduleText = new Date(data.date).toLocaleDateString();
+            } else if (data.recurrence === 'daily') {
+                scheduleText = 'Every day';
+            }
+
+            resultsContainer.innerHTML = `
+                <div style="background: #d4edda; padding: 20px; border-radius: 12px; border: 2px solid #28a745;">
+                    <h4 style="margin: 0 0 15px 0; color: #28a745;">
+                        ✅ Found Activity Information
+                    </h4>
+                    
+                    <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <p style="margin: 0 0 10px 0;"><strong>🎉 Activity:</strong> ${data.activityName || 'Not found'}</p>
+                        <p style="margin: 0 0 10px 0;"><strong>📍 Location:</strong> ${data.location || 'Not found'}</p>
+                        ${scheduleText ? `<p style="margin: 0 0 10px 0;"><strong>📅 Schedule:</strong> ${scheduleText}</p>` : ''}
+                        ${data.time ? `<p style="margin: 0 0 10px 0;"><strong>⏰ Time:</strong> ${data.time}</p>` : ''}
+                        ${data.duration ? `<p style="margin: 0 0 10px 0;"><strong>⏱️ Duration:</strong> ${data.duration}</p>` : ''}
+                        ${data.cost ? `<p style="margin: 0 0 10px 0;"><strong>💵 Cost:</strong> ${data.cost}</p>` : ''}
+                        ${data.description ? `<p style="margin: 0;"><strong>📝 Details:</strong> ${data.description}</p>` : ''}
+                    </div>
+                    
+                    ${data.source ? `
+                        <p style="margin: 0 0 15px 0; font-size: 12px; color: #666;">
+                            <strong>Source:</strong> <a href="${data.source}" target="_blank" style="color: #667eea;">${data.source}</a>
+                        </p>
+                    ` : ''}
+                    
+                    <div style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #ffc107;">
+                        <p style="margin: 0; font-size: 13px; color: #856404;">
+                            ⚠️ <strong>AI-suggested information.</strong> Please verify times and details are current before saving.
+                        </p>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick='fillActivityFromAI(${JSON.stringify(data).replace(/'/g, "&#39;")})' style="flex: 1; min-width: 150px;">
+                            ✓ Use This Info
+                        </button>
+                        <button class="btn btn-secondary" onclick="searchActivityWithAI()" style="flex: 1; min-width: 150px;">
+                            🔄 Search Again
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function fillActivityFromAI(data) {
+            console.log('📝 Auto-filling activity form with AI data:', data);
+            
+            // Hide AI search, show manual entry
+            document.getElementById('aiSearchContainer').classList.add('hidden');
+            document.getElementById('manualEntryContainer').classList.remove('hidden');
+            
+            // Fill in the fields
+            if (data.activityName) {
+                document.getElementById('activityName').value = data.activityName;
+            }
+            if (data.location) {
+                document.getElementById('activityLocation').value = data.location;
+            }
+            if (data.description) {
+                document.getElementById('activityDescription').value = data.description;
+            }
+            
+            // Set recurrence
+            if (data.recurrence) {
+                document.getElementById('activityRecurrence').value = data.recurrence;
+                updateActivityRecurrenceOptions();
+                
+                // Set specific fields based on recurrence type
+                if (data.recurrence === 'one-time' && data.date) {
+                    document.getElementById('activityDate').value = data.date;
+                } else if (data.recurrence === 'weekly' && data.weeklyDay !== undefined) {
+                    document.getElementById('activityWeeklyDay').value = data.weeklyDay;
+                } else if (data.recurrence === 'specific-days' && data.days) {
+                    document.querySelectorAll('.activity-day-checkbox').forEach(cb => {
+                        cb.checked = data.days.includes(parseInt(cb.value));
+                    });
+                }
+            }
+            
+            // Set time if provided
+            if (data.time) {
+                document.getElementById('activityTime').value = data.time;
+            }
+            
+            // Scroll to the form
+            document.getElementById('activityName').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // Notify user
+            speak('Activity information filled in. Please review and adjust as needed, then click Add Activity.');
+            
+            // Show a success message
+            const temp = document.createElement('div');
+            temp.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #28a745; color: white; padding: 15px 30px; border-radius: 8px; z-index: 10000; font-size: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);';
+            temp.textContent = '✓ Form filled with AI data - review before saving!';
+            document.body.appendChild(temp);
+            setTimeout(() => temp.remove(), 4000);
+            
+            console.log('✅ Form auto-filled successfully');
+        }
+
         function loadActivities(activities) {
             const container = document.getElementById('activityList');
             container.innerHTML = '';
@@ -8820,6 +9320,9 @@
             'task': ['tasks', 'How to use daily tasks and to-do lists'],
             'bill': ['bills', 'How to track bills and payments'],
             'activity': ['activities', 'How to add yoga, bingo, and other activities'],
+            'ai search': ['activities', 'How to use AI to find activity schedules automatically'],
+            'ai': ['activities', 'AI Activity Search - let AI find schedules for you'],
+            'find activities': ['activities', 'Use AI to search for yoga, bingo, classes'],
             'contact': ['contacts', 'How to save important phone numbers'],
             'voice': ['voice', 'How to use voice commands and voice assistant'],
             'password': ['q-change-password', 'How to change your password'],
