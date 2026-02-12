@@ -441,6 +441,124 @@ class TestKeyUIElements(unittest.TestCase):
 
 
 # ══════════════════════════════════════════════════════════════════════════════
+# TEST CLASS 11: AI Search Feature
+# ══════════════════════════════════════════════════════════════════════════════
+
+class TestAISearchFeature(unittest.TestCase):
+    """Tests for AI-powered activity search feature."""
+
+    def test_ai_search_button_exists(self):
+        """AI Search button must be present in Activities section."""
+        activities = SOUP.find("div", {"id": "activities"})
+        self.assertIsNotNone(activities, "Activities section not found")
+        
+        # Look for button that calls showAISearch()
+        ai_button = activities.find("button", onclick=lambda x: x and "showAISearch()" in x)
+        self.assertIsNotNone(ai_button,
+            "Missing AI Search button in Activities section")
+
+    def test_manual_entry_button_exists(self):
+        """Manual entry button must still be available."""
+        activities = SOUP.find("div", {"id": "activities"})
+        manual_button = activities.find("button", onclick=lambda x: x and "showManualEntry()" in x)
+        self.assertIsNotNone(manual_button,
+            "Missing Manual Entry button - both options must be available!")
+
+    def test_ai_search_input_exists(self):
+        """AI search input box must exist."""
+        search_input = SOUP.find("input", {"id": "aiActivitySearch"})
+        self.assertIsNotNone(search_input,
+            "Missing AI activity search input box (#aiActivitySearch)")
+
+    def test_ai_search_container_exists(self):
+        """Container for AI search interface must exist."""
+        container = SOUP.find("div", {"id": "aiSearchContainer"})
+        self.assertIsNotNone(container,
+            "Missing AI search container (#aiSearchContainer)")
+
+    def test_ai_results_container_exists(self):
+        """Container for AI search results must exist."""
+        results = SOUP.find("div", {"id": "aiSearchResults"})
+        self.assertIsNotNone(results,
+            "Missing AI search results container (#aiSearchResults)")
+
+    def test_manual_entry_container_exists(self):
+        """Manual entry form container must exist."""
+        container = SOUP.find("div", {"id": "manualEntryContainer"})
+        self.assertIsNotNone(container,
+            "Missing manual entry container (#manualEntryContainer)")
+
+    def test_ai_search_function_defined(self):
+        """searchActivityWithAI() function must be defined."""
+        script = get_script_text()
+        self.assertIn("function searchActivityWithAI(", script,
+            "Missing searchActivityWithAI() function")
+        self.assertIn("async function searchActivityWithAI(", script,
+            "searchActivityWithAI() must be async to call API")
+
+    def test_ai_autofill_function_defined(self):
+        """Function to auto-fill form from AI results must exist."""
+        script = get_script_text()
+        self.assertIn("fillActivityFromAI", script,
+            "Missing fillActivityFromAI() function")
+
+    def test_show_hide_functions_defined(self):
+        """UI toggle functions must be defined."""
+        script = get_script_text()
+        self.assertIn("function showAISearch(", script,
+            "Missing showAISearch() function")
+        self.assertIn("function showManualEntry(", script,
+            "Missing showManualEntry() function")
+        self.assertIn("function hideAISearch(", script,
+            "Missing hideAISearch() function")
+
+    def test_ai_search_uses_anthropic_api(self):
+        """AI search must use Anthropic API endpoint."""
+        script = get_script_text()
+        self.assertIn("api.anthropic.com/v1/messages", script,
+            "AI search not using Anthropic API endpoint")
+
+    def test_ai_search_uses_web_search_tool(self):
+        """AI search must use web_search tool for real-time data."""
+        script = get_script_text()
+        self.assertIn("web_search", script,
+            "AI search not using web_search tool - won't find current info!")
+
+    def test_display_results_function_defined(self):
+        """Function to display AI results must exist."""
+        script = get_script_text()
+        self.assertIn("displayAIResults", script,
+            "Missing displayAIResults() function")
+
+    def test_ai_disclaimer_present(self):
+        """Must show disclaimer that results are AI-generated."""
+        script = get_script_text()
+        # Look for disclaimer text in results rendering
+        self.assertTrue(
+            "AI-suggested" in script or "verify" in script.lower(),
+            "Missing AI disclaimer/verification warning - users must know to verify!"
+        )
+
+    def test_source_url_shown_in_results(self):
+        """AI results must show source URL for verification."""
+        script = get_script_text()
+        # Check that source URL is displayed in results
+        self.assertIn("data.source", script,
+            "AI results must show source URL so users can verify information")
+
+    def test_manual_add_activity_button_still_exists(self):
+        """Traditional add activity button must remain (regression check)."""
+        activities = SOUP.find("div", {"id": "activities"})
+        add_btn = activities.find("button", {"id": "addActivityBtn"})
+        self.assertIsNotNone(add_btn,
+            "Manual 'Add Activity' button removed - must keep it!")
+        # Check it still calls addActivity()
+        onclick = add_btn.get("onclick", "")
+        self.assertIn("addActivity()", onclick,
+            "Add Activity button broken - doesn't call addActivity()")
+
+
+# ══════════════════════════════════════════════════════════════════════════════
 # RUNNER
 # ══════════════════════════════════════════════════════════════════════════════
 
