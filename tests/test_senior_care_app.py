@@ -441,110 +441,96 @@ class TestKeyUIElements(unittest.TestCase):
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# TEST CLASS 11: AI Search Feature
+# TEST CLASS 11: AI Search Feature (Currently Disabled - Coming Soon)
 # ══════════════════════════════════════════════════════════════════════════════
 
 class TestAISearchFeature(unittest.TestCase):
-    """Tests for AI-powered activity search feature."""
+    """Tests for AI-powered activity search feature.
+    
+    NOTE: AI Search is currently DISABLED due to CORS/backend requirements.
+    These tests verify the feature is in correct "Coming Soon" disabled state.
+    When backend is implemented, update these tests to check enabled state.
+    """
 
-    def test_ai_search_button_exists(self):
-        """AI Search button must be present in Activities section."""
+    def test_ai_search_button_disabled_with_coming_soon(self):
+        """AI Search button must be present but disabled with 'Coming Soon' message."""
         activities = SOUP.find("div", {"id": "activities"})
         self.assertIsNotNone(activities, "Activities section not found")
         
-        # Look for button that calls showAISearch()
-        ai_button = activities.find("button", onclick=lambda x: x and "showAISearch()" in x)
+        # Look for disabled button (the AI Search button is the only disabled button in Activities)
+        ai_button = activities.find("button", disabled=True)
         self.assertIsNotNone(ai_button,
-            "Missing AI Search button in Activities section")
+            "Missing disabled AI Search button")
+        
+        # Check that button text includes "AI Search"
+        button_text = ai_button.get_text()
+        self.assertIn("AI Search", button_text,
+            "Disabled button doesn't say 'AI Search'")
+        
+        # Check that button text includes "Coming Soon"
+        self.assertIn("Coming Soon", button_text,
+            "Disabled button doesn't show 'Coming Soon' message")
 
-    def test_manual_entry_button_exists(self):
-        """Manual entry button must still be available."""
+    def test_coming_soon_explanation_shown(self):
+        """Must show explanation of why AI Search is disabled."""
+        activities = SOUP.find("div", {"id": "activities"})
+        activities_text = activities.get_text()
+        self.assertIn("backend server setup", activities_text.lower(),
+            "Missing explanation of why AI Search is disabled")
+        self.assertIn("temporarily disabled", activities_text.lower(),
+            "Missing 'temporarily disabled' message")
+
+    def test_manual_entry_button_exists_and_primary(self):
+        """Manual entry button must be available and highlighted as primary."""
         activities = SOUP.find("div", {"id": "activities"})
         manual_button = activities.find("button", onclick=lambda x: x and "showManualEntry()" in x)
         self.assertIsNotNone(manual_button,
-            "Missing Manual Entry button - both options must be available!")
+            "Missing Manual Entry button")
+        
+        # Check it's styled as primary (should have btn-primary class or blue styling)
+        button_classes = manual_button.get("class", [])
+        button_style = manual_button.get("style", "")
+        is_primary = "btn-primary" in button_classes or "primary" in button_style.lower()
+        self.assertTrue(is_primary,
+            "Manual Entry button should be styled as primary action")
 
-    def test_ai_search_input_exists(self):
-        """AI search input box must exist."""
-        search_input = SOUP.find("input", {"id": "aiActivitySearch"})
-        self.assertIsNotNone(search_input,
-            "Missing AI activity search input box (#aiActivitySearch)")
-
-    def test_ai_search_container_exists(self):
-        """Container for AI search interface must exist."""
-        container = SOUP.find("div", {"id": "aiSearchContainer"})
-        self.assertIsNotNone(container,
-            "Missing AI search container (#aiSearchContainer)")
-
-    def test_ai_results_container_exists(self):
-        """Container for AI search results must exist."""
-        results = SOUP.find("div", {"id": "aiSearchResults"})
-        self.assertIsNotNone(results,
-            "Missing AI search results container (#aiSearchResults)")
-
-    def test_manual_entry_container_exists(self):
-        """Manual entry form container must exist."""
-        container = SOUP.find("div", {"id": "manualEntryContainer"})
-        self.assertIsNotNone(container,
-            "Missing manual entry container (#manualEntryContainer)")
-
-    def test_ai_search_function_defined(self):
-        """searchActivityWithAI() function must be defined."""
+    def test_ai_search_javascript_functions_still_defined(self):
+        """JavaScript functions should remain for future use when backend is ready."""
         script = get_script_text()
+        
+        # These functions should still exist (ready for when backend is set up)
         self.assertIn("function searchActivityWithAI(", script,
-            "Missing searchActivityWithAI() function")
-        self.assertIn("async function searchActivityWithAI(", script,
-            "searchActivityWithAI() must be async to call API")
-
-    def test_ai_autofill_function_defined(self):
-        """Function to auto-fill form from AI results must exist."""
-        script = get_script_text()
+            "Missing searchActivityWithAI() function - keep for future use")
         self.assertIn("fillActivityFromAI", script,
-            "Missing fillActivityFromAI() function")
+            "Missing fillActivityFromAI() function - keep for future use")
+        self.assertIn("displayAIResults", script,
+            "Missing displayAIResults() function - keep for future use")
 
-    def test_show_hide_functions_defined(self):
-        """UI toggle functions must be defined."""
-        script = get_script_text()
-        self.assertIn("function showAISearch(", script,
-            "Missing showAISearch() function")
-        self.assertIn("function showManualEntry(", script,
-            "Missing showManualEntry() function")
-        self.assertIn("function hideAISearch(", script,
-            "Missing hideAISearch() function")
-
-    def test_ai_search_uses_anthropic_api(self):
-        """AI search must use Anthropic API endpoint."""
+    def test_ai_search_uses_anthropic_api_when_enabled(self):
+        """Verify API code is ready for when backend proxy is implemented."""
         script = get_script_text()
         self.assertIn("api.anthropic.com/v1/messages", script,
-            "AI search not using Anthropic API endpoint")
+            "API endpoint code should remain for future backend implementation")
 
-    def test_ai_search_uses_web_search_tool(self):
-        """AI search must use web_search tool for real-time data."""
+    def test_ai_search_uses_web_search_tool_when_enabled(self):
+        """Verify web_search tool code is ready for when backend is implemented."""
         script = get_script_text()
         self.assertIn("web_search", script,
-            "AI search not using web_search tool - won't find current info!")
+            "web_search tool code should remain for future use")
 
-    def test_display_results_function_defined(self):
-        """Function to display AI results must exist."""
+    def test_ai_disclaimer_code_present(self):
+        """Disclaimer code should remain for when feature is enabled."""
         script = get_script_text()
-        self.assertIn("displayAIResults", script,
-            "Missing displayAIResults() function")
-
-    def test_ai_disclaimer_present(self):
-        """Must show disclaimer that results are AI-generated."""
-        script = get_script_text()
-        # Look for disclaimer text in results rendering
         self.assertTrue(
             "AI-suggested" in script or "verify" in script.lower(),
-            "Missing AI disclaimer/verification warning - users must know to verify!"
+            "AI disclaimer code should remain for future use"
         )
 
-    def test_source_url_shown_in_results(self):
-        """AI results must show source URL for verification."""
+    def test_source_url_code_present(self):
+        """Source URL display code should remain for when feature is enabled."""
         script = get_script_text()
-        # Check that source URL is displayed in results
         self.assertIn("data.source", script,
-            "AI results must show source URL so users can verify information")
+            "Source URL code should remain for future use")
 
     def test_manual_add_activity_button_still_exists(self):
         """Traditional add activity button must remain (regression check)."""
@@ -556,6 +542,24 @@ class TestAISearchFeature(unittest.TestCase):
         onclick = add_btn.get("onclick", "")
         self.assertIn("addActivity()", onclick,
             "Add Activity button broken - doesn't call addActivity()")
+
+    def test_activity_form_fields_visible(self):
+        """Activity form fields should be immediately visible (no hidden container)."""
+        # Check that basic activity fields are present and not hidden
+        activity_name = SOUP.find("input", {"id": "activityName"})
+        self.assertIsNotNone(activity_name, "Activity name input missing")
+        
+        activity_location = SOUP.find("input", {"id": "activityLocation"})
+        self.assertIsNotNone(activity_location, "Activity location input missing")
+        
+        # Fields should not be in a hidden container
+        # If they have a parent with class "hidden", that's a problem
+        name_parent_classes = []
+        if activity_name.parent:
+            name_parent_classes = activity_name.parent.get("class", [])
+        
+        self.assertNotIn("hidden", name_parent_classes,
+            "Activity form fields are hidden - should be immediately visible")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
