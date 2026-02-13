@@ -4,9 +4,60 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-12-1858 UTC - AI SEARCH: Disabled with "Coming Soon" Message
-    BUILD DATE: February 12, 2026 at 6:58 PM UTC
-    CHANGES: AI Search temporarily disabled due to CORS/backend requirements
+    VERSION: 2026-02-13-2002 UTC - BUGFIX: One-Time Activity Date Field Not Showing
+    BUILD DATE: February 13, 2026 at 8:02 PM UTC
+    CHANGES: Fixed bug where date field was hidden for one-time activities
+    
+    🐛 BUG FIXED: ONE-TIME ACTIVITY DATE FIELD
+    
+    ❌ THE PROBLEM:
+    - User selects "one-time event" for activity
+    - Selects time and reminder
+    - Clicks "Add Activity"
+    - Gets error: "Please select a date for this one-time activity"
+    - BUT: No date field visible to select!
+    - Activity cannot be added
+    
+    🔍 ROOT CAUSE:
+    - "One-time event" is the default selection in the dropdown
+    - Date field container starts hidden: style="display: none;"
+    - updateActivityRecurrenceOptions() only called on dropdown change
+    - Function never called on initial page load
+    - Result: Date field stays hidden even though "one-time" is selected
+    
+    ✅ THE FIX:
+    - Added initialization call to updateActivityRecurrenceOptions() in DOMContentLoaded
+    - Now when page loads, function checks default selection
+    - If "one-time" is selected (default), date field shows immediately
+    - Date field now visible on page load
+    - Users can add one-time activities! ✅
+    
+    📝 CODE CHANGE:
+    Added to DOMContentLoaded event listener:
+    ```javascript
+    // Initialize activity recurrence options
+    if (document.getElementById('activityRecurrence')) {
+        updateActivityRecurrenceOptions();
+        console.log('✅ Initialized activity recurrence options');
+    }
+    ```
+    
+    🧪 HOW TO VERIFY FIX:
+    1. Go to Activities tab
+    2. Click "Manual Entry" (or it's already visible)
+    3. Check "How Often?" dropdown - should show "One-time event"
+    4. Date field should be visible immediately ✅
+    5. Fill in name, location, time, select date
+    6. Click "Add Activity"
+    7. Activity should be added successfully! ✅
+    
+    📊 IMPACT:
+    ✅ One-time activities can now be created
+    ✅ Date field visible when "one-time event" selected
+    ✅ All other recurrence types still work correctly
+    ✅ No regression - all functionality preserved
+    
+    📝 PREVIOUS VERSION (2026-02-12-1858 UTC):
     
     🚨 CRITICAL FIX: AI SEARCH DISABLED (COMING SOON)
     
@@ -3394,10 +3445,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-02-12-1858 UTC
+                        <strong>App Version:</strong> 2026-02-13-2002 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        AI Search: Coming Soon (Manual Entry Works!)
+                        Bugfix: One-Time Activity Date Field Now Shows!
                     </p>
                 </div>
             </div>
@@ -11816,6 +11867,12 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
         // Restore session on page load (prevents logout after sleep/reload)
         document.addEventListener('DOMContentLoaded', function() {
             console.log('📱 Page loaded - checking for saved session...');
+            
+            // Initialize activity recurrence options to show correct fields based on default selection
+            if (document.getElementById('activityRecurrence')) {
+                updateActivityRecurrenceOptions();
+                console.log('✅ Initialized activity recurrence options');
+            }
             
             // Check if user has completed setup (hide first time warning)
             const appInstalled = localStorage.getItem('appInstalled');
