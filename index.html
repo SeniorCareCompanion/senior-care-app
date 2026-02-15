@@ -4,9 +4,138 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-13-2002 UTC - BUGFIX: One-Time Activity Date Field Not Showing
-    BUILD DATE: February 13, 2026 at 8:02 PM UTC
-    CHANGES: Fixed bug where date field was hidden for one-time activities
+    VERSION: 2026-02-15-0425 UTC - MAJOR BUGFIXES: Voice Persistence + Background Notifications
+    BUILD DATE: February 15, 2026 at 4:25 AM UTC
+    CHANGES: Fixed voice settings resetting + improved background notification handling
+    
+    🐛 CRITICAL BUGS FIXED - iOS VOICE & NOTIFICATIONS
+    
+    ═══════════════════════════════════════════════════════════════════
+    BUG #1: VOICE ANNOUNCEMENTS RESETTING TO OFF
+    ═══════════════════════════════════════════════════════════════════
+    
+    ❌ THE PROBLEM:
+    - User turns Voice Announcements ON
+    - App goes to background or iOS locks/sleeps
+    - iOS may reload page to save memory
+    - Voice resets to OFF every time!
+    - User has to re-enable constantly
+    
+    🔍 ROOT CAUSE:
+    - voiceEnabled variable never saved to localStorage
+    - Page reload → voiceEnabled = false (always)
+    - Only auto-enable on login worked, not on background return
+    
+    ✅ THE FIX:
+    1. Save voice state to localStorage when toggled
+       - toggleVoice() now calls: localStorage.setItem('voiceAnnouncementsEnabled', ...)
+    
+    2. Restore voice state on page load
+       - Added IIFE to restore voiceEnabled from localStorage immediately
+       - Runs before any other code
+    
+    3. Restore voice button UI on login
+       - loadUserProfile() now syncs button appearance with saved state
+       - Auto-enable saves to localStorage too
+    
+    4. Page Visibility API handling
+       - Detects when app returns from background
+       - Restores voice state if it got reset
+       - console.log shows when this happens
+    
+    📝 CODE CHANGES:
+    ```javascript
+    // On toggle:
+    localStorage.setItem('voiceAnnouncementsEnabled', voiceEnabled ? 'true' : 'false');
+    
+    // On load:
+    (function restoreVoiceState() {
+        const saved = localStorage.getItem('voiceAnnouncementsEnabled');
+        if (saved === 'true') voiceEnabled = true;
+    })();
+    
+    // On visibility change:
+    if (!document.hidden && savedVoiceState === 'true') {
+        voiceEnabled = true;
+        // Restore button UI
+    }
+    ```
+    
+    ═══════════════════════════════════════════════════════════════════
+    BUG #2: NOTIFICATIONS DON'T WORK IN BACKGROUND
+    ═══════════════════════════════════════════════════════════════════
+    
+    ❌ THE PROBLEM:
+    - Reminders use setInterval(checkReminders, 60000)
+    - iOS pauses JavaScript when app is backgrounded
+    - setInterval stops running
+    - No reminders fire when app in background or phone locked
+    
+    🔍 ROOT CAUSE:
+    - iOS PWA limitation: JavaScript execution paused in background
+    - This is by design for battery/performance
+    - Can't be fully "fixed" - it's an iOS restriction
+    
+    ✅ THE IMPROVEMENT:
+    1. Page Visibility API handler
+       - Detects when app becomes visible again
+       - Restarts reminder checker: startReminderChecker()
+       - Checks immediately for missed reminders
+    
+    2. Help documentation added
+       - Clear explanation of iOS limitation
+       - Users understand why reminders need app open
+       - Tips on how to work with this limitation
+    
+    📝 NEW BEHAVIOR:
+    - App backgrounded → reminders pause (iOS limitation)
+    - App returns to foreground → reminders restart immediately ✅
+    - Missed reminders checked right away ✅
+    - Better than before: automatic recovery!
+    
+    ⚠️ IMPORTANT LIMITATION (iOS):
+    The app must be OPEN and VISIBLE for reminders to work.
+    This is an iOS restriction for web apps. Native apps can use
+    push notifications, but PWAs cannot access that iOS API.
+    
+    📚 DOCUMENTATION UPDATES:
+    
+    ✅ Common Questions → "Why am I not getting reminders?"
+    - Added yellow warning box explaining iOS limitation
+    - Clear bullets: what works / what doesn't
+    - Tips for users
+    
+    ✅ Troubleshooting → "Voice Announcements Turning Off"
+    - New section added
+    - Green "FIXED!" box
+    - Explains the fix
+    - Troubleshooting steps if still issues
+    
+    🧪 HOW TO VERIFY FIXES:
+    
+    TEST 1: Voice Persistence
+    1. Turn Voice Announcements ON
+    2. Lock phone / switch apps / wait 5 minutes
+    3. Return to app
+    4. Check Settings → Voice Settings
+    5. ✅ EXPECTED: Still ON!
+    
+    TEST 2: Background Recovery
+    1. Log in, set a reminder 2 minutes from now
+    2. Switch to another app
+    3. Wait past reminder time
+    4. Switch back to app
+    5. ✅ EXPECTED: Reminder shows immediately
+    
+    📊 IMPACT:
+    ✅ Voice settings persist across sessions
+    ✅ Voice survives app backgrounding
+    ✅ Voice survives phone lock/sleep
+    ✅ Reminders restart when app returns
+    ✅ Clear documentation of iOS limitations
+    ✅ Users understand expected behavior
+    
+    📝 PREVIOUS VERSION (2026-02-13-2002 UTC):
     
     🐛 BUG FIXED: ONE-TIME ACTIVITY DATE FIELD
     
@@ -3200,6 +3329,27 @@
                                     <li>Allow notifications when your browser asks</li>
                                     <li>On iPhone: Must "Add to Home Screen" first</li>
                                 </ol>
+                                
+                                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #ffc107;">
+                                    <p style="margin: 0 0 10px 0; font-weight: 600; color: #856404;">
+                                        📱 Important: iOS/iPhone Limitation
+                                    </p>
+                                    <p style="margin: 0 0 10px 0; font-size: 14px; color: #856404;">
+                                        <strong>The app must be open and visible to show reminders.</strong> This is an iOS limitation for web apps.
+                                    </p>
+                                    <p style="margin: 0; font-size: 13px; color: #856404;">
+                                        <strong>What this means:</strong>
+                                    </p>
+                                    <ul style="margin: 5px 0 0 20px; font-size: 13px; color: #856404; line-height: 1.8;">
+                                        <li>✅ App open on screen = reminders work</li>
+                                        <li>❌ App in background = reminders paused</li>
+                                        <li>❌ Phone locked/sleeping = reminders paused</li>
+                                        <li>✅ Opening app again = reminders resume</li>
+                                    </ul>
+                                    <p style="margin: 10px 0 0 0; font-size: 13px; font-weight: 600; color: #856404;">
+                                        💡 Tip: Keep the app open on your screen during times when you need reminders, or check the app regularly to see what's due.
+                                    </p>
+                                </div>
 
                                 <h3 id="help-q-backup">❓ How do I backup my data?</h3>
                                 <ol style="line-height: 2;">
@@ -3267,6 +3417,23 @@
                                     <li>Check microphone isn't muted on device</li>
                                     <li>Try closing and reopening the app</li>
                                     <li>Speak clearly near the microphone</li>
+                                </ol>
+
+                                <h3>🔇 Voice Announcements Turning Off</h3>
+                                <div style="background: #d4edda; padding: 15px; border-radius: 8px; margin: 10px 0; border-left: 4px solid #28a745;">
+                                    <p style="margin: 0 0 10px 0; font-weight: 600; color: #155724;">
+                                        ✅ FIXED! Voice settings now persist
+                                    </p>
+                                    <p style="margin: 0; font-size: 14px; color: #155724;">
+                                        If you previously experienced voice turning off when the app was in the background or your phone went to sleep, this has been fixed! Your voice announcement setting (ON/OFF) now saves automatically and restores when you come back to the app.
+                                    </p>
+                                </div>
+                                <p style="margin: 10px 0;"><strong>If voice still isn't speaking:</strong></p>
+                                <ol style="line-height: 2;">
+                                    <li>Check Settings → Voice Settings → Voice Announcements is ON</li>
+                                    <li>Make sure your device volume is up</li>
+                                    <li>Check phone isn't in silent/mute mode</li>
+                                    <li>Try toggling voice OFF then back ON</li>
                                 </ol>
 
                                 <h3>🤖 AI Search - Currently Disabled</h3>
@@ -3445,10 +3612,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-02-13-2002 UTC
+                        <strong>App Version:</strong> 2026-02-15-0425 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Bugfix: One-Time Activity Date Field Now Shows!
+                        FIXED: Voice Persistence + Background Handling!
                     </p>
                 </div>
             </div>
@@ -4151,6 +4318,18 @@
         // Global variables
         let currentUser = null;
         let voiceEnabled = false;
+        
+        // BUGFIX: Restore voice state from localStorage on page load
+        // This fixes the issue where voice resets to OFF when iOS backgrounds the app
+        (function restoreVoiceState() {
+            const savedVoiceState = localStorage.getItem('voiceAnnouncementsEnabled');
+            if (savedVoiceState === 'true') {
+                voiceEnabled = true;
+                console.log('✅ Restored voice state from localStorage: ON');
+            } else {
+                console.log('ℹ️ Voice state: OFF (default or saved state)');
+            }
+        })();
         let notificationsEnabled = false; // Track if push notifications are enabled
         let serviceWorkerRegistration = null; // Store service worker registration
         let pendingDeleteCategory = null;
@@ -4642,6 +4821,11 @@
 
         function toggleVoice() {
             voiceEnabled = !voiceEnabled;
+            
+            // BUGFIX: Save voice state to localStorage so it persists across page reloads
+            localStorage.setItem('voiceAnnouncementsEnabled', voiceEnabled ? 'true' : 'false');
+            console.log('✅ Voice state saved to localStorage:', voiceEnabled);
+            
             const btn = document.getElementById('voiceToggleBtn');
             if (btn) {
                 if (voiceEnabled) {
@@ -4683,15 +4867,33 @@
                     checkbox.checked = autoEnable;
                 }
                 
-                // Auto-enable voice if preference is set
+                // BUGFIX: Restore voice button UI to match current voiceEnabled state
+                // This ensures the button shows correct state after page reload
+                const btn = document.getElementById('voiceToggleBtn');
+                if (btn) {
+                    if (voiceEnabled) {
+                        btn.textContent = '🔊 Voice ON';
+                        btn.classList.remove('btn-primary');
+                        btn.classList.add('btn-success');
+                        console.log('✅ Voice button UI restored to ON');
+                    } else {
+                        btn.textContent = '🔇 Voice OFF';
+                        btn.classList.remove('btn-success');
+                        btn.classList.add('btn-primary');
+                        console.log('ℹ️ Voice button UI set to OFF');
+                    }
+                }
+                
+                // Auto-enable voice if preference is set AND voice is currently off
                 if (autoEnable && !voiceEnabled) {
                     voiceEnabled = true;
-                    const btn = document.getElementById('voiceToggleBtn');
+                    localStorage.setItem('voiceAnnouncementsEnabled', 'true');
                     if (btn) {
                         btn.textContent = '🔊 Voice ON';
                         btn.classList.remove('btn-primary');
                         btn.classList.add('btn-success');
                     }
+                    console.log('✅ Auto-enabled voice on login');
                 }
             }
         }
@@ -11890,6 +12092,53 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
             } else {
                 console.log('ℹ️ No session to restore - showing login screen');
             }
+        });
+        
+        // ═══════════════════════════════════════════════════════════════════
+        // BUGFIX: iOS Background/Sleep Handling
+        // ═══════════════════════════════════════════════════════════════════
+        // iOS pauses JavaScript when app goes to background or phone sleeps.
+        // This breaks the reminder checker. We need to restart it when app
+        // becomes visible again.
+        
+        document.addEventListener('visibilitychange', function() {
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('📱 VISIBILITY CHANGE DETECTED');
+            console.log('   Hidden:', document.hidden);
+            console.log('   Visibility State:', document.visibilityState);
+            
+            if (!document.hidden && document.visibilityState === 'visible') {
+                console.log('✅ App became visible - restoring functionality...');
+                
+                // Restore voice button UI to match saved state
+                const savedVoiceState = localStorage.getItem('voiceAnnouncementsEnabled');
+                if (savedVoiceState === 'true' && !voiceEnabled) {
+                    console.log('⚠️ Voice was ON but got disabled - restoring...');
+                    voiceEnabled = true;
+                    const btn = document.getElementById('voiceToggleBtn');
+                    if (btn) {
+                        btn.textContent = '🔊 Voice ON';
+                        btn.classList.remove('btn-primary');
+                        btn.classList.add('btn-success');
+                    }
+                }
+                
+                // Restart reminder checker if user is logged in
+                if (currentUser) {
+                    console.log('✅ User logged in - restarting reminder checker...');
+                    startReminderChecker();
+                    console.log('✅ Reminder checker restarted');
+                    
+                    // Check reminders immediately in case any were missed
+                    checkReminders();
+                    console.log('✅ Checked for missed reminders');
+                } else {
+                    console.log('ℹ️ No user logged in - skipping reminder restart');
+                }
+            } else {
+                console.log('ℹ️ App hidden - JavaScript may be paused');
+            }
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         });
     </script>
 </body>
