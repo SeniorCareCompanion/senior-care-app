@@ -4,9 +4,127 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-16-2230 UTC - FIXES: Appointments Dropdown + Task Category Hints
-    BUILD DATE: February 16, 2026 at 10:30 PM UTC
-    CHANGES: Fixed appointments showing all specialties + added task category tips
+    VERSION: 2026-02-16-2324 UTC - UX: Beta Version Visibility (Login + Settings)
+    BUILD DATE: February 16, 2026 at 11:24 PM UTC
+    CHANGES: Added beta version banner to login page, moved version from Profile to Settings
+    
+    🎯 UX IMPROVEMENT: BETA VERSION VISIBILITY
+    
+    Based on user request: "Version is hidden... it's one of the first 
+    things I'll ask a tester. Should we add to login page for beta testing?"
+    
+    ═══════════════════════════════════════════════════════════════════
+    CHANGE #1: BETA BANNER ON LOGIN PAGE
+    ═══════════════════════════════════════════════════════════════════
+    
+    ✅ ADDED BETA VERSION BANNER
+    
+    Location: Login page (below login buttons)
+    
+    What users see:
+    ```
+    ┌─────────────────────────────────────┐
+    │ 🧪 BETA TESTING VERSION            │
+    │ Build: 2026-02-16-2324 UTC         │
+    │ Found a bug? Email Bug Report      │
+    └─────────────────────────────────────┘
+    ```
+    
+    Features:
+    - Yellow warning background (highly visible)
+    - Monospace font for build number (easy to read/screenshot)
+    - Email link with pre-filled subject line
+    - Visible BEFORE login (no authentication needed)
+    
+    Email Link Details:
+    - Opens default email client
+    - To: gregwhall.tech@gmail.com
+    - Subject: "Senior Care Companion - Bug Report (v2026-02-16-2324)"
+    - Works on all devices (desktop, mobile, tablets)
+    
+    Benefits:
+    ✅ Testers see version immediately
+    ✅ Easy to screenshot for bug reports
+    ✅ One-click email bug reporting
+    ✅ Professional beta testing appearance
+    ✅ Easy to remove after beta (just delete div)
+    
+    ═══════════════════════════════════════════════════════════════════
+    CHANGE #2: MOVED VERSION FROM PROFILE TO SETTINGS
+    ═══════════════════════════════════════════════════════════════════
+    
+    ✅ NEW "APP VERSION" CARD IN SETTINGS
+    
+    Why Settings makes more sense:
+    - Profile = Personal user information
+    - Settings = App configuration & info
+    - Version is app-level, not user-level
+    
+    Location: Settings → App Version (new card)
+    
+    Card Contents:
+    - Current version number (large, prominent)
+    - Build date/time
+    - Latest updates summary
+    - Beta testing email link
+    - Link to Release Notes below
+    
+    Features:
+    - Expandable/collapsible (like other settings cards)
+    - Same visual style as Release Notes
+    - Email link for bug reports (same as login page)
+    - Quick link to full Release Notes
+    
+    Removed from Profile:
+    - Old small version display removed
+    - Profile now cleaner (just user info)
+    
+    ═══════════════════════════════════════════════════════════════════
+    CHANGE #3: UPDATED SETTINGS CARD ARRAYS
+    ═══════════════════════════════════════════════════════════════════
+    
+    Updated all Settings card management to include 'appVersion':
+    - expandAllSettingsCards() function
+    - collapseAllSettingsCards() function
+    - showSection() initialization
+    
+    Now includes: voiceSettings, notifications, dataManagement, 
+    **appVersion**, releaseNotes, aboutApp
+    
+    ═══════════════════════════════════════════════════════════════════
+    WHY THIS MATTERS FOR BETA TESTING
+    ═══════════════════════════════════════════════════════════════════
+    
+    BEFORE:
+    ```
+    You: "What version are you on?"
+    Tester: "Where do I find that?"
+    You: "Login → Profile → scroll to bottom"
+    Tester: *frustrated*
+    ```
+    
+    AFTER:
+    ```
+    You: "What version are you on?"
+    Tester: "Says 2026-02-16-2324 on the login screen"
+    You: "Perfect! Can you email me?"
+    Tester: *clicks Email Bug Report link*
+    ```
+    
+    🎯 BENEFITS:
+    ✅ Version visible without logging in
+    ✅ One-click bug reporting via email
+    ✅ Professional beta testing UX
+    ✅ Easy for testers to screenshot
+    ✅ Pre-filled email subject (includes version!)
+    ✅ Privacy-friendly (email vs phone number)
+    ✅ Easy to remove when beta ends
+    
+    📧 EMAIL PRIVACY:
+    User requested email instead of phone number to avoid 
+    unwanted texts if credentials leaked. Smart security decision!
+    
+    📝 PREVIOUS VERSION (2026-02-16-2230 UTC):
     
     🐛 BUG FIXES FROM BETA TESTING:
     
@@ -2062,6 +2180,23 @@
             <button class="btn btn-primary" onclick="login()">Login</button>
             <button class="btn btn-secondary" onclick="showRegister()">New User? Register</button>
             <button class="btn" onclick="showForgotPassword()" style="background: transparent; color: #4CAF50; border: none; text-decoration: underline; margin-top: 10px; font-size: 14px;">Forgot Password?</button>
+            
+            <!-- Beta Testing Version Banner -->
+            <div style="text-align: center; padding: 15px; background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; margin-top: 20px;">
+                <p style="margin: 0 0 5px 0; font-weight: 600; color: #856404; font-size: 14px;">
+                    🧪 BETA TESTING VERSION
+                </p>
+                <p style="margin: 0 0 8px 0; font-size: 12px; color: #856404; font-family: monospace;">
+                    Build: 2026-02-16-2324 UTC
+                </p>
+                <p style="margin: 0; font-size: 12px; color: #856404;">
+                    Found a bug? 
+                    <a href="mailto:gregwhall.tech@gmail.com?subject=Senior%20Care%20Companion%20-%20Bug%20Report%20(v2026-02-16-2324)" 
+                       style="color: #667eea; text-decoration: underline; font-weight: 600;">
+                        Email Bug Report
+                    </a>
+                </p>
+            </div>
         </div>
 
         <!-- Forgot Password Screen -->
@@ -4546,15 +4681,6 @@
                     </div>
                 </div>
                 
-                <!-- App Version Info -->
-                <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
-                    <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-02-16-2230 UTC
-                    </p>
-                    <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        FIXES: Appointments Dropdown + Task Tips!
-                    </p>
-                </div>
             </div>
                 
                 <!-- Release Notes / What's New -->
@@ -4723,6 +4849,55 @@
                 </div>
 
 
+                <!-- App Version Card -->
+                <div class="card" style="margin-top: 30px;">
+                    <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: linear-gradient(135deg, #48bb78 0%, #38b2ac 100%); color: white;" onclick="toggleSettingsCard('appVersion')">
+                        <span>📱 App Version</span>
+                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: rgba(255,255,255,0.2); color: white;" title="Expand/Collapse" onclick="toggleSettingsCard('appVersion'); event.stopPropagation();">
+                            <span id="settings-toggle-icon-appVersion">▲</span>
+                        </button>
+                    </div>
+                    <div id="settingsCard-appVersion" class="card-content">
+                        <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #48bb7815 0%, #38b2ac15 100%); border-radius: 8px; border: 2px solid #38b2ac; margin-bottom: 15px;">
+                            <p style="font-size: 14px; color: #2d3748; margin: 0 0 10px 0; font-weight: 600;">
+                                Current Version
+                            </p>
+                            <p style="font-size: 20px; color: #38b2ac; margin: 0 0 5px 0; font-weight: 700; font-family: monospace;">
+                                2026-02-16-2324 UTC
+                            </p>
+                            <p style="font-size: 13px; color: #718096; margin: 0;">
+                                February 16, 2026 at 11:24 PM
+                            </p>
+                        </div>
+                        
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; border-left: 3px solid #38b2ac;">
+                            <p style="margin: 0 0 8px 0; font-weight: 600; color: #2d3748; font-size: 14px;">
+                                Latest Updates:
+                            </p>
+                            <p style="margin: 0; font-size: 13px; color: #4a5568; line-height: 1.6;">
+                                • Beta version now visible on login page<br>
+                                • App version moved from Profile to Settings<br>
+                                • One-click email bug reporting added
+                            </p>
+                        </div>
+                        
+                        <div style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-top: 15px; border-left: 3px solid #ffc107;">
+                            <p style="margin: 0; font-size: 13px; color: #856404;">
+                                <strong>🧪 Beta Testing:</strong> Found a bug? 
+                                <a href="mailto:gregwhall.tech@gmail.com?subject=Senior%20Care%20Companion%20-%20Bug%20Report%20(v2026-02-16-2324)" 
+                                   style="color: #667eea; text-decoration: underline; font-weight: 600;">
+                                    Email Bug Report
+                                </a>
+                            </p>
+                        </div>
+                        
+                        <p style="margin: 15px 0 0 0; text-align: center; font-size: 12px; color: #718096;">
+                            📰 For full version history, see <span onclick="toggleSettingsCard('releaseNotes')" style="color: #667eea; cursor: pointer; text-decoration: underline; font-weight: 600;">Release Notes</span> below
+                        </p>
+                    </div>
+                </div>
+
+
                 <div class="card" style="margin-top: 30px;">
                     <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;" onclick="toggleSettingsCard('releaseNotes')">
                         <span>📰 Release Notes</span>
@@ -4763,21 +4938,32 @@
                         <!-- Latest Version -->
                         <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #667eea;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-16-2230 UTC</h4>
+                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-16-2324 UTC</h4>
                                 <span style="background: #48bb78; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">LATEST</span>
                             </div>
-                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 16, 2026 at 10:30 PM</p>
+                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 16, 2026 at 11:24 PM</p>
                             <div style="line-height: 1.8;">
-                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px; color: #667eea;">🐛 Fixes: Appointments Dropdown + Task Category Tips</p>
+                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px; color: #667eea;">🎯 UX: Beta Version Visibility</p>
                                 <ul style="margin: 5px 0; padding-left: 20px; font-size: 14px;">
-                                    <li><strong>Fixed:</strong> Appointments dropdown now shows all 19 doctor specialties (was only showing past doctors)</li>
-                                    <li><strong>Added:</strong> Helpful tips explaining task category dropdown behavior</li>
-                                    <li>Beta tester feedback implemented!</li>
+                                    <li><strong>Added:</strong> Beta version banner on login page (highly visible)</li>
+                                    <li><strong>Added:</strong> One-click email bug reporting with pre-filled subject</li>
+                                    <li><strong>Moved:</strong> App version from Profile to Settings (better organization)</li>
                                 </ul>
                             </div>
                         </div>
 
                         <!-- Recent Updates -->
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-16-2230 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 16, 2026 at 10:30 PM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">🐛 Fixes: Appointments Dropdown + Task Tips</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Fixed appointments dropdown (now shows all 19 specialties)</li>
+                                    <li>Added helpful task category tips</li>
+                                </ul>
+                            </div>
+                        </div>
                         <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
                             <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-16-2158 UTC</h4>
                             <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 16, 2026 at 9:58 PM</p>
@@ -10072,7 +10258,7 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
 
         // Expand all settings cards
         function expandAllSettingsCards() {
-            const cardKeys = ['voiceSettings', 'notifications', 'dataManagement', 'releaseNotes', 'aboutApp'];
+            const cardKeys = ['voiceSettings', 'notifications', 'dataManagement', 'appVersion', 'releaseNotes', 'aboutApp'];
             const minimizedSettings = {};
             
             cardKeys.forEach(cardKey => {
@@ -10093,7 +10279,7 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
 
         // Collapse all settings cards
         function collapseAllSettingsCards() {
-            const cardKeys = ['voiceSettings', 'notifications', 'dataManagement', 'releaseNotes', 'aboutApp'];
+            const cardKeys = ['voiceSettings', 'notifications', 'dataManagement', 'appVersion', 'releaseNotes', 'aboutApp'];
             const minimizedSettings = {};
             
             cardKeys.forEach(cardKey => {
@@ -10142,7 +10328,7 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
             // ALWAYS initialize Settings cards when showing Settings
             if (sectionName === 'settings') {
                 console.log('⚙️ Initializing Settings cards...');
-                const settingsCards = ['voiceSettings', 'notifications', 'dataManagement', 'releaseNotes', 'aboutApp'];
+                const settingsCards = ['voiceSettings', 'notifications', 'dataManagement', 'appVersion', 'releaseNotes', 'aboutApp'];
                 const minimizedSettings = JSON.parse(localStorage.getItem('minimizedSettings') || '{}');
                 console.log('  Saved minimized state:', minimizedSettings);
                 
