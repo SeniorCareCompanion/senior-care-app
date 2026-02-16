@@ -4,9 +4,178 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-15-0425 UTC - MAJOR BUGFIXES: Voice Persistence + Background Notifications
-    BUILD DATE: February 15, 2026 at 4:25 AM UTC
-    CHANGES: Fixed voice settings resetting + improved background notification handling
+    VERSION: 2026-02-16-1845 UTC - FEATURE: Expandable Today's Reminders + Docs
+    BUILD DATE: February 16, 2026 at 6:45 PM UTC
+    CHANGES: Added expand/collapse to "...and X more" + Help documentation
+    
+    ✨ NEW FEATURE: EXPANDABLE TODAY'S REMINDERS
+    
+    🎯 WHAT CHANGED:
+    - Home page "Today's Reminders" shows first 5 items
+    - If more than 5 reminders, shows "...and X more" line
+    - This line is now CLICKABLE with expand/collapse arrow ▼/▲
+    - Click to see ALL reminders for the day
+    - Click again to collapse back to top 5
+    
+    📚 DOCUMENTATION ADDED:
+    - Added "Understanding the Home Screen" section to Getting Started
+    - Explains what Today's Reminders shows
+    - Documents expand/collapse functionality
+    - Updated icon legend for clarity
+    - Users now have clear guidance on Home screen features
+    
+    🔧 HOW IT WORKS:
+    
+    BEFORE:
+    ```
+    💊 Aspirin at 8:00 AM
+    💊 Vitamin D at 8:00 AM
+    📅 Doctor Smith at 10:00 AM
+    ✅ Lunch at 12:00 PM
+    ✅ Afternoon Water at 2:00 PM
+    ...and 10 more                    ← Just text, not clickable
+    ```
+    
+    AFTER:
+    ```
+    💊 Aspirin at 8:00 AM
+    💊 Vitamin D at 8:00 AM
+    📅 Doctor Smith at 10:00 AM
+    ✅ Lunch at 12:00 PM
+    ✅ Afternoon Water at 2:00 PM
+    ...and 10 more                    ▼  ← Clickable! Purple highlighted
+    
+    [Click it]
+    
+    💊 Aspirin at 8:00 AM
+    💊 Vitamin D at 8:00 AM
+    📅 Doctor Smith at 10:00 AM
+    ✅ Lunch at 12:00 PM
+    ✅ Afternoon Water at 2:00 PM
+    ✅ Dinner at 6:00 PM
+    💊 Blood Pressure Med at 7:00 PM
+    ✅ Evening Water at 7:00 PM
+    ✅ Brush Teeth at 8:00 PM
+    💰 Electric Bill due in 2 days
+    💰 Water Bill due in 5 days
+    Show less                         ▲  ← Click to collapse
+    ```
+    
+    📝 TECHNICAL DETAILS:
+    
+    ✅ Added toggleHomeReminders() function
+    - Toggles homeRemindersExpanded variable
+    - Reloads reminders with new state
+    - Voice announces "Showing all reminders" / "Showing top 5"
+    
+    ✅ Updated loadHomeReminders() function
+    - Checks homeRemindersExpanded state
+    - Shows first 5 OR all reminders based on state
+    - Renders clickable expand/collapse line
+    - Purple gradient background for visibility
+    - Arrow changes: ▼ (collapsed) / ▲ (expanded)
+    
+    ✅ Visual Design:
+    - Expand/collapse line has purple gradient background
+    - Stands out from regular reminder items
+    - Arrow on right side (▼/▲)
+    - Cursor changes to pointer (indicates clickable)
+    - Text changes: "...and X more" / "Show less"
+    
+    🎯 USE CASE:
+    User wants to see what's coming later in the day without
+    navigating to individual sections. One click shows everything
+    scheduled for today in chronological order.
+    
+    💡 BENEFITS:
+    ✅ Quick overview of entire day
+    ✅ No need to check multiple tabs
+    ✅ See all reminders sorted by time
+    ✅ One-click access
+    ✅ Collapse back to keep home clean
+    
+    📝 PREVIOUS VERSION (2026-02-15-0425 UTC):
+    
+    ✨ NEW FEATURE: EXPANDABLE TODAY'S REMINDERS
+    
+    🎯 WHAT CHANGED:
+    - Home page "Today's Reminders" shows first 5 items
+    - If more than 5 reminders, shows "...and X more" line
+    - This line is now CLICKABLE with expand/collapse arrow ▼/▲
+    - Click to see ALL reminders for the day
+    - Click again to collapse back to top 5
+    
+    🔧 HOW IT WORKS:
+    
+    BEFORE:
+    ```
+    💊 Aspirin at 8:00 AM
+    💊 Vitamin D at 8:00 AM
+    📅 Doctor Smith at 10:00 AM
+    ✅ Lunch at 12:00 PM
+    ✅ Afternoon Water at 2:00 PM
+    ...and 10 more                    ← Just text, not clickable
+    ```
+    
+    AFTER:
+    ```
+    💊 Aspirin at 8:00 AM
+    💊 Vitamin D at 8:00 AM
+    📅 Doctor Smith at 10:00 AM
+    ✅ Lunch at 12:00 PM
+    ✅ Afternoon Water at 2:00 PM
+    ...and 10 more                    ▼  ← Clickable! Purple highlighted
+    
+    [Click it]
+    
+    💊 Aspirin at 8:00 AM
+    💊 Vitamin D at 8:00 AM
+    📅 Doctor Smith at 10:00 AM
+    ✅ Lunch at 12:00 PM
+    ✅ Afternoon Water at 2:00 PM
+    ✅ Dinner at 6:00 PM
+    💊 Blood Pressure Med at 7:00 PM
+    ✅ Evening Water at 7:00 PM
+    ✅ Brush Teeth at 8:00 PM
+    💰 Electric Bill due in 2 days
+    💰 Water Bill due in 5 days
+    Show less                         ▲  ← Click to collapse
+    ```
+    
+    📝 TECHNICAL DETAILS:
+    
+    ✅ Added toggleHomeReminders() function
+    - Toggles homeRemindersExpanded variable
+    - Reloads reminders with new state
+    - Voice announces "Showing all reminders" / "Showing top 5"
+    
+    ✅ Updated loadHomeReminders() function
+    - Checks homeRemindersExpanded state
+    - Shows first 5 OR all reminders based on state
+    - Renders clickable expand/collapse line
+    - Purple gradient background for visibility
+    - Arrow changes: ▼ (collapsed) / ▲ (expanded)
+    
+    ✅ Visual Design:
+    - Expand/collapse line has purple gradient background
+    - Stands out from regular reminder items
+    - Arrow on right side (▼/▲)
+    - Cursor changes to pointer (indicates clickable)
+    - Text changes: "...and X more" / "Show less"
+    
+    🎯 USE CASE:
+    User wants to see what's coming later in the day without
+    navigating to individual sections. One click shows everything
+    scheduled for today in chronological order.
+    
+    💡 BENEFITS:
+    ✅ Quick overview of entire day
+    ✅ No need to check multiple tabs
+    ✅ See all reminders sorted by time
+    ✅ One-click access
+    ✅ Collapse back to keep home clean
+    
+    📝 PREVIOUS VERSION (2026-02-15-0425 UTC):
     
     🐛 CRITICAL BUGS FIXED - iOS VOICE & NOTIFICATIONS
     
@@ -2341,6 +2510,26 @@
                                 <h3>Welcome to Senior Care! 👋</h3>
                                 <p>This app helps you manage medications, appointments, tasks, bills, activities, and contacts all in one place.</p>
                                 
+                                <h3>🏠 Understanding the Home Screen:</h3>
+                                <div style="background: #e6fffa; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #38b2ac;">
+                                    <h4 style="margin-top: 0; color: #38b2ac;">🔔 Today's Reminders</h4>
+                                    <p style="margin: 0 0 10px 0;">
+                                        The Home screen shows a "Today's Reminders" card listing everything you need to do today, sorted by time:
+                                    </p>
+                                    <ul style="margin: 0 0 10px 0; line-height: 1.8;">
+                                        <li>💊 Medications to take</li>
+                                        <li>📅 Appointments scheduled</li>
+                                        <li>✅ Tasks to complete</li>
+                                        <li>💰 Bills due soon (within 7 days)</li>
+                                    </ul>
+                                    <p style="margin: 0 0 10px 0; font-weight: 600;">
+                                        💡 Quick View: Shows first 5 reminders
+                                    </p>
+                                    <p style="margin: 0; font-size: 14px;">
+                                        If you have more than 5 reminders, you'll see a purple line that says <strong>"...and X more"</strong> with a down arrow (▼). <strong>Click this line</strong> to expand and see ALL your reminders for the day! Click the up arrow (▲) to collapse back to the top 5.
+                                    </p>
+                                </div>
+                                
                                 <h3>📱 Your First Steps:</h3>
                                 <ol style="line-height: 2;">
                                     <li><strong>Add to Home Screen:</strong> <span onclick="showHelpTopic('installation'); showSection('help');" style="color: #667eea; cursor: pointer; text-decoration: underline; font-weight: 600;">Tap here for Installation Guide</span> (most important first step!)</li>
@@ -2397,10 +2586,10 @@
                                     <li>🎉 = Activities</li>
                                     <li>📞 = Contacts</li>
                                     <li>🔔 = Reminder is ON</li>
-                                    <li>▼ = Click to expand (collapsed)</li>
-                                    <li>▲ = Click to minimize (expanded)</li>
-                                    <li>▲ Expand All = Show all cards</li>
-                                    <li>▼ Collapse All = Hide all cards</li>
+                                    <li>▼ = Click to expand/show more</li>
+                                    <li>▲ = Click to collapse/show less</li>
+                                    <li>▲ Expand All = Show all cards on page</li>
+                                    <li>▼ Collapse All = Hide all cards on page</li>
                                     <li>✓ = Completed/Taken/Paid</li>
                                 </ul>
                             </div>
@@ -3612,10 +3801,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-02-15-0425 UTC
+                        <strong>App Version:</strong> 2026-02-16-1845 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        FIXED: Voice Persistence + Background Handling!
+                        NEW: Expandable Reminders + Help Docs!
                     </p>
                 </div>
             </div>
@@ -4632,6 +4821,20 @@
             dismissReminder();
         }
 
+        // Track expand/collapse state for home reminders
+        let homeRemindersExpanded = false;
+
+        function toggleHomeReminders() {
+            homeRemindersExpanded = !homeRemindersExpanded;
+            loadHomeReminders(); // Reload to show expanded/collapsed state
+            
+            if (homeRemindersExpanded) {
+                speak('Showing all reminders');
+            } else {
+                speak('Showing top 5 reminders');
+            }
+        }
+
         function loadHomeReminders() {
             const container = document.getElementById('homeReminders');
             if (!container) return;
@@ -4712,16 +4915,28 @@
             // Display reminders
             if (activeReminders.length > 0) {
                 let html = '<div class="reminder-card"><h3>🔔 Today\'s Reminders</h3>';
-                activeReminders.slice(0, 5).forEach(reminder => {
+                
+                // Show first 5 OR all if expanded
+                const displayCount = homeRemindersExpanded ? activeReminders.length : Math.min(5, activeReminders.length);
+                
+                activeReminders.slice(0, displayCount).forEach(reminder => {
                     html += `<div class="reminder-item">
                         <span class="reminder-item-text">${reminder.type} ${reminder.text}</span>
                     </div>`;
                 });
+                
+                // Show expand/collapse button if more than 5 reminders
                 if (activeReminders.length > 5) {
-                    html += `<div class="reminder-item">
-                        <span class="reminder-item-text">...and ${activeReminders.length - 5} more</span>
+                    const remainingCount = activeReminders.length - 5;
+                    const arrow = homeRemindersExpanded ? '▲' : '▼';
+                    const text = homeRemindersExpanded ? 'Show less' : `...and ${remainingCount} more`;
+                    
+                    html += `<div class="reminder-item" onclick="toggleHomeReminders()" style="cursor: pointer; background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); border-left: 4px solid #667eea; padding: 12px; margin-top: 5px; border-radius: 8px;">
+                        <span class="reminder-item-text" style="font-weight: 600; color: #667eea;">${text}</span>
+                        <span style="float: right; font-size: 18px; color: #667eea;">${arrow}</span>
                     </div>`;
                 }
+                
                 html += '</div>';
                 container.innerHTML = html;
             } else {
