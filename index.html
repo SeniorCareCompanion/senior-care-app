@@ -4,9 +4,131 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-16-1845 UTC - FEATURE: Expandable Today's Reminders + Docs
-    BUILD DATE: February 16, 2026 at 6:45 PM UTC
-    CHANGES: Added expand/collapse to "...and X more" + Help documentation
+    VERSION: 2026-02-16-2127 UTC - BETA TESTER FIXES: Meals Sort + Optional Bill Amount + Bills Dropdown
+    BUILD DATE: February 16, 2026 at 9:27 PM UTC
+    CHANGES: Three improvements based on beta tester feedback
+    
+    🎉 BETA TESTER FEEDBACK IMPLEMENTED!
+    
+    ═══════════════════════════════════════════════════════════════════
+    FIX #1: BREAKFAST SORTING (Tester One)
+    ═══════════════════════════════════════════════════════════════════
+    
+    ❌ THE PROBLEM:
+    - User deletes "Breakfast" from Meals
+    - User adds "Breakfast" back
+    - Breakfast appears AFTER Lunch and Dinner
+    - Order is wrong: Lunch, Dinner, Breakfast ❌
+    
+    ✅ THE FIX:
+    - Meals now auto-sort by time after adding
+    - Breakfast (8:00 AM) → Lunch (12:00 PM) → Dinner (6:00 PM)
+    - Order stays correct even after delete/re-add
+    - Sort happens automatically in addCustomTask() function
+    
+    📝 CODE:
+    ```javascript
+    if (category === 'meals') {
+        users[currentUser].tasks[category].sort((a, b) => {
+            const timeA = a.time || '23:59';
+            const timeB = b.time || '23:59';
+            return timeA.localeCompare(timeB);
+        });
+    }
+    ```
+    
+    ═══════════════════════════════════════════════════════════════════
+    FIX #2: OPTIONAL BILL AMOUNT (Tester Two)
+    ═══════════════════════════════════════════════════════════════════
+    
+    ❌ THE PROBLEM:
+    - User wants to add bill reminder
+    - Doesn't know exact amount yet
+    - App requires amount field - can't leave blank
+    - User stuck: can't add bill without amount
+    
+    ✅ THE FIX:
+    - Bill amount now OPTIONAL
+    - Can add bill with just name + due date
+    - Amount shows "Amount TBD" when not specified
+    - Can edit later to add amount when known
+    
+    📝 CHANGES:
+    - Validation: Changed from `if (!name || !amount || !dueDate)` to `if (!name || !dueDate)`
+    - Storage: `amount: amount ? parseFloat(amount) : null`
+    - Display: Shows "Amount TBD" instead of "$0.00"
+    - Duplicate checking: Handles null amounts gracefully
+    
+    💡 USE CASE:
+    "I know Electric Bill is due March 15th, but won't know 
+    exact amount until I get the bill. Now I can add it as 
+    a reminder and fill in amount later!"
+    
+    ═══════════════════════════════════════════════════════════════════
+    FIX #3: COMMON BILLS DROPDOWN (Tester Three)
+    ═══════════════════════════════════════════════════════════════════
+    
+    ❌ THE PROBLEM:
+    - User has to type bill name every time
+    - Typos cause duplicates ("Electric" vs "Electric Bill")
+    - No suggestions for common bills
+    - Takes longer to add bills
+    
+    ✅ THE FIX:
+    - Added dropdown of 19 common bills
+    - Start typing → see suggestions
+    - Click to select → auto-fills
+    - Can still type custom bill names
+    
+    📋 COMMON BILLS LIST:
+    - Electric Bill
+    - Water Bill
+    - Gas Bill
+    - Internet
+    - Phone Bill
+    - Cable TV
+    - Rent
+    - Mortgage
+    - Car Payment
+    - Car Insurance
+    - Health Insurance
+    - Home Insurance
+    - Credit Card
+    - Trash/Recycling
+    - HOA Fees
+    - Streaming Services
+    - Gym Membership
+    - Storage Unit
+    - Property Tax
+    
+    📝 IMPLEMENTATION:
+    - HTML5 <datalist> element
+    - Works on all browsers
+    - Fuzzy matching (type "elec" → shows "Electric Bill")
+    - Doesn't restrict to list (can type anything)
+    
+    🎯 BENEFITS:
+    ✅ Faster bill entry
+    ✅ Fewer typos
+    ✅ Consistent naming
+    ✅ Better duplicate detection
+    ✅ Senior-friendly suggestions
+    
+    📊 SUMMARY OF ALL THREE FIXES:
+    
+    | Fix | Tester | Problem | Solution | Status |
+    |-----|--------|---------|----------|--------|
+    | Meals Sort | One | Breakfast goes to end | Auto-sort by time | ✅ Fixed |
+    | Optional Amount | Two | Can't add bill without amount | Make amount optional | ✅ Fixed |
+    | Bills Dropdown | Three | Have to type everything | Add common bills list | ✅ Fixed |
+    
+    💡 IMPACT:
+    - Better UX for meal task management
+    - More flexible bill tracking
+    - Faster bill entry with suggestions
+    - All fixes work without backend server!
+    
+    📝 PREVIOUS VERSION (2026-02-16-1845 UTC):
     
     ✨ NEW FEATURE: EXPANDABLE TODAY'S REMINDERS
     
@@ -2164,7 +2286,28 @@
                     <h3>Add New Bill</h3>
                     <div class="input-group">
                         <label>Bill Name</label>
-                        <input type="text" id="billName" placeholder="e.g., Electric Bill">
+                        <input type="text" id="billName" list="commonBills" placeholder="e.g., Electric Bill">
+                        <datalist id="commonBills">
+                            <option value="Electric Bill">
+                            <option value="Water Bill">
+                            <option value="Gas Bill">
+                            <option value="Internet">
+                            <option value="Phone Bill">
+                            <option value="Cable TV">
+                            <option value="Rent">
+                            <option value="Mortgage">
+                            <option value="Car Payment">
+                            <option value="Car Insurance">
+                            <option value="Health Insurance">
+                            <option value="Home Insurance">
+                            <option value="Credit Card">
+                            <option value="Trash/Recycling">
+                            <option value="HOA Fees">
+                            <option value="Streaming Services">
+                            <option value="Gym Membership">
+                            <option value="Storage Unit">
+                            <option value="Property Tax">
+                        </datalist>
                     </div>
                     <div class="input-group">
                         <label>Amount</label>
@@ -3801,10 +3944,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-02-16-1845 UTC
+                        <strong>App Version:</strong> 2026-02-16-2127 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        NEW: Expandable Reminders + Help Docs!
+                        Beta Fixes: Meals Sort + Optional Amount + Dropdown!
                     </p>
                 </div>
             </div>
@@ -7247,6 +7390,19 @@
 
                 console.log('Adding task to category:', category, task);
                 users[currentUser].tasks[category].push(task);
+                
+                // BUGFIX: Sort meals by time to keep Breakfast → Lunch → Dinner order
+                // This fixes the issue where deleting and re-adding Breakfast puts it at the end
+                if (category === 'meals') {
+                    users[currentUser].tasks[category].sort((a, b) => {
+                        // Sort by time (earlier times first)
+                        const timeA = a.time || '23:59'; // Tasks without time go to end
+                        const timeB = b.time || '23:59';
+                        return timeA.localeCompare(timeB);
+                    });
+                    console.log('✅ Meals sorted by time');
+                }
+                
                 saveData('users', users);
                 console.log('Task added successfully');
                 speak(`Added task ${name} with ${recurrence === 'daily' ? 'daily' : getTaskRecurrenceText(task)} schedule`);
@@ -7625,8 +7781,9 @@
             const dueDate = document.getElementById('billDueDate').value;
             const recurrence = document.getElementById('billRecurrence').value;
 
-            if (!name || !amount || !dueDate) {
-                alert('Please fill in all fields');
+            // BUGFIX: Make amount optional - tester wants to add bills without knowing amount yet
+            if (!name || !dueDate) {
+                alert('Please fill in Bill Name and Due Date');
                 return;
             }
 
@@ -7640,7 +7797,7 @@
                     users[currentUser].bills[billIndex] = {
                         id: existingBill.id,
                         name: name,
-                        amount: parseFloat(amount),
+                        amount: amount ? parseFloat(amount) : null, // Allow null amount
                         dueDate: dueDate,
                         recurrence: recurrence,
                         paid: existingBill.paid || false,
@@ -7660,18 +7817,19 @@
                 // Check for duplicates
                 const existingBills = users[currentUser].bills || [];
                 
-                // Check for EXACT duplicate (name + amount + due date all match)
+                // Check for EXACT duplicate (name + due date match, and amounts match if both provided)
                 const exactDuplicate = existingBills.find(bill =>
                     bill.name.toLowerCase().trim() === name.toLowerCase().trim() &&
-                    Math.abs(bill.amount - parseFloat(amount)) < 0.01 && // Allow for floating point comparison
-                    bill.dueDate === dueDate
+                    bill.dueDate === dueDate &&
+                    ((!amount && !bill.amount) || (amount && bill.amount && Math.abs(bill.amount - parseFloat(amount)) < 0.01))
                 );
                 
                 if (exactDuplicate) {
+                    const amountText = exactDuplicate.amount ? `$${exactDuplicate.amount.toFixed(2)}` : 'Amount TBD';
                     alert('❌ Duplicate Bill\n\n' +
                           'This bill already exists:\n\n' +
                           `Name: ${exactDuplicate.name}\n` +
-                          `Amount: $${exactDuplicate.amount.toFixed(2)}\n` +
+                          `Amount: ${amountText}\n` +
                           `Due Date: ${formatDate(exactDuplicate.dueDate)}\n\n` +
                           'Cannot add duplicate bill.');
                     speak('This bill already exists');
@@ -7681,15 +7839,21 @@
                 // Check for SAME NAME but different amount or date
                 const sameBillName = existingBills.find(bill =>
                     bill.name.toLowerCase().trim() === name.toLowerCase().trim() &&
-                    (Math.abs(bill.amount - parseFloat(amount)) >= 0.01 || bill.dueDate !== dueDate)
+                    (bill.dueDate !== dueDate || 
+                     (amount && bill.amount && Math.abs(bill.amount - parseFloat(amount)) >= 0.01) ||
+                     (amount && !bill.amount) ||
+                     (!amount && bill.amount))
                 );
                 
                 if (sameBillName) {
+                    const existingAmountText = sameBillName.amount ? `$${sameBillName.amount.toFixed(2)}` : 'Amount TBD';
+                    const newAmountText = amount ? `$${parseFloat(amount).toFixed(2)}` : 'Amount TBD';
+                    
                     const userConfirmed = confirm(
                         `⚠️ Bill Name Already Exists\n\n` +
                         `A bill named "${sameBillName.name}" already exists:\n\n` +
-                        `Existing: $${sameBillName.amount.toFixed(2)} due ${formatDate(sameBillName.dueDate)}\n` +
-                        `New: $${parseFloat(amount).toFixed(2)} due ${formatDate(dueDate)}\n\n` +
+                        `Existing: ${existingAmountText} due ${formatDate(sameBillName.dueDate)}\n` +
+                        `New: ${newAmountText} due ${formatDate(dueDate)}\n\n` +
                         `This might be:\n` +
                         `• Recurring bill for different month\n` +
                         `• Amount changed (e.g., electric bill varies)\n` +
@@ -7706,7 +7870,7 @@
                 const bill = {
                     id: Date.now(),
                     name: name,
-                    amount: parseFloat(amount),
+                    amount: amount ? parseFloat(amount) : null, // Allow null amount
                     dueDate: dueDate,
                     recurrence: recurrence,
                     paid: false,
@@ -7809,12 +7973,13 @@
 
                 const card = document.createElement('div');
                 card.className = 'card bill fade-in';
+                const amountDisplay = bill.amount ? `$${bill.amount.toFixed(2)}` : 'Amount TBD';
                 card.innerHTML = `
                     <div class="card-header" style="cursor: pointer; user-select: none;">
                         <div style="flex: 1;" onclick="toggleBillCard(${bill.id})">
                             ${paidIcon}${bill.name}${reminderBadge}
                             <div style="font-size: 14px; color: #666; margin-top: 2px;">
-                                $${bill.amount.toFixed(2)} • Due ${formatDate(bill.dueDate)}
+                                ${amountDisplay} • Due ${formatDate(bill.dueDate)}
                             </div>
                         </div>
                         <div style="display: flex; gap: 5px; align-items: center;">
@@ -7827,7 +7992,7 @@
                     </div>
                     <div id="bill-details-${bill.id}" style="${isMinimized ? 'display: none;' : ''}">
                         <div class="card-content">
-                            <strong>💵 Amount:</strong> $${bill.amount.toFixed(2)}<br>
+                            <strong>💵 Amount:</strong> ${amountDisplay}<br>
                             <strong>📅 Due Date:</strong> ${formatDate(bill.dueDate)}<br>
                             <strong>🔄 Repeats:</strong> ${getBillRecurrenceText(bill)}${reminderText}
                         </div>
