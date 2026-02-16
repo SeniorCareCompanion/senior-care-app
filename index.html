@@ -4,9 +4,165 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-16-2142 UTC - iOS FIX: Custom Bills Dropdown for Safari
-    BUILD DATE: February 16, 2026 at 9:42 PM UTC
-    CHANGES: Replaced datalist with iOS-compatible custom dropdown for bills
+    VERSION: 2026-02-16-2158 UTC - FEATURE: Helpful Dropdowns for Appointments, Activities & Tasks!
+    BUILD DATE: February 16, 2026 at 9:58 PM UTC
+    CHANGES: Added suggestion dropdowns to help seniors with common options
+    
+    🎉 NEW FEATURE: HELPFUL DROPDOWNS IN 3 SECTIONS!
+    
+    Based on user request: "Give Seniors a list of options they might never think of"
+    
+    ═══════════════════════════════════════════════════════════════════
+    DROPDOWN #1: APPOINTMENTS - DOCTOR SPECIALTIES
+    ═══════════════════════════════════════════════════════════════════
+    
+    ✅ ADDED 19 COMMON DOCTOR SPECIALTIES:
+    Click or start typing in "Doctor/Clinic Name" field to see:
+    - Primary Care Doctor
+    - Cardiologist
+    - Dentist
+    - Eye Doctor / Optometrist
+    - Podiatrist
+    - Dermatologist
+    - Physical Therapy
+    - Neurologist
+    - Orthopedic
+    - Psychiatrist
+    - Audiologist
+    - Endocrinologist
+    - Gastroenterologist
+    - Oncologist
+    - Pulmonologist
+    - Rheumatologist
+    - Urologist
+    - ENT (Ear, Nose, Throat)
+    - OB/GYN
+    
+    📝 IMPLEMENTATION:
+    - Uses existing autocomplete system
+    - Preset suggestions + past doctors
+    - Type to filter (e.g., "card" → Cardiologist)
+    - Click to select
+    
+    💡 WHY IT HELPS:
+    Seniors often forget specialty names ("I'm seeing the foot doctor" → Podiatrist)
+    
+    ═══════════════════════════════════════════════════════════════════
+    DROPDOWN #2: ACTIVITIES - COMMON ACTIVITIES
+    ═══════════════════════════════════════════════════════════════════
+    
+    ✅ ADDED PURPLE "▼ Common Activities" BUTTON
+    
+    17 COMMON SENIOR ACTIVITIES:
+    - 🧘 Yoga Class
+    - 🎱 Bingo
+    - 💦 Water Aerobics
+    - 🥋 Tai Chi
+    - 📚 Book Club
+    - 🃏 Card Games
+    - 🎨 Arts & Crafts
+    - 🚶 Walking Group
+    - ⛪ Church Service
+    - 💃 Dance Class
+    - 🏊 Swimming
+    - 🎵 Music Class
+    - 🌱 Gardening Club
+    - 🪑 Chair Exercises
+    - 🎬 Movie Night
+    - 🖌️ Painting Class
+    - ☕ Coffee Social
+    
+    📝 IMPLEMENTATION:
+    - Same UI pattern as Bills dropdown
+    - Pink/purple button (matches Activities color)
+    - Click → shows list with emojis
+    - Tap to select → auto-fills
+    - Auto-focus Location field
+    - Works on iOS! (custom dropdown)
+    
+    💡 WHY IT HELPS:
+    Gives seniors ideas for activities they might enjoy but didn't think of
+    
+    ═══════════════════════════════════════════════════════════════════
+    DROPDOWN #3: TASKS - CATEGORY-AWARE SUGGESTIONS
+    ═══════════════════════════════════════════════════════════════════
+    
+    ✅ ADDED GREEN "▼ Common Tasks" BUTTON
+    
+    SMART DROPDOWN - CHANGES BASED ON CATEGORY!
+    
+    When category = "Meals":
+    - 🍳 Breakfast
+    - 🥗 Lunch
+    - 🍽️ Dinner
+    - 🍎 Snack
+    - 🥤 Meal Prep
+    
+    When category = "Hydration":
+    - 💧 Morning Water
+    - 💧 Afternoon Water
+    - 💧 Evening Water
+    - 🥤 Juice
+    - ☕ Coffee/Tea
+    
+    When category = "Hygiene":
+    - 🚿 Shower
+    - 🪥 Brush Teeth
+    - 🧼 Hand Washing
+    - 💇 Hair Care
+    - 🪒 Shave
+    - 💅 Nail Care
+    - 🧴 Skincare Routine
+    
+    When category = "Safety":
+    - 🔒 Check Door Locks
+    - 🔥 Test Smoke Alarm
+    - 💡 Check Lighting
+    - 🧹 Clear Floor Hazards
+    - 🔋 Check Flashlight
+    - 📱 Charge Phone
+    - 💊 Check Medicine Cabinet
+    
+    📝 IMPLEMENTATION:
+    - Dynamic dropdown based on selected category
+    - Updates when category changes
+    - Green button (matches Tasks color)
+    - Click → shows category-specific suggestions
+    - Tap to select → auto-fills
+    - Auto-focus Time field
+    - Works on iOS! (custom dropdown)
+    
+    💡 WHY IT HELPS:
+    - Consistent task naming
+    - Suggests important safety tasks seniors might forget
+    - Faster task entry
+    
+    🎯 BENEFITS OF ALL 3 DROPDOWNS:
+    
+    ✅ Faster data entry (click vs type)
+    ✅ Consistent naming (no typos)
+    ✅ Gives ideas (discover activities/tasks)
+    ✅ Senior-friendly (visual emojis)
+    ✅ Works on iOS (custom dropdowns)
+    ✅ Smart workflow (auto-focus next field)
+    ✅ Voice feedback (announces selections)
+    
+    📱 COMPATIBILITY:
+    - ✅ iOS Safari (iPhone/iPad)
+    - ✅ Desktop Safari (Mac)
+    - ✅ Chrome (all platforms)
+    - ✅ Firefox
+    - ✅ Edge
+    
+    💬 USER FEEDBACK INCORPORATED:
+    "Could we add that dropdown to any of the other tabs? 
+    Give the Seniors a list of options they might never 
+    think of? Medications, tasks, activities and appointments?"
+    
+    ✅ Implemented for Appointments, Activities, and Tasks
+    ⏭️ Skipped Medications (too many specific drug names)
+    
+    📝 PREVIOUS VERSION (2026-02-16-2142 UTC):
     
     🍎 iOS SAFARI FIX - BILLS DROPDOWN NOW WORKS ON iPHONE!
     
@@ -2281,11 +2437,26 @@
                     <h3>Add Custom Task</h3>
                     <div class="input-group">
                         <label>Task Name</label>
-                        <input type="text" id="customTaskName" placeholder="e.g., Take a walk">
+                        <div style="position: relative;">
+                            <input type="text" id="customTaskName" placeholder="e.g., Take a walk or click ▼">
+                            <button type="button" onclick="toggleTaskNameDropdown()" 
+                                    style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); 
+                                           background: #48bb78; color: white; border: none; padding: 8px 12px; 
+                                           border-radius: 6px; cursor: pointer; font-size: 14px;">
+                                ▼ Common Tasks
+                            </button>
+                        </div>
+                        <!-- Custom dropdown for common tasks (category-aware) -->
+                        <div id="taskNameDropdown" class="hidden" 
+                             style="background: white; border: 2px solid #48bb78; border-radius: 8px; 
+                                    margin-top: 5px; max-height: 300px; overflow-y: auto; 
+                                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            <!-- Content populated by JavaScript based on category -->
+                        </div>
                     </div>
                     <div class="input-group">
                         <label>Category</label>
-                        <select id="customTaskCategory">
+                        <select id="customTaskCategory" onchange="updateTaskSuggestions()">
                             <option value="meals">Meals</option>
                             <option value="hydration">Hydration</option>
                             <option value="hygiene">Hygiene</option>
@@ -2595,7 +2766,123 @@
                     <!-- Manual Entry Container (visible by default now) -->
                     <div class="input-group">
                         <label for="activityName">Activity Name</label>
-                        <input type="text" id="activityName" placeholder="e.g., Yoga Class, Bingo Night">
+                        <div style="position: relative;">
+                            <input type="text" id="activityName" placeholder="e.g., Yoga Class, Bingo Night or click ▼">
+                            <button type="button" onclick="toggleActivityNameDropdown()" 
+                                    style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); 
+                                           background: #ed64a6; color: white; border: none; padding: 8px 12px; 
+                                           border-radius: 6px; cursor: pointer; font-size: 14px;">
+                                ▼ Common Activities
+                            </button>
+                        </div>
+                        <!-- Custom dropdown for common activities -->
+                        <div id="activityNameDropdown" class="hidden" 
+                             style="background: white; border: 2px solid #ed64a6; border-radius: 8px; 
+                                    margin-top: 5px; max-height: 300px; overflow-y: auto; 
+                                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            <div onclick="selectActivityName('Yoga Class')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                🧘 Yoga Class
+                            </div>
+                            <div onclick="selectActivityName('Bingo')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                🎱 Bingo
+                            </div>
+                            <div onclick="selectActivityName('Water Aerobics')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                💦 Water Aerobics
+                            </div>
+                            <div onclick="selectActivityName('Tai Chi')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                🥋 Tai Chi
+                            </div>
+                            <div onclick="selectActivityName('Book Club')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                📚 Book Club
+                            </div>
+                            <div onclick="selectActivityName('Card Games')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                🃏 Card Games
+                            </div>
+                            <div onclick="selectActivityName('Arts & Crafts')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                🎨 Arts & Crafts
+                            </div>
+                            <div onclick="selectActivityName('Walking Group')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                🚶 Walking Group
+                            </div>
+                            <div onclick="selectActivityName('Church Service')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                ⛪ Church Service
+                            </div>
+                            <div onclick="selectActivityName('Dance Class')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                💃 Dance Class
+                            </div>
+                            <div onclick="selectActivityName('Swimming')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                🏊 Swimming
+                            </div>
+                            <div onclick="selectActivityName('Music Class')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                🎵 Music Class
+                            </div>
+                            <div onclick="selectActivityName('Gardening Club')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                🌱 Gardening Club
+                            </div>
+                            <div onclick="selectActivityName('Chair Exercises')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                🪑 Chair Exercises
+                            </div>
+                            <div onclick="selectActivityName('Movie Night')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                🎬 Movie Night
+                            </div>
+                            <div onclick="selectActivityName('Painting Class')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                🖌️ Painting Class
+                            </div>
+                            <div onclick="selectActivityName('Coffee Social')" 
+                                 style="padding: 12px; cursor: pointer;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                ☕ Coffee Social
+                            </div>
+                        </div>
                     </div>
                     <div class="input-group">
                         <label for="activityLocation">Location</label>
@@ -4147,10 +4434,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-02-16-2142 UTC
+                        <strong>App Version:</strong> 2026-02-16-2158 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        iOS FIX: Bills Dropdown Now Works on iPhone!
+                        NEW: Dropdowns for Appointments, Activities & Tasks!
                     </p>
                 </div>
             </div>
@@ -6983,7 +7270,28 @@
 
 
         // Autocomplete suggestions storage
-        let doctorSuggestions = [];
+        // FEATURE: Preset common doctor specialties + appointments history autocomplete
+        let doctorSuggestions = [
+            'Primary Care Doctor',
+            'Cardiologist',
+            'Dentist',
+            'Eye Doctor / Optometrist',
+            'Podiatrist',
+            'Dermatologist',
+            'Physical Therapy',
+            'Neurologist',
+            'Orthopedic',
+            'Psychiatrist',
+            'Audiologist',
+            'Endocrinologist',
+            'Gastroenterologist',
+            'Oncologist',
+            'Pulmonologist',
+            'Rheumatologist',
+            'Urologist',
+            'ENT (Ear, Nose, Throat)',
+            'OB/GYN'
+        ];
         let locationSuggestions = [];
 
         function updateAppointmentAutocomplete(appointments) {
@@ -7026,7 +7334,8 @@
             const suggestions = dropdownId === 'doctorDropdown' ? doctorSuggestions : locationSuggestions;
             console.log('Suggestions:', suggestions);
             
-            if (suggestions.length === 0) {
+            // Only show "no history" message for location dropdown (not doctor, which has presets)
+            if (suggestions.length === 0 && dropdownId === 'locationDropdown') {
                 dropdown.innerHTML = '<div class="autocomplete-no-results">Start adding appointments to build your history!</div>';
                 dropdown.classList.add('show');
                 console.log('Showing "no history" message');
@@ -7619,6 +7928,7 @@
             document.getElementById('taskReminderEnabled').checked = false;
             document.getElementById('taskReminderMinutes').value = '10';
             document.getElementById('taskReminderOptions').classList.add('hidden');
+            document.getElementById('taskNameDropdown').classList.add('hidden'); // Hide dropdown
             document.querySelectorAll('.task-day-checkbox').forEach(cb => cb.checked = false);
             updateTaskRecurrenceOptions();
 
@@ -8167,6 +8477,103 @@
             speak(`Selected ${billName}`);
             // Focus on amount field for easier workflow
             document.getElementById('billAmount').focus();
+        }
+
+        // FEATURE: Activity name dropdown
+        function toggleActivityNameDropdown() {
+            const dropdown = document.getElementById('activityNameDropdown');
+            if (dropdown.classList.contains('hidden')) {
+                dropdown.classList.remove('hidden');
+                speak('Common activities list opened');
+            } else {
+                dropdown.classList.add('hidden');
+                speak('Common activities list closed');
+            }
+        }
+
+        function selectActivityName(activityName) {
+            document.getElementById('activityName').value = activityName;
+            document.getElementById('activityNameDropdown').classList.add('hidden');
+            speak(`Selected ${activityName}`);
+            // Focus on location field for easier workflow
+            document.getElementById('activityLocation').focus();
+        }
+
+        // FEATURE: Task name dropdown (category-aware)
+        const taskSuggestions = {
+            'meals': [
+                '🍳 Breakfast',
+                '🥗 Lunch', 
+                '🍽️ Dinner',
+                '🍎 Snack',
+                '🥤 Meal Prep'
+            ],
+            'hydration': [
+                '💧 Morning Water',
+                '💧 Afternoon Water',
+                '💧 Evening Water',
+                '🥤 Juice',
+                '☕ Coffee/Tea'
+            ],
+            'hygiene': [
+                '🚿 Shower',
+                '🪥 Brush Teeth',
+                '🧼 Hand Washing',
+                '💇 Hair Care',
+                '🪒 Shave',
+                '💅 Nail Care',
+                '🧴 Skincare Routine'
+            ],
+            'safety': [
+                '🔒 Check Door Locks',
+                '🔥 Test Smoke Alarm',
+                '💡 Check Lighting',
+                '🧹 Clear Floor Hazards',
+                '🔋 Check Flashlight',
+                '📱 Charge Phone',
+                '💊 Check Medicine Cabinet'
+            ]
+        };
+
+        function toggleTaskNameDropdown() {
+            const dropdown = document.getElementById('taskNameDropdown');
+            
+            // Populate dropdown based on current category
+            if (dropdown.classList.contains('hidden')) {
+                updateTaskSuggestions();
+                dropdown.classList.remove('hidden');
+                speak('Common tasks list opened');
+            } else {
+                dropdown.classList.add('hidden');
+                speak('Common tasks list closed');
+            }
+        }
+
+        function updateTaskSuggestions() {
+            const category = document.getElementById('customTaskCategory').value;
+            const dropdown = document.getElementById('taskNameDropdown');
+            const suggestions = taskSuggestions[category] || [];
+            
+            let html = '';
+            suggestions.forEach(task => {
+                const taskName = task.replace(/^[^\s]+ /, ''); // Remove emoji for the value
+                html += `<div onclick="selectTaskName('${taskName.replace(/'/g, "\\'")}')" 
+                             style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                             onmouseover="this.style.background='#f7fafc'" 
+                             onmouseout="this.style.background='white'">
+                            ${task}
+                        </div>`;
+            });
+            
+            dropdown.innerHTML = html;
+        }
+
+        function selectTaskName(taskName) {
+            document.getElementById('customTaskName').value = taskName;
+            document.getElementById('taskNameDropdown').classList.add('hidden');
+            speak(`Selected ${taskName}`);
+            // Focus on time field for easier workflow
+            document.getElementById('customTaskTime').focus();
         }
 
         window.editBill = editBill;
@@ -8873,6 +9280,7 @@
             document.getElementById('activityReminderEnabled').checked = false;
             document.getElementById('activityReminderMinutes').value = '30';
             document.getElementById('activityReminderOptions').classList.add('hidden');
+            document.getElementById('activityNameDropdown').classList.add('hidden'); // Hide dropdown
             document.querySelectorAll('.activity-day-checkbox').forEach(cb => cb.checked = false);
             updateActivityRecurrenceOptions();
 
