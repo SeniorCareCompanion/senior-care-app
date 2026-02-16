@@ -4763,131 +4763,124 @@
                         <!-- Latest Version -->
                         <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #667eea;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-09-2247 UTC</h4>
-                                <span style="background: #e53e3e; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">CRITICAL BUGFIX</span>
+                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-16-2230 UTC</h4>
+                                <span style="background: #48bb78; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">LATEST</span>
                             </div>
-                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 9, 2026 at 10:47 PM</p>
+                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 16, 2026 at 10:30 PM</p>
                             <div style="line-height: 1.8;">
-                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px; color: #e53e3e;">🐛 FIXED: PROFILE/SETTINGS TABS NOW DISPLAY!</p>
+                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px; color: #667eea;">🐛 Fixes: Appointments Dropdown + Task Category Tips</p>
                                 <ul style="margin: 5px 0; padding-left: 20px; font-size: 14px;">
-                                    <li><strong>Fixed tabs not showing content</strong> when clicked</li>
-                                    <li>Problem: showTopSection() was using 'hidden' class instead of 'active'</li>
-                                    <li>Both functions now use the same 'active' class system</li>
-                                    <li>Profile and Settings tabs now work perfectly!</li>
+                                    <li><strong>Fixed:</strong> Appointments dropdown now shows all 19 doctor specialties (was only showing past doctors)</li>
+                                    <li><strong>Added:</strong> Helpful tips explaining task category dropdown behavior</li>
+                                    <li>Beta tester feedback implemented!</li>
                                 </ul>
-                                
-                                <div style="background: #fff3cd; padding: 10px; border-radius: 6px; margin: 10px 0; border-left: 3px solid #ffc107;">
-                                    <p style="margin: 0; font-size: 13px; color: #856404;">
-                                        <strong>⚠️ WHAT HAPPENED:</strong> The voice announcements worked ("Showing profile", "Showing settings"), but the content didn't display because of a CSS class mismatch. Now fixed!
-                                    </p>
-                                </div>
-                                
-                                <p style="margin: 10px 0 0 0; font-size: 13px; color: #666;">
-                                    <strong>Technical:</strong> Updated <code>showTopSection()</code> to use <code>classList.add('active')</code> instead of <code>classList.remove('hidden')</code>. Updated <code>showSection()</code> to reset top tab styling.
-                                </p>
                             </div>
                         </div>
 
-                        <!-- Previous Versions -->
+                        <!-- Recent Updates -->
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-16-2158 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 16, 2026 at 9:58 PM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">✨ Major: 3 New Helpful Dropdowns!</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li><strong>Appointments:</strong> 19 doctor specialties (Cardiologist, Dentist, etc.)</li>
+                                    <li><strong>Activities:</strong> 17 common senior activities (Yoga, Bingo, etc.)</li>
+                                    <li><strong>Tasks:</strong> Smart category-based suggestions (Meals, Hygiene, etc.)</li>
+                                    <li>All work on iOS!</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-16-2142 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 16, 2026 at 9:42 PM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">🍎 iOS Fix: Bills Dropdown</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Replaced HTML5 datalist with custom dropdown (iOS Safari compatible)</li>
+                                    <li>Bills dropdown now works perfectly on iPhone!</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-16-2127 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 16, 2026 at 9:27 PM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">🎉 Beta Tester Fixes (3 improvements)</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li><strong>Meals auto-sort:</strong> Breakfast stays at top after delete/re-add</li>
+                                    <li><strong>Optional bill amount:</strong> Can add bills without knowing amount yet</li>
+                                    <li><strong>Bills dropdown:</strong> 19 common bills with emojis</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-16-1845 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 16, 2026 at 6:45 PM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">✨ UX: Expandable Today's Reminders</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Home page "...and X more" line now clickable</li>
+                                    <li>Expands to show all reminders for the day</li>
+                                    <li>Added Help documentation</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-15-0425 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 15, 2026 at 4:25 AM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">🐛 CRITICAL: Voice & Notifications</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li><strong>Fixed:</strong> Voice settings now persist (no more resetting to OFF)</li>
+                                    <li><strong>Improved:</strong> Reminders restart when app returns from background</li>
+                                    <li>Added clear iOS limitation documentation</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-13-2002 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 13, 2026 at 8:02 PM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">🐛 Bugfix: One-Time Activity Date</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Fixed date field not showing for one-time activities on page load</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Previous Versions (Older) -->
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-09-2247 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 9, 2026 at 10:47 PM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">🐛 Critical: Profile/Settings Tabs</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Fixed tabs not showing content when clicked</li>
+                                </ul>
+                            </div>
+                        </div>
                         <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
                             <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-09-2226 UTC</h4>
                             <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 9, 2026 at 10:26 PM</p>
                             <div style="line-height: 1.6; font-size: 13px;">
-                                <p style="margin: 5px 0; font-weight: 600;">✨ Major:</p>
-                                <ul style="margin: 5px 0; padding-left: 20px;">
-                                    <li>Profile/Settings split (but tabs didn't work - fixed in next version)</li>
-                                </ul>
+                                <p style="margin: 5px 0; font-weight: 600;">✨ Major: Profile/Settings Split</p>
                             </div>
                         </div>
 
-                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
-                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-08-2043 UTC</h4>
-                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 8, 2026 at 8:43 PM</p>
-                            <div style="line-height: 1.6; font-size: 13px;">
-                                <p style="margin: 5px 0; font-weight: 600;">✨ UX:</p>
-                                <ul style="margin: 5px 0; padding-left: 20px;">
-                                    <li>First time warning auto-hides after setup</li>
-                                </ul>
-                            </div>
+                        <!-- Older Updates Summary -->
+                        <div style="background: #edf2f7; padding: 15px; border-radius: 8px; text-align: center;">
+                            <p style="margin: 0; font-size: 13px; color: #718096;">
+                                📜 <strong>Older versions (Feb 6-9):</strong> Installation improvements, daily reset fixes, autocomplete features
+                            </p>
                         </div>
-
-                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
-                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-08-1840 UTC</h4>
-                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 8, 2026 at 6:40 PM</p>
-                            <div style="line-height: 1.6; font-size: 13px;">
-                                <p style="margin: 5px 0; font-weight: 600;">📱 Updates:</p>
-                                <ul style="margin: 5px 0; padding-left: 20px;">
-                                    <li>Exact iPhone installation steps (13 steps tested on real device)</li>
-                                    <li>Added critical "3 dots menu" step</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
-                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-08-1820 UTC</h4>
-                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 8, 2026 at 6:20 PM</p>
-                            <div style="line-height: 1.6; font-size: 13px;">
-                                <p style="margin: 5px 0; font-weight: 600;">✅ UX Fix:</p>
-                                <ul style="margin: 5px 0; padding-left: 20px;">
-                                    <li>Made installation instructions always visible (not collapsed)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
-                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-07-1900 UTC</h4>
-                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 7, 2026 at 7:00 PM</p>
-                            <div style="line-height: 1.6; font-size: 13px;">
-                                <p style="margin: 5px 0; font-weight: 600;">🚨 UX Fix:</p>
-                                <ul style="margin: 5px 0; padding-left: 20px;">
-                                    <li>Added installation warning to login/register screens</li>
-                                    <li>Instructions were collapsible (required clicking)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
-                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-07-1825 UTC</h4>
-                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 7, 2026 at 6:25 PM</p>
-                            <div style="line-height: 1.6; font-size: 13px;">
-                                <p style="margin: 5px 0; font-weight: 600;">🐛 Fixes:</p>
-                                <ul style="margin: 5px 0; padding-left: 20px;">
-                                    <li>Installation warning in Help section</li>
-                                    <li>Clickable installation guide links</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
-                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-07-0051 UTC</h4>
-                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 7, 2026 at 12:51 AM</p>
-                            <div style="line-height: 1.6; font-size: 13px;">
-                                <p style="margin: 5px 0; font-weight: 600;">🐛 Bug Fixes:</p>
-                                <ul style="margin: 5px 0; padding-left: 20px;">
-                                    <li>Fixed tasks not resetting daily</li>
-                                    <li>Removed "Free Forever" pricing claims</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
-                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-06-1805 UTC</h4>
-                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 6, 2026 at 6:05 PM</p>
-                            <div style="line-height: 1.6; font-size: 13px;">
-                                <p style="margin: 5px 0; font-weight: 600;">🐛 Bug Fix:</p>
-                                <ul style="margin: 5px 0; padding-left: 20px;">
-                                    <li>Fixed medications not resetting daily</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
-                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-06-0323 UTC</h4>
-                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 6, 2026 at 3:23 AM</p>
-                            <div style="line-height: 1.6; font-size: 13px;">
-                                <p style="margin: 5px 0; font-weight: 600;">✨ New Feature:</p>
-                                <ul style="margin: 5px 0; padding-left: 20px;">
-                                    <li>Added "About This App" section to Profile</li>
+                    </div>
+                </div>
                                 </ul>
                             </div>
                         </div>
