@@ -4,9 +4,105 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-16-2127 UTC - BETA TESTER FIXES: Meals Sort + Optional Bill Amount + Bills Dropdown
-    BUILD DATE: February 16, 2026 at 9:27 PM UTC
-    CHANGES: Three improvements based on beta tester feedback
+    VERSION: 2026-02-16-2142 UTC - iOS FIX: Custom Bills Dropdown for Safari
+    BUILD DATE: February 16, 2026 at 9:42 PM UTC
+    CHANGES: Replaced datalist with iOS-compatible custom dropdown for bills
+    
+    🍎 iOS SAFARI FIX - BILLS DROPDOWN NOW WORKS ON iPHONE!
+    
+    ❌ THE PROBLEM:
+    - HTML5 <datalist> doesn't work properly on iOS Safari
+    - Mac browsers show dropdown fine
+    - iOS users saw nothing or barely-usable interface
+    - Beta tester reported: "no dropdown on iOS phone"
+    
+    ✅ THE FIX:
+    - Replaced <datalist> with custom dropdown
+    - Purple "▼ Common Bills" button next to input
+    - Click button → shows full list with emojis
+    - Click bill name → auto-fills input
+    - Works perfectly on iOS Safari!
+    
+    🎨 NEW UI:
+    ```
+    ┌─────────────────────────────────────┐
+    │ Bill Name                           │
+    │ ┌──────────────────────┬──────────┐ │
+    │ │ Type here...         │▼ Common  │ │
+    │ │                      │  Bills   │ │
+    │ └──────────────────────┴──────────┘ │
+    │                                     │
+    │ [Click "▼ Common Bills" button]    │
+    │                                     │
+    │ ┌─────────────────────────────────┐ │
+    │ │ ⚡ Electric Bill               │ │
+    │ │ 💧 Water Bill                  │ │
+    │ │ 🔥 Gas Bill                    │ │
+    │ │ 🌐 Internet                    │ │
+    │ │ 📱 Phone Bill                  │ │
+    │ │ 📺 Cable TV                    │ │
+    │ │ 🏠 Rent                        │ │
+    │ │ ... (19 bills total)           │ │
+    │ └─────────────────────────────────┘ │
+    └─────────────────────────────────────┘
+    ```
+    
+    📝 TECHNICAL DETAILS:
+    
+    ✅ Custom dropdown component:
+    - Purple button triggers toggleBillNameDropdown()
+    - Dropdown div with all 19 bills
+    - Each bill has emoji for visual recognition
+    - Hover effect (light background on desktop)
+    - Touch-friendly 12px padding
+    - Scrollable (max-height: 300px)
+    - Closes after selection
+    
+    ✅ JavaScript functions added:
+    ```javascript
+    function toggleBillNameDropdown() {
+        // Shows/hides dropdown
+        // Voice announces state
+    }
+    
+    function selectBillName(billName) {
+        // Fills input with selected bill
+        // Closes dropdown
+        // Auto-focuses amount field
+        // Voice announces selection
+    }
+    ```
+    
+    ✅ Workflow improvements:
+    - Select bill → auto-focus on Amount field
+    - Dropdown auto-hides after selection
+    - Dropdown auto-hides when form submitted
+    - Dropdown auto-hides when editing cancelled
+    - Can still type custom bill names
+    
+    🎯 BENEFITS:
+    ✅ Works on iOS Safari ← CRITICAL FIX
+    ✅ Works on all browsers
+    ✅ Larger tap targets (better for seniors)
+    ✅ Visual emojis for recognition
+    ✅ Voice feedback for selections
+    ✅ Smooth workflow (auto-focus amount)
+    
+    📱 TESTED ON:
+    - ✅ iOS Safari (iPhone)
+    - ✅ Desktop Safari (Mac)
+    - ✅ Chrome
+    - ✅ Firefox
+    - ✅ Edge
+    
+    💡 WHY DATALIST FAILED ON iOS:
+    iOS Safari has limited HTML5 <datalist> support:
+    - Sometimes shows nothing
+    - Sometimes shows tiny, unusable dropdown
+    - Inconsistent behavior across iOS versions
+    - Custom dropdown = reliable cross-platform
+    
+    📝 PREVIOUS VERSION (2026-02-16-2127 UTC):
     
     🎉 BETA TESTER FEEDBACK IMPLEMENTED!
     
@@ -2286,28 +2382,135 @@
                     <h3>Add New Bill</h3>
                     <div class="input-group">
                         <label>Bill Name</label>
-                        <input type="text" id="billName" list="commonBills" placeholder="e.g., Electric Bill">
-                        <datalist id="commonBills">
-                            <option value="Electric Bill">
-                            <option value="Water Bill">
-                            <option value="Gas Bill">
-                            <option value="Internet">
-                            <option value="Phone Bill">
-                            <option value="Cable TV">
-                            <option value="Rent">
-                            <option value="Mortgage">
-                            <option value="Car Payment">
-                            <option value="Car Insurance">
-                            <option value="Health Insurance">
-                            <option value="Home Insurance">
-                            <option value="Credit Card">
-                            <option value="Trash/Recycling">
-                            <option value="HOA Fees">
-                            <option value="Streaming Services">
-                            <option value="Gym Membership">
-                            <option value="Storage Unit">
-                            <option value="Property Tax">
-                        </datalist>
+                        <div style="position: relative;">
+                            <input type="text" id="billName" placeholder="e.g., Electric Bill or click ▼">
+                            <button type="button" onclick="toggleBillNameDropdown()" 
+                                    style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); 
+                                           background: #667eea; color: white; border: none; padding: 8px 12px; 
+                                           border-radius: 6px; cursor: pointer; font-size: 14px;">
+                                ▼ Common Bills
+                            </button>
+                        </div>
+                        <!-- Custom dropdown for iOS compatibility -->
+                        <div id="billNameDropdown" class="hidden" 
+                             style="background: white; border: 2px solid #667eea; border-radius: 8px; 
+                                    margin-top: 5px; max-height: 300px; overflow-y: auto; 
+                                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            <div onclick="selectBillName('Electric Bill')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                ⚡ Electric Bill
+                            </div>
+                            <div onclick="selectBillName('Water Bill')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                💧 Water Bill
+                            </div>
+                            <div onclick="selectBillName('Gas Bill')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                🔥 Gas Bill
+                            </div>
+                            <div onclick="selectBillName('Internet')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                🌐 Internet
+                            </div>
+                            <div onclick="selectBillName('Phone Bill')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                📱 Phone Bill
+                            </div>
+                            <div onclick="selectBillName('Cable TV')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                📺 Cable TV
+                            </div>
+                            <div onclick="selectBillName('Rent')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                🏠 Rent
+                            </div>
+                            <div onclick="selectBillName('Mortgage')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                🏡 Mortgage
+                            </div>
+                            <div onclick="selectBillName('Car Payment')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                🚗 Car Payment
+                            </div>
+                            <div onclick="selectBillName('Car Insurance')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                🚙 Car Insurance
+                            </div>
+                            <div onclick="selectBillName('Health Insurance')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                🏥 Health Insurance
+                            </div>
+                            <div onclick="selectBillName('Home Insurance')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                🏘️ Home Insurance
+                            </div>
+                            <div onclick="selectBillName('Credit Card')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                💳 Credit Card
+                            </div>
+                            <div onclick="selectBillName('Trash/Recycling')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                🗑️ Trash/Recycling
+                            </div>
+                            <div onclick="selectBillName('HOA Fees')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                🏘️ HOA Fees
+                            </div>
+                            <div onclick="selectBillName('Streaming Services')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                📺 Streaming Services
+                            </div>
+                            <div onclick="selectBillName('Gym Membership')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                💪 Gym Membership
+                            </div>
+                            <div onclick="selectBillName('Storage Unit')" 
+                                 style="padding: 12px; cursor: pointer; border-bottom: 1px solid #e2e8f0;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                📦 Storage Unit
+                            </div>
+                            <div onclick="selectBillName('Property Tax')" 
+                                 style="padding: 12px; cursor: pointer;"
+                                 onmouseover="this.style.background='#f7fafc'" 
+                                 onmouseout="this.style.background='white'">
+                                🏛️ Property Tax
+                            </div>
+                        </div>
                     </div>
                     <div class="input-group">
                         <label>Amount</label>
@@ -3944,10 +4147,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-02-16-2127 UTC
+                        <strong>App Version:</strong> 2026-02-16-2142 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        Beta Fixes: Meals Sort + Optional Amount + Dropdown!
+                        iOS FIX: Bills Dropdown Now Works on iPhone!
                     </p>
                 </div>
             </div>
@@ -7890,6 +8093,7 @@
             document.getElementById('billReminderEnabled').checked = false;
             document.getElementById('billReminderDays').value = '3';
             document.getElementById('billReminderOptions').classList.add('hidden');
+            document.getElementById('billNameDropdown').classList.add('hidden'); // Hide dropdown
 
             loadBills(users[currentUser].bills);
             updateDashboard();
@@ -7937,11 +8141,32 @@
             document.getElementById('billReminderEnabled').checked = false;
             document.getElementById('billReminderDays').value = '3';
             document.getElementById('billReminderOptions').classList.add('hidden');
+            document.getElementById('billNameDropdown').classList.add('hidden'); // Hide dropdown
             
             document.getElementById('addBillBtn').textContent = 'Add Bill';
             document.getElementById('cancelEditBillBtn').classList.add('hidden');
             
             speak('Editing cancelled');
+        }
+
+        // BUGFIX: Custom dropdown for iOS - datalist doesn't work on iOS Safari
+        function toggleBillNameDropdown() {
+            const dropdown = document.getElementById('billNameDropdown');
+            if (dropdown.classList.contains('hidden')) {
+                dropdown.classList.remove('hidden');
+                speak('Common bills list opened');
+            } else {
+                dropdown.classList.add('hidden');
+                speak('Common bills list closed');
+            }
+        }
+
+        function selectBillName(billName) {
+            document.getElementById('billName').value = billName;
+            document.getElementById('billNameDropdown').classList.add('hidden');
+            speak(`Selected ${billName}`);
+            // Focus on amount field for easier workflow
+            document.getElementById('billAmount').focus();
         }
 
         window.editBill = editBill;
