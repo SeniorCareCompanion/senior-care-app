@@ -4,9 +4,118 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-16-2158 UTC - FEATURE: Helpful Dropdowns for Appointments, Activities & Tasks!
-    BUILD DATE: February 16, 2026 at 9:58 PM UTC
-    CHANGES: Added suggestion dropdowns to help seniors with common options
+    VERSION: 2026-02-16-2230 UTC - FIXES: Appointments Dropdown + Task Category Hints
+    BUILD DATE: February 16, 2026 at 10:30 PM UTC
+    CHANGES: Fixed appointments showing all specialties + added task category tips
+    
+    🐛 BUG FIXES FROM BETA TESTING:
+    
+    ═══════════════════════════════════════════════════════════════════
+    FIX #1: APPOINTMENTS DROPDOWN NOT SHOWING ALL SPECIALTIES
+    ═══════════════════════════════════════════════════════════════════
+    
+    ❌ THE BUG:
+    - User clicks in "Doctor/Clinic Name" field
+    - Console shows dropdown working (class "show" added)
+    - But only sees 2 doctors from past appointments
+    - Preset 19 specialties missing!
+    - Console logs showed: ['Dentist', 'Doctor'] instead of 19 items
+    
+    🔍 ROOT CAUSE:
+    ```javascript
+    // OLD CODE (line 7314):
+    doctorSuggestions = Array.from(doctors).sort(...);
+    // ❌ This OVERWRITES the preset specialties!
+    ```
+    
+    When appointments were loaded, updateAppointmentAutocomplete() 
+    would REPLACE the entire doctorSuggestions array with just 
+    past appointment doctors, losing all 19 preset specialties.
+    
+    ✅ THE FIX:
+    ```javascript
+    // NEW CODE:
+    const presetDoctorSpecialties = [
+        'Primary Care Doctor',
+        'Cardiologist',
+        'Dentist',
+        // ... 19 specialties total
+    ];
+    
+    // MERGE presets with past doctors (don't overwrite!)
+    const allDoctors = new Set([...presetDoctorSpecialties, ...Array.from(doctors)]);
+    doctorSuggestions = Array.from(allDoctors).sort(...);
+    ```
+    
+    Now users get BOTH:
+    - ✅ 19 preset specialties (always available)
+    - ✅ Past appointment doctors (custom names)
+    - ✅ No duplicates (Set removes them)
+    - ✅ Sorted alphabetically
+    
+    📝 BEHAVIOR NOW:
+    - New user: Sees 19 preset specialties
+    - After first appointment: Sees presets + "Dr. Smith"
+    - After many appointments: Sees presets + all custom doctors
+    - Type "card" → filters to "Cardiologist"
+    
+    ═══════════════════════════════════════════════════════════════════
+    FIX #2: TASK CATEGORY TIPS (UX IMPROVEMENT)
+    ═══════════════════════════════════════════════════════════════════
+    
+    ❌ THE CONFUSION:
+    User feedback: "To get a different category dropdown, user has 
+    to know they need to select Category first, then the dropdown. 
+    Maybe a note would help?"
+    
+    ✅ THE FIX:
+    Added TWO helpful tips:
+    
+    1. Under Task Name (after "▼ Common Tasks" button):
+    ```
+    💡 Tip: Suggestions change based on Category selected below
+    ```
+    
+    2. Under Category dropdown:
+    ```
+    💡 Tip: Choose category first, then click "▼ Common Tasks" for suggestions
+    ```
+    
+    📝 WORKFLOW NOW CLEAR:
+    1. User selects Category: "Hygiene"
+    2. Sees tip: "Choose category first..."
+    3. Clicks "▼ Common Tasks"
+    4. Sees hygiene-specific tasks (Shower, Brush Teeth, etc.)
+    5. Understands why suggestions changed!
+    
+    💡 BENEFIT:
+    Seniors understand the category → suggestions relationship
+    without having to figure it out themselves
+    
+    📊 SUMMARY:
+    
+    | Issue | Problem | Fix | Status |
+    |-------|---------|-----|--------|
+    | Appointments | Only past doctors showing | Merge presets with history | ✅ Fixed |
+    | Tasks | Category confusion | Added 2 helpful tips | ✅ Fixed |
+    
+    🧪 HOW TO TEST:
+    
+    TEST FIX #1:
+    1. Go to Appointments tab
+    2. Click in "Doctor/Clinic Name" field
+    3. EXPECTED: See all 19 specialties + any past doctors ✅
+    4. Type "cardio"
+    5. EXPECTED: Filters to "Cardiologist" ✅
+    
+    TEST FIX #2:
+    1. Go to Tasks tab
+    2. See tips under Task Name and Category
+    3. Change Category to "Hygiene"
+    4. Click "▼ Common Tasks"
+    5. EXPECTED: See Shower, Brush Teeth, etc. ✅
+    
+    📝 PREVIOUS VERSION (2026-02-16-2158 UTC):
     
     🎉 NEW FEATURE: HELPFUL DROPDOWNS IN 3 SECTIONS!
     
@@ -2446,6 +2555,9 @@
                                 ▼ Common Tasks
                             </button>
                         </div>
+                        <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">
+                            💡 Tip: Suggestions change based on Category selected below
+                        </p>
                         <!-- Custom dropdown for common tasks (category-aware) -->
                         <div id="taskNameDropdown" class="hidden" 
                              style="background: white; border: 2px solid #48bb78; border-radius: 8px; 
@@ -2462,6 +2574,9 @@
                             <option value="hygiene">Hygiene</option>
                             <option value="safety">Safety Checks</option>
                         </select>
+                        <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">
+                            💡 Tip: Choose category first, then click "▼ Common Tasks" for suggestions
+                        </p>
                     </div>
                     <div class="input-group">
                         <label>Time (optional)</label>
@@ -4434,10 +4549,10 @@
                 <!-- App Version Info -->
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
                     <p style="font-size: 12px; color: #6c757d; margin: 0 0 5px 0;">
-                        <strong>App Version:</strong> 2026-02-16-2158 UTC
+                        <strong>App Version:</strong> 2026-02-16-2230 UTC
                     </p>
                     <p style="font-size: 11px; color: #6c757d; margin: 0;">
-                        NEW: Dropdowns for Appointments, Activities & Tasks!
+                        FIXES: Appointments Dropdown + Task Tips!
                     </p>
                 </div>
             </div>
@@ -7310,8 +7425,34 @@
                 }
             });
             
-            // Store suggestions globally for autocomplete
-            doctorSuggestions = Array.from(doctors).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+            // BUGFIX: Merge preset doctor specialties with appointment history (don't overwrite presets!)
+            // Start with presets, add past doctors, remove duplicates, sort
+            const presetDoctorSpecialties = [
+                'Primary Care Doctor',
+                'Cardiologist',
+                'Dentist',
+                'Eye Doctor / Optometrist',
+                'Podiatrist',
+                'Dermatologist',
+                'Physical Therapy',
+                'Neurologist',
+                'Orthopedic',
+                'Psychiatrist',
+                'Audiologist',
+                'Endocrinologist',
+                'Gastroenterologist',
+                'Oncologist',
+                'Pulmonologist',
+                'Rheumatologist',
+                'Urologist',
+                'ENT (Ear, Nose, Throat)',
+                'OB/GYN'
+            ];
+            
+            // Combine presets with past doctors
+            const allDoctors = new Set([...presetDoctorSpecialties, ...Array.from(doctors)]);
+            doctorSuggestions = Array.from(allDoctors).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+            
             locationSuggestions = Array.from(locations).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
             
             console.log('Doctor suggestions updated:', doctorSuggestions);
