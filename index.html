@@ -2191,7 +2191,8 @@
                 </p>
                 <p style="margin: 0; font-size: 12px; color: #856404;">
                     Found a bug? 
-                    <a href="/cdn-cgi/l/email-protection#4d2a3f282a3a252c21216339282e250d2a202c2421632e2220723e382f27282e39701e282324223f687f7d0e2c3f28687f7d0e22203d2c23242223687f7d60687f7d0f382a687f7d1f283d223f39687f7d653b7f7d7f7b607d7f607c7b607f7e7f7964" style="color: #667eea; text-decoration: underline; font-weight: 600;">
+                    <a href="mailto:gregwhall.tech@gmail.com?subject=Senior%20Care%20Companion%20-%20Bug%20Report%20(v2026-02-16-2324)" 
+                       style="color: #667eea; text-decoration: underline; font-weight: 600;">
                         Email Bug Report
                     </a>
                 </p>
@@ -4883,7 +4884,8 @@
                         <div style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-top: 15px; border-left: 3px solid #ffc107;">
                             <p style="margin: 0; font-size: 13px; color: #856404;">
                                 <strong>🧪 Beta Testing:</strong> Found a bug? 
-                                <a href="/cdn-cgi/l/email-protection#40273225273728212c2c6e3425232800272d21292c6e232f2d7f3335222a2523347d13252e292f3265727003213225657270032f2d30212e292f2e6572706d6572700235276572701225302f32346572706836727072766d70726d71766d7273727469" style="color: #667eea; text-decoration: underline; font-weight: 600;">
+                                <a href="mailto:gregwhall.tech@gmail.com?subject=Senior%20Care%20Companion%20-%20Bug%20Report%20(v2026-02-16-2324)" 
+                                   style="color: #667eea; text-decoration: underline; font-weight: 600;">
                                     Email Bug Report
                                 </a>
                             </p>
@@ -6107,6 +6109,28 @@
             // Hide floating buttons on logout
             document.getElementById('floatingHelpBtn').classList.add('hidden');
             document.getElementById('floatingVoiceBtn').classList.add('hidden');
+            
+            // BUGFIX: Hide ALL sections before showing login to prevent content bleeding
+            const allSections = ['home', 'medications', 'appointments', 'tasks', 'bills', 'contacts', 'activities', 'profile', 'settings', 'help'];
+            allSections.forEach(sectionName => {
+                const section = document.getElementById(sectionName);
+                if (section) {
+                    section.classList.remove('active');
+                }
+            });
+            
+            // Hide top tabs (Profile/Settings)
+            const topSections = ['profile', 'settings'];
+            topSections.forEach(sectionName => {
+                const section = document.getElementById(sectionName);
+                if (section) {
+                    section.classList.remove('active');
+                }
+            });
+            
+            // Reset navigation highlighting
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelectorAll('.top-nav button').forEach(btn => btn.classList.remove('active'));
             
             document.getElementById('mainApp').classList.add('hidden');
             document.getElementById('loginScreen').classList.remove('hidden');
