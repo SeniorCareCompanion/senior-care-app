@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-18-2209 UTC - BUGFIX: Enable Notifications Button + Enhanced Debugging  
-    BUILD DATE: February 18, 2026 at 10:09 PM UTC (Script cleanup: 10:15 PM)
-    CHANGES: Fixed Enable Notifications button not working, added comprehensive debugging and button state management, removed Cloudflare script
+    VERSION: 2026-02-18-2225 UTC - BUGFIX: Notification Toggle Always Green Issue  
+    BUILD DATE: February 18, 2026 at 10:25 PM UTC
+    CHANGES: Fixed notification button always showing as enabled, added proper localStorage initialization and toggle functionality
     
     🎯 UX IMPROVEMENT: BETA VERSION VISIBILITY
     
@@ -2187,7 +2187,7 @@
                     🧪 BETA TESTING VERSION
                 </p>
                 <p style="margin: 0 0 8px 0; font-size: 12px; color: #856404; font-family: monospace;">
-                    Build: 2026-02-18-2209 UTC
+                    Build: 2026-02-18-2225 UTC
                 </p>
                 <p style="margin: 0; font-size: 12px; color: #856404;">
                     Found a bug? 
@@ -5307,6 +5307,19 @@
             }
         })();
         let notificationsEnabled = false; // Track if push notifications are enabled
+        
+        // Initialize notifications preference from localStorage
+        function initializeNotificationsPreference() {
+            const saved = localStorage.getItem('notificationsEnabled');
+            if (saved !== null) {
+                notificationsEnabled = saved === 'true';
+                console.log('📱 Loaded notifications preference from storage:', notificationsEnabled);
+            } else {
+                // Default to true if browser permission is already granted
+                notificationsEnabled = Notification.permission === 'granted';
+                console.log('📱 No saved preference, defaulting to:', notificationsEnabled);
+            }
+        }
         let serviceWorkerRegistration = null; // Store service worker registration
         let pendingDeleteCategory = null;
         let pendingDeleteIndex = null;
@@ -5366,8 +5379,9 @@
             // Check current permission
             if (Notification.permission === 'granted') {
                 console.log('✅ Permission already granted');
-                notificationsEnabled = true;
+                // Don't automatically enable - respect user's saved preference
                 updateNotificationButton();
+                alert('✅ Browser permission is granted!\n\nYou can now toggle notifications on/off using the button below.');
                 return true;
             }
 
@@ -5386,6 +5400,7 @@
                 if (permission === 'granted') {
                     console.log('✅ Permission granted!');
                     notificationsEnabled = true;
+                    localStorage.setItem('notificationsEnabled', 'true');
                     updateNotificationButton();
                     alert('✅ Notifications Enabled!\n\nYou will now receive reminder notifications.\n\n📱 iOS Users: For best results, "Add to Home Screen" from Safari share menu.');
                     speak('Notifications enabled');
@@ -5407,19 +5422,32 @@
             const btn = document.getElementById('notificationToggleBtn');
             if (!btn) return;
             
-            if (Notification.permission === 'granted') {
-                btn.textContent = '✅ Notifications Enabled';
-                btn.className = 'btn btn-success';
-                btn.onclick = function() { 
-                    alert('✅ Notifications are already enabled!\n\nClick "Test Notification" below to test them.');
+            console.log('🔔 Updating notification button...');
+            console.log('  Browser permission:', Notification.permission);
+            console.log('  App notifications enabled:', notificationsEnabled);
+            
+            // If browser doesn't support notifications
+            if (!('Notification' in window)) {
+                btn.textContent = '❌ Not Supported';
+                btn.className = 'btn btn-secondary';
+                btn.onclick = function() {
+                    alert('❌ Notifications Not Supported\n\nYour browser does not support notifications.');
                 };
-            } else if (Notification.permission === 'denied') {
+                return;
+            }
+            
+            // If browser permission is denied
+            if (Notification.permission === 'denied') {
                 btn.textContent = '❌ Notifications Blocked';
                 btn.className = 'btn btn-danger';
                 btn.onclick = function() {
-                    alert('❌ Notifications are blocked.\n\nTo enable:\n1. Go to your browser settings\n2. Find this site\n3. Enable notifications\n4. Refresh the page');
+                    alert('❌ Notifications are blocked in your browser.\n\nTo enable:\n1. Go to your browser settings\n2. Find this site\n3. Enable notifications\n4. Refresh the page');
                 };
-            } else {
+                return;
+            }
+            
+            // If browser permission not granted yet
+            if (Notification.permission !== 'granted') {
                 btn.textContent = '🔔 Enable Notifications';
                 btn.className = 'btn btn-primary';
                 btn.onclick = function() {
@@ -5431,11 +5459,59 @@
                         alert('Error: ' + e.message); 
                     }
                 };
+                return;
+            }
+            
+            // Browser permission is granted - now show app-level toggle
+            if (notificationsEnabled) {
+                btn.textContent = '🔕 Turn Off Notifications';
+                btn.className = 'btn btn-warning';
+                btn.onclick = function() {
+                    console.log('🔕 Turning OFF notifications');
+                    notificationsEnabled = false;
+                    localStorage.setItem('notificationsEnabled', 'false');
+                    updateNotificationButton();
+                    speak('Notifications turned off');
+                };
+            } else {
+                btn.textContent = '🔔 Turn On Notifications';
+                btn.className = 'btn btn-success';
+                btn.onclick = function() {
+                    console.log('🔔 Turning ON notifications');
+                    notificationsEnabled = true;
+                    localStorage.setItem('notificationsEnabled', 'true');
+                    updateNotificationButton();
+                    speak('Notifications turned on');
+                };
             }
         }
         
         // Initialize notification button on page load
         window.updateNotificationButton = updateNotificationButton;
+        
+        // DEBUG: Test function to check notification state
+        function debugNotificationState() {
+            console.log('🔍 NOTIFICATION DEBUG:');
+            console.log('  Browser supports notifications:', 'Notification' in window);
+            console.log('  Browser permission:', Notification ? Notification.permission : 'N/A');
+            console.log('  App notificationsEnabled:', notificationsEnabled);
+            console.log('  LocalStorage value:', localStorage.getItem('notificationsEnabled'));
+            
+            const btn = document.getElementById('notificationToggleBtn');
+            if (btn) {
+                console.log('  Button text:', btn.textContent);
+                console.log('  Button class:', btn.className);
+            }
+            
+            alert(`🔍 Notification State Debug:
+            
+Browser Support: ${'Notification' in window ? 'YES' : 'NO'}
+Browser Permission: ${Notification ? Notification.permission : 'N/A'}
+App Enabled: ${notificationsEnabled}
+Saved Setting: ${localStorage.getItem('notificationsEnabled')}
+Button Text: ${btn ? btn.textContent : 'Not Found'}`);
+        }
+        window.debugNotificationState = debugNotificationState;
 
         // Show notification
         function showNotification(title, body, tag) {
@@ -10325,8 +10401,9 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                 
                 console.log('✅ Settings cards initialization complete');
                 
-                // Initialize notification button state
-                console.log('🔔 Updating notification button...');
+                // Initialize notification preferences and button state
+                console.log('🔔 Initializing notification preferences...');
+                initializeNotificationsPreference();
                 updateNotificationButton();
             }
             
