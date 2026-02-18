@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-18-2200 UTC - BUGFIX: Notifications Settings Button
-    BUILD DATE: February 18, 2026 at 10:00 PM UTC
-    CHANGES: Fixed Notifications settings card not responding to clicks, added debugging
+    VERSION: 2026-02-18-2209 UTC - BUGFIX: Enable Notifications Button + Enhanced Debugging  
+    BUILD DATE: February 18, 2026 at 10:09 PM UTC
+    CHANGES: Fixed Enable Notifications button not working, added comprehensive debugging and button state management
     
     🎯 UX IMPROVEMENT: BETA VERSION VISIBILITY
     
@@ -2187,7 +2187,7 @@
                     🧪 BETA TESTING VERSION
                 </p>
                 <p style="margin: 0 0 8px 0; font-size: 12px; color: #856404; font-family: monospace;">
-                    Build: 2026-02-18-2200 UTC
+                    Build: 2026-02-18-2209 UTC
                 </p>
                 <p style="margin: 0; font-size: 12px; color: #856404;">
                     Found a bug? 
@@ -4771,7 +4771,7 @@
                     <div id="settingsCard-notifications" class="card-content" style="display: block;">
                         <p style="margin-bottom: 15px;">Enable push notifications to receive reminders even when the app is in the background</p>
                         
-                        <button id="notificationToggleBtn" class="btn btn-primary" onclick="requestNotificationPermission()" style="width: 100%; max-width: 100%; margin-bottom: 15px;">
+                        <button id="notificationToggleBtn" class="btn btn-primary" onclick="console.log('🔔 Enable Notifications button clicked!'); try { requestNotificationPermission(); } catch(e) { console.error('Error in requestNotificationPermission:', e); alert('Error: ' + e.message); }" style="width: 100%; max-width: 100%; margin-bottom: 15px;">
                             🔔 Enable Notifications
                         </button>
                         
@@ -4862,10 +4862,10 @@
                                 Current Version
                             </p>
                             <p style="font-size: 20px; color: #38b2ac; margin: 0 0 5px 0; font-weight: 700; font-family: monospace;">
-                                2026-02-18-2200 UTC
+                                2026-02-18-2209 UTC
                             </p>
                             <p style="font-size: 13px; color: #718096; margin: 0;">
-                                February 18, 2026 at 10:00 PM
+                                February 18, 2026 at 10:09 PM
                             </p>
                         </div>
                         
@@ -4874,9 +4874,9 @@
                                 Latest Updates:
                             </p>
                             <p style="margin: 0; font-size: 13px; color: #4a5568; line-height: 1.6;">
-                                • Fixed Notifications Settings button not responding to clicks<br>
-                                • Added debugging tools for settings card issues<br>
-                                • Improved error handling for settings interactions
+                                • Fixed "Enable Notifications" button not working (was dummy button)<br>
+                                • Added comprehensive debugging for notification permission issues<br>
+                                • Button now shows status (Enabled/Blocked/Enable) and updates dynamically
                             </p>
                         </div>
                         
@@ -4936,17 +4936,17 @@
                         <!-- Latest Version -->
                         <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #667eea;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-18-2200 UTC</h4>
+                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-18-2209 UTC</h4>
                                 <span style="background: #48bb78; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">LATEST</span>
                             </div>
-                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 18, 2026 at 10:00 PM</p>
+                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 18, 2026 at 10:09 PM</p>
                             <div style="line-height: 1.8;">
-                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px; color: #667eea;">🐛 Bugfix: Notifications Settings Button</p>
+                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px; color: #667eea;">🐛 Bugfix: Enable Notifications Button + Enhanced Debugging</p>
                                 <ul style="margin: 5px 0; padding-left: 20px; font-size: 14px;">
-                                    <li><strong>Fixed:</strong> Notifications settings card not responding to clicks</li>
-                                    <li><strong>Added:</strong> Enhanced debugging for settings card interactions</li>
-                                    <li><strong>Added:</strong> Error handling to prevent silent JavaScript failures</li>
-                                    <li>Notifications card now starts in expanded state by default</li>
+                                    <li><strong>Fixed:</strong> "Enable Notifications" button not working (was dummy button)</li>
+                                    <li><strong>Added:</strong> Comprehensive notification permission debugging</li>
+                                    <li><strong>Added:</strong> Dynamic button state management (shows Enabled/Blocked/Enable)</li>
+                                    <li><strong>Fixed:</strong> Notifications settings card click issues from previous version</li>
                                 </ul>
                             </div>
                         </div>
@@ -5351,39 +5351,91 @@
         }
 
         async function requestNotificationPermission() {
+            console.log('🔔 requestNotificationPermission called');
+            
+            // Check if Notification API exists
             if (!('Notification' in window)) {
+                console.error('❌ Notification API not supported');
                 alert('❌ Notifications Not Supported\n\nYour browser does not support notifications.');
                 return false;
             }
+            
+            console.log('✅ Notification API is supported');
+            console.log('Current permission:', Notification.permission);
 
             // Check current permission
             if (Notification.permission === 'granted') {
+                console.log('✅ Permission already granted');
                 notificationsEnabled = true;
+                updateNotificationButton();
                 return true;
             }
 
             if (Notification.permission === 'denied') {
+                console.log('❌ Permission denied');
                 alert('❌ Notifications Blocked\n\nYou previously blocked notifications.\n\nTo enable:\n1. Go to your browser settings\n2. Find this site\n3. Enable notifications\n4. Refresh the page');
                 return false;
             }
 
             // Request permission
             try {
+                console.log('📝 Requesting notification permission...');
                 const permission = await Notification.requestPermission();
+                console.log('📋 Permission result:', permission);
+                
                 if (permission === 'granted') {
+                    console.log('✅ Permission granted!');
                     notificationsEnabled = true;
+                    updateNotificationButton();
                     alert('✅ Notifications Enabled!\n\nYou will now receive reminder notifications.\n\n📱 iOS Users: For best results, "Add to Home Screen" from Safari share menu.');
                     speak('Notifications enabled');
                     return true;
                 } else {
+                    console.log('⚠️ Permission not granted:', permission);
                     alert('⚠️ Notifications Not Enabled\n\nYou can enable them later in your browser settings.');
                     return false;
                 }
             } catch (error) {
-                console.error('Error requesting notification permission:', error);
+                console.error('❌ Error requesting notification permission:', error);
+                alert('❌ Error requesting permissions: ' + error.message);
                 return false;
             }
         }
+        
+        // Update notification button text based on status
+        function updateNotificationButton() {
+            const btn = document.getElementById('notificationToggleBtn');
+            if (!btn) return;
+            
+            if (Notification.permission === 'granted') {
+                btn.textContent = '✅ Notifications Enabled';
+                btn.className = 'btn btn-success';
+                btn.onclick = function() { 
+                    alert('✅ Notifications are already enabled!\n\nClick "Test Notification" below to test them.');
+                };
+            } else if (Notification.permission === 'denied') {
+                btn.textContent = '❌ Notifications Blocked';
+                btn.className = 'btn btn-danger';
+                btn.onclick = function() {
+                    alert('❌ Notifications are blocked.\n\nTo enable:\n1. Go to your browser settings\n2. Find this site\n3. Enable notifications\n4. Refresh the page');
+                };
+            } else {
+                btn.textContent = '🔔 Enable Notifications';
+                btn.className = 'btn btn-primary';
+                btn.onclick = function() {
+                    console.log('🔔 Enable Notifications button clicked!');
+                    try { 
+                        requestNotificationPermission(); 
+                    } catch(e) { 
+                        console.error('Error in requestNotificationPermission:', e); 
+                        alert('Error: ' + e.message); 
+                    }
+                };
+            }
+        }
+        
+        // Initialize notification button on page load
+        window.updateNotificationButton = updateNotificationButton;
 
         // Show notification
         function showNotification(title, body, tag) {
@@ -10272,6 +10324,10 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                 });
                 
                 console.log('✅ Settings cards initialization complete');
+                
+                // Initialize notification button state
+                console.log('🔔 Updating notification button...');
+                updateNotificationButton();
             }
             
             // Update top tab styling
