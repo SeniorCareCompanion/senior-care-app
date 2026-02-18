@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-17-0126 UTC - BUGFIX: Logout Content Bleeding + Orphaned Release Notes
-    BUILD DATE: February 17, 2026 at 1:26 AM UTC
-    CHANGES: Fixed Settings content appearing on login after logout, removed orphaned release notes
+    VERSION: 2026-02-18-2200 UTC - BUGFIX: Notifications Settings Button
+    BUILD DATE: February 18, 2026 at 10:00 PM UTC
+    CHANGES: Fixed Notifications settings card not responding to clicks, added debugging
     
     🎯 UX IMPROVEMENT: BETA VERSION VISIBILITY
     
@@ -2187,11 +2187,11 @@
                     🧪 BETA TESTING VERSION
                 </p>
                 <p style="margin: 0 0 8px 0; font-size: 12px; color: #856404; font-family: monospace;">
-                    Build: 2026-02-17-0126 UTC
+                    Build: 2026-02-18-2200 UTC
                 </p>
                 <p style="margin: 0; font-size: 12px; color: #856404;">
                     Found a bug? 
-                    <a href="mailto:gregwhall.tech@gmail.com?subject=Senior%20Care%20Companion%20-%20Bug%20Report%20(v2026-02-17-0126)" style="color: #667eea; text-decoration: underline; font-weight: 600;">
+                    <a href="/cdn-cgi/l/email-protection#2f485d4a4858474e4343015b4a4c476f48424e4643014c4042105c5a4d454a4c5b127c4a4146405d0a1d1f6c4e5d4a0a1d1f6c40425f4e414640410a1d1f020a1d1f6d5a480a1d1f7d4a5f405d5b0a1d1f07591d1f1d19021f1d021e18021f1e1d1906" style="color: #667eea; text-decoration: underline; font-weight: 600;">
                         Email Bug Report
                     </a>
                 </p>
@@ -4762,13 +4762,13 @@
 
 
                 <div class="card">
-                    <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="toggleSettingsCard('notifications')">
+                    <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="try { toggleSettingsCard('notifications'); } catch(e) { console.error('Error toggling notifications:', e); }">
                         <span>🔔 Notification Settings</span>
-                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;" title="Expand/Collapse" onclick="toggleSettingsCard('notifications'); event.stopPropagation();">
+                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: #e2e8f0; color: #333;" title="Expand/Collapse" onclick="try { toggleSettingsCard('notifications'); event.stopPropagation(); } catch(e) { console.error('Error toggling notifications:', e); }">
                             <span id="settings-toggle-icon-notifications">▲</span>
                         </button>
                     </div>
-                    <div id="settingsCard-notifications" class="card-content">
+                    <div id="settingsCard-notifications" class="card-content" style="display: block;">
                         <p style="margin-bottom: 15px;">Enable push notifications to receive reminders even when the app is in the background</p>
                         
                         <button id="notificationToggleBtn" class="btn btn-primary" onclick="requestNotificationPermission()" style="width: 100%; max-width: 100%; margin-bottom: 15px;">
@@ -4862,10 +4862,10 @@
                                 Current Version
                             </p>
                             <p style="font-size: 20px; color: #38b2ac; margin: 0 0 5px 0; font-weight: 700; font-family: monospace;">
-                                2026-02-17-0126 UTC
+                                2026-02-18-2200 UTC
                             </p>
                             <p style="font-size: 13px; color: #718096; margin: 0;">
-                                February 17, 2026 at 1:26 AM
+                                February 18, 2026 at 10:00 PM
                             </p>
                         </div>
                         
@@ -4874,16 +4874,16 @@
                                 Latest Updates:
                             </p>
                             <p style="margin: 0; font-size: 13px; color: #4a5568; line-height: 1.6;">
-                                • Fixed Settings content bleeding onto login page after logout<br>
-                                • Removed orphaned release notes (appeared on all pages)<br>
-                                • Fixed email links to work on Mac and all browsers
+                                • Fixed Notifications Settings button not responding to clicks<br>
+                                • Added debugging tools for settings card issues<br>
+                                • Improved error handling for settings interactions
                             </p>
                         </div>
                         
                         <div style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-top: 15px; border-left: 3px solid #ffc107;">
                             <p style="margin: 0; font-size: 13px; color: #856404;">
                                 <strong>🧪 Beta Testing:</strong> Found a bug? 
-                                <a href="mailto:gregwhall.tech@gmail.com?subject=Senior%20Care%20Companion%20-%20Bug%20Report%20(v2026-02-17-0126)" style="color: #667eea; text-decoration: underline; font-weight: 600;">
+                                <a href="/cdn-cgi/l/email-protection#0b6c796e6c7c636a6767257f6e68634b6c666a62672568646634787e69616e687f36586e656264792e393b486a796e2e393b4864667b6a656264652e393b262e393b497e6c2e393b596e7b64797f2e393b237d393b393d263b39263a3c263b3a393d22" style="color: #667eea; text-decoration: underline; font-weight: 600;">
                                     Email Bug Report
                                 </a>
                             </p>
@@ -4936,22 +4936,34 @@
                         <!-- Latest Version -->
                         <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #667eea;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-17-0126 UTC</h4>
+                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-18-2200 UTC</h4>
                                 <span style="background: #48bb78; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">LATEST</span>
                             </div>
-                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 17, 2026 at 1:26 AM</p>
+                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 18, 2026 at 10:00 PM</p>
                             <div style="line-height: 1.8;">
-                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px; color: #667eea;">🐛 Bugfix: Logout Content Bleeding + Orphaned Release Notes</p>
+                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px; color: #667eea;">🐛 Bugfix: Notifications Settings Button</p>
                                 <ul style="margin: 5px 0; padding-left: 20px; font-size: 14px;">
-                                    <li><strong>Fixed:</strong> Settings content no longer appears on login page after logout</li>
-                                    <li><strong>Fixed:</strong> Removed orphaned release notes that appeared on all pages</li>
-                                    <li><strong>Fixed:</strong> Email links now work properly on Mac (mailto: instead of obfuscated)</li>
-                                    <li>Logout function now properly clears all section states</li>
+                                    <li><strong>Fixed:</strong> Notifications settings card not responding to clicks</li>
+                                    <li><strong>Added:</strong> Enhanced debugging for settings card interactions</li>
+                                    <li><strong>Added:</strong> Error handling to prevent silent JavaScript failures</li>
+                                    <li>Notifications card now starts in expanded state by default</li>
                                 </ul>
                             </div>
                         </div>
 
                         <!-- Recent Updates -->
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-17-0126 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 17, 2026 at 1:26 AM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">🐛 Bugfix: Logout Content Bleeding + Orphaned Release Notes</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Fixed Settings content appearing on login after logout</li>
+                                    <li>Removed orphaned release notes (appeared on all pages)</li>
+                                    <li>Fixed email links to work on Mac and all browsers</li>
+                                </ul>
+                            </div>
+                        </div>
                         <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
                             <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-16-2324 UTC</h4>
                             <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 16, 2026 at 11:24 PM</p>
@@ -5243,7 +5255,7 @@
         }
     </style>
 
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // PWA Installation
         let deferredPrompt;
         
@@ -10101,21 +10113,62 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
 
         // Settings card toggle function
         function toggleSettingsCard(cardKey) {
+            console.log(`🔧 toggleSettingsCard called with: ${cardKey}`);
+            
             const contentDiv = document.getElementById(`settingsCard-${cardKey}`);
             const toggleIcon = document.getElementById(`settings-toggle-icon-${cardKey}`);
             
-            if (!contentDiv || !toggleIcon) return;
+            console.log(`  contentDiv found: ${contentDiv ? 'YES' : 'NO'}`);
+            console.log(`  toggleIcon found: ${toggleIcon ? 'YES' : 'NO'}`);
             
-            const isHidden = contentDiv.style.display === 'none';
-            contentDiv.style.display = isHidden ? '' : 'none';
+            if (!contentDiv || !toggleIcon) {
+                console.error(`❌ Missing elements for card: ${cardKey}`);
+                return;
+            }
+            
+            const currentDisplay = contentDiv.style.display;
+            const isHidden = currentDisplay === 'none';
+            
+            console.log(`  Current display: "${currentDisplay}"`);
+            console.log(`  Is hidden: ${isHidden}`);
+            
+            contentDiv.style.display = isHidden ? 'block' : 'none';
             toggleIcon.textContent = isHidden ? '▲' : '▼';
+            
+            console.log(`  New display: "${contentDiv.style.display}"`);
+            console.log(`  New icon: "${toggleIcon.textContent}"`);
             
             // Save state
             const minimizedSettings = JSON.parse(localStorage.getItem('minimizedSettings') || '{}');
             minimizedSettings[cardKey] = !isHidden;
             localStorage.setItem('minimizedSettings', JSON.stringify(minimizedSettings));
+            
+            console.log(`✅ toggleSettingsCard complete for: ${cardKey}`);
         }
         window.toggleSettingsCard = toggleSettingsCard;
+        
+        // Test function to debug settings cards
+        function debugSettingsCard(cardKey) {
+            console.log(`🔍 DEBUG: Checking settings card: ${cardKey}`);
+            const contentDiv = document.getElementById(`settingsCard-${cardKey}`);
+            const toggleIcon = document.getElementById(`settings-toggle-icon-${cardKey}`);
+            const headerDiv = document.querySelector(`[onclick*="toggleSettingsCard('${cardKey}')"]`);
+            
+            console.log(`  Content div: ${contentDiv ? 'FOUND' : 'NOT FOUND'}`);
+            console.log(`  Toggle icon: ${toggleIcon ? 'FOUND' : 'NOT FOUND'}`);  
+            console.log(`  Header div: ${headerDiv ? 'FOUND' : 'NOT FOUND'}`);
+            
+            if (contentDiv) {
+                console.log(`  Current display: "${contentDiv.style.display}"`);
+                console.log(`  Computed display: "${window.getComputedStyle(contentDiv).display}"`);
+                console.log(`  Visible: ${contentDiv.offsetHeight > 0 ? 'YES' : 'NO'}`);
+            }
+            
+            if (toggleIcon) {
+                console.log(`  Icon text: "${toggleIcon.textContent}"`);
+            }
+        }
+        window.debugSettingsCard = debugSettingsCard;
 
         // Expand all settings cards
         function expandAllSettingsCards() {
