@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-18-2225 UTC - BUGFIX: Notification Toggle Always Green Issue  
-    BUILD DATE: February 18, 2026 at 10:25 PM UTC
-    CHANGES: Fixed notification button always showing as enabled, added proper localStorage initialization and toggle functionality
+    VERSION: 2026-02-19-0028 UTC - FEATURE: Senior-Friendly Logout Confirmation  
+    BUILD DATE: February 19, 2026 at 12:28 AM UTC
+    CHANGES: Added logout confirmation modal to prevent accidental logouts, made logout button less prominent
     
     🎯 UX IMPROVEMENT: BETA VERSION VISIBILITY
     
@@ -2085,6 +2085,29 @@
             </div>
         </div>
 
+        <!-- Logout Confirmation Modal -->
+        <div id="logoutModal" class="emergency-modal hidden">
+            <div class="emergency-modal-content">
+                <div class="emergency-modal-icon" style="font-size: 80px; color: #f59e0b;">🚪</div>
+                <h2 style="color: #f59e0b; font-size: 28px; margin-bottom: 15px;">Log Out?</h2>
+                <p style="font-size: 20px; color: #555; margin-bottom: 25px; line-height: 1.6;">
+                    Are you sure you want to log out?<br><br>
+                    <span style="font-size: 16px; color: #666;">
+                        • You'll need to enter your username and password again<br>
+                        • Your information is safely saved and will be here when you return
+                    </span>
+                </p>
+                <div class="emergency-modal-buttons">
+                    <button class="emergency-cancel-btn" onclick="cancelLogout()" style="padding: 18px 30px; font-size: 20px; background: #48bb78; color: white; font-weight: 700; order: 1;">
+                        Stay Logged In
+                    </button>
+                    <button class="emergency-confirm-btn" onclick="confirmActualLogout()" style="padding: 16px 30px; font-size: 18px; background: #f59e0b; font-weight: 600; order: 2; animation: none;">
+                        Yes, Log Me Out
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Reminder Alert Modal -->
         <div id="reminderAlert" class="reminder-alert hidden">
             <div class="reminder-alert-content">
@@ -2187,7 +2210,7 @@
                     🧪 BETA TESTING VERSION
                 </p>
                 <p style="margin: 0 0 8px 0; font-size: 12px; color: #856404; font-family: monospace;">
-                    Build: 2026-02-18-2225 UTC
+                    Build: 2026-02-19-0028 UTC
                 </p>
                 <p style="margin: 0; font-size: 12px; color: #856404;">
                     Found a bug? 
@@ -2380,7 +2403,7 @@
                     <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                         <span id="userName">Welcome!</span>
                     </div>
-                    <button class="btn btn-danger" onclick="logout()" style="padding: 10px 20px; font-size: 14px; margin: 0;">Logout</button>
+                    <button class="btn btn-secondary" onclick="confirmLogout()" style="padding: 10px 20px; font-size: 14px; margin: 0; background-color: #6c757d; border-color: #6c757d;">Logout</button>
                 </div>
             </div>
 
@@ -4862,10 +4885,10 @@
                                 Current Version
                             </p>
                             <p style="font-size: 20px; color: #38b2ac; margin: 0 0 5px 0; font-weight: 700; font-family: monospace;">
-                                2026-02-18-2209 UTC
+                                2026-02-19-0028 UTC
                             </p>
                             <p style="font-size: 13px; color: #718096; margin: 0;">
-                                February 18, 2026 at 10:09 PM
+                                February 19, 2026 at 12:28 AM
                             </p>
                         </div>
                         
@@ -4874,9 +4897,9 @@
                                 Latest Updates:
                             </p>
                             <p style="margin: 0; font-size: 13px; color: #4a5568; line-height: 1.6;">
-                                • Fixed "Enable Notifications" button not working (was dummy button)<br>
-                                • Added comprehensive debugging for notification permission issues<br>
-                                • Button now shows status (Enabled/Blocked/Enable) and updates dynamically
+                                • Added logout confirmation modal to prevent accidental logouts<br>
+                                • Made logout button less prominent (changed from red to gray)<br>
+                                • Seniors now get clear "Stay Logged In" vs "Yes, Log Me Out" options
                             </p>
                         </div>
                         
@@ -4936,25 +4959,48 @@
                         <!-- Latest Version -->
                         <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #667eea;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-18-2209 UTC</h4>
+                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-19-0028 UTC</h4>
                                 <span style="background: #48bb78; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">LATEST</span>
                             </div>
-                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 18, 2026 at 10:09 PM</p>
+                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 19, 2026 at 12:28 AM</p>
                             <div style="line-height: 1.8;">
-                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px; color: #667eea;">🐛 Bugfix: Enable Notifications Button + Enhanced Debugging</p>
+                                <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px; color: #667eea;">✨ Feature: Senior-Friendly Logout Confirmation</p>
                                 <ul style="margin: 5px 0; padding-left: 20px; font-size: 14px;">
-                                    <li><strong>Fixed:</strong> "Enable Notifications" button not working (was dummy button)</li>
-                                    <li><strong>Added:</strong> Comprehensive notification permission debugging</li>
-                                    <li><strong>Added:</strong> Dynamic button state management (shows Enabled/Blocked/Enable)</li>
-                                    <li><strong>Fixed:</strong> Notifications settings card click issues from previous version</li>
+                                    <li><strong>Added:</strong> Logout confirmation modal to prevent accidental logouts</li>
+                                    <li><strong>Added:</strong> Clear "Stay Logged In" vs "Yes, Log Me Out" options</li>
+                                    <li><strong>Changed:</strong> Logout button from red (danger) to gray (less prominent)</li>
+                                    <li><strong>Added:</strong> Voice feedback for logout actions</li>
+                                    <li>Modal design follows senior-friendly principles (large text, clear buttons)</li>
                                 </ul>
                             </div>
                         </div>
 
                         <!-- Recent Updates -->
                         <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-18-2209 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 18, 2026 at 10:09 PM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">🐛 Bugfix: Enable Notifications Button + Enhanced Debugging</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Fixed "Enable Notifications" button not working</li>
+                                    <li>Added comprehensive notification permission debugging</li>
+                                    <li>Dynamic button state management</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
                             <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-02-17-0126 UTC</h4>
                             <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">February 17, 2026 at 1:26 AM</p>
+                            <div style="line-height: 1.6; font-size: 13px;">
+                                <p style="margin: 5px 0; font-weight: 600;">🐛 Bugfix: Logout Content Bleeding + Orphaned Release Notes</p>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>Fixed Settings content appearing on login after logout</li>
+                                    <li>Removed orphaned release notes (appeared on all pages)</li>
+                                    <li>Fixed email links to work on Mac and all browsers</li>
+                                </ul>
+                            </div>
+                        </div>
                             <div style="line-height: 1.6; font-size: 13px;">
                                 <p style="margin: 5px 0; font-weight: 600;">🐛 Bugfix: Logout Content Bleeding + Orphaned Release Notes</p>
                                 <ul style="margin: 5px 0; padding-left: 20px;">
@@ -6244,6 +6290,53 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             setTimeout(() => {
                 checkBackupReminder();
             }, 3000);
+        }
+
+        // Senior-friendly logout confirmation with modal
+        function confirmLogout() {
+            console.log('🚪 Logout confirmation requested');
+            
+            // Show the logout confirmation modal
+            const modal = document.getElementById('logoutModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                console.log('✅ Logout confirmation modal shown');
+            } else {
+                console.error('❌ Logout modal not found, falling back to browser confirm');
+                // Fallback to browser confirm if modal not found
+                const userConfirmed = confirm(
+                    "🚪 LOG OUT CONFIRMATION\n\n" +
+                    "Are you sure you want to log out?\n\n" +
+                    "• You will need to enter your username and password again\n" +
+                    "• Your data is saved and will be here when you return\n\n" +
+                    "Click OK to log out, or Cancel to stay logged in."
+                );
+                
+                if (userConfirmed) {
+                    logout();
+                }
+            }
+        }
+        
+        // Cancel logout - stay logged in
+        function cancelLogout() {
+            console.log('❌ User cancelled logout');
+            const modal = document.getElementById('logoutModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+            speak('Staying logged in');
+        }
+        
+        // Confirm actual logout
+        function confirmActualLogout() {
+            console.log('✅ User confirmed logout');
+            const modal = document.getElementById('logoutModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+            speak('Logging out');
+            logout();
         }
 
         function logout() {
