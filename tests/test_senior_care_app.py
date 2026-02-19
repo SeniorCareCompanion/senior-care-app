@@ -152,6 +152,7 @@ class TestSettingsCards(unittest.TestCase):
         "settingsCard-voiceSettings",
         "settingsCard-notifications",
         "settingsCard-dataManagement",
+        "settingsCard-appVersion",
         "settingsCard-releaseNotes",
         "settingsCard-aboutApp",
     ]
@@ -164,7 +165,7 @@ class TestSettingsCards(unittest.TestCase):
 
     def test_settings_toggle_icons_present(self):
         ids = get_element_ids()
-        for card_id in ["voiceSettings", "notifications", "dataManagement", "releaseNotes", "aboutApp"]:
+        for card_id in ["voiceSettings", "notifications", "dataManagement", "appVersion", "releaseNotes", "aboutApp"]:
             icon_id = f"settings-toggle-icon-{card_id}"
             with self.subTest(icon=icon_id):
                 self.assertIn(icon_id, ids, f"Missing settings toggle icon: #{icon_id}")
@@ -441,7 +442,133 @@ class TestKeyUIElements(unittest.TestCase):
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# TEST CLASS 11: AI Search Feature (Currently Disabled - Coming Soon)
+# TEST CLASS 12: Version Consistency  
+# ══════════════════════════════════════════════════════════════════════════════
+
+class TestVersionConsistency(unittest.TestCase):
+    """Verify version numbers are consistent across login page, settings, and release notes.
+    
+    Prevents the version sync bugs we've been experiencing during rapid development.
+    All version displays should match the authoritative version in the header comment.
+    """
+    
+    def _extract_header_version(self):
+        """Extract version from HTML header comment (authoritative source)."""
+        version_match = re.search(r'VERSION:\s*([0-9-]+\s+UTC)', RAW_HTML)
+        if not version_match:
+            self.fail("No VERSION found in header comment")
+        return version_match.group(1).strip()
+    
+    def _extract_login_banner_version(self):
+        """Extract version from login page beta banner."""
+        # Look for "Build: YYYY-MM-DD-HHMM UTC" in login banner
+        build_match = re.search(r'Build:\s*([0-9-]+\s+UTC)', RAW_HTML)
+        if not build_match:
+            self.fail("No build version found in login banner")
+        return build_match.group(1).strip()
+    
+    def _extract_settings_version(self):
+        """Extract version from Settings → App Version card."""
+        # Look for the Settings App Version card content
+        settings_pattern = r'Current Version.*?<p[^>]*>\s*([0-9-]+\s+UTC)\s*</p>'
+        settings_match = re.search(settings_pattern, RAW_HTML, re.DOTALL)
+        if not settings_match:
+            self.fail("No version found in Settings App Version card")
+        return settings_match.group(1).strip()
+    
+    def _extract_release_notes_latest_version(self):
+        """Extract version marked as LATEST in Release Notes."""
+        # Look for version near LATEST tag
+        latest_pattern = r'Version\s*([0-9-]+\s+UTC)[^>]*>.*?LATEST'
+        latest_match = re.search(latest_pattern, RAW_HTML, re.DOTALL)
+        if not latest_match:
+            self.fail("No LATEST version found in Release Notes")
+        return latest_match.group(1).strip()
+    
+    def _extract_email_bug_report_version(self):
+        """Extract version from email bug report subject lines."""
+        # Look for version in mailto subject  
+        email_pattern = r'subject=[^"]*v([0-9-]+)[^"]*'
+        email_match = re.search(email_pattern, RAW_HTML)
+        if not email_match:
+            self.fail("No version found in email bug report links")
+        return email_match.group(1).replace('-', '-') + ' UTC'  # Normalize format
+    
+    def test_header_version_exists(self):
+        """Header comment must contain authoritative version."""
+        version = self._extract_header_version()
+        self.assertRegex(version, r'^2026-\d\d-\d\d-\d\d\d\d UTC$',
+            f"Header version format invalid: {version}")
+    
+    def test_login_banner_matches_header(self):
+        """Login page beta banner version must match header."""
+        header_version = self._extract_header_version()
+        login_version = self._extract_login_banner_version()
+        self.assertEqual(header_version, login_version,
+            f"Login banner version ({login_version}) doesn't match header ({header_version})")
+    
+    def test_settings_version_matches_header(self):
+        """Settings App Version card must match header.""" 
+        header_version = self._extract_header_version()
+        settings_version = self._extract_settings_version()
+        self.assertEqual(header_version, settings_version,
+            f"Settings version ({settings_version}) doesn't match header ({header_version})")
+    
+    def test_release_notes_latest_matches_header(self):
+        """Release Notes LATEST version must match header."""
+        header_version = self._extract_header_version()
+        release_notes_version = self._extract_release_notes_latest_version()
+        self.assertEqual(header_version, release_notes_version,
+            f"Release Notes LATEST ({release_notes_version}) doesn't match header ({header_version})")
+    
+    def test_email_bug_report_version_matches_header(self):
+        """Email bug report subject versions must match header."""
+        header_version = self._extract_header_version()
+        email_version = self._extract_email_bug_report_version()
+        self.assertEqual(header_version, email_version,
+            f"Email bug report version ({email_version}) doesn't match header ({header_version})")
+    
+    def test_all_versions_identical(self):
+        """All version displays must be identical (comprehensive check)."""
+        header_version = self._extract_header_version()
+        login_version = self._extract_login_banner_version()
+        settings_version = self._extract_settings_version()
+        release_notes_version = self._extract_release_notes_latest_version()
+        email_version = self._extract_email_bug_report_version()
+        
+        versions = {
+            'Header': header_version,
+            'Login Banner': login_version,
+            'Settings Card': settings_version,
+            'Release Notes LATEST': release_notes_version,
+            'Email Bug Report': email_version
+        }
+        
+        # All should be the same
+        unique_versions = set(versions.values())
+        if len(unique_versions) != 1:
+            version_report = '\n'.join([f"  {location}: {version}" 
+                                      for location, version in versions.items()])
+            self.fail(f"Version mismatch found:\n{version_report}")
+    
+    def test_version_format_consistency(self):
+        """All versions should follow YYYY-MM-DD-HHMM UTC format."""
+        locations = [
+            ('Header', self._extract_header_version),
+            ('Login Banner', self._extract_login_banner_version),
+            ('Settings Card', self._extract_settings_version),
+            ('Release Notes', self._extract_release_notes_latest_version),
+        ]
+        
+        for location, extractor in locations:
+            with self.subTest(location=location):
+                version = extractor()
+                self.assertRegex(version, r'^2026-\d\d-\d\d-\d\d\d\d UTC$',
+                    f"{location} version format invalid: {version}")
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TEST CLASS 13: AI Search Feature (Currently Disabled - Coming Soon)
 # ══════════════════════════════════════════════════════════════════════════════
 
 class TestAISearchFeature(unittest.TestCase):
