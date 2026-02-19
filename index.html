@@ -1145,6 +1145,13 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Senior Care">
+    
+    <!-- Cache-busting headers to ensure latest version display -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">  
+    <meta http-equiv="Expires" content="0">
+    <meta name="app-version" content="2026-02-19-1820-UTC">
+    
     <title>Senior Care Companion</title>
     
     <!-- STANDALONE VERSION - No external files needed! -->
@@ -2214,7 +2221,7 @@
                 </p>
                 <p style="margin: 0; font-size: 12px; color: #856404;">
                     Found a bug? 
-                    <a href="mailto:gregwhall.tech@gmail.com?subject=Senior%20Care%20Companion%20-%20Bug%20Report%20(v2026-02-19-1820)" style="color: #667eea; text-decoration: underline; font-weight: 600;">
+                    <a href="/cdn-cgi/l/email-protection#dbbca9bebcacb3bab7b7f5afbeb8b39bbcb6bab2b7f5b8b4b6e4a8aeb9b1beb8afe688beb5b2b4a9fee9eb98baa9befee9eb98b4b6abbab5b2b4b5fee9ebf6fee9eb99aebcfee9eb89beabb4a9affee9ebf3ade9ebe9edf6ebe9f6eae2f6eae3e9ebf2" style="color: #667eea; text-decoration: underline; font-weight: 600;">
                         Email Bug Report
                     </a>
                 </p>
@@ -4906,7 +4913,7 @@
                         <div style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-top: 15px; border-left: 3px solid #ffc107;">
                             <p style="margin: 0; font-size: 13px; color: #856404;">
                                 <strong>🧪 Beta Testing:</strong> Found a bug? 
-                                <a href="mailto:gregwhall.tech@gmail.com?subject=Senior%20Care%20Companion%20-%20Bug%20Report%20(v2026-02-19-1820)" style="color: #667eea; text-decoration: underline; font-weight: 600;">
+                                <a href="/cdn-cgi/l/email-protection#2f485d4a4858474e4343015b4a4c476f48424e4643014c4042105c5a4d454a4c5b127c4a4146405d0a1d1f6c4e5d4a0a1d1f6c40425f4e414640410a1d1f020a1d1f6d5a480a1d1f7d4a5f405d5b0a1d1f07591d1f1d19021f1d021e16021e171d1f06" style="color: #667eea; text-decoration: underline; font-weight: 600;">
                                     Email Bug Report
                                 </a>
                             </p>
@@ -4955,14 +4962,14 @@
                                 💡 Check this Release Notes section below to see what's new in each version!
                             </p>
                         </div>
-                        
+                        <!-- CACHE-BUSTING TIMESTAMP: 2026-02-19-1820 -->
                         <!-- Latest Version -->
-                        <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #667eea;">
+                        <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 6px solid #48bb78; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                                <h4 style="margin: 0; color: #667eea;">Version 2026-02-19-1820 UTC</h4>
-                                <span style="background: #48bb78; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">LATEST</span>
+                                <h4 style="margin: 0; color: #667eea; font-size: 16px; font-weight: 700;">Version 2026-02-19-1820 UTC</h4>
+                                <span style="background: #48bb78; color: white; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: 700; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">✅ LATEST ✅</span>
                             </div>
-                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #718096;">February 19, 2026 at 6:20 PM</p>
+                            <p style="margin: 0 0 10px 0; font-size: 14px; color: #48bb78; font-weight: 600;">February 19, 2026 at 6:20 PM (CURRENT VERSION)</p>
                             <div style="line-height: 1.8;">
                                 <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px; color: #667eea;">🚨 EMERGENCY: Fixed Catastrophic JavaScript Corruption</p>
                                 <ul style="margin: 5px 0; padding-left: 20px; font-size: 14px;">
@@ -5331,7 +5338,16 @@
 
     <!-- IMPORTANT: Keep only ONE script tag! Cloudflare email-decode scripts keep reappearing and break tests. -->
     <!-- IMPORTANT: Keep only ONE script tag! Cloudflare email-decode scripts keep reappearing and break tests. -->
+    <!-- IMPORTANT: Keep only ONE script tag! Cloudflare email-decode scripts keep reappearing and break tests. -->
     <script>
+        // VERSION CHECK - Log current version on page load
+        console.log('🏷️ ═══════════════════════════════════════════════');
+        console.log('🏷️ SENIOR CARE COMPANION VERSION CHECK');
+        console.log('🏷️ CURRENT VERSION: 2026-02-19-1820 UTC');
+        console.log('🏷️ BUILD: February 19, 2026 at 6:20 PM');  
+        console.log('🏷️ STATUS: Latest version loaded successfully');
+        console.log('🏷️ ═══════════════════════════════════════════════');
+        
         // PWA Installation
         let deferredPrompt;
         
@@ -13639,15 +13655,4 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                     startReminderChecker();
                     console.log('✅ Reminder checker restarted');
                     
-                    // Check reminders immediately in case any were missed
-                    checkReminders();
-                    console.log('✅ Checked for missed reminders');
-                } else {
-                    console.log('ℹ️ No user logged in - skipping reminder restart');
-                }
-            }
-
-        });
-    </script>
-</body>
-</html>
+                    
