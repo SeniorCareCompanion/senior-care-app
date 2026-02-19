@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-19-0028 UTC - FEATURE: Senior-Friendly Logout Confirmation  
+    VERSION: 2026-02-19-0028 UTC - FEATURE: Senior-Friendly Logout Confirmation + Test Fix  
     BUILD DATE: February 19, 2026 at 12:28 AM UTC
-    CHANGES: Added logout confirmation modal to prevent accidental logouts, made logout button less prominent
+    CHANGES: Added logout confirmation modal to prevent accidental logouts, made logout button less prominent, fixed test compatibility
     
     🎯 UX IMPROVEMENT: BETA VERSION VISIBILITY
     
@@ -2403,7 +2403,7 @@
                     <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                         <span id="userName">Welcome!</span>
                     </div>
-                    <button class="btn btn-secondary" onclick="confirmLogout()" style="padding: 10px 20px; font-size: 14px; margin: 0; background-color: #6c757d; border-color: #6c757d;">Logout</button>
+                    <button id="logoutBtn" class="btn btn-secondary logout-button" onclick="logout()" data-testid="logout-button" data-action="logout" style="padding: 10px 20px; font-size: 14px; margin: 0; background-color: #6c757d; border-color: #6c757d;">Logout</button>
                 </div>
             </div>
 
@@ -6292,6 +6292,13 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             }, 3000);
         }
 
+        // Main logout function - goes through confirmation for user safety
+        // Tests and direct calls will trigger the confirmation modal
+        function logout() {
+            console.log('🚪 logout() called - showing confirmation');
+            confirmLogout();
+        }
+
         // Senior-friendly logout confirmation with modal
         function confirmLogout() {
             console.log('🚪 Logout confirmation requested');
@@ -6336,10 +6343,10 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                 modal.classList.add('hidden');
             }
             speak('Logging out');
-            logout();
+            actualLogout();
         }
 
-        function logout() {
+        function actualLogout() {
             currentUser = null;
             
             // Clear persisted session
