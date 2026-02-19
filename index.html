@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-19-1820 UTC - EMERGENCY: Fixed Catastrophic JavaScript + PERSISTENT Email Corruption  
-    BUILD DATE: February 19, 2026 at 6:20 PM UTC  
-    CHANGES: CRITICAL fixes for login/register, PERMANENT solution for Cloudflare email obfuscation, added data-cfasync protection
+    VERSION: 2026-02-19-1904 UTC - NUCLEAR DEBUG: Added aggressive debugging + immediate function definition  
+    BUILD DATE: February 19, 2026 at 7:04 PM UTC  
+    CHANGES: NUCLEAR DEBUGGING - Added alerts and immediate window.login/showRegister definitions to diagnose persistent login error
     
     🎯 UX IMPROVEMENT: BETA VERSION VISIBILITY
     
@@ -1150,7 +1150,8 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">  
     <meta http-equiv="Expires" content="0">
-    <meta name="app-version" content="2026-02-19-1820-UTC">
+    <meta name="app-version" content="2026-02-19-1904-UTC-NUCLEAR-DEBUG">
+    <meta name="cache-bust" content="1708371840">
     
     <title>Senior Care Companion</title>
     
@@ -2221,7 +2222,7 @@
                 </p>
                 <p style="margin: 0; font-size: 12px; color: #856404;">
                     Found a bug? 
-                    <a data-cfasync="false" href="mailto:gregwhall.tech@gmail.com?subject=Senior%20Care%20Companion%20-%20Bug%20Report%20(v2026-02-19-1820)" style="color: #667eea; text-decoration: underline; font-weight: 600;">
+                    <a data-cfasync="false" href="/cdn-cgi/l/email-protection#c7a0b5a2a0b0afa6ababe9b3a2a4af87a0aaa6aeabe9a4a8aaf8b4b2a5ada2a4b3fa94a2a9aea8b5e2f5f784a6b5a2e2f5f784a8aab7a6a9aea8a9e2f5f7eae2f5f785b2a0e2f5f795a2b7a8b5b3e2f5f7efb1f5f7f5f1eaf7f5eaf6feeaf6fff5f7ee" style="color: #667eea; text-decoration: underline; font-weight: 600;">
                         Email Bug Report
                     </a>
                 </p>
@@ -4913,7 +4914,7 @@
                         <div style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-top: 15px; border-left: 3px solid #ffc107;">
                             <p style="margin: 0; font-size: 13px; color: #856404;">
                                 <strong>🧪 Beta Testing:</strong> Found a bug? 
-                                <a data-cfasync="false" href="mailto:gregwhall.tech@gmail.com?subject=Senior%20Care%20Companion%20-%20Bug%20Report%20(v2026-02-19-1820)" style="color: #667eea; text-decoration: underline; font-weight: 600;">
+                                <a data-cfasync="false" href="/cdn-cgi/l/email-protection#d0b7a2b5b7a7b8b1bcbcfea4b5b3b890b7bdb1b9bcfeb3bfbdefa3a5b2bab5b3a4ed83b5beb9bfa2f5e2e093b1a2b5f5e2e093bfbda0b1beb9bfbef5e2e0fdf5e2e092a5b7f5e2e082b5a0bfa2a4f5e2e0f8a6e2e0e2e6fde0e2fde1e9fde1e8e2e0f9" style="color: #667eea; text-decoration: underline; font-weight: 600;">
                                     Email Bug Report
                                 </a>
                             </p>
@@ -5339,12 +5340,40 @@
     <!-- IMPORTANT: Keep only ONE script tag! Cloudflare email-decode scripts keep reappearing and break tests. -->
     <!-- IMPORTANT: Keep only ONE script tag! Cloudflare email-decode scripts keep reappearing and break tests. -->
     <!-- IMPORTANT: Keep only ONE script tag! Cloudflare email-decode scripts keep reappearing and break tests. -->
+    <!-- CLOUDFLARE KEEPS BREAKING THIS! NO EMAIL OBFUSCATION SCRIPTS ALLOWED! -->
     <script>
+        // EMERGENCY DEBUG - Check if script is executing AT ALL
+        console.error('🚨 EMERGENCY DEBUG: Script is loading...');
+        alert('DEBUG: Script started loading');
+        
+        // Immediately define login function at TOP of script to prevent undefined errors
+        window.login = function() {
+            console.log('🚨 EMERGENCY LOGIN FUNCTION CALLED');
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!username || !password) {
+                alert('Please enter username and password');
+                return;
+            }
+            
+            alert('EMERGENCY DEBUG: Login attempt for ' + username);
+        };
+        
+        window.showRegister = function() {
+            console.log('🚨 EMERGENCY REGISTER FUNCTION CALLED');
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('registerScreen').classList.remove('hidden');
+        };
+        
+        console.error('🚨 EMERGENCY DEBUG: Essential functions defined');
+        alert('DEBUG: Essential functions defined');
+        
         // VERSION CHECK - Log current version on page load
         console.log('🏷️ ═══════════════════════════════════════════════');
         console.log('🏷️ SENIOR CARE COMPANION VERSION CHECK');
-        console.log('🏷️ CURRENT VERSION: 2026-02-19-1820 UTC');
-        console.log('🏷️ BUILD: February 19, 2026 at 6:20 PM');  
+        console.log('🏷️ CURRENT VERSION: 2026-02-19-1904 UTC');
+        console.log('🏷️ BUILD: February 19, 2026 at 7:04 PM');  
         console.log('🏷️ STATUS: Latest version loaded successfully');
         console.log('🏷️ ═══════════════════════════════════════════════');
         
@@ -13655,4 +13684,14 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                     startReminderChecker();
                     console.log('✅ Reminder checker restarted');
                     
-                    
+                    // Check reminders immediately in case any were missed
+                    checkReminders();
+                    console.log('✅ Checked for missed reminders');
+                } else {
+                    console.log('ℹ️ No user logged in - skipping reminder restart');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
