@@ -492,7 +492,7 @@ class TestVersionConsistency(unittest.TestCase):
         email_match = re.search(email_pattern, RAW_HTML)
         if not email_match:
             self.fail("No version found in email bug report links")
-        return email_match.group(1).replace('-', '-') + ' UTC'  # Normalize format
+        return email_match.group(1) + ' UTC'  # Normalize format
     
     def test_header_version_exists(self):
         """Header comment must contain authoritative version."""
