@@ -1,0 +1,257 @@
+name: 🚀 Senior Care Companion - Test & Deploy
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  NODE_VERSION: '18'
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  # ════════════════════════════════════════════════════════════════════════════════
+  # QUALITY ASSURANCE - Run All Tests
+  # ════════════════════════════════════════════════════════════════════════════════
+  quality-assurance:
+    name: 🧪 Quality Assurance Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+      
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: 📦 Install Python Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        # Add any Python dependencies your tests need
+        pip install beautifulsoup4 lxml html5lib
+        
+    - name: 🧪 Run Senior Care Companion Test Suite
+      run: |
+        echo "🚀 Running Senior Care Companion Test Suite..."
+        cd tests
+        python test_senior_care_app.py index.html > test_results.txt 2>&1
+        
+        # Check if tests passed
+        if [ $? -eq 0 ]; then
+          echo "✅ ALL TESTS PASSED!"
+          echo "test_status=PASSED" >> $GITHUB_ENV
+        else
+          echo "❌ TESTS FAILED!"
+          echo "test_status=FAILED" >> $GITHUB_ENV
+          cat test_results.txt
+          exit 1
+        fi
+        
+    - name: 📊 Upload Test Results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: tests/test_results.txt
+        
+    - name: 💬 Comment Test Results on PR
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const testResults = fs.readFileSync('tests/test_results.txt', 'utf8');
+          const status = process.env.test_status;
+          
+          const emoji = status === 'PASSED' ? '✅' : '❌';
+          const body = `## ${emoji} Test Results
+          
+          **Status:** ${status}
+          
+          <details>
+          <summary>📋 Full Test Output</summary>
+          
+          \`\`\`
+          ${testResults}
+          \`\`\`
+          </details>
+          `;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: body
+          });
+
+  # ════════════════════════════════════════════════════════════════════════════════
+  # CRITICAL CHECKS - Verify No Catastrophic Issues
+  # ════════════════════════════════════════════════════════════════════════════════
+  critical-checks:
+    name: 🚨 Critical Safety Checks  
+    runs-on: ubuntu-latest
+    needs: quality-assurance
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+      
+    - name: 🔍 Check for Catastrophic Issues
+      run: |
+        echo "🔍 Running Critical Safety Checks..."
+        
+        # Check 1: Verify single script block (no Cloudflare interference)
+        script_count=$(grep -c '<script' index.html || true)
+        if [ "$script_count" -ne 1 ]; then
+          echo "❌ CRITICAL: Found $script_count script blocks, expected 1!"
+          echo "🚨 Cloudflare email obfuscation may have corrupted JavaScript!"
+          exit 1
+        fi
+        echo "✅ Script block count: $script_count (correct)"
+        
+        # Check 2: Verify JavaScript functions exist
+        if ! grep -q "function login()" index.html; then
+          echo "❌ CRITICAL: login() function not found!"
+          echo "🚨 Authentication will be broken!"
+          exit 1
+        fi
+        echo "✅ login() function: Found"
+        
+        if ! grep -q "function showRegister()" index.html; then
+          echo "❌ CRITICAL: showRegister() function not found!"  
+          echo "🚨 Registration will be broken!"
+          exit 1
+        fi
+        echo "✅ showRegister() function: Found"
+        
+        # Check 3: Verify file ends properly (not truncated)
+        if ! tail -1 index.html | grep -q "</html>"; then
+          echo "❌ CRITICAL: File doesn't end with </html>!"
+          echo "🚨 JavaScript may be truncated!"
+          exit 1
+        fi
+        echo "✅ File ending: Proper </html> tag found"
+        
+        # Check 4: Verify email bug report links work
+        mailto_count=$(grep -c 'mailto:' index.html || true)
+        if [ "$mailto_count" -lt 2 ]; then
+          echo "❌ CRITICAL: Expected 2 mailto links, found $mailto_count!"
+          echo "🚨 Email bug reporting may be broken!"
+          exit 1
+        fi
+        echo "✅ Email bug report links: $mailto_count found"
+        
+        # Check 5: Version consistency check
+        python3 << 'EOF'
+import re
+import sys
+
+with open('index.html', 'r') as f:
+    html = f.read()
+
+# Extract versions from different locations
+header_match = re.search(r'VERSION:\s*([0-9-]+\s+UTC)', html)
+email_match = re.search(r'subject=[^"]*v([0-9-]+)[^"]*', html)
+
+if not header_match:
+    print("❌ CRITICAL: No header version found!")
+    sys.exit(1)
+    
+if not email_match:
+    print("❌ CRITICAL: No email version found!")  
+    sys.exit(1)
+    
+header_version = header_match.group(1).strip()
+email_version = email_match.group(1) + ' UTC'
+
+if header_version != email_version:
+    print(f"❌ CRITICAL: Version mismatch!")
+    print(f"   Header: {header_version}")
+    print(f"   Email:  {email_version}")
+    sys.exit(1)
+
+print(f"✅ Version consistency: {header_version}")
+EOF
+        
+        echo ""
+        echo "🎉 ALL CRITICAL CHECKS PASSED!"
+        echo "✅ Build is SAFE for deployment to beta testers"
+
+  # ════════════════════════════════════════════════════════════════════════════════
+  # STAGING DEPLOYMENT - Deploy to Staging for Final Verification
+  # ════════════════════════════════════════════════════════════════════════════════
+  deploy-staging:
+    name: 🚧 Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [quality-assurance, critical-checks]
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    environment:
+      name: staging
+      url: https://your-staging-url.github.io
+      
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+      
+    - name: 🚧 Deploy to Staging
+      run: |
+        echo "🚧 Deploying to staging environment..."
+        # Add your staging deployment logic here
+        # This could be GitHub Pages, Netlify, Vercel, etc.
+        
+    - name: ✅ Staging Deployment Success
+      run: |
+        echo "✅ Successfully deployed to staging!"
+        echo "🔗 Staging URL: https://your-staging-url.github.io"
+        echo "🧪 Ready for manual testing before production deployment"
+
+  # ════════════════════════════════════════════════════════════════════════════════
+  # PRODUCTION DEPLOYMENT - Only After Manual Approval
+  # ════════════════════════════════════════════════════════════════════════════════
+  deploy-production:
+    name: 🚀 Deploy to Production
+    runs-on: ubuntu-latest  
+    needs: [quality-assurance, critical-checks]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: production
+      url: https://your-production-url.github.io
+      
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+      
+    - name: 🚀 Deploy to Production
+      run: |
+        echo "🚀 Deploying to production environment..."
+        echo "✅ All tests passed, critical checks completed"
+        # Add your production deployment logic here
+        
+    - name: 🎉 Production Deployment Success
+      run: |
+        echo "🎉 Successfully deployed to production!"
+        echo "✅ Beta testers now have access to the latest build"
+        echo "🔗 Production URL: https://your-production-url.github.io"
+
+  # ════════════════════════════════════════════════════════════════════════════════
+  # NOTIFICATION - Alert on Deployment Status  
+  # ════════════════════════════════════════════════════════════════════════════════
+  notify:
+    name: 📢 Deployment Notifications
+    runs-on: ubuntu-latest
+    needs: [deploy-production]
+    if: always()
+    
+    steps:
+    - name: 📢 Notify Deployment Status
+      run: |
+        if [ "${{ needs.deploy-production.result }}" == "success" ]; then
+          echo "✅ SUCCESS: New build deployed to production!"
+          echo "🧪 Beta testers can now access the latest version"
+        else
+          echo "❌ FAILED: Production deployment blocked"  
+          echo "🛡️ Beta testers protected from broken build"
+        fi
