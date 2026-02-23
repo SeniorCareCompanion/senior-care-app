@@ -31,8 +31,8 @@ echo ""
 # ════════════════════════════════════════════════════════════════════════════════
 echo -e "${YELLOW}🧪 Step 1: Running Full Test Suite${NC}"
 if [ -f "tests/test_senior_care_app.py" ]; then
-    cd tests
-    if python test_senior_care_app.py index.html > test_results.txt 2>&1; then
+    # # cd ..sts && # cd ..
+    if python3 tests/test_senior_care_app.py index.html > test_results.txt 2>&1; then
         echo -e "${GREEN}✅ All 51 tests PASSED!${NC}"
         passed_tests=$(grep -c "ok$" test_results.txt || echo "0")
         echo "   📊 Tests passed: $passed_tests"
@@ -44,7 +44,7 @@ if [ -f "tests/test_senior_care_app.py" ]; then
         echo -e "${RED}🚫 DEPLOYMENT BLOCKED - Fix test failures first!${NC}"
         exit 1
     fi
-    cd ..
+    # cd ..
 else
     echo -e "${YELLOW}⚠️ Test file not found, skipping automated tests${NC}"
 fi

@@ -1,0 +1,100 @@
+test_activity_form_fields_visible (__main__.TestAISearchFeature)
+Activity form fields should be immediately visible (no hidden container). ... ok
+test_ai_disclaimer_code_present (__main__.TestAISearchFeature)
+Disclaimer code should remain for when feature is enabled. ... ok
+test_ai_search_button_disabled_with_coming_soon (__main__.TestAISearchFeature)
+AI Search button must be present but disabled with 'Coming Soon' message. ... ok
+test_ai_search_javascript_functions_still_defined (__main__.TestAISearchFeature)
+JavaScript functions should remain for future use when backend is ready. ... ok
+test_ai_search_uses_anthropic_api_when_enabled (__main__.TestAISearchFeature)
+Verify API code is ready for when backend proxy is implemented. ... ok
+test_ai_search_uses_web_search_tool_when_enabled (__main__.TestAISearchFeature)
+Verify web_search tool code is ready for when backend is implemented. ... ok
+test_coming_soon_explanation_shown (__main__.TestAISearchFeature)
+Must show explanation of why AI Search is disabled. ... ok
+test_manual_add_activity_button_still_exists (__main__.TestAISearchFeature)
+Traditional add activity button must remain (regression check). ... ok
+test_manual_entry_button_exists_and_primary (__main__.TestAISearchFeature)
+Manual entry button must be available and highlighted as primary. ... ok
+test_source_url_code_present (__main__.TestAISearchFeature)
+Source URL display code should remain for when feature is enabled. ... ok
+test_about_app_single_card_wrapper (__main__.TestDuplicateDetection)
+About This App card header must be a direct child of exactly one .card div. ... ok
+test_no_double_card_about_app (__main__.TestDuplicateDetection)
+Regression: About This App previously had two nested <div class='card'> tags. ... ok
+test_no_duplicate_element_ids (__main__.TestDuplicateDetection)
+Regression: duplicate IDs cause silent JS bugs. ... ok
+test_file_exists (__main__.TestFileBasis) ... ok
+test_file_not_empty (__main__.TestFileBasis) ... ok
+test_has_doctype (__main__.TestFileBasis) ... ok
+test_has_title (__main__.TestFileBasis) ... ok
+test_has_version_comment (__main__.TestFileBasis) ... ok
+test_single_script_block (__main__.TestFileBasis)
+Warn if there are multiple <script> blocks (can cause issues). ... ok
+test_app_installed_flag_set_on_login (__main__.TestInstallationInstructions)
+appInstalled localStorage flag must be set after login. ... ok
+test_first_time_warning_exists (__main__.TestInstallationInstructions) ... ok
+test_installation_steps_present (__main__.TestInstallationInstructions) ... ok
+test_three_dots_step_present (__main__.TestInstallationInstructions)
+Regression: critical '3 dots' step was missing and caused confusion. ... ok
+test_warning_hidden_for_returning_users (__main__.TestInstallationInstructions)
+Warning must be hidden if appInstalled flag is set. ... ok
+test_required_functions_defined (__main__.TestJavaScriptFunctions) ... ok
+test_settings_initialization_in_show_top_section (__main__.TestJavaScriptFunctions)
+Settings cards must be initialized when Settings tab is clicked. ... ok
+test_show_top_section_uses_active_class (__main__.TestJavaScriptFunctions)
+Regression: showTopSection previously used 'hidden' instead of 'active'. ... ok
+test_emergency_section_present (__main__.TestKeyUIElements)
+Home page should have emergency/911 content. ... ok
+test_logout_button_present (__main__.TestKeyUIElements) ... ok
+test_required_ui_elements_exist (__main__.TestKeyUIElements) ... ok
+test_apple_mobile_web_app_capable (__main__.TestMobileUI)
+Must be marked as a PWA for iOS. ... ok
+test_release_notes_title_not_too_long (__main__.TestMobileUI)
+Regression: long title caused word-wrap on iPhone, pushing arrow left. ... ok
+test_viewport_meta_tag_present (__main__.TestMobileUI)
+Must have viewport meta tag for proper mobile rendering. ... ok
+test_all_nav_sections_exist (__main__.TestNavigation)
+Every section referenced in nav tabs must actually exist. ... ok
+test_main_nav_tabs_present (__main__.TestNavigation)
+Every main nav tab must exist. ... ok
+test_top_nav_profile_button (__main__.TestNavigation) ... ok
+test_top_nav_settings_button (__main__.TestNavigation) ... ok
+test_profile_cards_present (__main__.TestProfileCards) ... ok
+test_profile_toggle_icons_present (__main__.TestProfileCards) ... ok
+test_settings_cards_not_in_profile (__main__.TestProfileCards)
+Regression: cards that were moved to Settings must not re-appear in Profile. ... ok
+test_all_sections_present (__main__.TestRequiredSections) ... ok
+test_no_duplicate_settings_card_ids (__main__.TestSettingsCards)
+Every settingsCard- ID must appear exactly once. ... ok
+test_settings_cards_present (__main__.TestSettingsCards) ... ok
+test_settings_toggle_icons_present (__main__.TestSettingsCards) ... ok
+test_all_versions_identical (__main__.TestVersionConsistency)
+All version displays must be identical (comprehensive check). ... ok
+test_email_bug_report_version_matches_header (__main__.TestVersionConsistency)
+Email bug report subject versions must match header. ... ok
+test_header_version_exists (__main__.TestVersionConsistency)
+Header comment must contain authoritative version. ... ok
+test_login_banner_matches_header (__main__.TestVersionConsistency)
+Login page beta banner version must match header. ... ok
+test_release_notes_latest_matches_header (__main__.TestVersionConsistency)
+Release Notes LATEST version must match header. ... ok
+test_settings_version_matches_header (__main__.TestVersionConsistency)
+Settings App Version card must match header. ... ok
+test_version_format_consistency (__main__.TestVersionConsistency)
+All versions should follow YYYY-MM-DD-HHMM UTC format. ... ok
+
+----------------------------------------------------------------------
+Ran 51 tests in 0.087s
+
+OK
+
+🧪 Senior Care Companion - Test Suite
+📄 Testing: index.html
+═══════════════════════════════════════════════════════
+
+
+═══════════════════════════════════════════════════════
+✅ ALL 51 TESTS PASSED!
+═══════════════════════════════════════════════════════
+
