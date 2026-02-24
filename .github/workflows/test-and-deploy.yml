@@ -36,8 +36,8 @@ jobs:
     - name: 🧪 Run Senior Care Companion Test Suite
       run: |
         echo "🚀 Running Senior Care Companion Test Suite..."
-        cd tests
-        python test_senior_care_app.py index.html > test_results.txt 2>&1
+        # cd tests
+        python tests/test_senior_care_app.py index.html > test_results.txt 2>&1
         
         # Check if tests passed
         if [ $? -eq 0 ]; then
