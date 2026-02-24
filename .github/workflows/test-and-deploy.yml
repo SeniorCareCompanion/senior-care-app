@@ -146,35 +146,35 @@ jobs:
         
         # Check 5: Version consistency check
         python3 << 'EOF'
-import re
-import sys
-
-with open('index.html', 'r') as f:
-    html = f.read()
-
-# Extract versions from different locations
-header_match = re.search(r'VERSION:\s*([0-9-]+\s+UTC)', html)
-email_match = re.search(r'subject=[^"]*v([0-9-]+)[^"]*', html)
-
-if not header_match:
-    print("❌ CRITICAL: No header version found!")
-    sys.exit(1)
-    
-if not email_match:
-    print("❌ CRITICAL: No email version found!")  
-    sys.exit(1)
-    
-header_version = header_match.group(1).strip()
-email_version = email_match.group(1) + ' UTC'
-
-if header_version != email_version:
-    print(f"❌ CRITICAL: Version mismatch!")
-    print(f"   Header: {header_version}")
-    print(f"   Email:  {email_version}")
-    sys.exit(1)
-
-print(f"✅ Version consistency: {header_version}")
-EOF
+        import re
+        import sys
+        
+        with open('index.html', 'r') as f:
+            html = f.read()
+        
+        # Extract versions from different locations
+        header_match = re.search(r'VERSION:\s*([0-9-]+\s+UTC)', html)
+        email_match = re.search(r'subject=[^"]*v([0-9-]+)[^"]*', html)
+        
+        if not header_match:
+            print("❌ CRITICAL: No header version found!")
+            sys.exit(1)
+            
+        if not email_match:
+            print("❌ CRITICAL: No email version found!")  
+            sys.exit(1)
+            
+        header_version = header_match.group(1).strip()
+        email_version = email_match.group(1) + ' UTC'
+        
+        if header_version != email_version:
+            print(f"❌ CRITICAL: Version mismatch!")
+            print(f"   Header: {header_version}")
+            print(f"   Email:  {email_version}")
+            sys.exit(1)
+        
+        print(f"✅ Version consistency: {header_version}")
+        EOF
         
         echo ""
         echo "🎉 ALL CRITICAL CHECKS PASSED!"
