@@ -2567,7 +2567,7 @@
                     <div id="weeklyDayContainer" class="input-group hidden">
                         <label>Which day of the week?</label>
                         <select id="medWeeklyDay">
-index.html                            <option value="0">Sunday</option>
+                            <option value="0">Sunday</option>
                             <option value="1">Monday</option>
                             <option value="2">Tuesday</option>
                             <option value="3">Wednesday</option>
@@ -5307,8 +5307,7 @@ index.html                            <option value="0">Sunday</option>
     <!-- IMPORTANT: Keep only ONE script tag! Cloudflare email-decode scripts keep reappearing and break tests. -->
     <!-- STOP CLOUDFLARE EMAIL OBFUSCATION! IT BREAKS EVERYTHING! -->
     <!-- CLOUDFLARE EMAIL OBFUSCATION DISABLED - STOPS BREAKING JAVASCRIPT! -->
-    <!--script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>-->
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"><script>
         // VERSION CHECK - Log current version on page load
         console.log('🏷️ ═══════════════════════════════════════════════');
         console.log('🏷️ SENIOR CARE COMPANION VERSION CHECK');
@@ -6252,6 +6251,59 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             
             console.log('✅ Session restored successfully');
             return true;
+        }
+
+        function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!username || !password) {
+                alert('Please enter username and password');
+                return;
+            }
+
+            const users = loadData('users') || {};
+            
+            if (!users[username] || users[username].password !== password) {
+                alert('Invalid username or password');
+                return;
+            }
+
+            currentUser = username;
+            
+            // Persist session to localStorage to survive page reloads/sleep
+            localStorage.setItem('currentUser', username);
+            
+            // Mark that app has been successfully installed/setup
+            localStorage.setItem('appInstalled', 'true');
+            
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('userName').textContent = users[username].name;
+            
+            // Show floating help button (now that user is logged in)
+            document.getElementById('floatingHelpBtn').classList.remove('hidden');
+            
+            // Initialize voice button
+            const voiceBtn = document.getElementById('voiceToggleBtn');
+            if (voiceBtn) {
+                voiceBtn.textContent = '🔇 Voice OFF';
+                voiceBtn.classList.add('btn-primary');
+            }
+            
+            loadAllData();
+            loadVoicePreference(); // Load user's voice preference
+            initializeNotifications(); // Initialize notification system
+            speak(`Welcome back, ${users[username].name}`);
+            startReminderChecker(); // Start checking for reminders
+            
+            // Check if we should show "Add to Home Screen" modal
+            checkAndShowAddToHomeModal();
+            
+            // Check if backup reminder is due (after a short delay to let app load)
+            setTimeout(() => {
+                checkBackupReminder();
+            }, 3000);
         }
 
         // Main logout function - goes through confirmation for user safety
@@ -13641,8 +13693,8 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
         // Core Authentication Functions
         function login() {
             console.log('🔐 Login function called');
-            const username = document.getElementById('loginUsername').value;
-            const password = document.getElementById('loginPassword').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
             
             if (username && password) {
                 localStorage.setItem('isLoggedIn', 'true');
