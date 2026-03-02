@@ -2222,7 +2222,7 @@
                 </p>
                 <p style="margin: 0; font-size: 12px; color: #856404;">
                     Found a bug? 
-                    <a href="mailto:gregwhall.tech@gmail.com?subject=Senior%20Care%20Companion%20-%20Bug%20Report%20(v2026-03-02-1930)" style="color: #667eea; text-decoration: underline; font-weight: 600;">
+                    <a data-cfasync="false" data-email-obfuscation="disabled" class="cloudflare-email-protected" href="/cdn-cgi/l/email-protection#c8afbaadafbfa0a9a4a4e6bcadaba088afa5a9a1a4e6aba7a5f7bbbdaaa2adabbcf59bada6a1a7baedfaf88ba9baadedfaf88ba7a5b8a9a6a1a7a6edfaf8e5edfaf88abdafedfaf89aadb8a7babcedfaf8e0befaf8fafee5f8fae5faf9e5faf8fcfce1" style="color: #667eea; text-decoration: underline; font-weight: 600;">
                         Email Bug Report
                     </a>
                 </p>
@@ -4996,7 +4996,7 @@
                         <div style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-top: 15px; border-left: 3px solid #ffc107;">
                             <p style="margin: 0; font-size: 13px; color: #856404;">
                                 <strong>🧪 Beta Testing:</strong> Found a bug? 
-                                <a href="mailto:gregwhall.tech@gmail.com?subject=Senior%20Care%20Companion%20-%20Bug%20Report%20(v2026-03-02-1930)" style="color: #667eea; text-decoration: underline; font-weight: 600;">
+                                <a data-cfasync="false" data-email-obfuscation="disabled" class="cloudflare-email-protected" href="/cdn-cgi/l/email-protection#a3c4d1c6c4d4cbc2cfcf8dd7c6c0cbe3c4cec2cacf8dc0ccce9cd0d6c1c9c6c0d79ef0c6cdcaccd1869193e0c2d1c6869193e0ccced3c2cdcacccd8691938e869193e1d6c4869193f1c6d3ccd1d78691938bd5919391958e93918e91928e919397978a" style="color: #667eea; text-decoration: underline; font-weight: 600;">
                                     Email Bug Report
                                 </a>
                             </p>
@@ -5307,7 +5307,7 @@
     <!-- IMPORTANT: Keep only ONE script tag! Cloudflare email-decode scripts keep reappearing and break tests. -->
     <!-- STOP CLOUDFLARE EMAIL OBFUSCATION! IT BREAKS EVERYTHING! -->
     <!-- CLOUDFLARE EMAIL OBFUSCATION DISABLED - STOPS BREAKING JAVASCRIPT! -->
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"><script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // VERSION CHECK - Log current version on page load
         console.log('🏷️ ═══════════════════════════════════════════════');
         console.log('🏷️ SENIOR CARE COMPANION VERSION CHECK');
@@ -13658,7 +13658,7 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
             }
         });
 
-        // Vault Navigation Functions
+ // Vault Navigation Functions
         function showVaultSection(section) {
             console.log('🗂️ Switching to vault section:', section);
             
@@ -13680,322 +13680,4 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
             }
             
             // Highlight active nav button
-            const activeButton = document.getElementById('vault-nav-' + section);
-            if (activeButton) {
-                activeButton.style.opacity = '1';
-                activeButton.style.transform = 'scale(1.05)';
-            }
-            
-            // Voice announcement
-            speak(`Switched to ${section} section in The Vault`);
-        }
-
-        // Core Authentication Functions
-        function login() {
-            console.log('🔐 Login function called');
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            if (username && password) {
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('appInstalled', 'true');
-                localStorage.setItem('username', username);
-                
-                // Hide login section and show main app
-                document.getElementById('loginSection').style.display = 'none';
-                document.getElementById('mainApp').style.display = 'block';
-                
-                // Hide first-time warning for returning users
-                const warning = document.getElementById('firstTimeUserWarning');
-                if (warning) {
-                    warning.style.display = 'none';
-                }
-                
-                showTopSection('home');
-                speak('Login successful. Welcome to Senior Care Companion');
-                
-                // Initialize dashboard
-                if (typeof displayTodaysReminders === 'function') {
-                    displayTodaysReminders();
-                }
-                
-                return true;
-            } else {
-                speak('Please enter both username and password');
-                return false;
-            }
-        }
-
-        function logout() {
-            console.log('🚪 Logout function called');
-            localStorage.setItem('isLoggedIn', 'false');
-            localStorage.removeItem('username');
-            
-            // Show login section and hide main app
-            document.getElementById('loginSection').style.display = 'block';
-            document.getElementById('mainApp').style.display = 'none';
-            
-            // Show first-time warning again
-            const warning = document.getElementById('firstTimeUserWarning');
-            if (warning && localStorage.getItem('appInstalled') !== 'true') {
-                warning.style.display = 'block';
-            }
-            
-            speak('You have been logged out');
-        }
-
-        function register() {
-            console.log('📝 Register function called');
-            speak('Registration feature coming soon. Please contact support for account creation.');
-        }
-
-        function showRegister() {
-            console.log('📝 Show register called');
-            speak('Registration coming soon');
-        }
-
-        // Core Navigation Functions
-        function showSection(sectionName) {
-            console.log('📱 Showing section:', sectionName);
-            
-            document.querySelectorAll('.section').forEach(section => {
-                section.classList.remove('active');
-            });
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-
-            const section = document.getElementById(sectionName);
-            if (section) {
-                section.classList.add('active');
-                section.classList.add('fade-in');
-            }
-            
-            // Find and activate the corresponding tab
-            const tabs = document.querySelectorAll('.nav-tab');
-            tabs.forEach(tab => {
-                if (tab.textContent.toLowerCase().includes(sectionName.split('-')[0])) {
-                    tab.classList.add('active');
-                }
-            });
-            
-            // Reset top tab styling when showing main sections
-            const topTabs = document.querySelectorAll('.top-nav-tab');
-            topTabs.forEach(tab => {
-                tab.style.background = 'rgba(255,255,255,0.25)';
-                tab.style.color = 'white';
-                tab.style.boxShadow = 'none';
-            });
-            
-            // Simplified voice announcements
-            const sectionNames = {
-                'home': 'Home',
-                'medications': 'Medications',
-                'appointments': 'Appointments',
-                'tasks': 'Tasks',
-                'bills': 'Bills',
-                'activities': 'Activities',
-                'contacts': 'Contacts',
-                'help': 'Help',
-                'vault': 'The Vault',
-                'profile': 'Profile',
-                'settings': 'Settings'
-            };
-            
-            speak(sectionNames[sectionName] || sectionName);
-        }
-
-        // Profile and Settings Card Functions
-        function toggleProfileCard(cardName) {
-            console.log('👤 Toggle profile card:', cardName);
-            const contentDiv = document.getElementById(`profileCard-${cardName}`);
-            const toggleIcon = document.getElementById(`profile-toggle-icon-${cardName}`);
-            
-            if (contentDiv && toggleIcon) {
-                const isHidden = contentDiv.style.display === 'none';
-                contentDiv.style.display = isHidden ? 'block' : 'none';
-                toggleIcon.textContent = isHidden ? '▲' : '▼';
-                
-                const minimized = JSON.parse(localStorage.getItem('minimizedProfile') || '{}');
-                minimized[cardName] = !isHidden;
-                localStorage.setItem('minimizedProfile', JSON.stringify(minimized));
-            }
-        }
-
-        function toggleSettingsCard(cardName) {
-            console.log('⚙️ Toggle settings card:', cardName);
-            const contentDiv = document.getElementById(`settingsCard-${cardName}`);
-            const toggleIcon = document.getElementById(`settings-toggle-icon-${cardName}`);
-            
-            if (contentDiv && toggleIcon) {
-                const isHidden = contentDiv.style.display === 'none';
-                contentDiv.style.display = isHidden ? 'block' : 'none';
-                toggleIcon.textContent = isHidden ? '▲' : '▼';
-                
-                const minimized = JSON.parse(localStorage.getItem('minimizedSettings') || '{}');
-                minimized[cardName] = !isHidden;
-                localStorage.setItem('minimizedSettings', JSON.stringify(minimized));
-            }
-        }
-
-        function expandAllProfileCards() {
-            console.log('👤 Expand all profile cards');
-            const profileCards = ['basicInfo', 'emergencyContacts', 'medicalInfo'];
-            profileCards.forEach(cardKey => {
-                const contentDiv = document.getElementById(`profileCard-${cardKey}`);
-                const toggleIcon = document.getElementById(`profile-toggle-icon-${cardKey}`);
-                
-                if (contentDiv && toggleIcon) {
-                    contentDiv.style.display = 'block';
-                    toggleIcon.textContent = '▲';
-                }
-            });
-            localStorage.setItem('minimizedProfile', JSON.stringify({}));
-        }
-
-        function collapseAllProfileCards() {
-            console.log('👤 Collapse all profile cards');
-            const profileCards = ['basicInfo', 'emergencyContacts', 'medicalInfo'];
-            const minimized = {};
-            
-            profileCards.forEach(cardKey => {
-                const contentDiv = document.getElementById(`profileCard-${cardKey}`);
-                const toggleIcon = document.getElementById(`profile-toggle-icon-${cardKey}`);
-                
-                if (contentDiv && toggleIcon) {
-                    contentDiv.style.display = 'none';
-                    toggleIcon.textContent = '▼';
-                    minimized[cardKey] = true;
-                }
-            });
-            localStorage.setItem('minimizedProfile', JSON.stringify(minimized));
-        }
-
-        function expandAllSettingsCards() {
-            console.log('⚙️ Expand all settings cards');
-            const settingsCards = ['voiceSettings', 'notifications', 'dataManagement', 'appVersion', 'releaseNotes', 'aboutApp'];
-            settingsCards.forEach(cardKey => {
-                const contentDiv = document.getElementById(`settingsCard-${cardKey}`);
-                const toggleIcon = document.getElementById(`settings-toggle-icon-${cardKey}`);
-                
-                if (contentDiv && toggleIcon) {
-                    contentDiv.style.display = 'block';
-                    toggleIcon.textContent = '▲';
-                }
-            });
-            localStorage.setItem('minimizedSettings', JSON.stringify({}));
-        }
-
-        function collapseAllSettingsCards() {
-            console.log('⚙️ Collapse all settings cards');
-            const settingsCards = ['voiceSettings', 'notifications', 'dataManagement', 'appVersion', 'releaseNotes', 'aboutApp'];
-            const minimized = {};
-            
-            settingsCards.forEach(cardKey => {
-                const contentDiv = document.getElementById(`settingsCard-${cardKey}`);
-                const toggleIcon = document.getElementById(`settings-toggle-icon-${cardKey}`);
-                
-                if (contentDiv && toggleIcon) {
-                    contentDiv.style.display = 'none';
-                    toggleIcon.textContent = '▼';
-                    minimized[cardKey] = true;
-                }
-            });
-            localStorage.setItem('minimizedSettings', JSON.stringify(minimized));
-        }
-
-        // Voice and Speak Function
-        function speak(text) {
-            console.log('🗣️ Speaking:', text);
-            const voiceEnabled = localStorage.getItem('voiceEnabled') !== 'false';
-            
-            if (voiceEnabled && 'speechSynthesis' in window) {
-                try {
-                    const utterance = new SpeechSynthesisUtterance(text);
-                    speechSynthesis.speak(utterance);
-                } catch (error) {
-                    console.log('Voice not available:', error);
-                }
-            }
-        }
-
-        // Data Management Functions
-        function saveData(key, data) {
-            try {
-                localStorage.setItem(key, JSON.stringify(data));
-                return true;
-            } catch (error) {
-                console.error('Save error:', error);
-                return false;
-            }
-        }
-
-        function loadData(key, defaultValue = null) {
-            try {
-                const data = localStorage.getItem(key);
-                return data ? JSON.parse(data) : defaultValue;
-            } catch (error) {
-                console.error('Load error:', error);
-                return defaultValue;
-            }
-        }
-
-        function loadAllData() {
-            console.log('📊 Loading all data');
-            // This function loads all app data - implementation depends on data structure
-            return {
-                medications: loadData('medications', []),
-                appointments: loadData('appointments', []),
-                tasks: loadData('tasks', []),
-                contacts: loadData('contacts', [])
-            };
-        }
-
-        function updateDashboard() {
-            console.log('🏠 Updating dashboard');
-            // Dashboard update logic would go here
-            if (typeof displayTodaysReminders === 'function') {
-                displayTodaysReminders();
-            }
-        }
-
-        // AI Search Functions (kept for future use)
-        function searchActivityWithAI(query) {
-            console.log('🤖 AI Search called with query:', query);
-            speak('AI search feature coming soon with backend integration');
-            
-            // Future implementation will use:
-            // fetch("https://api.anthropic.com/v1/messages", {...})
-            // with web_search tool and data.source display
-            
-            // AI Disclaimer code for when feature is enabled
-            const disclaimer = "AI suggestions should be reviewed with healthcare providers";
-            
-            // Placeholder for web_search integration
-            const webSearchResults = "web_search functionality ready for backend";
-            
-            // Source URL handling for when feature is active
-            if (typeof data !== 'undefined' && data.source) {
-                console.log('Source URL:', data.source);
-            }
-            
-            return {
-                message: "AI search coming soon",
-                disclaimer: disclaimer,
-                webSearch: webSearchResults
-            };
-        }
-
-        // Global function exposure for external access
-        window.login = login;
-        window.logout = logout;
-        window.showSection = showSection;
-        window.showTopSection = showTopSection;
-        window.showVaultSection = showVaultSection;
-
-        console.log('🏷️ CURRENT VERSION: 2026-03-02-1930 UTC');
-        console.log('✅ Senior Care Companion JavaScript initialized successfully');
-        
-    </script>
-</body>
-</html>
+            const activeButton = document.ge
