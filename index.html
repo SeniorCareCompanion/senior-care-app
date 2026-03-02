@@ -2059,6 +2059,15 @@
         .section:not(.active) {
             display: none !important;
         }
+        
+        /* Explicitly hide help section unless it has active class */
+        #help {
+            display: none !important;
+        }
+        
+        #help.active {
+            display: block !important;
+        }
 
     </style>
 </head>
