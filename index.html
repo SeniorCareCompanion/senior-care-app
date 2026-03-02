@@ -6255,59 +6255,6 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             return true;
         }
 
-        function login() {
-            const username = document.getElementById('loginUsername').value;
-            const password = document.getElementById('loginPassword').value;
-
-            if (!username || !password) {
-                alert('Please enter username and password');
-                return;
-            }
-
-            const users = loadData('users') || {};
-            
-            if (!users[username] || users[username].password !== password) {
-                alert('Invalid username or password');
-                return;
-            }
-
-            currentUser = username;
-            
-            // Persist session to localStorage to survive page reloads/sleep
-            localStorage.setItem('currentUser', username);
-            
-            // Mark that app has been successfully installed/setup
-            localStorage.setItem('appInstalled', 'true');
-            
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('mainApp').classList.remove('hidden');
-            document.getElementById('userName').textContent = users[username].name;
-            
-            // Show floating help button (now that user is logged in)
-            document.getElementById('floatingHelpBtn').classList.remove('hidden');
-            
-            // Initialize voice button
-            const voiceBtn = document.getElementById('voiceToggleBtn');
-            if (voiceBtn) {
-                voiceBtn.textContent = '🔇 Voice OFF';
-                voiceBtn.classList.add('btn-primary');
-            }
-            
-            loadAllData();
-            loadVoicePreference(); // Load user's voice preference
-            initializeNotifications(); // Initialize notification system
-            speak(`Welcome back, ${users[username].name}`);
-            startReminderChecker(); // Start checking for reminders
-            
-            // Check if we should show "Add to Home Screen" modal
-            checkAndShowAddToHomeModal();
-            
-            // Check if backup reminder is due (after a short delay to let app load)
-            setTimeout(() => {
-                checkBackupReminder();
-            }, 3000);
-        }
-
         // Main logout function - goes through confirmation for user safety
         // Tests and direct calls will trigger the confirmation modal
         function logout() {
