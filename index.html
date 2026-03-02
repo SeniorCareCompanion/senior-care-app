@@ -13702,7 +13702,7 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                 localStorage.setItem('username', username);
                 
                 // Hide login section and show main app
-                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('mainApp').style.display = 'block';
                 
                 // Hide first-time warning for returning users
@@ -13732,7 +13732,7 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
             localStorage.removeItem('username');
             
             // Show login section and hide main app
-            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('loginScreen').style.display = 'block';
             document.getElementById('mainApp').style.display = 'none';
             
             // Show first-time warning again
