@@ -13652,7 +13652,7 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                 
                 // Hide login section and show main app
                 document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('mainApp').style.display = 'block';
+                document.getElementById('mainApp').classList.remove('hidden');
                 
                 // Hide first-time warning for returning users
                 const warning = document.getElementById('firstTimeUserWarning');
@@ -13682,7 +13682,7 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
             
             // Show login section and hide main app
             document.getElementById('loginScreen').style.display = 'block';
-            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('mainApp').classList.add('hidden');
             
             // Show first-time warning again
             const warning = document.getElementById('firstTimeUserWarning');
