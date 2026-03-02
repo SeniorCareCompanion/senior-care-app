@@ -2434,6 +2434,7 @@
                 <button class="nav-tab" onclick="showSection('activities')">🎉 Activities</button>
                 <button class="nav-tab" onclick="showSection('contacts')">📞 Contacts</button>
                 <button class="nav-tab" onclick="showSection('help')">❓ Help</button>
+                <button class="nav-tab" onclick="showSection('vault')">🗂️ The Vault</button>
             </div>
 
             <!-- Home Section -->
@@ -3336,6 +3337,85 @@
                         <p style="margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">Type a keyword to find help instantly</p>
                     </div>
                 </div>
+
+            <!-- The Vault Section -->
+            <div id="vault" class="section">
+             <h2 class="section-title">🗂️ The Vault</h2>
+
+             <!-- Vault Navigation Buttons -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 25px 0;">
+        <button onclick="showVaultSection('recipes')" 
+                class="vault-nav-btn" 
+                id="vault-nav-recipes"
+                style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+            <div style="font-size: 28px; margin-bottom: 10px;">🍳</div>
+            <div>Recipes</div>
+        </button>
+        <button onclick="showVaultSection('grocery')" 
+                class="vault-nav-btn" 
+                id="vault-nav-grocery"
+                style="padding: 20px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+            <div style="font-size: 28px; margin-bottom: 10px;">🛒</div>
+            <div>Grocery List</div>
+        </button>
+        <button onclick="showVaultSection('passwords')" 
+                class="vault-nav-btn" 
+                id="vault-nav-passwords"
+                style="padding: 20px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+            <div style="font-size: 28px; margin-bottom: 10px;">🔐</div>
+            <div>Passwords</div>
+        </button>
+    </div>
+
+    <!-- Vault Content Areas -->
+    <div id="vault-content">
+        <!-- Recipes Section -->
+        <div id="vault-recipes" class="vault-subsection" style="display: block;">
+            <div class="card">
+                <div class="card-content" style="text-align: center; padding: 40px;">
+                    <div style="font-size: 48px; margin-bottom: 20px;">🍳</div>
+                    <h3 style="color: #667eea; margin-bottom: 15px;">Recipes Coming Soon!</h3>
+                    <p style="color: #718096; font-size: 16px;">
+                        Store your favorite family recipes with ingredients and instructions
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grocery List Section -->
+        <div id="vault-grocery" class="vault-subsection" style="display: none;">
+            <div class="card">
+                <div class="card-content" style="text-align: center; padding: 40px;">
+                    <div style="font-size: 48px; margin-bottom: 20px;">🛒</div>
+                    <h3 style="color: #f5576c; margin-bottom: 15px;">Grocery List Coming Soon!</h3>
+                    <p style="color: #718096; font-size: 16px;">
+                        Create shopping lists with items and quantities
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Passwords Section -->
+        <div id="vault-passwords" class="vault-subsection" style="display: none;">
+            <div class="card">
+                <div class="card-content" style="text-align: center; padding: 40px;">
+                    <div style="font-size: 48px; margin-bottom: 20px;">🔐</div>
+                    <h3 style="color: #4facfe; margin-bottom: 15px;">Passwords Coming Soon!</h3>
+                    <p style="color: #718096; font-size: 16px;">
+                        Securely store your important passwords
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+               <div class="card-content">
+                 <h3>Coming Soon!</h3>
+                 <p>Recipes, grocery lists, and secure passwords will be available here.</p>
+               </div>
+            </div>
+          </div>
 
                 <!-- Search Results (hidden by default) -->
                 <div id="searchResults" class="hidden" style="margin-bottom: 20px;"></div>
@@ -13549,6 +13629,39 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                 }
             }
         });
+
+ // Vault Navigation Functions
+        function showVaultSection(section) {
+            console.log('🗂️ Switching to vault section:', section);
+            
+            // Hide all vault subsections
+            const subsections = document.querySelectorAll('.vault-subsection');
+            subsections.forEach(sub => sub.style.display = 'none');
+            
+            // Reset all vault nav buttons
+            const navButtons = document.querySelectorAll('.vault-nav-btn');
+            navButtons.forEach(btn => {
+                btn.style.opacity = '0.7';
+                btn.style.transform = 'scale(1)';
+            });
+            
+            // Show selected subsection
+            const targetSection = document.getElementById('vault-' + section);
+            if (targetSection) {
+                targetSection.style.display = 'block';
+            }
+            
+            // Highlight active nav button
+            const activeButton = document.getElementById('vault-nav-' + section);
+            if (activeButton) {
+                activeButton.style.opacity = '1';
+                activeButton.style.transform = 'scale(1.05)';
+            }
+            
+            // Voice announcement
+            speak(`Switched to ${section} section in The Vault`);
+        }
+
     </script>
 </body>
 </html>
