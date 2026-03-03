@@ -13715,6 +13715,15 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
             if (section) {
                 section.classList.add('active');
                 section.classList.add('fade-in');
+                
+                // If this is the help section, make sure buttons are visible
+                if (sectionName === 'help') {
+                    const quickAccessButtons = document.getElementById('quickAccessButtons');
+                    if (quickAccessButtons) {
+                        quickAccessButtons.style.display = 'grid';
+                        console.log('✅ Showing quick access buttons for Help tab');
+                    }
+                }
             }
             
             // Find and activate the corresponding tab
