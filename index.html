@@ -2075,6 +2075,19 @@
             overflow: visible !important;
         }
         
+        /* Hide quick access buttons when help is not active */
+        #help:not(.active) #quickAccessButtons {
+            display: none !important;
+        }
+        
+        #quickAccessButtons {
+            display: none !important;
+        }
+        
+        #help.active #quickAccessButtons {
+            display: grid !important;
+        }
+        
         /* Hide all help topic sections by default */
         .help-topic-section {
             display: none !important;
@@ -3453,7 +3466,7 @@
                 <div id="searchResults" class="hidden" style="margin-bottom: 20px;"></div>
 
                 <!-- Quick Access Buttons -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px;">
+                <div id="quickAccessButtons" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px;">
                     <button class="btn btn-info" onclick="showHelpTopic('getting-started')" style="padding: 15px; font-size: 16px;">
                         🚀 Getting Started
                     </button>
