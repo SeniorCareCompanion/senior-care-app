@@ -13614,6 +13614,12 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
 
         // Vault Navigation Functions
         function showVaultSection(section) {
+            // Hide quick access buttons in Vault
+            const quickAccessButtons = document.getElementById('quickAccessButtons');
+            if (quickAccessButtons) {
+                quickAccessButtons.style.display = 'none';
+            }
+            
             console.log('🗂️ Switching to vault section:', section);
             
             // Hide all vault subsections
