@@ -4,9 +4,9 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-03-02-2230 UTC - Added "The Vault" feature with navigation restructure  
-    BUILD DATE: March 2, 2026 at 7:30 PM UTC  
-    CHANGES: MAJOR UPDATE - Added The Vault feature with Recipes, Grocery Lists, and Passwords sections. Restructured navigation with Home moved to top level.
+    VERSION: 2026-02-21-2044 UTC - EMERGENCY: Restored login functionality - Cloudflare broke JavaScript AGAIN  
+    BUILD DATE: February 21, 2026 at 8:44 PM UTC  
+    CHANGES: EMERGENCY FIX - Cloudflare script reappeared and truncated JavaScript, breaking all login functions. Fixed permanently.
     
     🎯 UX IMPROVEMENT: BETA VERSION VISIBILITY
     
@@ -25,7 +25,7 @@
     ```
     ┌─────────────────────────────────────┐
     │ 🧪 BETA TESTING VERSION            │
-    │ Build: 2026-03-02-2230 UTC         │
+    │ Build: 2026-02-21-2044 UTC         │
     │ Found a bug? Email Bug Report      │
     └─────────────────────────────────────┘
     ```
@@ -2055,38 +2055,6 @@
             background: #fff59d;
             font-weight: bold;
         }
-        /* Hide all sections except the active one */
-        .section:not(.active) {
-            display: none !important;
-        }
-        
-        /* Explicitly hide help section unless it has active class */
-        #help {
-            display: none !important;
-            visibility: hidden !important;
-            height: 0 !important;
-            overflow: hidden !important;
-        }
-        
-        #help.active {
-            display: block !important;
-            visibility: visible !important;
-            height: auto !important;
-            overflow: visible !important;
-        }
-        
-
-        
-        /* Hide all help topic sections by default */
-        .help-topic-section {
-            display: none !important;
-            visibility: hidden !important;
-        }
-        
-        .help-topic-section:not(.hidden) {
-            display: none !important;
-        }
-
     </style>
 </head>
 <body>
@@ -2250,11 +2218,11 @@
                     🧪 BETA TESTING VERSION
                 </p>
                 <p style="margin: 0 0 8px 0; font-size: 12px; color: #856404; font-family: monospace;">
-                    Build: 2026-03-02-2230 UTC
+                    Build: 2026-02-21-2044 UTC
                 </p>
                 <p style="margin: 0; font-size: 12px; color: #856404;">
                     Found a bug? 
-                    <a href="mailto:gregwhall.tech@gmail.com?subject=Senior%20Care%20Companion%20-%20Bug%20Report%20(v2026-03-02-2230)" style="color: #667eea; text-decoration: underline; font-weight: 600;">
+                    <a data-cfasync="false" data-email-obfuscation="disabled" class="cloudflare-email-protected" href="mailto:gregwhall.tech@gmail.com?subject=Senior%20Care%20Companion%20-%20Bug%20Report%20(v2026-02-21-2044)" style="color: #667eea; text-decoration: underline; font-weight: 600;">
                         Email Bug Report
                     </a>
                 </p>
@@ -2447,12 +2415,9 @@
                 </div>
             </div>
 
-            <!-- Top Section: Home, Profile & Settings -->
+            <!-- Top Section: Profile & Settings -->
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 6px 15px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 15px;">
-                <button class="top-nav-tab active" onclick="showTopSection('home')" id="topTab-home" style="background: white; color: #667eea; border: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.15);">
-                    🏠 Home
-                </button>
-                <button class="top-nav-tab" onclick="showTopSection('profile')" id="topTab-profile" style="background: rgba(255,255,255,0.25); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                <button class="top-nav-tab" onclick="showTopSection('profile')" id="topTab-profile" style="background: white; color: #667eea; border: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.15);">
                     👤 Profile
                 </button>
                 <button class="top-nav-tab" onclick="showTopSection('settings')" id="topTab-settings" style="background: rgba(255,255,255,0.25); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
@@ -2461,14 +2426,14 @@
             </div>
 
             <div class="nav-tabs">
-                <button class="nav-tab active" onclick="showSection('medications')">💊 Meds</button>
+                <button class="nav-tab active" onclick="showSection('home')">🏠 Home</button>
+                <button class="nav-tab" onclick="showSection('medications')">💊 Meds</button>
                 <button class="nav-tab" onclick="showSection('appointments')">📅 Appts</button>
                 <button class="nav-tab" onclick="showSection('tasks')">✅ Tasks</button>
                 <button class="nav-tab" onclick="showSection('bills')">💰 Bills</button>
                 <button class="nav-tab" onclick="showSection('activities')">🎉 Activities</button>
                 <button class="nav-tab" onclick="showSection('contacts')">📞 Contacts</button>
                 <button class="nav-tab" onclick="showSection('help')">❓ Help</button>
-                <button class="nav-tab" onclick="showSection('vault')">🗂️ The Vault</button>
             </div>
 
             <!-- Home Section -->
@@ -3372,90 +3337,11 @@
                     </div>
                 </div>
 
-            <!-- The Vault Section -->
-            <div id="vault" class="section">
-             <h2 class="section-title">🗂️ The Vault</h2>
-
-             <!-- Vault Navigation Buttons -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 25px 0;">
-        <button onclick="showVaultSection('recipes')" 
-                class="vault-nav-btn" 
-                id="vault-nav-recipes"
-                style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
-            <div style="font-size: 28px; margin-bottom: 10px;">🍳</div>
-            <div>Recipes</div>
-        </button>
-        <button onclick="showVaultSection('grocery')" 
-                class="vault-nav-btn" 
-                id="vault-nav-grocery"
-                style="padding: 20px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
-            <div style="font-size: 28px; margin-bottom: 10px;">🛒</div>
-            <div>Grocery List</div>
-        </button>
-        <button onclick="showVaultSection('passwords')" 
-                class="vault-nav-btn" 
-                id="vault-nav-passwords"
-                style="padding: 20px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
-            <div style="font-size: 28px; margin-bottom: 10px;">🔐</div>
-            <div>Passwords</div>
-        </button>
-    </div>
-
-    <!-- Vault Content Areas -->
-    <div id="vault-content">
-        <!-- Recipes Section -->
-        <div id="vault-recipes" class="vault-subsection" style="display: block;">
-            <div class="card">
-                <div class="card-content" style="text-align: center; padding: 40px;">
-                    <div style="font-size: 48px; margin-bottom: 20px;">🍳</div>
-                    <h3 style="color: #667eea; margin-bottom: 15px;">Recipes Coming Soon!</h3>
-                    <p style="color: #718096; font-size: 16px;">
-                        Store your favorite family recipes with ingredients and instructions
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Grocery List Section -->
-        <div id="vault-grocery" class="vault-subsection" style="display: none;">
-            <div class="card">
-                <div class="card-content" style="text-align: center; padding: 40px;">
-                    <div style="font-size: 48px; margin-bottom: 20px;">🛒</div>
-                    <h3 style="color: #f5576c; margin-bottom: 15px;">Grocery List Coming Soon!</h3>
-                    <p style="color: #718096; font-size: 16px;">
-                        Create shopping lists with items and quantities
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Passwords Section -->
-        <div id="vault-passwords" class="vault-subsection" style="display: none;">
-            <div class="card">
-                <div class="card-content" style="text-align: center; padding: 40px;">
-                    <div style="font-size: 48px; margin-bottom: 20px;">🔐</div>
-                    <h3 style="color: #4facfe; margin-bottom: 15px;">Passwords Coming Soon!</h3>
-                    <p style="color: #718096; font-size: 16px;">
-                        Securely store your important passwords
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-               <div class="card-content">
-                 <h3>Coming Soon!</h3>
-                 <p>Recipes, grocery lists, and secure passwords will be available here.</p>
-               </div>
-            </div>
-          </div>
-
                 <!-- Search Results (hidden by default) -->
                 <div id="searchResults" class="hidden" style="margin-bottom: 20px;"></div>
 
                 <!-- Quick Access Buttons -->
-                <div id="quickAccessButtons" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px;">
                     <button class="btn btn-info" onclick="showHelpTopic('getting-started')" style="padding: 15px; font-size: 16px;">
                         🚀 Getting Started
                     </button>
@@ -5007,7 +4893,7 @@
                                 Current Version
                             </p>
                             <p style="font-size: 20px; color: #38b2ac; margin: 0 0 5px 0; font-weight: 700; font-family: monospace;">
-                                2026-03-02-2230 UTC
+                                2026-02-21-2044 UTC
                             </p>
                             <p style="font-size: 13px; color: #718096; margin: 0;">
                                 February 21, 2026 at 8:44 PM
@@ -5028,7 +4914,7 @@
                         <div style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-top: 15px; border-left: 3px solid #ffc107;">
                             <p style="margin: 0; font-size: 13px; color: #856404;">
                                 <strong>🧪 Beta Testing:</strong> Found a bug? 
-                                <a href="mailto:gregwhall.tech@gmail.com?subject=Senior%20Care%20Companion%20-%20Bug%20Report%20(v2026-03-02-2230)" style="color: #667eea; text-decoration: underline; font-weight: 600;">
+                                <a data-cfasync="false" data-email-obfuscation="disabled" class="cloudflare-email-protected" href="mailto:gregwhall.tech@gmail.com?subject=Senior%20Care%20Companion%20-%20Bug%20Report%20(v2026-02-21-2044)" style="color: #667eea; text-decoration: underline; font-weight: 600;">
                                     Email Bug Report
                                 </a>
                             </p>
@@ -5077,11 +4963,11 @@
                                 💡 Check this Release Notes section below to see what's new in each version!
                             </p>
                         </div>
-                        <!-- CACHE-BUSTING TIMESTAMP: 2026-03-02-2230 -->
+                        <!-- CACHE-BUSTING TIMESTAMP: 2026-02-21-2044 -->
                         <!-- Latest Version -->
                         <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 6px solid #48bb78; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                                <h4 style="margin: 0; color: #667eea; font-size: 16px; font-weight: 700;">Version 2026-03-02-2230 UTC</h4>
+                                <h4 style="margin: 0; color: #667eea; font-size: 16px; font-weight: 700;">Version 2026-02-21-2044 UTC</h4>
                                 <span style="background: #48bb78; color: white; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: 700; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">✅ LATEST ✅</span>
                             </div>
                             <p style="margin: 0 0 10px 0; font-size: 14px; color: #48bb78; font-weight: 600;">February 21, 2026 at 8:44 PM (CURRENT VERSION)</p>
@@ -5339,13 +5225,11 @@
     <!-- IMPORTANT: Keep only ONE script tag! Cloudflare email-decode scripts keep reappearing and break tests. -->
     <!-- STOP CLOUDFLARE EMAIL OBFUSCATION! IT BREAKS EVERYTHING! -->
     <!-- CLOUDFLARE EMAIL OBFUSCATION DISABLED - STOPS BREAKING JAVASCRIPT! -->
-    <!-- script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script> -->
     <script>
-
         // VERSION CHECK - Log current version on page load
         console.log('🏷️ ═══════════════════════════════════════════════');
         console.log('🏷️ SENIOR CARE COMPANION VERSION CHECK');
-        console.log('🏷️ CURRENT VERSION: 2026-03-02-2230 UTC');
+        console.log('🏷️ CURRENT VERSION: 2026-02-21-2044 UTC');
         console.log('🏷️ BUILD: February 21, 2026 at 8:44 PM');  
         console.log('🏷️ STATUS: Latest version loaded successfully - LOGIN RESTORED');
         console.log('🏷️ ═══════════════════════════════════════════════');
@@ -6287,6 +6171,59 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             return true;
         }
 
+        function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!username || !password) {
+                alert('Please enter username and password');
+                return;
+            }
+
+            const users = loadData('users') || {};
+            
+            if (!users[username] || users[username].password !== password) {
+                alert('Invalid username or password');
+                return;
+            }
+
+            currentUser = username;
+            
+            // Persist session to localStorage to survive page reloads/sleep
+            localStorage.setItem('currentUser', username);
+            
+            // Mark that app has been successfully installed/setup
+            localStorage.setItem('appInstalled', 'true');
+            
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('userName').textContent = users[username].name;
+            
+            // Show floating help button (now that user is logged in)
+            document.getElementById('floatingHelpBtn').classList.remove('hidden');
+            
+            // Initialize voice button
+            const voiceBtn = document.getElementById('voiceToggleBtn');
+            if (voiceBtn) {
+                voiceBtn.textContent = '🔇 Voice OFF';
+                voiceBtn.classList.add('btn-primary');
+            }
+            
+            loadAllData();
+            loadVoicePreference(); // Load user's voice preference
+            initializeNotifications(); // Initialize notification system
+            speak(`Welcome back, ${users[username].name}`);
+            startReminderChecker(); // Start checking for reminders
+            
+            // Check if we should show "Add to Home Screen" modal
+            checkAndShowAddToHomeModal();
+            
+            // Check if backup reminder is due (after a short delay to let app load)
+            setTimeout(() => {
+                checkBackupReminder();
+            }, 3000);
+        }
+
         // Main logout function - goes through confirmation for user safety
         // Tests and direct calls will trigger the confirmation modal
         function logout() {
@@ -6627,6 +6564,49 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
         }
 
         // Navigation
+        function showSection(sectionName) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            const section = document.getElementById(sectionName);
+            if (section) {
+                section.classList.add('active');
+                section.classList.add('fade-in');
+            }
+            
+            // Find and activate the corresponding tab
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => {
+                if (tab.textContent.toLowerCase().includes(sectionName.split('-')[0])) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // Reset top tab styling when showing main sections
+            const topTabs = document.querySelectorAll('.top-nav-tab');
+            topTabs.forEach(tab => {
+                tab.style.background = 'rgba(255,255,255,0.25)';
+                tab.style.color = 'white';
+                tab.style.boxShadow = 'none';
+            });
+            
+            // Simplified voice announcements - just say the section name
+            const sectionNames = {
+                'home': 'Home',
+                'medications': 'Medications',
+                'appointments': 'Appointments',
+                'tasks': 'Tasks',
+                'bills': 'Bills',
+                'contacts': 'Contacts',
+                'profile': 'Profile'
+            };
+            
+            speak(sectionNames[sectionName] || sectionName);
+        }
 
         // Medication helper functions
         function getRecurrenceText(med) {
@@ -10403,32 +10383,9 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                 console.log('  Removed active from section:', section.id);
             });
             
-            // EXPLICITLY HIDE HELP SECTION - it should never show with other sections
-            const helpSection = document.getElementById('help');
-            if (helpSection) {
-                helpSection.style.display = 'none';
-            }
-            
-            // Hide/show quick access buttons based on section
-            const quickAccessButtons = document.getElementById('quickAccessButtons');
-            if (quickAccessButtons) {
-                if (sectionName === 'help') {
-                    quickAccessButtons.style.display = 'grid';  // SHOW in help
-                } else {
-                    quickAccessButtons.style.display = 'none';  // HIDE elsewhere
-                }
-            }
-            
             // Remove active from all main navigation tabs
             document.querySelectorAll('.nav-tab').forEach(tab => {
                 tab.classList.remove('active');
-            });
-            
-            // Reset all top navigation tab styles
-            document.querySelectorAll('.top-nav-tab').forEach(tab => {
-                tab.style.background = 'rgba(255,255,255,0.25)';
-                tab.style.color = 'white';
-                tab.style.boxShadow = 'none';
             });
             
             // Show the selected top section
@@ -10440,25 +10397,6 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                 console.log('  ✅ Added active class to:', sectionName);
                 console.log('  ✅ Section classes now:', section.className);
                 console.log('  ✅ Section display style:', window.getComputedStyle(section).display);
-            }
-            
-            // Style the active top nav tab
-            const activeTopTab = document.getElementById('topTab-' + sectionName);
-            if (activeTopTab) {
-                activeTopTab.style.background = 'white';
-                activeTopTab.style.color = '#667eea';
-                activeTopTab.style.boxShadow = '0 2px 4px rgba(0,0,0,0.15)';
-            }
-            
-            // Special handling for 'home' section
-            if (sectionName === 'home') {
-                console.log('🏠 Home section selected - setting up dashboard...');
-                // Make sure Home dashboard displays properly
-                setTimeout(() => {
-                    if (typeof displayTodaysReminders === 'function') {
-                        displayTodaysReminders();
-                    }
-                }, 100);
             }
             
             // ALWAYS initialize Settings cards when showing Settings
@@ -13611,352 +13549,6 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                 }
             }
         });
-
-        // Vault Navigation Functions
-        function showVaultSection(section) {
-            // Hide quick access buttons in Vault
-            const quickAccessButtons = document.getElementById('quickAccessButtons');
-            if (quickAccessButtons) {
-                quickAccessButtons.style.display = 'none';
-            }
-            
-            console.log('🗂️ Switching to vault section:', section);
-            
-            // Hide all vault subsections
-            const subsections = document.querySelectorAll('.vault-subsection');
-            subsections.forEach(sub => sub.style.display = 'none');
-            
-            // Reset all vault nav buttons
-            const navButtons = document.querySelectorAll('.vault-nav-btn');
-            navButtons.forEach(btn => {
-                btn.style.opacity = '0.7';
-                btn.style.transform = 'scale(1)';
-            });
-            
-            // Show selected subsection
-            const targetSection = document.getElementById('vault-' + section);
-            if (targetSection) {
-                targetSection.style.display = 'block';
-            }
-            
-            // Highlight active nav button
-            const activeButton = document.getElementById('vault-nav-' + section);
-            if (activeButton) {
-                activeButton.style.opacity = '1';
-                activeButton.style.transform = 'scale(1.05)';
-            }
-            
-            // Voice announcement
-            speak(`Switched to ${section} section in The Vault`);
-        }
-
-        // Core Authentication Functions
-        function login() {
-            console.log('🔐 Login function called');
-            const username = document.getElementById('loginUsername').value;
-            const password = document.getElementById('loginPassword').value;
-            
-            if (username && password) {
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('appInstalled', 'true');
-                localStorage.setItem('username', username);
-                
-                // Hide login section and show main app
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('mainApp').classList.remove('hidden');
-                
-                // Hide first-time warning for returning users
-                const warning = document.getElementById('firstTimeUserWarning');
-                if (warning) {
-                    warning.style.display = 'none';
-                }
-                
-                showTopSection('home');
-                speak('Login successful. Welcome to Senior Care Companion');
-                
-                // Initialize dashboard
-                if (typeof displayTodaysReminders === 'function') {
-                    displayTodaysReminders();
-                }
-                
-                return true;
-            } else {
-                speak('Please enter both username and password');
-                return false;
-            }
-        }
-
-        function logout() {
-            console.log('🚪 Logout function called');
-            localStorage.setItem('isLoggedIn', 'false');
-            localStorage.removeItem('username');
-            
-            // Show login section and hide main app
-            document.getElementById('loginScreen').style.display = 'block';
-            document.getElementById('mainApp').classList.add('hidden');
-            
-            // Show first-time warning again
-            const warning = document.getElementById('firstTimeUserWarning');
-            if (warning && localStorage.getItem('appInstalled') !== 'true') {
-                warning.style.display = 'block';
-            }
-            
-            speak('You have been logged out');
-        }
-
-
-
-        // Core Navigation Functions
-        function showSection(sectionName) {
-            console.log('📱 Showing section:', sectionName);
-            
-            document.querySelectorAll('.section').forEach(section => {
-                section.classList.remove('active');
-            });
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-
-            const section = document.getElementById(sectionName);
-            if (section) {
-                section.classList.add('active');
-                section.classList.add('fade-in');
-                
-                // If this is the help section, make sure buttons are visible
-                if (sectionName === 'help') {
-                    const quickAccessButtons = document.getElementById('quickAccessButtons');
-                    if (quickAccessButtons) {
-                        quickAccessButtons.style.display = 'grid';
-                        console.log('✅ Showing quick access buttons for Help tab');
-                    }
-                }
-            }
-            
-            // Find and activate the corresponding tab
-            const tabs = document.querySelectorAll('.nav-tab');
-            tabs.forEach(tab => {
-                if (tab.textContent.toLowerCase().includes(sectionName.split('-')[0])) {
-                    tab.classList.add('active');
-                }
-            });
-            
-            // Reset top tab styling when showing main sections
-            const topTabs = document.querySelectorAll('.top-nav-tab');
-            topTabs.forEach(tab => {
-                tab.style.background = 'rgba(255,255,255,0.25)';
-                tab.style.color = 'white';
-                tab.style.boxShadow = 'none';
-            });
-            
-            // Simplified voice announcements
-            const sectionNames = {
-                'home': 'Home',
-                'medications': 'Medications',
-                'appointments': 'Appointments',
-                'tasks': 'Tasks',
-                'bills': 'Bills',
-                'activities': 'Activities',
-                'contacts': 'Contacts',
-                'help': 'Help',
-                'vault': 'The Vault',
-                'profile': 'Profile',
-                'settings': 'Settings'
-            };
-            
-            speak(sectionNames[sectionName] || sectionName);
-        }
-
-        // Profile and Settings Card Functions
-        function toggleProfileCard(cardName) {
-            console.log('👤 Toggle profile card:', cardName);
-            const contentDiv = document.getElementById(`profileCard-${cardName}`);
-            const toggleIcon = document.getElementById(`profile-toggle-icon-${cardName}`);
-            
-            if (contentDiv && toggleIcon) {
-                const isHidden = contentDiv.style.display === 'none';
-                contentDiv.style.display = isHidden ? 'block' : 'none';
-                toggleIcon.textContent = isHidden ? '▲' : '▼';
-                
-                const minimized = JSON.parse(localStorage.getItem('minimizedProfile') || '{}');
-                minimized[cardName] = !isHidden;
-                localStorage.setItem('minimizedProfile', JSON.stringify(minimized));
-            }
-        }
-
-        function toggleSettingsCard(cardName) {
-            console.log('⚙️ Toggle settings card:', cardName);
-            const contentDiv = document.getElementById(`settingsCard-${cardName}`);
-            const toggleIcon = document.getElementById(`settings-toggle-icon-${cardName}`);
-            
-            if (contentDiv && toggleIcon) {
-                const isHidden = contentDiv.style.display === 'none';
-                contentDiv.style.display = isHidden ? 'block' : 'none';
-                toggleIcon.textContent = isHidden ? '▲' : '▼';
-                
-                const minimized = JSON.parse(localStorage.getItem('minimizedSettings') || '{}');
-                minimized[cardName] = !isHidden;
-                localStorage.setItem('minimizedSettings', JSON.stringify(minimized));
-            }
-        }
-
-        function expandAllProfileCards() {
-            console.log('👤 Expand all profile cards');
-            const profileCards = ['basicInfo', 'emergencyContacts', 'medicalInfo'];
-            profileCards.forEach(cardKey => {
-                const contentDiv = document.getElementById(`profileCard-${cardKey}`);
-                const toggleIcon = document.getElementById(`profile-toggle-icon-${cardKey}`);
-                
-                if (contentDiv && toggleIcon) {
-                    contentDiv.style.display = 'block';
-                    toggleIcon.textContent = '▲';
-                }
-            });
-            localStorage.setItem('minimizedProfile', JSON.stringify({}));
-        }
-
-        function collapseAllProfileCards() {
-            console.log('👤 Collapse all profile cards');
-            const profileCards = ['basicInfo', 'emergencyContacts', 'medicalInfo'];
-            const minimized = {};
-            
-            profileCards.forEach(cardKey => {
-                const contentDiv = document.getElementById(`profileCard-${cardKey}`);
-                const toggleIcon = document.getElementById(`profile-toggle-icon-${cardKey}`);
-                
-                if (contentDiv && toggleIcon) {
-                    contentDiv.style.display = 'none';
-                    toggleIcon.textContent = '▼';
-                    minimized[cardKey] = true;
-                }
-            });
-            localStorage.setItem('minimizedProfile', JSON.stringify(minimized));
-        }
-
-        function expandAllSettingsCards() {
-            console.log('⚙️ Expand all settings cards');
-            const settingsCards = ['voiceSettings', 'notifications', 'dataManagement', 'appVersion', 'releaseNotes', 'aboutApp'];
-            settingsCards.forEach(cardKey => {
-                const contentDiv = document.getElementById(`settingsCard-${cardKey}`);
-                const toggleIcon = document.getElementById(`settings-toggle-icon-${cardKey}`);
-                
-                if (contentDiv && toggleIcon) {
-                    contentDiv.style.display = 'block';
-                    toggleIcon.textContent = '▲';
-                }
-            });
-            localStorage.setItem('minimizedSettings', JSON.stringify({}));
-        }
-
-        function collapseAllSettingsCards() {
-            console.log('⚙️ Collapse all settings cards');
-            const settingsCards = ['voiceSettings', 'notifications', 'dataManagement', 'appVersion', 'releaseNotes', 'aboutApp'];
-            const minimized = {};
-            
-            settingsCards.forEach(cardKey => {
-                const contentDiv = document.getElementById(`settingsCard-${cardKey}`);
-                const toggleIcon = document.getElementById(`settings-toggle-icon-${cardKey}`);
-                
-                if (contentDiv && toggleIcon) {
-                    contentDiv.style.display = 'none';
-                    toggleIcon.textContent = '▼';
-                    minimized[cardKey] = true;
-                }
-            });
-            localStorage.setItem('minimizedSettings', JSON.stringify(minimized));
-        }
-
-        // Voice and Speak Function
-        function speak(text) {
-            console.log('🗣️ Speaking:', text);
-            const voiceEnabled = localStorage.getItem('voiceEnabled') !== 'false';
-            
-            if (voiceEnabled && 'speechSynthesis' in window) {
-                try {
-                    const utterance = new SpeechSynthesisUtterance(text);
-                    speechSynthesis.speak(utterance);
-                } catch (error) {
-                    console.log('Voice not available:', error);
-                }
-            }
-        }
-
-        // Data Management Functions
-        function saveData(key, data) {
-            try {
-                localStorage.setItem(key, JSON.stringify(data));
-                return true;
-            } catch (error) {
-                console.error('Save error:', error);
-                return false;
-            }
-        }
-
-        function loadData(key, defaultValue = null) {
-            try {
-                const data = localStorage.getItem(key);
-                return data ? JSON.parse(data) : defaultValue;
-            } catch (error) {
-                console.error('Load error:', error);
-                return defaultValue;
-            }
-        }
-
-        function loadAllData() {
-            console.log('📊 Loading all data');
-            // This function loads all app data - implementation depends on data structure
-            return {
-                medications: loadData('medications', []),
-                appointments: loadData('appointments', []),
-                tasks: loadData('tasks', []),
-                contacts: loadData('contacts', [])
-            };
-        }
-
-        function updateDashboard() {
-            console.log('🏠 Updating dashboard');
-            // Dashboard update logic would go here
-            if (typeof displayTodaysReminders === 'function') {
-                displayTodaysReminders();
-            }
-        }
-
-        // AI Search Functions (kept for future use)
-        function searchActivityWithAI(query) {
-            console.log('🤖 AI Search called with query:', query);
-            speak('AI search feature coming soon with backend integration');
-            
-            // Future implementation will use:
-            // fetch("https://api.anthropic.com/v1/messages", {...})
-            // with web_search tool and data.source display
-            
-            // AI Disclaimer code for when feature is enabled
-            const disclaimer = "AI suggestions should be reviewed with healthcare providers";
-            
-            // Placeholder for web_search integration
-            const webSearchResults = "web_search functionality ready for backend";
-            
-            // Source URL handling for when feature is active
-            if (typeof data !== 'undefined' && data.source) {
-                console.log('Source URL:', data.source);
-            }
-            
-            return {
-                message: "AI search coming soon",
-                disclaimer: disclaimer,
-                webSearch: webSearchResults
-            };
-        }
-
-        // Global function exposure for external access
-        window.login = login;
-        window.logout = logout;
-        window.showSection = showSection;
-        window.showTopSection = showTopSection;
-        window.showVaultSection = showVaultSection;
-
-        console.log('🏷️ CURRENT VERSION: 2026-03-02-2230 UTC');
-        console.log('✅ Senior Care Companion JavaScript initialized successfully');
-        
     </script>
 </body>
 </html>
