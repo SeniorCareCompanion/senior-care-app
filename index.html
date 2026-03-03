@@ -2063,10 +2063,26 @@
         /* Explicitly hide help section unless it has active class */
         #help {
             display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            overflow: hidden !important;
         }
         
         #help.active {
             display: block !important;
+            visibility: visible !important;
+            height: auto !important;
+            overflow: visible !important;
+        }
+        
+        /* Hide all help topic sections by default */
+        .help-topic-section {
+            display: none !important;
+            visibility: hidden !important;
+        }
+        
+        .help-topic-section:not(.hidden) {
+            display: none !important;
         }
 
     </style>
