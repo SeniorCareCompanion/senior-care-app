@@ -6625,49 +6625,6 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
         }
 
         // Navigation
-        function showSection(sectionName) {
-            document.querySelectorAll('.section').forEach(section => {
-                section.classList.remove('active');
-            });
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-
-            const section = document.getElementById(sectionName);
-            if (section) {
-                section.classList.add('active');
-                section.classList.add('fade-in');
-            }
-            
-            // Find and activate the corresponding tab
-            const tabs = document.querySelectorAll('.nav-tab');
-            tabs.forEach(tab => {
-                if (tab.textContent.toLowerCase().includes(sectionName.split('-')[0])) {
-                    tab.classList.add('active');
-                }
-            });
-            
-            // Reset top tab styling when showing main sections
-            const topTabs = document.querySelectorAll('.top-nav-tab');
-            topTabs.forEach(tab => {
-                tab.style.background = 'rgba(255,255,255,0.25)';
-                tab.style.color = 'white';
-                tab.style.boxShadow = 'none';
-            });
-            
-            // Simplified voice announcements - just say the section name
-            const sectionNames = {
-                'home': 'Home',
-                'medications': 'Medications',
-                'appointments': 'Appointments',
-                'tasks': 'Tasks',
-                'bills': 'Bills',
-                'contacts': 'Contacts',
-                'profile': 'Profile'
-            };
-            
-            speak(sectionNames[sectionName] || sectionName);
-        }
 
         // Medication helper functions
         function getRecurrenceText(med) {
