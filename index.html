@@ -10409,10 +10409,14 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                 helpSection.style.display = 'none';
             }
             
-            // Hide quick access buttons when not in help
+            // Hide/show quick access buttons based on section
             const quickAccessButtons = document.getElementById('quickAccessButtons');
-            if (quickAccessButtons && sectionName !== 'help') {
-                quickAccessButtons.style.display = 'none';
+            if (quickAccessButtons) {
+                if (sectionName === 'help') {
+                    quickAccessButtons.style.display = 'grid';  // SHOW in help
+                } else {
+                    quickAccessButtons.style.display = 'none';  // HIDE elsewhere
+                }
             }
             
             // Remove active from all main navigation tabs
