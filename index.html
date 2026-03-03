@@ -10428,6 +10428,12 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                 console.log('  Removed active from section:', section.id);
             });
             
+            // EXPLICITLY HIDE HELP SECTION - it should never show with other sections
+            const helpSection = document.getElementById('help');
+            if (helpSection) {
+                helpSection.style.display = 'none';
+            }
+            
             // Remove active from all main navigation tabs
             document.querySelectorAll('.nav-tab').forEach(tab => {
                 tab.classList.remove('active');
