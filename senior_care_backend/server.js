@@ -141,6 +141,42 @@ app.put('/api/family-connections/:connectionId/approve', async (req, res) => {
 // MEDICATION TRACKING ENDPOINTS
 // ============================================================
 
+// Create a user if they don't exist
+app.post('/api/users', async (req, res) => {
+    try {
+        const { id, username } = req.body;
+
+        // Try to insert the user
+        const { data, error } = await supabase
+            .from('users')
+            .insert([{ 
+                id, 
+                username,
+                email: `${username.toLowerCase()}@senior-care.local`
+            }])
+            .select();
+
+        if (error) {
+            // User might already exist, that's ok - just return success
+            if (error.code === '23505') { // Unique constraint violation
+                return res.json({ 
+                    message: 'User already exists',
+                    id: id
+                });
+            }
+            return res.status(400).json({ error: error.message });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'User created successfully',
+            data: data[0]
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Log medication as taken
 app.post('/api/medications/mark-taken', async (req, res) => {
     try {
