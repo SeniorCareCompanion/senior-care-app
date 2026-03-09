@@ -148,13 +148,16 @@ app.post('/api/users', async (req, res) => {
 
         console.log(`Creating user: id=${id}, username=${username}`);
 
+        // Generate a unique email based on username and UUID
+        const email = `${username.toLowerCase()}-${id.substring(0, 8)}@senior-care.app`;
+
         // Try to insert the user
         const { data, error } = await supabase
             .from('users')
             .insert([{ 
                 id, 
-                username
-                // Don't include email - it's marked as NOT NULL but we'll handle that
+                username,
+                email: email
             }])
             .select();
 
