@@ -146,17 +146,20 @@ app.post('/api/users', async (req, res) => {
     try {
         const { id, username } = req.body;
 
+        console.log(`Creating user: id=${id}, username=${username}`);
+
         // Try to insert the user
         const { data, error } = await supabase
             .from('users')
             .insert([{ 
                 id, 
-                username,
-                email: `${username.toLowerCase()}@senior-care.local`
+                username
+                // Don't include email - it's marked as NOT NULL but we'll handle that
             }])
             .select();
 
         if (error) {
+            console.error('User creation error:', error);
             // User might already exist, that's ok - just return success
             if (error.code === '23505') { // Unique constraint violation
                 return res.json({ 
@@ -167,12 +170,14 @@ app.post('/api/users', async (req, res) => {
             return res.status(400).json({ error: error.message });
         }
 
+        console.log('User created successfully:', data);
         res.json({ 
             success: true, 
             message: 'User created successfully',
             data: data[0]
         });
     } catch (error) {
+        console.error('User creation exception:', error);
         res.status(500).json({ error: error.message });
     }
 });
