@@ -144,9 +144,9 @@ app.put('/api/family-connections/:connectionId/approve', async (req, res) => {
 // Create a user if they don't exist
 app.post('/api/users', async (req, res) => {
     try {
-        const { id, username } = req.body;
+        const { id, username, age } = req.body;
 
-        console.log(`Creating user: id=${id}, username=${username}`);
+        console.log(`Creating user: id=${id}, username=${username}, age=${age}`);
 
         // Generate a unique email based on username and UUID
         const email = `${username.toLowerCase()}-${id.substring(0, 8)}@senior-care.app`;
@@ -157,7 +157,8 @@ app.post('/api/users', async (req, res) => {
             .insert([{ 
                 id, 
                 username,
-                email: email
+                email: email,
+                age: age || null
             }])
             .select();
 
