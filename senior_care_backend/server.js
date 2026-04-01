@@ -144,12 +144,12 @@ app.put('/api/family-connections/:connectionId/approve', async (req, res) => {
 // Create a user if they don't exist
 app.post('/api/users', async (req, res) => {
     try {
-        const { id, username, age } = req.body;
+        const { id, username, email, age } = req.body;
 
-        console.log(`Creating user: id=${id}, username=${username}, age=${age}`);
+        console.log(`Creating user: id=${id}, username=${username}, email=${email}, age=${age}`);
 
-        // Generate a unique email based on username and UUID
-        const email = `${username.toLowerCase()}-${id.substring(0, 8)}@senior-care.app`;
+        // Use provided email or generate a unique one
+        const userEmail = email || `${username.toLowerCase()}-${id.substring(0, 8)}@senior-care.app`;
 
         // Try to insert the user
         const { data, error } = await supabase
@@ -157,7 +157,7 @@ app.post('/api/users', async (req, res) => {
             .insert([{ 
                 id, 
                 username,
-                email: email,
+                email: userEmail,
                 age: age || null
             }])
             .select();
