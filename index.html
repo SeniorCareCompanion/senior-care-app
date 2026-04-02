@@ -5132,6 +5132,53 @@
                     </div>
                 </div>
 
+                <!-- Family Connections Card -->
+                <div class="card" style="margin-top: 30px;">
+                    <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;" onclick="toggleSettingsCard('familyConnections')">
+                        <span>👨‍👩‍👧 Family Connections</span>
+                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: rgba(255,255,255,0.2); color: white;" onclick="toggleSettingsCard('familyConnections'); event.stopPropagation();">
+                            <span id="settings-toggle-icon-familyConnections">▲</span>
+                        </button>
+                    </div>
+                    <div id="settingsCard-familyConnections" class="card-content" style="padding: 20px;">
+                        <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                            <h4 style="margin: 0 0 15px 0; color: #f5576c;">📧 Invite Family Member</h4>
+                            <div class="input-group">
+                                <label>Family Member Email</label>
+                                <input type="email" id="familyMemberEmail" placeholder="family@example.com">
+                            </div>
+                            <div class="input-group">
+                                <label>Family Member Username</label>
+                                <input type="text" id="familyMemberUsername" placeholder="their username">
+                            </div>
+                            <div class="input-group">
+                                <label>Relationship</label>
+                                <select id="familyRelationship" style="padding: 10px; border: 1px solid #ddd; border-radius: 6px; width: 100%; font-size: 14px;">
+                                    <option value="">Select relationship...</option>
+                                    <option value="Spouse">Spouse</option>
+                                    <option value="Husband">Husband</option>
+                                    <option value="Wife">Wife</option>
+                                    <option value="Mother">Mother</option>
+                                    <option value="Father">Father</option>
+                                    <option value="Son">Son</option>
+                                    <option value="Daughter">Daughter</option>
+                                    <option value="Brother">Brother</option>
+                                    <option value="Sister">Sister</option>
+                                    <option value="Caregiver">Caregiver</option>
+                                    <option value="Friend">Friend</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary" onclick="inviteFamilyMember()" style="width: 100%;">Send Invitation</button>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0 0 15px 0; color: #333;">Your Family Connections</h4>
+                            <div id="familyConnectionsList">
+                                <p style="color: #999; font-size: 14px;">No family connections yet. Invite someone above!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div> <!-- Close mainApp -->
 
@@ -5235,7 +5282,7 @@
     <!-- IMPORTANT: Keep only ONE script tag! Cloudflare email-decode scripts keep reappearing and break tests. -->
     <!-- STOP CLOUDFLARE EMAIL OBFUSCATION! IT BREAKS EVERYTHING! -->
     <!-- CLOUDFLARE EMAIL OBFUSCATION DISABLED - STOPS BREAKING JAVASCRIPT! -->
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    <script>
         // VERSION CHECK - Log current version on page load
         console.log('🏷️ ═══════════════════════════════════════════════');
         console.log('🏷️ SENIOR CARE COMPANION VERSION CHECK');
@@ -5279,6 +5326,7 @@
                         body: JSON.stringify({
                             id: userId,
                             username: username,
+                            email: currentUserData.email || null,
                             age: currentUserData.age || null
                         })
                     });
@@ -5322,16 +5370,23 @@
         /**
          * Create a family connection request
          */
-        async function createFamilyConnection(seniorUsername, familyMemberEmail, relationship) {
+        async function createFamilyConnection(seniorUsername, familyMemberEmail, familyMemberUsername, relationship) {
             try {
-                const seniorUserId = 'user_' + seniorUsername.replace(/\s+/g, '_').toLowerCase();
+                const users = loadData('users');
+                const seniorUserData = users[seniorUsername];
+                const seniorUserId = seniorUserData?.userId;
+                if (!seniorUserId) {
+                    console.error('Senior user not found');
+                    return null;
+                }
                 console.log('📤 Creating family connection...');
                 const response = await fetch(`${BACKEND_API_URL}/api/family-connections`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        seniorUserId: seniorUserId,
-                        familyMemberEmail: familyMemberEmail,
+                        senior_user_id: seniorUserId,
+                        family_member_email: familyMemberEmail,
+                        family_member_username: familyMemberUsername,
                         relationship: relationship
                     })
                 });
@@ -6254,12 +6309,12 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             }
 
             if (password !== confirmPassword) {
-                alert('Passwords do not match. Please try again.');
+                alert('Passwords do not match');
                 return;
             }
 
             if (password.length < 6) {
-                alert('Password must be at least 6 characters long');
+                alert('Password must be at least 6 characters');
                 return;
             }
 
@@ -6269,7 +6324,6 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                 return;
             }
 
-            // Basic email validation
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 alert('Please enter a valid email address');
@@ -6299,6 +6353,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
 
             saveData('users', users);
             
+            // Mark that app has been successfully installed/setup
             localStorage.setItem('appInstalled', 'true');
             
             alert('Account created successfully!');
@@ -10370,7 +10425,8 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                 <p><strong>Username:</strong> ${currentUser}</p>
             `;
 
-            document.getElementById('updateName').value = userData.name;
+            document.getElementById('updateFirstName').value = userData.firstName || '';
+            document.getElementById('updateLastName').value = userData.lastName || '';
             document.getElementById('updateAge').value = userData.age;
             document.getElementById('updateEmail').value = userData.email || '';
             
@@ -10599,7 +10655,7 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
             // ALWAYS initialize Settings cards when showing Settings
             if (sectionName === 'settings') {
                 console.log('⚙️ Initializing Settings cards...');
-                const settingsCards = ['voiceSettings', 'notifications', 'dataManagement', 'appVersion', 'releaseNotes', 'aboutApp'];
+                const settingsCards = ['voiceSettings', 'notifications', 'dataManagement', 'appVersion', 'releaseNotes', 'aboutApp', 'familyConnections'];
                 const minimizedSettings = JSON.parse(localStorage.getItem('minimizedSettings') || '{}');
                 console.log('  Saved minimized state:', minimizedSettings);
                 
@@ -10634,6 +10690,7 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                 console.log('🔔 Initializing notification preferences...');
                 initializeNotificationsPreference();
                 updateNotificationButton();
+                loadFamilyConnections();
             }
             
             // Update top tab styling
@@ -10675,7 +10732,8 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
             }
 
             const users = loadData('users');
-            users[currentUser].name = name;
+            users[currentUser].firstName = firstName;
+            users[currentUser].lastName = lastName;
             users[currentUser].age = age;
             users[currentUser].email = email;
             saveData('users', users);
@@ -13740,6 +13798,64 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                 }
             }
         });
+
+        // Invite Family Member UI Handler
+        async function inviteFamilyMember() {
+            const email = document.getElementById('familyMemberEmail').value;
+            const relationship = document.getElementById('familyRelationship').value;
+            if (!email || !relationship) {
+                alert('Please fill in all fields');
+                return;
+            }
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Please enter a valid email address');
+                return;
+            }
+            console.log(`📧 Inviting ${email} as ${relationship}...`);
+            const result = await createFamilyConnection(currentUser, email, relationship);
+            if (result && result.success) {
+                alert(`Invitation sent to ${email}!`);
+                speak(`Invitation sent to ${email}`);
+                document.getElementById('familyMemberEmail').value = '';
+                document.getElementById('familyMemberUsername').value = '';
+                document.getElementById('familyRelationship').value = '';
+                loadFamilyConnections();
+            } else {
+                alert('Failed to send invitation. Please check that the family member has created an account first.');
+            }
+        }
+
+        // Load family connections for display
+        async function loadFamilyConnections() {
+            try {
+                const users = loadData('users');
+                const currentUserData = users[currentUser];
+                let userId = currentUserData.userId;
+                if (!userId) return;
+                const response = await fetch(`${BACKEND_API_URL}/api/family-connections/${userId}`);
+                if (!response.ok) return;
+                const result = await response.json();
+                const connections = result.data || [];
+                const container = document.getElementById('familyConnectionsList');
+                if (connections.length === 0) {
+                    container.innerHTML = '<p style="color: #999; font-size: 14px;">No family connections yet. Invite someone above!</p>';
+                } else {
+                    container.innerHTML = connections.map(conn => `
+                        <div style="background: #f9f9f9; padding: 12px; border-radius: 6px; margin-bottom: 10px;">
+                            <p style="margin: 0 0 5px 0; font-weight: 600; color: #333;">${conn.family_member?.username || 'Pending'}</p>
+                            <p style="margin: 0; font-size: 13px; color: #666;">Relationship: ${conn.relationship}</p>
+                            <p style="margin: 5px 0 0 0; font-size: 12px; color: ${conn.approved_by_senior ? '#28a745' : '#ffc107'};">
+                                ${conn.approved_by_senior ? '✅ Approved' : '⏳ Pending Approval'}
+                            </p>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.log('Error loading family connections:', error.message);
+            }
+        }
+
     </script>
 </body>
 </html>

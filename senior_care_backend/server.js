@@ -71,20 +71,22 @@ app.get('/api/family-connections/:seniorUserId', async (req, res) => {
 // Create a family connection (invite)
 app.post('/api/family-connections', async (req, res) => {
     try {
-        const { senior_user_id, family_member_email, relationship } = req.body;
+        const { senior_user_id, family_member_email, family_member_username, relationship } = req.body;
 
-        // First, find the family member by email
-        const { data: familyMember, error: findError } = await supabase
+        // Find the family member by BOTH email AND username (to handle multiple users per email)
+        const { data: familyMembers, error: findError } = await supabase
             .from('users')
             .select('id')
             .eq('email', family_member_email)
-            .single();
+            .eq('username', family_member_username);
 
-        if (findError) {
+        if (findError || !familyMembers || familyMembers.length === 0) {
             return res.status(400).json({ 
-                error: 'Family member not found. They need to create an account first.' 
+                error: 'Family member not found. Please check the email and username are correct.' 
             });
         }
+
+        const familyMember = familyMembers[0];
 
         // Create the connection
         const { data, error } = await supabase
