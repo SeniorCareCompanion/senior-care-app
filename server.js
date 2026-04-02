@@ -173,8 +173,6 @@ app.post('/api/users', async (req, res) => {
                 email: userEmail,
                 age: age || null,
                 first_name: firstName || null,
-                last_name: lastName || null,
-                first_name: firstName || null,
                 last_name: lastName || null
             }])
             .select();
