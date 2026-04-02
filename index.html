@@ -4928,7 +4928,7 @@
                             </p>
                             <p style="margin: 0; font-size: 12px; color: #856404;">
                                 Found a problem? 
-                                <a href="/cdn-cgi/l/email-protection#482f3a2d2f3f20292424663c2d2b20082f25292124662b2725773b3d2a222d2b3c751b2d2621273a6d7a780b293a2d6d7a780b27253829262127266d7a78656d7a780a3d2f6d7a781a2d38273a3c6d7a78603e7a787a7e65787a657a79657a787c7c61" style="color: #667eea; text-decoration: underline; font-weight: 600;">
+                                <a href="mailto:gregwhall.tech@gmail.com?subject=Senior%20Care%20Companion%20-%20Bug%20Report%20(v2026-02-21-2044)" style="color: #667eea; text-decoration: underline; font-weight: 600;">
                                     Email us here
                                 </a>
                             </p>
@@ -5148,10 +5148,6 @@
                                 <input type="email" id="familyMemberEmail" placeholder="family@example.com">
                             </div>
                             <div class="input-group">
-                                <label>Family Member Username</label>
-                                <input type="text" id="familyMemberUsername" placeholder="their username">
-                            </div>
-                            <div class="input-group">
                                 <label>Relationship</label>
                                 <select id="familyRelationship" style="padding: 10px; border: 1px solid #ddd; border-radius: 6px; width: 100%; font-size: 14px;">
                                     <option value="">Select relationship...</option>
@@ -5282,7 +5278,7 @@
     <!-- IMPORTANT: Keep only ONE script tag! Cloudflare email-decode scripts keep reappearing and break tests. -->
     <!-- STOP CLOUDFLARE EMAIL OBFUSCATION! IT BREAKS EVERYTHING! -->
     <!-- CLOUDFLARE EMAIL OBFUSCATION DISABLED - STOPS BREAKING JAVASCRIPT! -->
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    <script>
         // VERSION CHECK - Log current version on page load
         console.log('🏷️ ═══════════════════════════════════════════════');
         console.log('🏷️ SENIOR CARE COMPANION VERSION CHECK');
@@ -5370,23 +5366,16 @@
         /**
          * Create a family connection request
          */
-        async function createFamilyConnection(seniorUsername, familyMemberEmail, familyMemberUsername, relationship) {
+        async function createFamilyConnection(seniorUsername, familyMemberEmail, relationship) {
             try {
-                const users = loadData('users');
-                const seniorUserData = users[seniorUsername];
-                const seniorUserId = seniorUserData?.userId;
-                console.log(`📤 Creating family connection... Senior: ${seniorUsername}, UserId: ${seniorUserId}`);
-                if (!seniorUserId) {
-                    console.error('❌ Senior user not found or no userId');
-                    return null;
-                }
+                const seniorUserId = 'user_' + seniorUsername.replace(/\s+/g, '_').toLowerCase();
+                console.log('📤 Creating family connection...');
                 const response = await fetch(`${BACKEND_API_URL}/api/family-connections`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         senior_user_id: seniorUserId,
                         family_member_email: familyMemberEmail,
-                        family_member_username: familyMemberUsername,
                         relationship: relationship
                     })
                 });
@@ -6355,7 +6344,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
 
             saveData('users', users);
             
-            // Create user in backend
+            // Create user in backend with firstName/lastName
             try {
                 let userId = users[username].userId;
                 if (!userId) {
@@ -6367,7 +6356,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                     users[username].userId = userId;
                     saveData('users', users);
                 }
-                console.log(`📝 Registering: ${username} (${email})`);
+                console.log(`📝 Backend call: Sending firstName="${firstName}", lastName="${lastName}"`);
                 const backendResponse = await fetch('https://senior-care-backend.vercel.app/api/users', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -10453,16 +10442,14 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
             const container = document.getElementById('profileInfo');
             if (!container) return;
             container.innerHTML = `
-                <p style="margin-bottom: 10px;"><strong>Name:</strong> ${userData.firstName ? userData.firstName + ' ' + (userData.lastName || '') : userData.name || 'Not set'}</p>
+                <p style="margin-bottom: 10px;"><strong>Name:</strong> ${userData.name}</p>
                 <p style="margin-bottom: 10px;"><strong>Age:</strong> ${userData.age}</p>
                 <p style="margin-bottom: 10px;"><strong>Email:</strong> ${userData.email || 'Not set'}</p>
                 <p><strong>Username:</strong> ${currentUser}</p>
             `;
 
-            const firstName = userData.firstName || (userData.name ? userData.name.split(' ')[0] : '');
-            const lastName = userData.lastName || (userData.name ? userData.name.split(' ').slice(1).join(' ') : '');
-            document.getElementById('updateFirstName').value = firstName;
-            document.getElementById('updateLastName').value = lastName;
+            document.getElementById('updateFirstName').value = userData.firstName || '';
+            document.getElementById('updateLastName').value = userData.lastName || '';
             document.getElementById('updateAge').value = userData.age;
             document.getElementById('updateEmail').value = userData.email || '';
             
@@ -13850,12 +13837,11 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                 return;
             }
             console.log(`📧 Inviting ${email} as ${relationship}...`);
-            const result = await createFamilyConnection(currentUser, email, username, relationship);
+            const result = await createFamilyConnection(currentUser, email, relationship);
             if (result && result.success) {
                 alert(`Invitation sent to ${email}!`);
                 speak(`Invitation sent to ${email}`);
                 document.getElementById('familyMemberEmail').value = '';
-                document.getElementById('familyMemberUsername').value = '';
                 document.getElementById('familyRelationship').value = '';
                 loadFamilyConnections();
             } else {
@@ -13885,4 +13871,14 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                             <p style="margin: 5px 0 0 0; font-size: 12px; color: ${conn.approved_by_senior ? '#28a745' : '#ffc107'};">
                                 ${conn.approved_by_senior ? '✅ Approved' : '⏳ Pending Approval'}
                             </p>
-                   
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.log('Error loading family connections:', error.message);
+            }
+        }
+
+    </script>
+</body>
+</html>
