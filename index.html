@@ -5375,11 +5375,11 @@
                 const users = loadData('users');
                 const seniorUserData = users[seniorUsername];
                 const seniorUserId = seniorUserData?.userId;
+                console.log(`📤 Creating family connection... Senior: ${seniorUsername}, UserId: ${seniorUserId}`);
                 if (!seniorUserId) {
-                    console.error('Senior user not found');
+                    console.error('❌ Senior user not found or no userId');
                     return null;
                 }
-                console.log('📤 Creating family connection...');
                 const response = await fetch(`${BACKEND_API_URL}/api/family-connections`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -10419,14 +10419,16 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
             const container = document.getElementById('profileInfo');
             if (!container) return;
             container.innerHTML = `
-                <p style="margin-bottom: 10px;"><strong>Name:</strong> ${userData.name}</p>
+                <p style="margin-bottom: 10px;"><strong>Name:</strong> ${userData.firstName ? userData.firstName + ' ' + (userData.lastName || '') : userData.name || 'Not set'}</p>
                 <p style="margin-bottom: 10px;"><strong>Age:</strong> ${userData.age}</p>
                 <p style="margin-bottom: 10px;"><strong>Email:</strong> ${userData.email || 'Not set'}</p>
                 <p><strong>Username:</strong> ${currentUser}</p>
             `;
 
-            document.getElementById('updateFirstName').value = userData.firstName || '';
-            document.getElementById('updateLastName').value = userData.lastName || '';
+            const firstName = userData.firstName || (userData.name ? userData.name.split(' ')[0] : '');
+            const lastName = userData.lastName || (userData.name ? userData.name.split(' ').slice(1).join(' ') : '');
+            document.getElementById('updateFirstName').value = firstName;
+            document.getElementById('updateLastName').value = lastName;
             document.getElementById('updateAge').value = userData.age;
             document.getElementById('updateEmail').value = userData.email || '';
             
@@ -13813,7 +13815,7 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                 return;
             }
             console.log(`📧 Inviting ${email} as ${relationship}...`);
-            const result = await createFamilyConnection(currentUser, email, relationship);
+            const result = await createFamilyConnection(currentUser, email, username, relationship);
             if (result && result.success) {
                 alert(`Invitation sent to ${email}!`);
                 speak(`Invitation sent to ${email}`);
