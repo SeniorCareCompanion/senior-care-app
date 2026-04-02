@@ -6353,7 +6353,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
 
             saveData('users', users);
             
-            // Create user in backend immediately
+            // Create user in backend
             try {
                 let userId = users[username].userId;
                 if (!userId) {
@@ -6365,8 +6365,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                     users[username].userId = userId;
                     saveData('users', users);
                 }
-                
-                console.log(`📝 Registering user in backend: ${username} (${email})`);
+                console.log(`📝 Registering: ${username} (${email})`);
                 const backendResponse = await fetch('https://senior-care-backend.vercel.app/api/users', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -6374,17 +6373,16 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                         id: userId,
                         username: username,
                         email: email,
-                        age: ageNum
+                        age: ageNum,
+                        firstName: firstName,
+                        lastName: lastName
                     })
                 });
-                
                 if (backendResponse.ok) {
                     console.log('✅ User created in Supabase!');
-                } else {
-                    console.log('⚠️ Backend response:', backendResponse.status);
                 }
             } catch (error) {
-                console.log('⚠️ Backend registration failed (offline?):', error.message);
+                console.log('⚠️ Backend error:', error.message);
             }
             
             // Mark that app has been successfully installed/setup
@@ -13838,8 +13836,9 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
         // Invite Family Member UI Handler
         async function inviteFamilyMember() {
             const email = document.getElementById('familyMemberEmail').value;
+            const username = document.getElementById('familyMemberUsername').value;
             const relationship = document.getElementById('familyRelationship').value;
-            if (!email || !relationship) {
+            if (!email || !username || !relationship) {
                 alert('Please fill in all fields');
                 return;
             }
