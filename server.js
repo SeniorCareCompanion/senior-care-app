@@ -159,7 +159,10 @@ app.post('/api/users', async (req, res) => {
     try {
         const { id, username, email, age, firstName, lastName } = req.body;
 
-        console.log(`Creating user: id=${id}, username=${username}, email=${email}, age=${age}, firstName=${firstName}, lastName=${lastName}`);
+        console.log(`📝 Creating user: id=${id}, username=${username}, email=${email}, age=${age}`);
+        console.log(`📝 firstName received: "${firstName}" (type: ${typeof firstName}, truthy: ${!!firstName})`);
+        console.log(`📝 lastName received: "${lastName}" (type: ${typeof lastName}, truthy: ${!!lastName})`);
+        console.log(`📝 FULL req.body:`, JSON.stringify(req.body, null, 2));
 
         // Use provided email or generate a unique one
         const userEmail = email || `${username.toLowerCase()}-${id.substring(0, 8)}@senior-care.app`;
@@ -178,7 +181,8 @@ app.post('/api/users', async (req, res) => {
             .select();
 
         if (error) {
-            console.error('User creation error:', error);
+            console.error('❌ User creation error:', error);
+            console.error('❌ Error message:', error.message);
             // User might already exist, that's ok - just return success
             if (error.code === '23505') { // Unique constraint violation
                 return res.json({ 
@@ -189,7 +193,7 @@ app.post('/api/users', async (req, res) => {
             return res.status(400).json({ error: error.message });
         }
 
-        console.log('User created successfully:', data);
+        console.log('✅ User created successfully:', data);
         res.json({ 
             success: true, 
             message: 'User created successfully',
