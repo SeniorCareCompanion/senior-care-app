@@ -6292,8 +6292,6 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             const password = document.getElementById('regPassword').value;
             const confirmPassword = document.getElementById('regConfirmPassword').value;
 
-            console.log(`🔍 Form values: firstName="${firstName}", lastName="${lastName}", email="${email}", age="${age}", username="${username}"`);
-
             if (!firstName || !lastName || !email || !age || !username || !password || !confirmPassword) {
                 alert('Please fill in all fields');
                 return;
@@ -6344,7 +6342,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
 
             saveData('users', users);
             
-            // Create user in backend with firstName/lastName
+            // Create user in backend
             try {
                 let userId = users[username].userId;
                 if (!userId) {
@@ -6356,7 +6354,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                     users[username].userId = userId;
                     saveData('users', users);
                 }
-                console.log(`📝 Backend call: Sending firstName="${firstName}", lastName="${lastName}"`);
+                const ageNum = parseInt(age) || 0;
                 const backendResponse = await fetch('https://senior-care-backend.vercel.app/api/users', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -6369,11 +6367,9 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                         lastName: lastName
                     })
                 });
-                if (backendResponse.ok) {
-                    console.log('✅ User created in Supabase!');
-                }
+                console.log('Backend response:', backendResponse.status);
             } catch (error) {
-                console.log('⚠️ Backend error:', error.message);
+                console.log('Backend error:', error.message);
             }
             
             // Mark that app has been successfully installed/setup
@@ -13825,9 +13821,8 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
         // Invite Family Member UI Handler
         async function inviteFamilyMember() {
             const email = document.getElementById('familyMemberEmail').value;
-            const username = document.getElementById('familyMemberUsername').value;
             const relationship = document.getElementById('familyRelationship').value;
-            if (!email || !username || !relationship) {
+            if (!email || !relationship) {
                 alert('Please fill in all fields');
                 return;
             }
