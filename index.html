@@ -2301,21 +2301,8 @@
             </div>
             
             <div class="input-group">
-                <label for="regFirstName">First Name</label>
-                <input type="text" id="regFirstName" placeholder="Enter your first name" autocomplete="given-name">
-            </div>
-            <div class="input-group">
-                <label for="regLastName">Last Name</label>
-                <input type="text" id="regLastName" placeholder="Enter your last name" autocomplete="family-name">
-            </div>
-            <div class="input-group">
-                <label for="regEmail">Email Address</label>
-                <input type="email" id="regEmail" placeholder="your.email@example.com">
-                <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">📧 Used to send backup files to your inbox</p>
-            </div>
-            <div class="input-group">
-                <label for="regAge">Age</label>
-                <input type="number" id="regAge" placeholder="Enter your age" min="0" max="150">
+                <label for="regName">Full Name</label>
+                <input type="text" id="regName" placeholder="Enter your full name" autocomplete="name">
             </div>
             <div class="input-group">
                 <label for="regUsername">Username</label>
@@ -2325,15 +2312,19 @@
                 <label for="regPassword">Password</label>
                 <div style="position: relative;">
                     <input type="password" id="regPassword" placeholder="Choose a password" autocomplete="new-password" style="padding-right: 45px;">
-                    <span class="password-toggle" onclick="togglePasswordVisibility('regPassword', this)">👁️</span>
+                    <span class="password-toggle" onclick="togglePasswordVisibility('regPassword', this)">
+                        👁️
+                    </span>
                 </div>
             </div>
             <div class="input-group">
-                <label for="regConfirmPassword">Confirm Password</label>
-                <div style="position: relative;">
-                    <input type="password" id="regConfirmPassword" placeholder="Confirm your password" autocomplete="new-password" style="padding-right: 45px;">
-                    <span class="password-toggle" onclick="togglePasswordVisibility('regConfirmPassword', this)">👁️</span>
-                </div>
+                <label for="regAge">Age</label>
+                <input type="number" id="regAge" placeholder="Enter your age">
+            </div>
+            <div class="input-group">
+                <label for="regEmail">Email Address</label>
+                <input type="email" id="regEmail" placeholder="your.email@example.com">
+                <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">📧 Used to send backup files to your inbox</p>
             </div>
             <button class="btn btn-primary" onclick="register()">Create Account</button>
             <button class="btn btn-secondary" onclick="showLogin()">Back to Login</button>
@@ -4660,12 +4651,8 @@
                     </h3>
                     <div id="profileCard-updateProfile" style="padding: 20px; background: white; border: 1px solid #ddd; border-radius: 0 0 8px 8px;">
                     <div class="input-group">
-                        <label>First Name</label>
-                        <input type="text" id="updateFirstName">
-                    </div>
-                    <div class="input-group">
-                        <label>Last Name</label>
-                        <input type="text" id="updateLastName">
+                        <label>Full Name</label>
+                        <input type="text" id="updateName">
                     </div>
                     <div class="input-group">
                         <label>Age</label>
@@ -5132,49 +5119,6 @@
                     </div>
                 </div>
 
-                <!-- Family Connections Card -->
-                <div class="card" style="margin-top: 30px;">
-                    <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;" onclick="toggleSettingsCard('familyConnections')">
-                        <span>👨‍👩‍👧 Family Connections</span>
-                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: rgba(255,255,255,0.2); color: white;" onclick="toggleSettingsCard('familyConnections'); event.stopPropagation();">
-                            <span id="settings-toggle-icon-familyConnections">▲</span>
-                        </button>
-                    </div>
-                    <div id="settingsCard-familyConnections" class="card-content" style="padding: 20px;">
-                        <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                            <h4 style="margin: 0 0 15px 0; color: #f5576c;">📧 Invite Family Member</h4>
-                            <div class="input-group">
-                                <label>Family Member Email</label>
-                                <input type="email" id="familyMemberEmail" placeholder="family@example.com">
-                            </div>
-                            <div class="input-group">
-                                <label>Relationship</label>
-                                <select id="familyRelationship" style="padding: 10px; border: 1px solid #ddd; border-radius: 6px; width: 100%; font-size: 14px;">
-                                    <option value="">Select relationship...</option>
-                                    <option value="Spouse">Spouse</option>
-                                    <option value="Husband">Husband</option>
-                                    <option value="Wife">Wife</option>
-                                    <option value="Mother">Mother</option>
-                                    <option value="Father">Father</option>
-                                    <option value="Son">Son</option>
-                                    <option value="Daughter">Daughter</option>
-                                    <option value="Brother">Brother</option>
-                                    <option value="Sister">Sister</option>
-                                    <option value="Caregiver">Caregiver</option>
-                                    <option value="Friend">Friend</option>
-                                </select>
-                            </div>
-                            <button class="btn btn-primary" onclick="inviteFamilyMember()" style="width: 100%;">Send Invitation</button>
-                        </div>
-                        <div>
-                            <h4 style="margin: 0 0 15px 0; color: #333;">Your Family Connections</h4>
-                            <div id="familyConnectionsList">
-                                <p style="color: #999; font-size: 14px;">No family connections yet. Invite someone above!</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </div> <!-- Close mainApp -->
 
@@ -5278,7 +5222,7 @@
     <!-- IMPORTANT: Keep only ONE script tag! Cloudflare email-decode scripts keep reappearing and break tests. -->
     <!-- STOP CLOUDFLARE EMAIL OBFUSCATION! IT BREAKS EVERYTHING! -->
     <!-- CLOUDFLARE EMAIL OBFUSCATION DISABLED - STOPS BREAKING JAVASCRIPT! -->
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // VERSION CHECK - Log current version on page load
         console.log('🏷️ ═══════════════════════════════════════════════');
         console.log('🏷️ SENIOR CARE COMPANION VERSION CHECK');
@@ -5321,9 +5265,7 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             id: userId,
-                            username: username,
-                            email: currentUserData.email || null,
-                            age: currentUserData.age || null
+                            username: username
                         })
                     });
                     if (createUserResponse.ok) {
@@ -5374,8 +5316,8 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        senior_user_id: seniorUserId,
-                        family_member_email: familyMemberEmail,
+                        seniorUserId: seniorUserId,
+                        familyMemberEmail: familyMemberEmail,
                         relationship: relationship
                     })
                 });
@@ -6284,37 +6226,18 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
         }
 
         async function register() {
-            const firstName = document.getElementById('regFirstName').value;
-            const lastName = document.getElementById('regLastName').value;
-            const email = document.getElementById('regEmail').value;
-            const age = document.getElementById('regAge').value;
+            const name = document.getElementById('regName').value;
             const username = document.getElementById('regUsername').value;
             const password = document.getElementById('regPassword').value;
-            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            const age = document.getElementById('regAge').value;
+            const email = document.getElementById('regEmail').value;
 
-            console.log(`🔍 Form values: firstName="${firstName}", lastName="${lastName}", email="${email}", age="${age}", username="${username}"`);
-
-            if (!firstName || !lastName || !email || !age || !username || !password || !confirmPassword) {
+            if (!name || !username || !password || !age || !email) {
                 alert('Please fill in all fields');
                 return;
             }
 
-            if (password !== confirmPassword) {
-                alert('Passwords do not match');
-                return;
-            }
-
-            if (password.length < 6) {
-                alert('Password must be at least 6 characters');
-                return;
-            }
-
-            const ageNum = parseInt(age);
-            if (isNaN(ageNum) || ageNum < 0 || ageNum > 150) {
-                alert('Please enter a valid age');
-                return;
-            }
-
+            // Basic email validation
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 alert('Please enter a valid email address');
@@ -6329,11 +6252,10 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             }
 
             users[username] = {
-                firstName: firstName,
-                lastName: lastName,
-                email: email,
-                age: ageNum,
+                name: name,
                 password: password,
+                age: age,
+                email: email,
                 medications: [],
                 appointments: [],
                 tasks: JSON.parse(JSON.stringify(defaultTasks)),
@@ -6356,7 +6278,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                     users[username].userId = userId;
                     saveData('users', users);
                 }
-                console.log(`📝 Backend call: Sending firstName="${firstName}", lastName="${lastName}"`);
+                console.log(`📝 Backend: firstName="${firstName}", lastName="${lastName}"`);
                 const backendResponse = await fetch('https://senior-care-backend.vercel.app/api/users', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -6369,8 +6291,11 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                         lastName: lastName
                     })
                 });
+                console.log(`📊 Status: ${backendResponse.status}`);
                 if (backendResponse.ok) {
-                    console.log('✅ User created in Supabase!');
+                    console.log('✅ Backend success');
+                } else {
+                    console.log('❌ Backend error:', backendResponse.status);
                 }
             } catch (error) {
                 console.log('⚠️ Backend error:', error.message);
@@ -10448,8 +10373,7 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                 <p><strong>Username:</strong> ${currentUser}</p>
             `;
 
-            document.getElementById('updateFirstName').value = userData.firstName || '';
-            document.getElementById('updateLastName').value = userData.lastName || '';
+            document.getElementById('updateName').value = userData.name;
             document.getElementById('updateAge').value = userData.age;
             document.getElementById('updateEmail').value = userData.email || '';
             
@@ -10678,7 +10602,7 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
             // ALWAYS initialize Settings cards when showing Settings
             if (sectionName === 'settings') {
                 console.log('⚙️ Initializing Settings cards...');
-                const settingsCards = ['voiceSettings', 'notifications', 'dataManagement', 'appVersion', 'releaseNotes', 'aboutApp', 'familyConnections'];
+                const settingsCards = ['voiceSettings', 'notifications', 'dataManagement', 'appVersion', 'releaseNotes', 'aboutApp'];
                 const minimizedSettings = JSON.parse(localStorage.getItem('minimizedSettings') || '{}');
                 console.log('  Saved minimized state:', minimizedSettings);
                 
@@ -10713,7 +10637,6 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                 console.log('🔔 Initializing notification preferences...');
                 initializeNotificationsPreference();
                 updateNotificationButton();
-                loadFamilyConnections();
             }
             
             // Update top tab styling
@@ -10755,8 +10678,7 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
             }
 
             const users = loadData('users');
-            users[currentUser].firstName = firstName;
-            users[currentUser].lastName = lastName;
+            users[currentUser].name = name;
             users[currentUser].age = age;
             users[currentUser].email = email;
             saveData('users', users);
@@ -13821,64 +13743,6 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                 }
             }
         });
-
-        // Invite Family Member UI Handler
-        async function inviteFamilyMember() {
-            const email = document.getElementById('familyMemberEmail').value;
-            const username = document.getElementById('familyMemberUsername').value;
-            const relationship = document.getElementById('familyRelationship').value;
-            if (!email || !username || !relationship) {
-                alert('Please fill in all fields');
-                return;
-            }
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                alert('Please enter a valid email address');
-                return;
-            }
-            console.log(`📧 Inviting ${email} as ${relationship}...`);
-            const result = await createFamilyConnection(currentUser, email, relationship);
-            if (result && result.success) {
-                alert(`Invitation sent to ${email}!`);
-                speak(`Invitation sent to ${email}`);
-                document.getElementById('familyMemberEmail').value = '';
-                document.getElementById('familyRelationship').value = '';
-                loadFamilyConnections();
-            } else {
-                alert('Failed to send invitation. Please check that the family member has created an account first.');
-            }
-        }
-
-        // Load family connections for display
-        async function loadFamilyConnections() {
-            try {
-                const users = loadData('users');
-                const currentUserData = users[currentUser];
-                let userId = currentUserData.userId;
-                if (!userId) return;
-                const response = await fetch(`${BACKEND_API_URL}/api/family-connections/${userId}`);
-                if (!response.ok) return;
-                const result = await response.json();
-                const connections = result.data || [];
-                const container = document.getElementById('familyConnectionsList');
-                if (connections.length === 0) {
-                    container.innerHTML = '<p style="color: #999; font-size: 14px;">No family connections yet. Invite someone above!</p>';
-                } else {
-                    container.innerHTML = connections.map(conn => `
-                        <div style="background: #f9f9f9; padding: 12px; border-radius: 6px; margin-bottom: 10px;">
-                            <p style="margin: 0 0 5px 0; font-weight: 600; color: #333;">${conn.family_member?.username || 'Pending'}</p>
-                            <p style="margin: 0; font-size: 13px; color: #666;">Relationship: ${conn.relationship}</p>
-                            <p style="margin: 5px 0 0 0; font-size: 12px; color: ${conn.approved_by_senior ? '#28a745' : '#ffc107'};">
-                                ${conn.approved_by_senior ? '✅ Approved' : '⏳ Pending Approval'}
-                            </p>
-                        </div>
-                    `).join('');
-                }
-            } catch (error) {
-                console.log('Error loading family connections:', error.message);
-            }
-        }
-
     </script>
 </body>
 </html>
