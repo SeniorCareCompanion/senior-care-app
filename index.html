@@ -5148,6 +5148,10 @@
                                 <input type="email" id="familyMemberEmail" placeholder="family@example.com">
                             </div>
                             <div class="input-group">
+                                <label>Family Member Username</label>
+                                <input type="text" id="familyMemberUsername" placeholder="their username">
+                            </div>
+                            <div class="input-group">
                                 <label>Relationship</label>
                                 <select id="familyRelationship" style="padding: 10px; border: 1px solid #ddd; border-radius: 6px; width: 100%; font-size: 14px;">
                                     <option value="">Select relationship...</option>
@@ -5366,16 +5370,23 @@
         /**
          * Create a family connection request
          */
-        async function createFamilyConnection(seniorUsername, familyMemberEmail, relationship) {
+        async function createFamilyConnection(seniorUsername, familyMemberEmail, familyMemberUsername, relationship) {
             try {
-                const seniorUserId = 'user_' + seniorUsername.replace(/\s+/g, '_').toLowerCase();
-                console.log('📤 Creating family connection...');
+                const users = loadData('users');
+                const seniorUserData = users[seniorUsername];
+                const seniorUserId = seniorUserData?.userId;
+                console.log(`📤 Creating family connection... Senior: ${seniorUsername}, UserId: ${seniorUserId}`);
+                if (!seniorUserId) {
+                    console.error('❌ Senior user not found or no userId');
+                    return null;
+                }
                 const response = await fetch(`${BACKEND_API_URL}/api/family-connections`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         senior_user_id: seniorUserId,
                         family_member_email: familyMemberEmail,
+                        family_member_username: familyMemberUsername,
                         relationship: relationship
                     })
                 });
@@ -6342,35 +6353,16 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
 
             saveData('users', users);
             
-            // Create user in backend
+            // Backend call
             try {
-                let userId = users[username].userId;
-                if (!userId) {
-                    userId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                        const r = Math.random() * 16 | 0;
-                        const v = c === 'x' ? r : (r & 0x3 | 0x8);
-                        return v.toString(16);
-                    });
-                    users[username].userId = userId;
-                    saveData('users', users);
-                }
+                const userId = users[username].userId || username;
                 const ageNum = parseInt(age) || 0;
-                const backendResponse = await fetch('https://senior-care-backend.vercel.app/api/users', {
+                await fetch('https://senior-care-backend.vercel.app/api/users', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        id: userId,
-                        username: username,
-                        email: email,
-                        age: ageNum,
-                        firstName: firstName,
-                        lastName: lastName
-                    })
+                    body: JSON.stringify({ id: userId, username, email, age: ageNum, firstName, lastName })
                 });
-                console.log('Backend response:', backendResponse.status);
-            } catch (error) {
-                console.log('Backend error:', error.message);
-            }
+            } catch(e) { console.log('Backend error:', e.message); }
             
             // Mark that app has been successfully installed/setup
             localStorage.setItem('appInstalled', 'true');
@@ -10438,14 +10430,16 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
             const container = document.getElementById('profileInfo');
             if (!container) return;
             container.innerHTML = `
-                <p style="margin-bottom: 10px;"><strong>Name:</strong> ${userData.name}</p>
+                <p style="margin-bottom: 10px;"><strong>Name:</strong> ${userData.firstName ? userData.firstName + ' ' + (userData.lastName || '') : userData.name || 'Not set'}</p>
                 <p style="margin-bottom: 10px;"><strong>Age:</strong> ${userData.age}</p>
                 <p style="margin-bottom: 10px;"><strong>Email:</strong> ${userData.email || 'Not set'}</p>
                 <p><strong>Username:</strong> ${currentUser}</p>
             `;
 
-            document.getElementById('updateFirstName').value = userData.firstName || '';
-            document.getElementById('updateLastName').value = userData.lastName || '';
+            const firstName = userData.firstName || (userData.name ? userData.name.split(' ')[0] : '');
+            const lastName = userData.lastName || (userData.name ? userData.name.split(' ').slice(1).join(' ') : '');
+            document.getElementById('updateFirstName').value = firstName;
+            document.getElementById('updateLastName').value = lastName;
             document.getElementById('updateAge').value = userData.age;
             document.getElementById('updateEmail').value = userData.email || '';
             
@@ -13832,11 +13826,12 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                 return;
             }
             console.log(`📧 Inviting ${email} as ${relationship}...`);
-            const result = await createFamilyConnection(currentUser, email, relationship);
+            const result = await createFamilyConnection(currentUser, email, username, relationship);
             if (result && result.success) {
                 alert(`Invitation sent to ${email}!`);
                 speak(`Invitation sent to ${email}`);
                 document.getElementById('familyMemberEmail').value = '';
+                document.getElementById('familyMemberUsername').value = '';
                 document.getElementById('familyRelationship').value = '';
                 loadFamilyConnections();
             } else {
