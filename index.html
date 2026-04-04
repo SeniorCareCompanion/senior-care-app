@@ -5356,13 +5356,6 @@
                 const data = await response.json();
                 if (response.ok) {
                     console.log('✅ Medication logged to backend');
-                    try {
-                        await fetch(`${BACKEND_API_URL}/api/notify-family`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ senior_user_id: userId, medication_name: medicationName, medication_time: formatTime(doseTime) })
-                        });
-                    } catch(e) { }
                     return data;
                 } else {
                     console.warn('⚠️ Backend returned:', response.status, data);
@@ -6359,6 +6352,8 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             };
 
             saveData('users', users);
+            
+            // Backend: Create user with UUID
             try {
                 let userId = users[username].userId;
                 if (!userId) {
