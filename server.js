@@ -8,6 +8,9 @@ const { createClient } = require('@supabase/supabase-js');
 const cors = require('cors');
 require('dotenv').config();
 
+// Import Resend for email notifications
+const { Resend } = require('resend');
+
 const app = express();
 
 // ============================================================
@@ -24,6 +27,12 @@ app.use(express.json());
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
+
+// ============================================================
+// RESEND CLIENT FOR EMAIL NOTIFICATIONS
+// ============================================================
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // ============================================================
 // HEALTH CHECK ENDPOINT
@@ -460,6 +469,115 @@ app.put('/api/features/:featureId/toggle', async (req, res) => {
             message: `Feature ${featureId} is now ${data[0].enabled ? 'ENABLED' : 'DISABLED'}`
         });
     } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ============================================================
+// NOTIFICATION ENDPOINTS
+// ============================================================
+
+// Send notifications to all family members of a senior
+app.post('/api/notify-family', async (req, res) => {
+    try {
+        const { senior_user_id, medication_name, medication_time } = req.body;
+
+        console.log(`📧 Notify family: senior=${senior_user_id}, medication=${medication_name}`);
+
+        // 1. Get the senior's user data
+        const { data: seniorData, error: seniorError } = await supabase
+            .from('users')
+            .select('username, email')
+            .eq('id', senior_user_id)
+            .single();
+
+        if (seniorError || !seniorData) {
+            return res.status(400).json({ error: 'Senior user not found' });
+        }
+
+        const seniorUsername = seniorData.username;
+
+        // 2. Get all family members connected to this senior
+        const { data: connections, error: connError } = await supabase
+            .from('family_connections')
+            .select('family_member_user_id')
+            .eq('senior_user_id', senior_user_id)
+            .eq('approved_by_senior', true);
+
+        if (connError) {
+            console.error('❌ Error fetching connections:', connError);
+            return res.status(400).json({ error: connError.message });
+        }
+
+        if (!connections || connections.length === 0) {
+            return res.json({ message: 'No approved family members to notify' });
+        }
+
+        console.log(`📨 Found ${connections.length} family members to notify`);
+
+        // 3. Get email addresses of all family members
+        const familyMemberIds = connections.map(c => c.family_member_user_id);
+        const { data: familyMembers, error: familyError } = await supabase
+            .from('users')
+            .select('id, email, username')
+            .in('id', familyMemberIds);
+
+        if (familyError) {
+            console.error('❌ Error fetching family members:', familyError);
+            return res.status(400).json({ error: familyError.message });
+        }
+
+        // 4. Send email to each family member via Resend
+        const emailResults = [];
+        for (const member of familyMembers) {
+            try {
+                const emailResult = await resend.emails.send({
+                    from: 'notifications@onboarding.resend.dev',
+                    to: member.email,
+                    subject: `📋 Medication Update: ${seniorUsername}`,
+                    html: `
+                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                            <h2 style="color: #333;">Medication Reminder</h2>
+                            <p style="font-size: 16px; color: #555;">
+                                <strong>${seniorUsername}</strong> just took <strong>${medication_name}</strong>
+                                ${medication_time ? `at ${medication_time}` : ''}
+                            </p>
+                            <div style="background: #f0f7ff; padding: 15px; border-radius: 8px; margin-top: 20px;">
+                                <p style="margin: 0; color: #666; font-size: 14px;">
+                                    This is an automated notification from Senior Care Companion.
+                                </p>
+                            </div>
+                        </div>
+                    `
+                });
+
+                console.log(`✅ Email sent to ${member.email}`);
+                emailResults.push({ email: member.email, status: 'sent' });
+
+                // Log notification in database
+                await supabase
+                    .from('notification_logs')
+                    .insert({
+                        senior_user_id: senior_user_id,
+                        family_member_user_id: member.id,
+                        medication_id: medication_name,
+                        notification_type: 'email',
+                        status: 'sent',
+                        recipient_email: member.email
+                    });
+            } catch (emailError) {
+                console.error(`❌ Failed to send email to ${member.email}:`, emailError);
+                emailResults.push({ email: member.email, status: 'failed', error: emailError.message });
+            }
+        }
+
+        res.json({
+            success: true,
+            message: `Notifications sent to ${emailResults.length} family members`,
+            results: emailResults
+        });
+    } catch (error) {
+        console.error('❌ Notify family error:', error.message);
         res.status(500).json({ error: error.message });
     }
 });
