@@ -5356,6 +5356,23 @@
                 const data = await response.json();
                 if (response.ok) {
                     console.log('✅ Medication logged to backend');
+                    
+                    // Notify family members
+                    try {
+                        const notifyResp = await fetch(`${BACKEND_API_URL}/api/notify-family`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                senior_user_id: userId,
+                                medication_name: medicationName,
+                                medication_time: formatTime(doseTime)
+                            })
+                        });
+                        if (notifyResp.ok) {
+                            console.log('✅ Family notified');
+                        }
+                    } catch(e) { console.log('ℹ️ Notification error:', e.message); }
+                    
                     return data;
                 } else {
                     console.warn('⚠️ Backend returned:', response.status, data);
@@ -6294,7 +6311,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             document.getElementById('registerScreen').classList.remove('hidden');
         }
 
-        async function register() {
+        function register() {
             const firstName = document.getElementById('regFirstName').value;
             const lastName = document.getElementById('regLastName').value;
             const email = document.getElementById('regEmail').value;
@@ -6352,26 +6369,6 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             };
 
             saveData('users', users);
-            
-            // Backend: Create user with UUID
-            try {
-                let userId = users[username].userId;
-                if (!userId) {
-                    userId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                        const r = Math.random() * 16 | 0;
-                        const v = c === 'x' ? r : (r & 0x3 | 0x8);
-                        return v.toString(16);
-                    });
-                    users[username].userId = userId;
-                    saveData('users', users);
-                }
-                const ageNum = parseInt(age) || 0;
-                await fetch('https://senior-care-backend.vercel.app/api/users', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: userId, username, email, age: ageNum, firstName, lastName })
-                });
-            } catch(e) { console.log('Backend error:', e.message); }
             
             // Mark that app has been successfully installed/setup
             localStorage.setItem('appInstalled', 'true');
