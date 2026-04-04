@@ -4928,7 +4928,7 @@
                             </p>
                             <p style="margin: 0; font-size: 12px; color: #856404;">
                                 Found a problem? 
-                                <a href="/cdn-cgi/l/email-protection#ff988d9a9888979e9393d18b9a9c97bf98929e9693d19c9092c08c8a9d959a9c8bc2ac9a9196908ddacdcfbc9e8d9adacdcfbc90928f9e91969091dacdcfd2dacdcfbd8a98dacdcfad9a8f908d8bdacdcfd789cdcfcdc9d2cfcdd2cdced2cdcfcbcbd6" style="color: #667eea; text-decoration: underline; font-weight: 600;">
+                                <a href="mailto:gregwhall.tech@gmail.com?subject=Senior%20Care%20Companion%20-%20Bug%20Report%20(v2026-02-21-2044)" style="color: #667eea; text-decoration: underline; font-weight: 600;">
                                     Email us here
                                 </a>
                             </p>
@@ -5282,7 +5282,7 @@
     <!-- IMPORTANT: Keep only ONE script tag! Cloudflare email-decode scripts keep reappearing and break tests. -->
     <!-- STOP CLOUDFLARE EMAIL OBFUSCATION! IT BREAKS EVERYTHING! -->
     <!-- CLOUDFLARE EMAIL OBFUSCATION DISABLED - STOPS BREAKING JAVASCRIPT! -->
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    <script>
         // VERSION CHECK - Log current version on page load
         console.log('🏷️ ═══════════════════════════════════════════════');
         console.log('🏷️ SENIOR CARE COMPANION VERSION CHECK');
@@ -5356,23 +5356,13 @@
                 const data = await response.json();
                 if (response.ok) {
                     console.log('✅ Medication logged to backend');
-                    
-                    // Notify family members
                     try {
-                        const notifyResp = await fetch(`${BACKEND_API_URL}/api/notify-family`, {
+                        await fetch(`${BACKEND_API_URL}/api/notify-family`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                senior_user_id: userId,
-                                medication_name: medicationName,
-                                medication_time: formatTime(doseTime)
-                            })
+                            body: JSON.stringify({ senior_user_id: userId, medication_name: medicationName, medication_time: formatTime(doseTime) })
                         });
-                        if (notifyResp.ok) {
-                            console.log('✅ Family notified');
-                        }
-                    } catch(e) { console.log('ℹ️ Notification error:', e.message); }
-                    
+                    } catch(e) { console.log('Notify error:', e.message); }
                     return data;
                 } else {
                     console.warn('⚠️ Backend returned:', response.status, data);
@@ -6369,6 +6359,26 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             };
 
             saveData('users', users);
+            
+            // Backend: Create user
+            try {
+                let userId = users[username].userId;
+                if (!userId) {
+                    userId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                        const r = Math.random() * 16 | 0;
+                        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                        return v.toString(16);
+                    });
+                    users[username].userId = userId;
+                    saveData('users', users);
+                }
+                const ageNum = parseInt(age) || 0;
+                await fetch('https://senior-care-backend.vercel.app/api/users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: userId, username, email, age: ageNum, firstName, lastName })
+                });
+            } catch(e) { console.log('Backend error:', e.message); }
             
             // Mark that app has been successfully installed/setup
             localStorage.setItem('appInstalled', 'true');
@@ -13867,4 +13877,14 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                             <p style="margin: 5px 0 0 0; font-size: 12px; color: ${conn.approved_by_senior ? '#28a745' : '#ffc107'};">
                                 ${conn.approved_by_senior ? '✅ Approved' : '⏳ Pending Approval'}
                             </p>
-                   
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.log('Error loading family connections:', error.message);
+            }
+        }
+
+    </script>
+</body>
+</html>
