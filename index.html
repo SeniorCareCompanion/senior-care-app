@@ -4928,7 +4928,7 @@
                             </p>
                             <p style="margin: 0; font-size: 12px; color: #856404;">
                                 Found a problem? 
-                                <a href="mailto:gregwhall.tech@gmail.com?subject=Senior%20Care%20Companion%20-%20Bug%20Report%20(v2026-02-21-2044)" style="color: #667eea; text-decoration: underline; font-weight: 600;">
+                                <a href="/cdn-cgi/l/email-protection#b4d3c6d1d3c3dcd5d8d89ac0d1d7dcf4d3d9d5ddd89ad7dbd98bc7c1d6ded1d7c089e7d1dadddbc6918684f7d5c6d1918684f7dbd9c4d5dadddbda91868499918684f6c1d3918684e6d1c4dbc6c09186849cc28684868299848699868599868480809d" style="color: #667eea; text-decoration: underline; font-weight: 600;">
                                     Email us here
                                 </a>
                             </p>
@@ -5282,7 +5282,7 @@
     <!-- IMPORTANT: Keep only ONE script tag! Cloudflare email-decode scripts keep reappearing and break tests. -->
     <!-- STOP CLOUDFLARE EMAIL OBFUSCATION! IT BREAKS EVERYTHING! -->
     <!-- CLOUDFLARE EMAIL OBFUSCATION DISABLED - STOPS BREAKING JAVASCRIPT! -->
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // VERSION CHECK - Log current version on page load
         console.log('🏷️ ═══════════════════════════════════════════════');
         console.log('🏷️ SENIOR CARE COMPANION VERSION CHECK');
@@ -13783,9 +13783,7 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
             }
         });
         
-        // ═══════════════════════════════════════════════════════════════════
-        // BUGFIX: iOS Background/Sleep Handling
-        // ═══════════════════════════════════════════════════════════════════
+        // ══════════════════════════════════════════════════════════════════════════════
         // iOS pauses JavaScript when app goes to background or phone sleeps.
         // This breaks the reminder checker. We need to restart it when app
         // becomes visible again.
@@ -13824,8 +13822,9 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
         // Invite Family Member UI Handler
         async function inviteFamilyMember() {
             const email = document.getElementById('familyMemberEmail').value;
+            const username = document.getElementById('familyMemberUsername').value;
             const relationship = document.getElementById('familyRelationship').value;
-            if (!email || !relationship) {
+            if (!email || !username || !relationship) {
                 alert('Please fill in all fields');
                 return;
             }
@@ -13834,7 +13833,7 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                 alert('Please enter a valid email address');
                 return;
             }
-            console.log(`📧 Inviting ${email} as ${relationship}...`);
+            console.log(`📧 Inviting ${email} (${username}) as ${relationship}...`);
             const result = await createFamilyConnection(currentUser, email, username, relationship);
             if (result && result.success) {
                 alert(`Invitation sent to ${email}!`);
