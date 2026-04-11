@@ -270,15 +270,6 @@ app.post('/api/medications/mark-taken', async (req, res) => {
     try {
         const { user_id, medication_id, medication_name } = req.body;
 
-        // Check if feature is enabled
-        const { data: featureData } = await supabase
-            .from('features')
-            .select('enabled')
-            .eq('id', 'family_notifications')
-            .single();
-
-        const notificationsEnabled = featureData?.enabled || false;
-
         // Log the medication
         const { data: logData, error: logError } = await supabase
             .from('medication_logs')
@@ -295,16 +286,13 @@ app.post('/api/medications/mark-taken', async (req, res) => {
             return res.status(400).json({ error: logError.message });
         }
 
-        // Send notifications to family members (if feature enabled)
-        if (notificationsEnabled) {
-            await sendMedicationNotification(user_id, medication_name, 'taken');
-        }
+        // Always send notifications to approved family members
+        await sendMedicationNotification(user_id, medication_name, 'taken');
 
         res.json({ 
             success: true, 
             data: logData[0],
-            notificationsEnabled: notificationsEnabled,
-            message: 'Medication marked as taken'
+            message: 'Medication marked as taken and family notified'
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
