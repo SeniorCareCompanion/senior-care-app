@@ -41,7 +41,7 @@ app.get('/api/health', (req, res) => {
 // FAMILY CONNECTIONS ENDPOINTS
 // ============================================================
 
-// Get all family connections for a senior
+// Get all family connections for a senior (connections they sent)
 app.get('/api/family-connections/:seniorUserId', async (req, res) => {
     try {
         const { seniorUserId } = req.params;
@@ -62,6 +62,33 @@ app.get('/api/family-connections/:seniorUserId', async (req, res) => {
             success: true, 
             data: data,
             message: `Found ${data.length} family connections`
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get all family connections received by a family member (invitations they received)
+app.get('/api/family-connections/received/:familyMemberId', async (req, res) => {
+    try {
+        const { familyMemberId } = req.params;
+
+        const { data, error } = await supabase
+            .from('family_connections')
+            .select(`
+                *,
+                senior:senior_user_id(id, email, username)
+            `)
+            .eq('family_member_user_id', familyMemberId);
+
+        if (error) {
+            return res.status(400).json({ error: error.message });
+        }
+
+        res.json({ 
+            success: true, 
+            data: data,
+            message: `Found ${data.length} pending invitations`
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -133,6 +160,56 @@ app.put('/api/family-connections/:connectionId/approve', async (req, res) => {
             success: true, 
             data: data[0],
             message: 'Family connection approved'
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Approve a family connection (PATCH endpoint for frontend compatibility)
+app.patch('/api/family-connections/:connectionId/approve', async (req, res) => {
+    try {
+        const { connectionId } = req.params;
+
+        const { data, error } = await supabase
+            .from('family_connections')
+            .update({ approved_by_senior: true })
+            .eq('id', connectionId)
+            .select();
+
+        if (error) {
+            return res.status(400).json({ error: error.message });
+        }
+
+        res.json({ 
+            success: true, 
+            data: data[0],
+            message: 'Family connection approved'
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Delete/Reject a family connection
+app.delete('/api/family-connections/:connectionId', async (req, res) => {
+    try {
+        const { connectionId } = req.params;
+
+        const { data, error } = await supabase
+            .from('family_connections')
+            .delete()
+            .eq('id', connectionId)
+            .select();
+
+        if (error) {
+            return res.status(400).json({ error: error.message });
+        }
+
+        res.json({ 
+            success: true, 
+            data: data[0],
+            message: 'Family connection declined'
         });
     } catch (error) {
         res.status(500).json({ error: error.message });

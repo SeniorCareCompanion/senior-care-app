@@ -13854,15 +13854,43 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                 const currentUserData = users[currentUser];
                 let userId = currentUserData.userId;
                 if (!userId) return;
-                const response = await fetch(`${BACKEND_API_URL}/api/family-connections/${userId}`);
-                if (!response.ok) return;
-                const result = await response.json();
-                const connections = result.data || [];
+                
+                // Fetch invitations SENT BY this user (they are the senior)
+                const sentResponse = await fetch(`${BACKEND_API_URL}/api/family-connections/${userId}`);
+                const sentConnections = sentResponse.ok ? (await sentResponse.json()).data || [] : [];
+                
+                // Fetch invitations RECEIVED BY this user (they are the family member)
+                const receivedResponse = await fetch(`${BACKEND_API_URL}/api/family-connections/received/${userId}`);
+                const receivedConnections = receivedResponse.ok ? (await receivedResponse.json()).data || [] : [];
+                
                 const container = document.getElementById('familyConnectionsList');
-                if (connections.length === 0) {
-                    container.innerHTML = '<p style="color: #999; font-size: 14px;">No family connections yet. Invite someone above!</p>';
+                let html = '';
+                
+                // Show pending invitations FROM others TO this user
+                if (receivedConnections.length > 0) {
+                    const pending = receivedConnections.filter(conn => !conn.approved_by_senior);
+                    if (pending.length > 0) {
+                        html += `<div style="background: #fff3cd; border: 1px solid #ffc107; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <h5 style="margin: 0 0 10px 0; color: #856404;">📬 Pending Invitations</h5>`;
+                        html += pending.map(conn => `
+                            <div style="background: white; padding: 12px; border-radius: 6px; margin-bottom: 10px;">
+                                <p style="margin: 0 0 5px 0; font-weight: 600; color: #333;">${conn.senior?.username || 'A Senior'} invites you as their ${conn.relationship}</p>
+                                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                    <button onclick="approveInvitation(${conn.id})" style="flex: 1; padding: 8px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">✅ Accept</button>
+                                    <button onclick="rejectInvitation(${conn.id})" style="flex: 1; padding: 8px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">❌ Decline</button>
+                                </div>
+                            </div>
+                        `).join('');
+                        html += '</div>';
+                    }
+                }
+                
+                // Show connections SENT BY this user
+                if (sentConnections.length === 0) {
+                    html += '<p style="color: #999; font-size: 14px;">No family connections yet. Invite someone above!</p>';
                 } else {
-                    container.innerHTML = connections.map(conn => `
+                    html += '<div><h5 style="margin: 0 0 10px 0; color: #333;">👥 Your Invitations Sent</h5>';
+                    html += sentConnections.map(conn => `
                         <div style="background: #f9f9f9; padding: 12px; border-radius: 6px; margin-bottom: 10px;">
                             <p style="margin: 0 0 5px 0; font-weight: 600; color: #333;">${conn.family_member?.username || 'Pending'}</p>
                             <p style="margin: 0; font-size: 13px; color: #666;">Relationship: ${conn.relationship}</p>
@@ -13871,9 +13899,50 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                             </p>
                         </div>
                     `).join('');
+                    html += '</div>';
                 }
+                
+                container.innerHTML = html;
             } catch (error) {
                 console.log('Error loading family connections:', error.message);
+            }
+        }
+        
+        // Approve a pending invitation
+        async function approveInvitation(connectionId) {
+            try {
+                const response = await fetch(`${BACKEND_API_URL}/api/family-connections/${connectionId}/approve`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ approved_by_senior: true })
+                });
+                if (response.ok) {
+                    alert('Invitation accepted!');
+                    speak('Invitation accepted');
+                    loadFamilyConnections();
+                } else {
+                    alert('Failed to accept invitation');
+                }
+            } catch (error) {
+                console.error('Error approving invitation:', error);
+            }
+        }
+        
+        // Reject a pending invitation
+        async function rejectInvitation(connectionId) {
+            try {
+                const response = await fetch(`${BACKEND_API_URL}/api/family-connections/${connectionId}`, {
+                    method: 'DELETE'
+                });
+                if (response.ok) {
+                    alert('Invitation declined');
+                    speak('Invitation declined');
+                    loadFamilyConnections();
+                } else {
+                    alert('Failed to decline invitation');
+                }
+            } catch (error) {
+                console.error('Error rejecting invitation:', error);
             }
         }
 
