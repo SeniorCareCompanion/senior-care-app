@@ -5171,7 +5171,12 @@
                             <button class="btn btn-primary" onclick="inviteFamilyMember()" style="width: 100%;">Send Invitation</button>
                         </div>
                         <div>
-                            <h4 style="margin: 0 0 15px 0; color: #333;">Your Family Connections</h4>
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+                                <h4 style="margin: 0; color: #333;">Your Family Connections</h4>
+                                <button class="btn btn-secondary" onclick="loadFamilyConnections()" style="padding: 6px 12px; font-size: 12px; margin: 0;">
+                                    🔄 Refresh
+                                </button>
+                            </div>
                             <div id="familyConnectionsList">
                                 <p style="color: #999; font-size: 14px;">No family connections yet. Invite someone above!</p>
                             </div>
