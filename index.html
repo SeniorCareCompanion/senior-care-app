@@ -4,9 +4,10 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-02-21-2044 UTC - EMERGENCY: Restored login functionality - Cloudflare broke JavaScript AGAIN  
-    BUILD DATE: February 21, 2026 at 8:44 PM UTC  
-    CHANGES: EMERGENCY FIX - Cloudflare script reappeared and truncated JavaScript, breaking all login functions. Fixed permanently.
+    VERSION: 2026-04-15-build-002
+    BUILD DATE: April 15, 2026 at 18:45 UTC
+    BUILD SYSTEM: Incremental build numbers (reset daily)
+    CRITICAL FIX: Medication reminders not triggering - initializeNotificationsPreference() now called on login
     
     🎯 UX IMPROVEMENT: BETA VERSION VISIBILITY
     
@@ -4901,10 +4902,10 @@
                                 Current Version
                             </p>
                             <p style="font-size: 20px; color: #38b2ac; margin: 0 0 5px 0; font-weight: 700; font-family: monospace;">
-                                2026-02-21-2044 UTC
+                                2026-04-15-build-002
                             </p>
                             <p style="font-size: 13px; color: #718096; margin: 0;">
-                                February 21, 2026 at 8:44 PM
+                                April 15, 2026 at 6:45 PM UTC
                             </p>
                         </div>
                         
@@ -4913,9 +4914,9 @@
                                 Latest Updates:
                             </p>
                             <p style="margin: 0; font-size: 13px; color: #4a5568; line-height: 1.6;">
-                                • EMERGENCY: Fixed catastrophic JavaScript corruption (login/register broken)<br>
-                                • ELIMINATED: Cloudflare script interference permanently<br>
-                                • RESTORED: All app functionality (login, register, navigation)
+                                • 🚨 CRITICAL FIX: Medication reminders now trigger properly after login<br>
+                                • ✅ Family Connections refresh button working<br>
+                                • 📱 Version numbering system implemented
                             </p>
                         
                         <p style="margin: 15px 0 0 0; text-align: center; font-size: 12px; color: #718096;">
@@ -6462,6 +6463,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             // Load all user data
             loadAllData();
             loadVoicePreference();
+            initializeNotificationsPreference(); // Load user's saved notification preference
             initializeNotifications();
             startReminderChecker();
             
@@ -6509,6 +6511,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             
             loadAllData();
             loadVoicePreference(); // Load user's voice preference
+            initializeNotificationsPreference(); // Load user's saved notification preference
             initializeNotifications(); // Initialize notification system
             speak(`Welcome back, ${users[username].name}`);
             startReminderChecker(); // Start checking for reminders
