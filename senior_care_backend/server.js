@@ -513,6 +513,99 @@ app.put('/api/features/:featureId/toggle', async (req, res) => {
 });
 
 // ============================================================
+// SMS NOTIFICATIONS via AWS SNS
+// ============================================================
+
+const AWS = require('aws-sdk');
+
+// Configure AWS
+AWS.config.update({
+  accessKeyId: process.env.AWS_ACCESS_KEY,
+  secretAccessKey: process.env.AWS_SECRET_KEY,
+  region: process.env.AWS_SNS_REGION || 'us-east-1'
+});
+
+const sns = new AWS.SNS();
+
+// Send SMS notification
+app.post('/api/send-sms', async (req, res) => {
+  try {
+    const { phoneNumber, message } = req.body;
+
+    // Validate inputs
+    if (!phoneNumber || !message) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Phone number and message required' 
+      });
+    }
+
+    // Format phone number (ensure +1 prefix for US numbers)
+    let formattedNumber = phoneNumber;
+    if (!formattedNumber.startsWith('+')) {
+      formattedNumber = '+1' + phoneNumber.replace(/\D/g, '');
+    }
+
+    console.log(`📱 Sending SMS to ${formattedNumber}: ${message}`);
+
+    // Send via SNS
+    const result = await sns.publish({
+      Message: message,
+      PhoneNumber: formattedNumber
+    }).promise();
+
+    console.log(`✅ SMS sent successfully. MessageId: ${result.MessageId}`);
+
+    res.json({ 
+      success: true, 
+      messageId: result.MessageId,
+      phoneNumber: formattedNumber
+    });
+
+  } catch (error) {
+    console.error('❌ SMS Error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// Test SMS endpoint (for testing)
+app.post('/api/test-sms', async (req, res) => {
+  try {
+    const { phoneNumber } = req.body;
+
+    if (!phoneNumber) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Phone number required' 
+      });
+    }
+
+    const testMessage = '✅ Test SMS from Senior Care Companion. Notifications are working!';
+
+    const result = await sns.publish({
+      Message: testMessage,
+      PhoneNumber: phoneNumber.startsWith('+') ? phoneNumber : '+1' + phoneNumber.replace(/\D/g, '')
+    }).promise();
+
+    res.json({ 
+      success: true, 
+      message: 'Test SMS sent!',
+      messageId: result.MessageId
+    });
+
+  } catch (error) {
+    console.error('❌ Test SMS Error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// ============================================================
 // ERROR HANDLING
 // ============================================================
 
