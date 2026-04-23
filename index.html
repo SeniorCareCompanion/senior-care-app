@@ -4,7 +4,7 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-04-15-build-002
+    VERSION: 2026-04-15-build-003
     BUILD DATE: April 15, 2026 at 18:45 UTC
     BUILD SYSTEM: Incremental build numbers (reset daily)
     CRITICAL FIX: Medication reminders not triggering - initializeNotificationsPreference() now called on login
@@ -2213,16 +2213,9 @@
             <button class="btn btn-secondary" onclick="showRegister()">New User? Register</button>
             <button class="btn" onclick="showForgotPassword()" style="background: transparent; color: #4CAF50; border: none; text-decoration: underline; margin-top: 10px; font-size: 14px;">Forgot Password?</button>
             
-            <!-- Beta Testing Version Banner -->
-            <div style="text-align: center; padding: 15px; background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; margin-top: 20px;">
-                <p style="margin: 0 0 5px 0; font-weight: 600; color: #856404; font-size: 14px;">
-                    🧪 BETA TESTING VERSION
-                </p>
-                <p style="margin: 0 0 8px 0; font-size: 12px; color: #856404; font-family: monospace;">
-                    Build: 2026-02-21-2044 UTC
-                </p>
-
-            </div>
+            <!-- REMOVED for Build 003: Beta Testing Version Banner -->
+            <!-- Version is displayed in Settings card instead -->
+            
         </div>
 
         <!-- Forgot Password Screen -->
@@ -2340,14 +2333,15 @@
             <button class="btn btn-secondary" onclick="showLogin()">Back to Login</button>
         </div>
 
-        <!-- Add to Home Screen Modal (shown after first login) -->
+        <!-- COMMENTED OUT - Add to Home Screen Modal
+                <!-- Add to Home Screen Modal (shown after first login) -->
         <div id="addToHomeModal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 15px; overflow-y: auto;">
             <div style="background: white; border-radius: 12px; max-width: 450px; width: 100%; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 10px 40px rgba(0,0,0,0.3); margin: auto;">
                 
                 <!-- Header (fixed) -->
                 <div style="text-align: center; padding: 20px 20px 15px 20px; border-bottom: 2px solid #e2e8f0;">
                     <div style="font-size: 48px; margin-bottom: 8px;">🎉</div>
-                    <h2 style="margin: 0 0 5px 0; color: #2d3748; font-size: 22px;">Welcome to Senior Care!</h2>
+        -->                    <h2 style="margin: 0 0 5px 0; color: #2d3748; font-size: 22px;">Welcome to Senior Care!</h2>
                     <p style="color: #718096; font-size: 14px; margin: 0;">Your account is ready to use</p>
                 </div>
 
@@ -4737,6 +4731,57 @@
                     </button>
                 </div>
 
+                <!-- Family Connections Card -->
+                <div class="card" style="margin-top: 30px;">
+                    <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;" onclick="toggleSettingsCard('familyConnections')">
+                        <span>👨‍👩‍👧 Family Connections</span>
+                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: rgba(255,255,255,0.2); color: white;" onclick="toggleSettingsCard('familyConnections'); event.stopPropagation();">
+                            <span id="settings-toggle-icon-familyConnections">▲</span>
+                        </button>
+                    </div>
+                    <div id="settingsCard-familyConnections" class="card-content" style="padding: 20px;">
+                        <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                            <h4 style="margin: 0 0 15px 0; color: #f5576c;">📧 Invite Family Member</h4>
+                            <div class="input-group">
+                                <label>Family Member Email</label>
+                                <input type="email" id="familyMemberEmail" placeholder="family@example.com">
+                            </div>
+                            <div class="input-group">
+                                <label>Family Member Username</label>
+                                <input type="text" id="familyMemberUsername" placeholder="their username">
+                            </div>
+                            <div class="input-group">
+                                <label>Relationship</label>
+                                <select id="familyRelationship" style="padding: 10px; border: 1px solid #ddd; border-radius: 6px; width: 100%; font-size: 14px;">
+                                    <option value="">Select relationship...</option>
+                                    <option value="Spouse">Spouse</option>
+                                    <option value="Husband">Husband</option>
+                                    <option value="Wife">Wife</option>
+                                    <option value="Mother">Mother</option>
+                                    <option value="Father">Father</option>
+                                    <option value="Son">Son</option>
+                                    <option value="Daughter">Daughter</option>
+                                    <option value="Brother">Brother</option>
+                                    <option value="Sister">Sister</option>
+                                    <option value="Caregiver">Caregiver</option>
+                                    <option value="Friend">Friend</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary" onclick="inviteFamilyMember()" style="width: 100%;">Send Invitation</button>
+                        </div>
+                        <div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+                                <h4 style="margin: 0; color: #333;">Your Family Connections</h4>
+                                <button class="btn btn-secondary" onclick="loadFamilyConnections()" style="padding: 6px 12px; font-size: 12px; margin: 0;">
+                                    🔄 Refresh
+                                </button>
+                            </div>
+                            <div id="familyConnectionsList">
+                                <p style="color: #999; font-size: 14px;">No family connections yet. Invite someone above!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="card">
                     <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="toggleSettingsCard('voiceSettings')">
                         <span>🔊 Voice Settings</span>
@@ -4902,7 +4947,7 @@
                                 Current Version
                             </p>
                             <p style="font-size: 20px; color: #38b2ac; margin: 0 0 5px 0; font-weight: 700; font-family: monospace;">
-                                2026-04-15-build-002
+                                2026-04-15-build-003
                             </p>
                             <p style="font-size: 13px; color: #718096; margin: 0;">
                                 April 15, 2026 at 6:45 PM UTC
@@ -5133,57 +5178,6 @@
                     </div>
                 </div>
 
-                <!-- Family Connections Card -->
-                <div class="card" style="margin-top: 30px;">
-                    <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;" onclick="toggleSettingsCard('familyConnections')">
-                        <span>👨‍👩‍👧 Family Connections</span>
-                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: rgba(255,255,255,0.2); color: white;" onclick="toggleSettingsCard('familyConnections'); event.stopPropagation();">
-                            <span id="settings-toggle-icon-familyConnections">▲</span>
-                        </button>
-                    </div>
-                    <div id="settingsCard-familyConnections" class="card-content" style="padding: 20px;">
-                        <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                            <h4 style="margin: 0 0 15px 0; color: #f5576c;">📧 Invite Family Member</h4>
-                            <div class="input-group">
-                                <label>Family Member Email</label>
-                                <input type="email" id="familyMemberEmail" placeholder="family@example.com">
-                            </div>
-                            <div class="input-group">
-                                <label>Family Member Username</label>
-                                <input type="text" id="familyMemberUsername" placeholder="their username">
-                            </div>
-                            <div class="input-group">
-                                <label>Relationship</label>
-                                <select id="familyRelationship" style="padding: 10px; border: 1px solid #ddd; border-radius: 6px; width: 100%; font-size: 14px;">
-                                    <option value="">Select relationship...</option>
-                                    <option value="Spouse">Spouse</option>
-                                    <option value="Husband">Husband</option>
-                                    <option value="Wife">Wife</option>
-                                    <option value="Mother">Mother</option>
-                                    <option value="Father">Father</option>
-                                    <option value="Son">Son</option>
-                                    <option value="Daughter">Daughter</option>
-                                    <option value="Brother">Brother</option>
-                                    <option value="Sister">Sister</option>
-                                    <option value="Caregiver">Caregiver</option>
-                                    <option value="Friend">Friend</option>
-                                </select>
-                            </div>
-                            <button class="btn btn-primary" onclick="inviteFamilyMember()" style="width: 100%;">Send Invitation</button>
-                        </div>
-                        <div>
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
-                                <h4 style="margin: 0; color: #333;">Your Family Connections</h4>
-                                <button class="btn btn-secondary" onclick="loadFamilyConnections()" style="padding: 6px 12px; font-size: 12px; margin: 0;">
-                                    🔄 Refresh
-                                </button>
-                            </div>
-                            <div id="familyConnectionsList">
-                                <p style="color: #999; font-size: 14px;">No family connections yet. Invite someone above!</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- FAMILY MEDICATION NOTIFICATIONS -->
                 <div class="card">
@@ -6517,7 +6511,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             startReminderChecker(); // Start checking for reminders
             
             // Check if we should show "Add to Home Screen" modal
-            checkAndShowAddToHomeModal();
+            // checkAndShowAddToHomeModal(); // Commented out for Build 003
             
             // Check if backup reminder is due (after a short delay to let app load)
             setTimeout(() => {
@@ -6646,7 +6640,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                 if (!hasSeenModal) {
                     // Delay slightly so user sees the main app first
                     setTimeout(() => {
-                        showAddToHomeModal();
+                        // showAddToHomeModal(); // Commented out for Build 003
                     }, 1000);
                 }
             }
