@@ -532,12 +532,15 @@ if (process.env.SENIOR_CARE_AWS_ACCESS_KEY && process.env.SENIOR_CARE_AWS_SECRET
     
     sns = new AWS.SNS();
     console.log('✅ AWS SNS initialized successfully');
+    console.log('   Region:', process.env.SENIOR_CARE_AWS_REGION || 'us-east-1');
   } catch (error) {
     console.error('⚠️ AWS SNS initialization failed:', error.message);
     console.log('ℹ️ SMS notifications will be unavailable');
   }
 } else {
   console.log('ℹ️ AWS credentials not configured. SMS notifications disabled.');
+  console.log('   AWS_ACCESS_KEY present:', !!process.env.SENIOR_CARE_AWS_ACCESS_KEY);
+  console.log('   AWS_SECRET_KEY present:', !!process.env.SENIOR_CARE_AWS_SECRET_ACCESS_KEY);
 }
 
 // Send SMS notification
