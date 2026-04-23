@@ -516,20 +516,41 @@ app.put('/api/features/:featureId/toggle', async (req, res) => {
 // SMS NOTIFICATIONS via AWS SNS
 // ============================================================
 
-const AWS = require('aws-sdk');
+let sns = null;
 
-// Configure AWS (using Vercel-safe environment variable names)
-AWS.config.update({
-  accessKeyId: process.env.SENIOR_CARE_AWS_ACCESS_KEY,
-  secretAccessKey: process.env.SENIOR_CARE_AWS_SECRET_ACCESS_KEY,
-  region: process.env.SENIOR_CARE_AWS_REGION || 'us-east-1'
-});
-
-const sns = new AWS.SNS();
+// Only initialize AWS SNS if credentials are provided
+if (process.env.SENIOR_CARE_AWS_ACCESS_KEY && process.env.SENIOR_CARE_AWS_SECRET_ACCESS_KEY) {
+  try {
+    const AWS = require('aws-sdk');
+    
+    // Configure AWS (using Vercel-safe environment variable names)
+    AWS.config.update({
+      accessKeyId: process.env.SENIOR_CARE_AWS_ACCESS_KEY,
+      secretAccessKey: process.env.SENIOR_CARE_AWS_SECRET_ACCESS_KEY,
+      region: process.env.SENIOR_CARE_AWS_REGION || 'us-east-1'
+    });
+    
+    sns = new AWS.SNS();
+    console.log('✅ AWS SNS initialized successfully');
+  } catch (error) {
+    console.error('⚠️ AWS SNS initialization failed:', error.message);
+    console.log('ℹ️ SMS notifications will be unavailable');
+  }
+} else {
+  console.log('ℹ️ AWS credentials not configured. SMS notifications disabled.');
+}
 
 // Send SMS notification
 app.post('/api/send-sms', async (req, res) => {
   try {
+    // Check if SNS is initialized
+    if (!sns) {
+      return res.status(503).json({ 
+        success: false, 
+        error: 'SMS service not configured. AWS credentials missing.' 
+      });
+    }
+
     const { phoneNumber, message } = req.body;
 
     // Validate inputs
@@ -574,6 +595,14 @@ app.post('/api/send-sms', async (req, res) => {
 // Test SMS endpoint (for testing)
 app.post('/api/test-sms', async (req, res) => {
   try {
+    // Check if SNS is initialized
+    if (!sns) {
+      return res.status(503).json({ 
+        success: false, 
+        error: 'SMS service not configured. AWS credentials missing.' 
+      });
+    }
+
     const { phoneNumber } = req.body;
 
     if (!phoneNumber) {
