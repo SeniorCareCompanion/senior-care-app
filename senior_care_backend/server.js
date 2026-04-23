@@ -518,11 +518,11 @@ app.put('/api/features/:featureId/toggle', async (req, res) => {
 
 const AWS = require('aws-sdk');
 
-// Configure AWS
+// Configure AWS (using Vercel-safe environment variable names)
 AWS.config.update({
-  accessKeyId: process.env.AWS_ACCESS_KEY,
-  secretAccessKey: process.env.AWS_SECRET_KEY,
-  region: process.env.AWS_SNS_REGION || 'us-east-1'
+  accessKeyId: process.env.SENIOR_CARE_AWS_ACCESS_KEY,
+  secretAccessKey: process.env.SENIOR_CARE_AWS_SECRET_ACCESS_KEY,
+  region: process.env.SENIOR_CARE_AWS_REGION || 'us-east-1'
 });
 
 const sns = new AWS.SNS();
