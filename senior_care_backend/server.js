@@ -641,12 +641,33 @@ app.post('/api/test-sms', async (req, res) => {
 // EMAIL NOTIFICATIONS via RESEND
 // ============================================================
 
-const resend = require('resend');
-const resendClient = new resend.Resend(process.env.RESEND_API_KEY);
+let resendClient = null;
+
+// Only initialize Resend if API key is provided
+if (process.env.RESEND_API_KEY) {
+  try {
+    const resend = require('resend');
+    resendClient = new resend.Resend(process.env.RESEND_API_KEY);
+    console.log('✅ Resend email client initialized successfully');
+  } catch (error) {
+    console.error('⚠️ Resend initialization failed:', error.message);
+    console.log('ℹ️ Email notifications will be unavailable');
+  }
+} else {
+  console.log('ℹ️ Resend API key not configured. Email notifications disabled.');
+}
 
 // Send email notification
 app.post('/api/send-email', async (req, res) => {
   try {
+    // Check if Resend is initialized
+    if (!resendClient) {
+      return res.status(503).json({ 
+        success: false, 
+        error: 'Email service not configured. Resend API key missing.' 
+      });
+    }
+
     const { email, subject, message, html } = req.body;
 
     // Validate inputs
@@ -692,6 +713,14 @@ app.post('/api/send-email', async (req, res) => {
 // Test email endpoint
 app.post('/api/test-email', async (req, res) => {
   try {
+    // Check if Resend is initialized
+    if (!resendClient) {
+      return res.status(503).json({ 
+        success: false, 
+        error: 'Email service not configured. Resend API key missing.' 
+      });
+    }
+
     const { email } = req.body;
 
     if (!email) {
