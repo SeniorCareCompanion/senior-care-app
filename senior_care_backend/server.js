@@ -682,7 +682,7 @@ app.post('/api/send-email', async (req, res) => {
 
     // Send via Resend
     const result = await resendClient.emails.send({
-      from: 'Senior Care Companion <noreply@seniorcare.com>',
+      from: 'Senior Care Companion <onboarding@resend.dev>',
       to: email,
       subject: subject,
       html: html || `<p>${message}</p>`,
@@ -731,7 +731,7 @@ app.post('/api/test-email', async (req, res) => {
     }
 
     const result = await resendClient.emails.send({
-      from: 'Senior Care Companion <noreply@seniorcare.com>',
+      from: 'Senior Care Companion <onboarding@resend.dev>',
       to: email,
       subject: '✅ Senior Care Companion - Email Test',
       html: `
