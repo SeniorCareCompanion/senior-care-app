@@ -223,9 +223,9 @@ app.delete('/api/family-connections/:connectionId', async (req, res) => {
 // Create a user if they don't exist
 app.post('/api/users', async (req, res) => {
     try {
-        const { id, username, email, age } = req.body;
+        const { id, username, email, age, firstName, lastName, phone } = req.body;
 
-        console.log(`Creating user: id=${id}, username=${username}, email=${email}, age=${age}`);
+        console.log(`Creating user: id=${id}, username=${username}, email=${email}, age=${age}, phone=${phone || 'not provided'}`);
 
         // Use provided email or generate a unique one
         const userEmail = email || `${username.toLowerCase()}-${id.substring(0, 8)}@senior-care.app`;
@@ -237,7 +237,13 @@ app.post('/api/users', async (req, res) => {
                 id, 
                 username,
                 email: userEmail,
-                age: age || null
+                age: age || null,
+                first_name: firstName || null,
+                last_name: lastName || null,
+                phone: phone || null,
+                phone_verified: false,
+                sms_reminders_enabled: true,
+                notify_family_on_med: false
             }])
             .select();
 

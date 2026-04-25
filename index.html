@@ -2305,11 +2305,16 @@
             <div class="input-group">
                 <label for="regEmail">Email Address</label>
                 <input type="email" id="regEmail" placeholder="your.email@example.com">
-                <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">📧 Used to send backup files to your inbox</p>
+                <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">📧 Required for Family Connection notifications and account recovery</p>
             </div>
             <div class="input-group">
                 <label for="regAge">Age</label>
                 <input type="number" id="regAge" placeholder="Enter your age" min="0" max="150">
+            </div>
+            <div class="input-group">
+                <label for="regPhone">Phone Number (Optional)</label>
+                <input type="tel" id="regPhone" placeholder="+1 (303) 555-1234" autocomplete="tel">
+                <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">📱 Used for SMS medication reminders. Format: +1 (555) 123-4567</p>
             </div>
             <div class="input-group">
                 <label for="regUsername">Username</label>
@@ -4669,7 +4674,12 @@
                     <div class="input-group">
                         <label>Email Address</label>
                         <input type="email" id="updateEmail">
-                        <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">📧 Used to send backup files to your inbox</p>
+                        <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">📧 Used for family notifications and account recovery</p>
+                    </div>
+                    <div class="input-group">
+                        <label>Phone Number (Optional)</label>
+                        <input type="tel" id="updatePhone" placeholder="+1 (303) 555-1234">
+                        <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">📱 Used for SMS medication reminders. Format: +1 (555) 123-4567</p>
                     </div>
                     <button class="btn btn-primary" onclick="updateProfile()">Update Profile</button>
                     </div>
@@ -6322,12 +6332,13 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             const lastName = document.getElementById('regLastName').value;
             const email = document.getElementById('regEmail').value;
             const age = document.getElementById('regAge').value;
+            const phone = document.getElementById('regPhone').value.trim(); // Optional
             const username = document.getElementById('regUsername').value;
             const password = document.getElementById('regPassword').value;
             const confirmPassword = document.getElementById('regConfirmPassword').value;
 
             if (!firstName || !lastName || !email || !age || !username || !password || !confirmPassword) {
-                alert('Please fill in all fields');
+                alert('Please fill in all required fields');
                 return;
             }
 
@@ -6353,6 +6364,18 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                 return;
             }
 
+            // Validate phone if provided (basic validation)
+            let phoneToStore = phone || null;
+            if (phone) {
+                // Remove all non-digit characters except leading +
+                const phoneDigits = phone.replace(/[^\d+]/g, '');
+                if (phoneDigits.length < 10) {
+                    alert('Please enter a valid phone number (at least 10 digits)');
+                    return;
+                }
+                phoneToStore = phoneDigits;
+            }
+
             const users = loadData('users') || {};
             
             if (users[username]) {
@@ -6365,6 +6388,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                 lastName: lastName,
                 email: email,
                 age: ageNum,
+                phone: phoneToStore,
                 password: password,
                 medications: [],
                 appointments: [],
@@ -6392,7 +6416,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                 await fetch('https://senior-care-backend.vercel.app/api/users', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: userId, username, email, age: ageNum, firstName, lastName })
+                    body: JSON.stringify({ id: userId, username, email, age: ageNum, firstName, lastName, phone: phoneToStore })
                 });
             } catch(e) { console.log('Backend error:', e.message); }
             
@@ -10467,6 +10491,7 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                 <p style="margin-bottom: 10px;"><strong>Name:</strong> ${userData.firstName ? userData.firstName + ' ' + (userData.lastName || '') : userData.name || 'Not set'}</p>
                 <p style="margin-bottom: 10px;"><strong>Age:</strong> ${userData.age}</p>
                 <p style="margin-bottom: 10px;"><strong>Email:</strong> ${userData.email || 'Not set'}</p>
+                <p style="margin-bottom: 10px;"><strong>Phone:</strong> ${userData.phone || 'Not set'}</p>
                 <p><strong>Username:</strong> ${currentUser}</p>
             `;
 
@@ -10476,6 +10501,7 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
             document.getElementById('updateLastName').value = lastName;
             document.getElementById('updateAge').value = userData.age;
             document.getElementById('updateEmail').value = userData.email || '';
+            document.getElementById('updatePhone').value = userData.phone || '';
             
             // Load voice preference checkbox state
             loadVoicePreference();
@@ -10762,12 +10788,14 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
 
 
         function updateProfile() {
-            const name = document.getElementById('updateName').value;
+            const firstName = document.getElementById('updateFirstName').value;
+            const lastName = document.getElementById('updateLastName').value;
             const age = document.getElementById('updateAge').value;
             const email = document.getElementById('updateEmail').value;
+            const phone = document.getElementById('updatePhone').value.trim(); // Optional
 
-            if (!name || !age || !email) {
-                alert('Please fill in all fields');
+            if (!firstName || !lastName || !age || !email) {
+                alert('Please fill in all required fields');
                 return;
             }
 
@@ -10778,14 +10806,26 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                 return;
             }
 
+            // Validate phone if provided
+            let phoneToStore = phone || null;
+            if (phone) {
+                const phoneDigits = phone.replace(/[^\d+]/g, '');
+                if (phoneDigits.length < 10) {
+                    alert('Please enter a valid phone number (at least 10 digits)');
+                    return;
+                }
+                phoneToStore = phoneDigits;
+            }
+
             const users = loadData('users');
             users[currentUser].firstName = firstName;
             users[currentUser].lastName = lastName;
             users[currentUser].age = age;
             users[currentUser].email = email;
+            users[currentUser].phone = phoneToStore;
             saveData('users', users);
 
-            document.getElementById('userName').textContent = name;
+            document.getElementById('userName').textContent = firstName + ' ' + lastName;
             loadProfile(users[currentUser]);
             speak('Profile updated successfully');
         }
