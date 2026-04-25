@@ -638,6 +638,103 @@ app.post('/api/test-sms', async (req, res) => {
 });
 
 // ============================================================
+// EMAIL NOTIFICATIONS via RESEND
+// ============================================================
+
+const resend = require('resend');
+const resendClient = new resend.Resend(process.env.RESEND_API_KEY);
+
+// Send email notification
+app.post('/api/send-email', async (req, res) => {
+  try {
+    const { email, subject, message, html } = req.body;
+
+    // Validate inputs
+    if (!email || !subject || (!message && !html)) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Email, subject, and message (or html) required' 
+      });
+    }
+
+    console.log(`📧 Sending email to ${email}: ${subject}`);
+
+    // Send via Resend
+    const result = await resendClient.emails.send({
+      from: 'Senior Care Companion <noreply@seniorcare.com>',
+      to: email,
+      subject: subject,
+      html: html || `<p>${message}</p>`,
+      reply_to: 'support@seniorcare.com'
+    });
+
+    if (result.error) {
+      throw result.error;
+    }
+
+    console.log(`✅ Email sent successfully. MessageId: ${result.data.id}`);
+
+    res.json({ 
+      success: true, 
+      messageId: result.data.id,
+      email: email
+    });
+
+  } catch (error) {
+    console.error('❌ Email Error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// Test email endpoint
+app.post('/api/test-email', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Email required' 
+      });
+    }
+
+    const result = await resendClient.emails.send({
+      from: 'Senior Care Companion <noreply@seniorcare.com>',
+      to: email,
+      subject: '✅ Senior Care Companion - Email Test',
+      html: `
+        <h2>Email Notifications Working!</h2>
+        <p>This is a test email from Senior Care Companion.</p>
+        <p>When family members are invited, they'll receive emails like this when medications are logged.</p>
+        <hr>
+        <p style="color: #666; font-size: 12px;">Senior Care Companion</p>
+      `,
+      reply_to: 'support@seniorcare.com'
+    });
+
+    if (result.error) {
+      throw result.error;
+    }
+
+    res.json({ 
+      success: true, 
+      message: 'Test email sent!',
+      messageId: result.data.id
+    });
+
+  } catch (error) {
+    console.error('❌ Test Email Error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// ============================================================
 // ERROR HANDLING
 // ============================================================
 
