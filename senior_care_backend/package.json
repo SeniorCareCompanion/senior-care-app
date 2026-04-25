@@ -13,9 +13,10 @@
   "type": "commonjs",
   "dependencies": {
     "@supabase/supabase-js": "^2.98.0",
-    "aws-sdk": "^2.1693.0",
+    "aws-sdk": "^1.18.0",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "resend": "^6.1.3"
   }
 }
