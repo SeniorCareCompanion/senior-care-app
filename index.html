@@ -2424,6 +2424,9 @@
                 <button class="top-nav-tab" onclick="showTopSection('profile')" id="topTab-profile" style="background: white; color: #667eea; border: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.15);">
                     👤 Profile
                 </button>
+                <button class="top-nav-tab" onclick="showTopSection('family')" id="topTab-family" style="background: rgba(255,255,255,0.25); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                    👨‍👩‍👧 Family
+                </button>
                 <button class="top-nav-tab" onclick="showTopSection('settings')" id="topTab-settings" style="background: rgba(255,255,255,0.25); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
                     ⚙️ Settings
                 </button>
@@ -4726,30 +4729,29 @@
                 
             </div>
                 
-                <!-- Release Notes / What's New -->
-            <!-- Settings Section -->
-            <div id="settings" class="section">
-                <h2 class="section-title">⚙️ Settings</h2>
+            <!-- Family Section -->
+            <div id="family" class="section">
+                <h2 class="section-title">👨‍👩‍👧 Family</h2>
                 
                 <!-- Expand/Collapse All Controls -->
                 <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <button class="btn btn-secondary" onclick="expandAllSettingsCards()" style="flex: 1; padding: 10px; font-size: 14px;">
+                    <button class="btn btn-secondary" onclick="expandAllFamilyCards()" style="flex: 1; padding: 10px; font-size: 14px;">
                         ▲ Expand All
                     </button>
-                    <button class="btn btn-secondary" onclick="collapseAllSettingsCards()" style="flex: 1; padding: 10px; font-size: 14px;">
+                    <button class="btn btn-secondary" onclick="collapseAllFamilyCards()" style="flex: 1; padding: 10px; font-size: 14px;">
                         ▼ Collapse All
                     </button>
                 </div>
 
-                <!-- Family Connections Card -->
+                <!-- Family Connections Card (MOVED FROM SETTINGS) -->
                 <div class="card" style="margin-top: 30px;">
-                    <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;" onclick="toggleSettingsCard('familyConnections')">
+                    <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;" onclick="toggleFamilyCard('familyConnections')">
                         <span>👨‍👩‍👧 Family Connections</span>
-                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: rgba(255,255,255,0.2); color: white;" onclick="toggleSettingsCard('familyConnections'); event.stopPropagation();">
-                            <span id="settings-toggle-icon-familyConnections">▲</span>
+                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: rgba(255,255,255,0.2); color: white;" onclick="toggleFamilyCard('familyConnections'); event.stopPropagation();">
+                            <span id="family-toggle-icon-familyConnections">▲</span>
                         </button>
                     </div>
-                    <div id="settingsCard-familyConnections" class="card-content" style="padding: 20px;">
+                    <div id="familyCard-familyConnections" class="card-content" style="padding: 20px;">
                         <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
                             <h4 style="margin: 0 0 15px 0; color: #f5576c;">📧 Invite Family Member</h4>
                             <div class="input-group">
@@ -4792,6 +4794,49 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Family Updates Card (MOVED FROM SETTINGS) -->
+                <div class="card">
+                    <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white;" onclick="toggleFamilyCard('familyNotifications')">
+                        <span>📬 Family Updates</span>
+                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: rgba(255,255,255,0.2); color: white;" onclick="toggleFamilyCard('familyNotifications'); event.stopPropagation();">
+                            <span id="family-toggle-icon-familyNotifications">▲</span>
+                        </button>
+                    </div>
+                    <div id="familyCard-familyNotifications" class="card-content" style="padding: 20px;">
+                        <p style="margin-bottom: 15px; color: #666; font-size: 14px;">See when your family members take their medications</p>
+                        
+                        <div id="familyNotificationsList" style="max-height: 400px; overflow-y: auto;">
+                            <div style="text-align: center; color: #999; padding: 40px 20px;">
+                                <p style="font-size: 14px;">Loading updates...</p>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-secondary" onclick="loadFamilyMedicationNotifications()" style="width: 100%; margin-top: 15px;">
+                            🔄 Refresh
+                        </button>
+                    </div>
+                </div>
+                
+            </div>
+                
+                <!-- Release Notes / What's New -->
+            <!-- Settings Section -->
+            <div id="settings" class="section">
+                <h2 class="section-title">⚙️ Settings</h2>
+                
+                <!-- Expand/Collapse All Controls -->
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button class="btn btn-secondary" onclick="expandAllSettingsCards()" style="flex: 1; padding: 10px; font-size: 14px;">
+                        ▲ Expand All
+                    </button>
+                    <button class="btn btn-secondary" onclick="collapseAllSettingsCards()" style="flex: 1; padding: 10px; font-size: 14px;">
+                        ▼ Collapse All
+                    </button>
+                </div>
+
+
+                <!-- Voice Settings Card -->
                 <div class="card">
                     <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="toggleSettingsCard('voiceSettings')">
                         <span>🔊 Voice Settings</span>
@@ -5188,29 +5233,6 @@
                     </div>
                 </div>
 
-
-                <!-- FAMILY MEDICATION NOTIFICATIONS -->
-                <div class="card">
-                    <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white;" onclick="toggleSettingsCard('familyNotifications')">
-                        <span>📬 Family Updates</span>
-                        <button class="action-btn" style="font-size: 18px; padding: 5px 12px; background: rgba(255,255,255,0.2); color: white;" onclick="toggleSettingsCard('familyNotifications'); event.stopPropagation();">
-                            <span id="settings-toggle-icon-familyNotifications">▲</span>
-                        </button>
-                    </div>
-                    <div id="settingsCard-familyNotifications" class="card-content" style="padding: 20px;">
-                        <p style="margin-bottom: 15px; color: #666; font-size: 14px;">See when your family members take their medications</p>
-                        
-                        <div id="familyNotificationsList" style="max-height: 400px; overflow-y: auto;">
-                            <div style="text-align: center; color: #999; padding: 40px 20px;">
-                                <p style="font-size: 14px;">Loading updates...</p>
-                            </div>
-                        </div>
-                        
-                        <button class="btn btn-secondary" onclick="loadFamilyMedicationNotifications()" style="width: 100%; margin-top: 15px;">
-                            🔄 Refresh
-                        </button>
-                    </div>
-                </div>
 
             </div>
         </div> <!-- Close mainApp -->
@@ -10633,7 +10655,90 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
         }
         window.toggleSettingsCard = toggleSettingsCard;
         
-        // Test function to debug settings cards
+        // Toggle Family Cards (similar to Settings cards)
+        function toggleFamilyCard(cardKey) {
+            console.log(`🔧 toggleFamilyCard called with: ${cardKey}`);
+            
+            const contentDiv = document.getElementById(`familyCard-${cardKey}`);
+            const toggleIcon = document.getElementById(`family-toggle-icon-${cardKey}`);
+            
+            console.log(`  contentDiv found: ${contentDiv ? 'YES' : 'NO'}`);
+            console.log(`  toggleIcon found: ${toggleIcon ? 'YES' : 'NO'}`);
+            
+            if (!contentDiv || !toggleIcon) {
+                console.error(`❌ Missing elements for card: ${cardKey}`);
+                return;
+            }
+            
+            const currentDisplay = contentDiv.style.display;
+            const isHidden = currentDisplay === 'none';
+            
+            console.log(`  Current display: "${currentDisplay}"`);
+            console.log(`  Is hidden: ${isHidden}`);
+            
+            contentDiv.style.display = isHidden ? 'block' : 'none';
+            toggleIcon.textContent = isHidden ? '▲' : '▼';
+            
+            console.log(`  New display: "${contentDiv.style.display}"`);
+            console.log(`  New icon: "${toggleIcon.textContent}"`);
+            
+            // Save state to localStorage
+            const minimizedFamily = JSON.parse(localStorage.getItem('minimizedFamily') || '{}');
+            minimizedFamily[cardKey] = !isHidden;
+            localStorage.setItem('minimizedFamily', JSON.stringify(minimizedFamily));
+            
+            console.log(`✅ toggleFamilyCard complete for: ${cardKey}`);
+        }
+        window.toggleFamilyCard = toggleFamilyCard;
+        
+        // Expand all Family cards
+        function expandAllFamilyCards() {
+            console.log('👨‍👩‍👧 Expanding all Family cards...');
+            const familyCards = ['familyConnections', 'familyNotifications'];
+            familyCards.forEach(cardKey => {
+                const contentDiv = document.getElementById(`familyCard-${cardKey}`);
+                const toggleIcon = document.getElementById(`family-toggle-icon-${cardKey}`);
+                if (contentDiv && toggleIcon) {
+                    contentDiv.style.display = 'block';
+                    toggleIcon.textContent = '▲';
+                }
+            });
+            const minimizedFamily = {};
+            localStorage.setItem('minimizedFamily', JSON.stringify(minimizedFamily));
+        }
+        window.expandAllFamilyCards = expandAllFamilyCards;
+        
+        // Collapse all Family cards
+        function collapseAllFamilyCards() {
+            console.log('👨‍👩‍👧 Collapsing all Family cards...');
+            const familyCards = ['familyConnections', 'familyNotifications'];
+            familyCards.forEach(cardKey => {
+                const contentDiv = document.getElementById(`familyCard-${cardKey}`);
+                const toggleIcon = document.getElementById(`family-toggle-icon-${cardKey}`);
+                if (contentDiv && toggleIcon) {
+                    contentDiv.style.display = 'none';
+                    toggleIcon.textContent = '▼';
+                }
+            });
+            const minimizedFamily = {'familyConnections': true, 'familyNotifications': true};
+            localStorage.setItem('minimizedFamily', JSON.stringify(minimizedFamily));
+        }
+        window.collapseAllFamilyCards = collapseAllFamilyCards;
+        
+        // Test function to debug family cards
+        function debugFamilyCard(cardKey) {
+            console.log(`🔍 DEBUG: Checking family card: ${cardKey}`);
+            const contentDiv = document.getElementById(`familyCard-${cardKey}`);
+            const toggleIcon = document.getElementById(`family-toggle-icon-${cardKey}`);
+            const headerDiv = document.querySelector(`[onclick*="toggleFamilyCard('${cardKey}')"]`);
+            
+            console.log(`  Content div: ${contentDiv ? 'FOUND' : 'NOT FOUND'}`);
+            console.log(`  Toggle icon: ${toggleIcon ? 'FOUND' : 'NOT FOUND'}`);
+            console.log(`  Header div: ${headerDiv ? 'FOUND' : 'NOT FOUND'}`);
+        }
+        window.debugFamilyCard = debugFamilyCard;
+        
+
         function debugSettingsCard(cardKey) {
             console.log(`🔍 DEBUG: Checking settings card: ${cardKey}`);
             const contentDiv = document.getElementById(`settingsCard-${cardKey}`);
@@ -10658,7 +10763,7 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
 
         // Expand all settings cards
         function expandAllSettingsCards() {
-            const cardKeys = ['voiceSettings', 'notifications', 'dataManagement', 'appVersion', 'releaseNotes', 'aboutApp', 'familyConnections', 'familyNotifications'];
+            const cardKeys = ['voiceSettings', 'notifications', 'dataManagement', 'appVersion', 'releaseNotes', 'aboutApp'];
             const minimizedSettings = {};
             
             cardKeys.forEach(cardKey => {
@@ -10679,7 +10784,7 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
 
         // Collapse all settings cards
         function collapseAllSettingsCards() {
-            const cardKeys = ['voiceSettings', 'notifications', 'dataManagement', 'appVersion', 'releaseNotes', 'aboutApp', 'familyConnections', 'familyNotifications'];
+            const cardKeys = ['voiceSettings', 'notifications', 'dataManagement', 'appVersion', 'releaseNotes', 'aboutApp'];
             const minimizedSettings = {};
             
             cardKeys.forEach(cardKey => {
@@ -10728,7 +10833,7 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
             // ALWAYS initialize Settings cards when showing Settings
             if (sectionName === 'settings') {
                 console.log('⚙️ Initializing Settings cards...');
-                const settingsCards = ['voiceSettings', 'notifications', 'dataManagement', 'appVersion', 'releaseNotes', 'aboutApp', 'familyConnections', 'familyNotifications'];
+                const settingsCards = ['voiceSettings', 'notifications', 'dataManagement', 'appVersion', 'releaseNotes', 'aboutApp'];
                 const minimizedSettings = JSON.parse(localStorage.getItem('minimizedSettings') || '{}');
                 console.log('  Saved minimized state:', minimizedSettings);
                 
@@ -10763,7 +10868,40 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                 console.log('🔔 Initializing notification preferences...');
                 initializeNotificationsPreference();
                 updateNotificationButton();
+            }
+            
+            // ALWAYS initialize Family cards when showing Family tab
+            if (sectionName === 'family') {
+                console.log('👨‍👩‍👧 Initializing Family cards...');
+                const familyCards = ['familyConnections', 'familyNotifications'];
+                const minimizedFamily = JSON.parse(localStorage.getItem('minimizedFamily') || '{}');
+                console.log('  Saved minimized state:', minimizedFamily);
+                
+                familyCards.forEach(cardKey => {
+                    const contentDiv = document.getElementById(`familyCard-${cardKey}`);
+                    const toggleIcon = document.getElementById(`family-toggle-icon-${cardKey}`);
+                    
+                    console.log(`  Card ${cardKey}:`, {
+                        contentDiv: contentDiv ? 'FOUND' : 'NOT FOUND',
+                        toggleIcon: toggleIcon ? 'FOUND' : 'NOT FOUND'
+                    });
+                    
+                    if (contentDiv && toggleIcon) {
+                        if (minimizedFamily[cardKey]) {
+                            contentDiv.style.display = 'none';
+                            toggleIcon.textContent = '▼';
+                        } else {
+                            contentDiv.style.display = 'block';
+                            toggleIcon.textContent = '▲';
+                        }
+                    }
+                });
+                
+                console.log('✅ Family cards initialization complete');
+                
+                // Load family data
                 loadFamilyConnections();
+                loadFamilyMedicationNotifications();
             }
             
             // Update top tab styling
