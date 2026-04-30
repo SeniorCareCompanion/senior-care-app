@@ -4,15 +4,104 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-04-27-build-003
-    BUILD DATE: April 27, 2026 at 20:02 PM UTC
+    VERSION: 2026-04-30-build-001
+    BUILD DATE: April 15, 2026 at 20:15 UTC
     BUILD SYSTEM: Incremental build numbers (reset daily)
-    CRITICAL FIX: Medication reminders not triggering - initializeNotificationsPreference() now called on login
     
-    🎯 UX IMPROVEMENT: BETA VERSION VISIBILITY
+    🎯 NEW FEATURE: DEDICATED FAMILY TAB
     
-    Based on user request: "Version is hidden... it's one of the first 
-    things I'll ask a tester. Should we add to login page for beta testing?"
+    User Feedback: "Would it be easier to have a different tab for family 
+    connections? We have Profile and Settings at the top."
+    
+    ✨ SOLUTION: Added dedicated Family tab!
+    
+    ═══════════════════════════════════════════════════════════════════
+    CHANGE #1: NEW FAMILY TAB IN TOP NAVIGATION
+    ═══════════════════════════════════════════════════════════════════
+    
+    ✅ ADDED FAMILY TAB BETWEEN PROFILE AND SETTINGS
+    
+    Top Navigation Now Shows:
+    ```
+    [👤 Profile] [👨‍👩‍👧 Family] [⚙️ Settings]
+    ```
+    
+    Benefits:
+    ✅ Family features are discoverable and prominent
+    ✅ Clear separation of concerns (Profile/Family/Settings)
+    ✅ Seniors won't miss family notifications
+    ✅ Settings page is now cleaner and more focused
+    ✅ Logical grouping - all family stuff in one place
+    ✅ Room for future family features
+    
+    ═══════════════════════════════════════════════════════════════════
+    CHANGE #2: FAMILY CONNECTIONS MOVED TO FAMILY TAB
+    ═══════════════════════════════════════════════════════════════════
+    
+    FROM: Settings section
+    TO: Family tab (dedicated)
+    
+    Features (unchanged functionality):
+    ✅ Invite family members by email + username
+    ✅ Set relationship type (Spouse, Child, Caregiver, etc.)
+    ✅ View pending invitations from other seniors
+    ✅ Accept/decline invitations
+    ✅ See your sent invitations and their approval status
+    
+    ═══════════════════════════════════════════════════════════════════
+    CHANGE #3: FAMILY UPDATES MOVED TO FAMILY TAB
+    ═══════════════════════════════════════════════════════════════════
+    
+    FROM: Settings section
+    TO: Family tab (dedicated)
+    
+    Features (unchanged functionality):
+    ✅ See when family members take their medications
+    ✅ Grouped notifications by senior name
+    ✅ Timestamps for each notification
+    ✅ Visual indicators (✅ for taken, ⚠️ for alerts)
+    ✅ Manual refresh button
+    
+    ═══════════════════════════════════════════════════════════════════
+    IMPLEMENTATION DETAILS
+    ═══════════════════════════════════════════════════════════════════
+    
+    HTML Changes:
+    ✅ New <div id="family" class="section"> added
+    ✅ Family Connections card moved from Settings to Family
+    ✅ Family Updates card moved from Settings to Family
+    ✅ Card IDs updated: settingsCard-* → familyCard-*
+    ✅ Toggle icons updated: settings-toggle-icon-* → family-toggle-icon-*
+    
+    JavaScript Changes:
+    ✅ New toggleFamilyCard() function for card expand/collapse
+    ✅ New expandAllFamilyCards() function
+    ✅ New collapseAllFamilyCards() function
+    ✅ Updated showTopSection() to handle 'family' section
+    ✅ Separate localStorage key: 'minimizedFamily' (vs 'minimizedSettings')
+    ✅ Auto-loads family data when Family tab is opened
+    
+    Settings Updates:
+    ✅ Removed family cards from Settings initialization
+    ✅ Settings page now contains: Voice, Notifications, Data, Version, Release Notes, About
+    ✅ Cleaner, more focused Settings experience
+    
+    ═══════════════════════════════════════════════════════════════════
+    DATABASE & API: NO CHANGES
+    ═══════════════════════════════════════════════════════════════════
+    
+    This is purely a UI reorganization. The following remain identical:
+    ✅ Database schema (Supabase tables)
+    ✅ API endpoints (Vercel backend)
+    ✅ All backend functionality
+    ✅ All family connection logic
+    ✅ All notification loading
+    ✅ No data migration needed
+    
+    ═══════════════════════════════════════════════════════════════════
+    PREVIOUS VERSION (2026-04-30-build-001 UTC):
+    
+    ✅ CRITICAL FIX: Medication reminders not triggering - initializeNotificationsPreference() now called on login
     
     ═══════════════════════════════════════════════════════════════════
     CHANGE #1: BETA BANNER ON LOGIN PAGE
@@ -4999,9 +5088,13 @@
                     <div id="settingsCard-appVersion" class="card-content">
                         <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #48bb7815 0%, #38b2ac15 100%); border-radius: 8px; border: 2px solid #38b2ac; margin-bottom: 15px;">
                             <p style="font-size: 14px; color: #2d3748; margin: 0 0 10px 0; font-weight: 600;">
-                                2026-04-27-build-003</p>
+                                Current Version
+                            </p>
+                            <p style="font-size: 20px; color: #38b2ac; margin: 0 0 5px 0; font-weight: 700; font-family: monospace;">
+                                2026-04-30-build-001
+                            </p>
                             <p style="font-size: 13px; color: #718096; margin: 0;">
-                                April 27, 2026 at 20:02 PM UTC
+                                April 30, 2026 at 01:54 AM UTC
                             </p>
                         </div>
                         
@@ -14188,7 +14281,34 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                             <h5 style="margin: 0 0 10px 0; color: #333; font-size: 14px; font-weight: 600;">👤 ${seniorName}</h5>
                     `;
                     notifs.forEach(notif => {
-                        const time = new Date(notif.created_at || notif.sent_at).toLocaleString();
+                        // Format timestamp in user's LOCAL timezone (auto-detected)
+                        let time = 'Unknown time';
+                        try {
+                            const utcDate = new Date(notif.created_at || notif.sent_at);
+                            
+                            // Get user's local timezone automatically
+                            const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                            console.log(`🌍 User timezone: ${userTimeZone}`);
+                            
+                            // Format options using user's local timezone
+                            const options = {
+                                year: 'numeric',
+                                month: 'numeric',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                second: '2-digit',
+                                hour12: true,
+                                timeZone: userTimeZone // Use their local timezone!
+                            };
+                            
+                            time = new Intl.DateTimeFormat('en-US', options).format(utcDate);
+                            console.log(`📅 Formatted time: ${time}`);
+                        } catch (timeError) {
+                            console.error('❌ Error formatting time:', timeError);
+                            time = new Date(notif.created_at || notif.sent_at).toLocaleString();
+                        }
+                        
                         const icon = notif.notification_type === 'medication_taken' ? '✅' : '⚠️';
                         const bgColor = notif.notification_type === 'medication_taken' ? '#e6f7ed' : '#fff5e6';
                         const borderColor = notif.notification_type === 'medication_taken' ? '#81c784' : '#ffb74d';
