@@ -688,11 +688,11 @@ app.post('/api/send-email', async (req, res) => {
 
     // Send via Resend
     const result = await resendClient.emails.send({
-      from: 'Senior Care Companion <onboarding@resend.dev>',
+      from: 'Family Care 360 <noreply@familycare360.app>',
       to: email,
       subject: subject,
       html: html || `<p>${message}</p>`,
-      reply_to: 'support@seniorcare.com'
+      reply_to: 'support@familycare360.app'
     });
 
     if (result.error) {
@@ -737,17 +737,17 @@ app.post('/api/test-email', async (req, res) => {
     }
 
     const result = await resendClient.emails.send({
-      from: 'Senior Care Companion <onboarding@resend.dev>',
+      from: 'Family Care 360 <noreply@familycare360.app>',
       to: email,
-      subject: '✅ Senior Care Companion - Email Test',
+      subject: '✅ Family Care 360 - Email Test',
       html: `
         <h2>Email Notifications Working!</h2>
-        <p>This is a test email from Senior Care Companion.</p>
+        <p>This is a test email from Family Care 360.</p>
         <p>When family members are invited, they'll receive emails like this when medications are logged.</p>
         <hr>
-        <p style="color: #666; font-size: 12px;">Senior Care Companion</p>
+        <p style="color: #666; font-size: 12px;">Family Care 360</p>
       `,
-      reply_to: 'support@seniorcare.com'
+      reply_to: 'support@familycare360.app'
     });
 
     if (result.error) {
