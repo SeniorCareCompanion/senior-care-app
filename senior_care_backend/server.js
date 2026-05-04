@@ -353,7 +353,7 @@ app.get('/api/medications/adherence/:userId', async (req, res) => {
 // Send notification to family members
 async function sendMedicationNotification(seniorUserId, medicationName, action) {
     try {
-        // Get all family members for this senior
+        // Get all APPROVED family members for this senior
         const { data: connections, error: connectError } = await supabase
             .from('family_connections')
             .select('family_member_user_id')
@@ -377,8 +377,16 @@ async function sendMedicationNotification(seniorUserId, medicationName, action) 
             ? `${seniorName} just took their ${medicationName}`
             : `${seniorName} missed their ${medicationName}`;
 
-        // Log notification for each family member
+        // Log notification and send email for each family member
         for (const connection of connections || []) {
+            // Get family member's email
+            const { data: familyMember } = await supabase
+                .from('users')
+                .select('email')
+                .eq('id', connection.family_member_user_id)
+                .single();
+
+            // Log notification to database
             await supabase
                 .from('notification_logs')
                 .insert({
@@ -388,6 +396,36 @@ async function sendMedicationNotification(seniorUserId, medicationName, action) 
                     medication_id: medicationName,
                     message: message
                 });
+
+            // Send email notification if email service is available
+            if (resendClient && familyMember?.email) {
+                try {
+                    const emailSubject = action === 'taken' 
+                        ? `✅ ${seniorName} took their ${medicationName}`
+                        : `⚠️ ${seniorName} missed their ${medicationName}`;
+
+                    const emailHtml = `
+                        <h2>${message}</h2>
+                        <p>Medication: <strong>${medicationName}</strong></p>
+                        <p>Time: ${new Date().toLocaleString()}</p>
+                        <hr>
+                        <p style="color: #666; font-size: 12px;">Family Care 360</p>
+                    `;
+
+                    await resendClient.emails.send({
+                        from: 'Family Care 360 <noreply@familycare360.app>',
+                        to: familyMember.email,
+                        subject: emailSubject,
+                        html: emailHtml,
+                        reply_to: 'support@familycare360.app'
+                    });
+
+                    console.log(`📧 Email sent to ${familyMember.email} for ${medicationName}`);
+                } catch (emailError) {
+                    console.error(`⚠️ Failed to send email to ${familyMember?.email}:`, emailError.message);
+                    // Don't throw - notification was logged even if email failed
+                }
+            }
         }
 
         console.log(`✅ Notifications sent for: ${medicationName}`);
