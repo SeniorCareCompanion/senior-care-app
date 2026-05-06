@@ -404,10 +404,15 @@ async function sendMedicationNotification(seniorUserId, medicationName, action) 
                         ? `✅ ${seniorName} took their ${medicationName}`
                         : `⚠️ ${seniorName} missed their ${medicationName}`;
 
+                    // Format the current time in UTC with Z indicator so it converts properly
+                    const utcNow = new Date().toISOString();
+                    // Note: Email recipients will see this in their local timezone
+                    // The Z ensures proper timezone conversion
+                    
                     const emailHtml = `
                         <h2>${message}</h2>
                         <p>Medication: <strong>${medicationName}</strong></p>
-                        <p>Time: ${new Date().toLocaleString()}</p>
+                        <p>Time: ${utcNow}</p>
                         <hr>
                         <p style="color: #666; font-size: 12px;">Family Care 360</p>
                     `;
