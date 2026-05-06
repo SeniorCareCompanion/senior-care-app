@@ -305,6 +305,8 @@ app.put('/api/users/:userId/timezone', async (req, res) => {
     }
 });
 
+// Log medication as taken
+app.post('/api/medications/mark-taken', async (req, res) => {
     try {
         const { user_id, medication_id, medication_name } = req.body;
 
