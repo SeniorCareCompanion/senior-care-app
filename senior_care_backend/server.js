@@ -16,7 +16,6 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.options('*', cors());
 
 // ============================================================
 // SUPABASE CLIENT
@@ -273,7 +272,7 @@ app.post('/api/users', async (req, res) => {
     }
 });
 
-// Update user's timezone (called on login to capture device timezone)
+// Update user's timezone
 app.put('/api/users/:userId/timezone', async (req, res) => {
     try {
         const { userId } = req.params;
@@ -387,7 +386,7 @@ app.get('/api/medications/adherence/:userId', async (req, res) => {
 // Send notification to family members
 async function sendMedicationNotification(seniorUserId, medicationName, action) {
     try {
-        // Get all APPROVED family members for this senior
+        // Get all family members for this senior
         const { data: connections, error: connectError } = await supabase
             .from('family_connections')
             .select('family_member_user_id')
@@ -413,10 +412,10 @@ async function sendMedicationNotification(seniorUserId, medicationName, action) 
 
         // Log notification and send email for each family member
         for (const connection of connections || []) {
-            // Get family member's email
+            // Get family member's email and timezone
             const { data: familyMember } = await supabase
                 .from('users')
-                .select('email')
+                .select('email, timezone')
                 .eq('id', connection.family_member_user_id)
                 .single();
 
@@ -431,23 +430,14 @@ async function sendMedicationNotification(seniorUserId, medicationName, action) 
                     message: message
                 });
 
-            // Send email notification if email service is available
+            // Send email notification if service available
             if (resendClient && familyMember?.email) {
                 try {
                     const emailSubject = action === 'taken' 
                         ? `✅ ${seniorName} took their ${medicationName}`
                         : `⚠️ ${seniorName} missed their ${medicationName}`;
 
-                    // Get family member's timezone to format time correctly in email
-                    const { data: familyMemberData } = await supabase
-                        .from('users')
-                        .select('timezone')
-                        .eq('id', connection.family_member_user_id)
-                        .single();
-
-                    const familyTimezone = familyMemberData?.timezone || 'UTC';
-
-                    // Format time in family member's local timezone
+                    const familyTimezone = familyMember?.timezone || 'UTC';
                     const now = new Date();
                     let formattedTime = 'Unknown time';
                     
@@ -463,9 +453,7 @@ async function sendMedicationNotification(seniorUserId, medicationName, action) 
                             timeZone: familyTimezone
                         };
                         formattedTime = new Intl.DateTimeFormat('en-US', options).format(now);
-                        console.log(`⏰ Formatted time for ${familyMemberData?.email} (${familyTimezone}): ${formattedTime}`);
                     } catch (timeError) {
-                        console.error('⚠️ Error formatting time:', timeError.message);
                         formattedTime = now.toLocaleString();
                     }
                     
@@ -488,7 +476,6 @@ async function sendMedicationNotification(seniorUserId, medicationName, action) 
                     console.log(`📧 Email sent to ${familyMember.email} for ${medicationName}`);
                 } catch (emailError) {
                     console.error(`⚠️ Failed to send email to ${familyMember?.email}:`, emailError.message);
-                    // Don't throw - notification was logged even if email failed
                 }
             }
         }
@@ -527,15 +514,12 @@ app.get('/api/notifications/:familyMemberId', async (req, res) => {
 
         // Ensure all timestamps have Z appended (UTC indicator)
         const fixedData = data.map(notification => {
-            // Add Z to sent_at if it doesn't have it
             if (notification.sent_at && !notification.sent_at.endsWith('Z')) {
                 notification.sent_at = notification.sent_at + 'Z';
             }
-            // Add Z to created_at if it exists and doesn't have it
             if (notification.created_at && !notification.created_at.endsWith('Z')) {
                 notification.created_at = notification.created_at + 'Z';
             }
-            // Add Z to read_at if it exists and doesn't have it
             if (notification.read_at && !notification.read_at.endsWith('Z')) {
                 notification.read_at = notification.read_at + 'Z';
             }
@@ -808,11 +792,11 @@ app.post('/api/send-email', async (req, res) => {
 
     // Send via Resend
     const result = await resendClient.emails.send({
-      from: 'Family Care 360 <noreply@familycare360.app>',
+      from: 'Senior Care Companion <onboarding@resend.dev>',
       to: email,
       subject: subject,
       html: html || `<p>${message}</p>`,
-      reply_to: 'support@familycare360.app'
+      reply_to: 'support@seniorcare.com'
     });
 
     if (result.error) {
@@ -857,17 +841,17 @@ app.post('/api/test-email', async (req, res) => {
     }
 
     const result = await resendClient.emails.send({
-      from: 'Family Care 360 <noreply@familycare360.app>',
+      from: 'Senior Care Companion <onboarding@resend.dev>',
       to: email,
-      subject: '✅ Family Care 360 - Email Test',
+      subject: '✅ Senior Care Companion - Email Test',
       html: `
         <h2>Email Notifications Working!</h2>
-        <p>This is a test email from Family Care 360.</p>
+        <p>This is a test email from Senior Care Companion.</p>
         <p>When family members are invited, they'll receive emails like this when medications are logged.</p>
         <hr>
-        <p style="color: #666; font-size: 12px;">Family Care 360</p>
+        <p style="color: #666; font-size: 12px;">Senior Care Companion</p>
       `,
-      reply_to: 'support@familycare360.app'
+      reply_to: 'support@seniorcare.com'
     });
 
     if (result.error) {
