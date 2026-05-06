@@ -223,9 +223,9 @@ app.delete('/api/family-connections/:connectionId', async (req, res) => {
 // Create a user if they don't exist
 app.post('/api/users', async (req, res) => {
     try {
-        const { id, username, email, age, firstName, lastName, phone } = req.body;
+        const { id, username, email, age, firstName, lastName, phone, timezone } = req.body;
 
-        console.log(`Creating user: id=${id}, username=${username}, email=${email}, age=${age}, phone=${phone || 'not provided'}`);
+        console.log(`Creating user: id=${id}, username=${username}, email=${email}, age=${age}, phone=${phone || 'not provided'}, timezone=${timezone || 'UTC'}`);
 
         // Use provided email or generate a unique one
         const userEmail = email || `${username.toLowerCase()}-${id.substring(0, 8)}@senior-care.app`;
@@ -241,6 +241,7 @@ app.post('/api/users', async (req, res) => {
                 first_name: firstName || null,
                 last_name: lastName || null,
                 phone: phone || null,
+                timezone: timezone || 'UTC',
                 phone_verified: false,
                 sms_reminders_enabled: true,
                 notify_family_on_med: false
@@ -271,8 +272,38 @@ app.post('/api/users', async (req, res) => {
     }
 });
 
-// Log medication as taken
-app.post('/api/medications/mark-taken', async (req, res) => {
+// Update user's timezone (called on login to capture device timezone)
+app.put('/api/users/:userId/timezone', async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const { timezone } = req.body;
+
+        if (!timezone) {
+            return res.status(400).json({ error: 'Timezone required' });
+        }
+
+        console.log(`📍 Updating timezone for user ${userId}: ${timezone}`);
+
+        const { data, error } = await supabase
+            .from('users')
+            .update({ timezone: timezone })
+            .eq('id', userId)
+            .select();
+
+        if (error) {
+            return res.status(400).json({ error: error.message });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Timezone updated',
+            data: data[0]
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
     try {
         const { user_id, medication_id, medication_name } = req.body;
 
@@ -404,15 +435,41 @@ async function sendMedicationNotification(seniorUserId, medicationName, action) 
                         ? `✅ ${seniorName} took their ${medicationName}`
                         : `⚠️ ${seniorName} missed their ${medicationName}`;
 
-                    // Format the current time in UTC with Z indicator so it converts properly
-                    const utcNow = new Date().toISOString();
-                    // Note: Email recipients will see this in their local timezone
-                    // The Z ensures proper timezone conversion
+                    // Get family member's timezone to format time correctly in email
+                    const { data: familyMemberData } = await supabase
+                        .from('users')
+                        .select('timezone')
+                        .eq('id', connection.family_member_user_id)
+                        .single();
+
+                    const familyTimezone = familyMemberData?.timezone || 'UTC';
+
+                    // Format time in family member's local timezone
+                    const now = new Date();
+                    let formattedTime = 'Unknown time';
+                    
+                    try {
+                        const options = {
+                            year: 'numeric',
+                            month: 'numeric',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit',
+                            hour12: true,
+                            timeZone: familyTimezone
+                        };
+                        formattedTime = new Intl.DateTimeFormat('en-US', options).format(now);
+                        console.log(`⏰ Formatted time for ${familyMemberData?.email} (${familyTimezone}): ${formattedTime}`);
+                    } catch (timeError) {
+                        console.error('⚠️ Error formatting time:', timeError.message);
+                        formattedTime = now.toLocaleString();
+                    }
                     
                     const emailHtml = `
                         <h2>${message}</h2>
                         <p>Medication: <strong>${medicationName}</strong></p>
-                        <p>Time: ${utcNow}</p>
+                        <p>Time: ${formattedTime}</p>
                         <hr>
                         <p style="color: #666; font-size: 12px;">Family Care 360</p>
                     `;

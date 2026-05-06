@@ -4,7 +4,7 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-05-06-build-002
+    VERSION: 2026-05-06-build-001
     BUILD DATE: April 15, 2026 at 20:15 UTC
     BUILD SYSTEM: Incremental build numbers (reset daily)
     
@@ -99,7 +99,7 @@
     ✅ No data migration needed
     
     ═══════════════════════════════════════════════════════════════════
-    PREVIOUS VERSION (2026-05-06-build-002 UTC):
+    PREVIOUS VERSION (2026-05-06-build-001 UTC):
     
     ✅ CRITICAL FIX: Medication reminders not triggering - initializeNotificationsPreference() now called on login
     
@@ -5091,10 +5091,10 @@
                                 Current Version
                             </p>
                             <p style="font-size: 20px; color: #38b2ac; margin: 0 0 5px 0; font-weight: 700; font-family: monospace;">
-                                2026-05-06-build-002
+                                2026-05-06-build-001
                             </p>
                             <p style="font-size: 13px; color: #718096; margin: 0;">
-                                May 06, 2026 at 01:46 AM UTC
+                                May 06, 2026 at 02:28 AM UTC
                             </p>
                         </div>
                         
@@ -6600,6 +6600,35 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             return true;
         }
 
+        // Capture user's device timezone and save to backend
+        async function captureAndSaveTimezone(userId) {
+            try {
+                // Get user's timezone from their device
+                const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                console.log(`📍 User timezone detected: ${timezone}`);
+
+                // Send to backend to store in database
+                const response = await fetch(`${BACKEND_API_URL}/api/users/${userId}/timezone`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ timezone: timezone })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    console.log(`✅ Timezone saved to database: ${timezone}`);
+                } else {
+                    console.error('⚠️ Failed to save timezone:', result.error);
+                }
+            } catch (error) {
+                console.error('❌ Error capturing timezone:', error.message);
+                // Don't fail login if timezone capture fails
+            }
+        }
+
         function login() {
             const username = document.getElementById('loginUsername').value;
             const password = document.getElementById('loginPassword').value;
@@ -6644,6 +6673,9 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             initializeNotifications(); // Initialize notification system
             speak(`Welcome back, ${users[username].name}`);
             startReminderChecker(); // Start checking for reminders
+            
+            // Capture and save user's timezone
+            captureAndSaveTimezone(users[username].userId);
             
             // Check if we should show "Add to Home Screen" modal
             // checkAndShowAddToHomeModal(); // Commented out for Build 003
