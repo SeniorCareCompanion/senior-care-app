@@ -460,10 +460,27 @@ app.get('/api/notifications/:familyMemberId', async (req, res) => {
             return res.status(400).json({ error: error.message });
         }
 
+        // Ensure all timestamps have Z appended (UTC indicator)
+        const fixedData = data.map(notification => {
+            // Add Z to sent_at if it doesn't have it
+            if (notification.sent_at && !notification.sent_at.endsWith('Z')) {
+                notification.sent_at = notification.sent_at + 'Z';
+            }
+            // Add Z to created_at if it exists and doesn't have it
+            if (notification.created_at && !notification.created_at.endsWith('Z')) {
+                notification.created_at = notification.created_at + 'Z';
+            }
+            // Add Z to read_at if it exists and doesn't have it
+            if (notification.read_at && !notification.read_at.endsWith('Z')) {
+                notification.read_at = notification.read_at + 'Z';
+            }
+            return notification;
+        });
+
         res.json({ 
             success: true, 
-            data: data,
-            count: data.length
+            data: fixedData,
+            count: fixedData.length
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
