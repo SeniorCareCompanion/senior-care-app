@@ -4,7 +4,7 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-05-18-build-001
+    VERSION: 2026-05-20-build-001
     BUILD DATE: April 15, 2026 at 20:15 UTC
     BUILD SYSTEM: Incremental build numbers (reset daily)
     
@@ -99,7 +99,7 @@
     ✅ No data migration needed
     
     ═══════════════════════════════════════════════════════════════════
-    PREVIOUS VERSION (2026-05-18-build-001 UTC):
+    PREVIOUS VERSION (2026-05-20-build-001 UTC):
     
     ✅ CRITICAL FIX: Medication reminders not triggering - initializeNotificationsPreference() now called on login
     
@@ -5019,9 +5019,21 @@
                             </p>
                         </div>
                         
-                        <button class="btn btn-secondary" onclick="testNotification()" style="width: 100%; max-width: 100%;">
+                        <button class="btn btn-secondary" onclick="testNotification()" style="width: 100%; max-width: 100%; margin-bottom: 15px;">
                             🧪 Test Notification
                         </button>
+
+                        <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; border: 2px solid #4caf50; margin-bottom: 15px;">
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                <div>
+                                    <p style="margin: 0 0 5px 0; font-weight: 600; color: #2e7d32;">📱 SMS Notifications</p>
+                                    <p style="margin: 0; font-size: 13px; color: #558b2f;">Get text alerts when family members take their medications</p>
+                                </div>
+                                <label style="display: flex; align-items: center; cursor: pointer; margin-left: 15px;">
+                                    <input type="checkbox" id="smsNotificationToggle" style="width: 20px; height: 20px; cursor: pointer;" onchange="saveSmsPreference()">
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -5091,10 +5103,10 @@
                                 Current Version
                             </p>
                             <p style="font-size: 20px; color: #38b2ac; margin: 0 0 5px 0; font-weight: 700; font-family: monospace;">
-                                2026-05-18-build-001
+                                2026-05-20-build-001
                             </p>
                             <p style="font-size: 13px; color: #718096; margin: 0;">
-                                May 18, 2026 at 15:13 PM UTC
+                                May 20, 2026 at 21:06 PM UTC
                             </p>
                         </div>
                         
@@ -6378,6 +6390,29 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                         btn.classList.add('btn-success');
                     }
                     console.log('✅ Auto-enabled voice on login');
+                }
+            }
+        }
+
+        // SMS notification preference functions
+        function saveSmsPreference() {
+            const smsEnabled = document.getElementById('smsNotificationToggle').checked;
+            const users = loadData('users');
+            if (users && users[currentUser]) {
+                users[currentUser].smsNotificationsEnabled = smsEnabled;
+                saveData('users', users);
+                console.log('SMS notification preference saved:', smsEnabled);
+            }
+        }
+
+        function loadSmsPreference() {
+            const users = loadData('users');
+            if (users && users[currentUser]) {
+                const smsEnabled = users[currentUser].smsNotificationsEnabled !== false;
+                const toggle = document.getElementById('smsNotificationToggle');
+                if (toggle) {
+                    toggle.checked = smsEnabled;
+                    console.log('SMS notification preference loaded:', smsEnabled);
                 }
             }
         }
@@ -10992,6 +11027,7 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                 console.log('🔔 Initializing notification preferences...');
                 initializeNotificationsPreference();
                 updateNotificationButton();
+                loadSmsPreference(); // Load SMS notification preference
             }
             
             // ALWAYS initialize Family cards when showing Family tab
