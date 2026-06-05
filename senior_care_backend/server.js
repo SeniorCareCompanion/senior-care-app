@@ -1097,3 +1097,25 @@ app.post('/api/create-scheduled-notifications', async (req, res) => {
     });
   }
 });
+
+// ============================================================
+// ERROR HANDLING MIDDLEWARE
+// ============================================================
+
+app.use((err, req, res, next) => {
+    console.error('❌ Server Error:', err.stack);
+    res.status(500).json({ 
+        success: false,
+        error: 'Internal Server Error' 
+    });
+});
+
+// ============================================================
+// START SERVER
+// ============================================================
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`🚀 Senior Care Companion API running on port ${PORT}`);
+});
+
