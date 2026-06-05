@@ -4,7 +4,7 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-04-15-build-004
+    VERSION: 2026-06-05-build-001
     BUILD DATE: April 15, 2026 at 20:15 UTC
     BUILD SYSTEM: Incremental build numbers (reset daily)
     
@@ -99,7 +99,7 @@
     ✅ No data migration needed
     
     ═══════════════════════════════════════════════════════════════════
-    PREVIOUS VERSION (2026-04-15-build-003 UTC):
+    PREVIOUS VERSION (2026-06-05-build-001 UTC):
     
     ✅ CRITICAL FIX: Medication reminders not triggering - initializeNotificationsPreference() now called on login
     
@@ -5103,10 +5103,10 @@
                                 Current Version
                             </p>
                             <p style="font-size: 20px; color: #38b2ac; margin: 0 0 5px 0; font-weight: 700; font-family: monospace;">
-                                2026-04-15-build-003
+                                2026-06-05-build-001
                             </p>
                             <p style="font-size: 13px; color: #718096; margin: 0;">
-                                April 15, 2026 at 6:45 PM UTC
+                                June 05, 2026 at 01:26 AM UTC
                             </p>
                         </div>
                         
@@ -7410,6 +7410,14 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
 
                 users[currentUser].medications.push(medication);
                 saveData('users', users);
+                
+                // 🔔 Create scheduled notifications for this medication
+                if (medication.reminderEnabled) {
+                    console.log('🔔 Calling createScheduledNotifications for:', medication.name);
+                    createScheduledNotifications(medication, currentUser).catch(err => {
+                        console.error('❌ Failed to create scheduled notifications:', err);
+                    });
+                }
                 
                 const timeDesc = timesPerDay === 1 ? 'once daily' : `${timesPerDay} times daily`;
                 speak(`Added medication ${name}, ${timeDesc} with ${getRecurrenceText(medication)} schedule`);
