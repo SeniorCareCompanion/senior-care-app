@@ -7200,6 +7200,100 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             }
         }
 
+
+        // 🔔 Create scheduled medication notifications for server-side reminders
+        async function createScheduledNotifications(medication, userId) {
+            try {
+                console.log('🔔 Creating scheduled notifications for:', medication.name);
+                
+                // Get user details for timezone
+                const users = loadData('users');
+                const userTimezone = users[userId]?.timezone || 'America/Denver';
+                
+                // Calculate next 30 days of medication reminders
+                const today = new Date();
+                const notifications = [];
+                
+                for (let daysFromNow = 0; daysFromNow < 30; daysFromNow++) {
+                    const checkDate = new Date(today);
+                    checkDate.setDate(checkDate.getDate() + daysFromNow);
+                    
+                    // Check if medication should be taken on this date
+                    if (shouldMedicationBeTakenOnDate(medication, checkDate)) {
+                        // Create notification for each dose time
+                        medication.times.forEach(time => {
+                            const [hours, minutes] = time.split(':').map(Number);
+                            
+                            // Calculate scheduled time (medication time)
+                            const medTime = new Date(checkDate);
+                            medTime.setHours(hours, minutes, 0, 0);
+                            
+                            // Calculate reminder time (before medication time)
+                            const reminderMinutes = medication.reminderMinutes || 10;
+                            const reminderTime = new Date(medTime.getTime() - reminderMinutes * 60000);
+                            
+                            // Only add if reminder is in the future
+                            if (reminderTime > new Date()) {
+                                notifications.push({
+                                    senior_user_id: userId,
+                                    medication_name: medication.name,
+                                    medication_id: String(medication.id),
+                                    scheduled_time: reminderTime.toISOString(),
+                                    reminder_minutes: reminderMinutes,
+                                    status: 'pending'
+                                });
+                            }
+                        });
+                    }
+                }
+                
+                if (notifications.length === 0) {
+                    console.log('No future notifications to schedule');
+                    return;
+                }
+                
+                // Send to backend to create in Supabase
+                const response = await fetch('/api/create-scheduled-notifications', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        userId: userId,
+                        notifications: notifications
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    console.log(`✅ Created ${result.count} scheduled notifications`);
+                } else {
+                    console.error('Failed to create scheduled notifications:', result.error);
+                }
+                
+            } catch (error) {
+                console.error('Error creating scheduled notifications:', error);
+            }
+        }
+
+        // Helper: Check if medication should be taken on a specific date
+        function shouldMedicationBeTakenOnDate(medication, date) {
+            const dayOfWeek = date.getDay(); // 0 = Sunday, 6 = Saturday
+            const dateStr = date.toISOString().split('T')[0];
+            
+            if (medication.recurrence === 'daily') {
+                return true;
+            } else if (medication.recurrence === 'specific-days') {
+                return medication.specificDays && medication.specificDays.includes(dayOfWeek);
+            } else if (medication.recurrence === 'every-x-days') {
+                const startDate = new Date(medication.startDate);
+                const daysDiff = Math.floor((date - startDate) / (1000 * 60 * 60 * 24));
+                return daysDiff >= 0 && daysDiff % medication.everyXDays === 0;
+            } else if (medication.recurrence === 'weekly') {
+                return dayOfWeek === medication.weeklyDay;
+            }
+            return false;
+        }
         function addMedication() {
             const name = document.getElementById('medName').value;
             const dosage = document.getElementById('medDosage').value;

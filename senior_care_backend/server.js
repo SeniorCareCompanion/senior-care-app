@@ -900,3 +900,200 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
+// ============================================================
+// SCHEDULED NOTIFICATIONS - Server-Side Scheduler
+// ============================================================
+
+// Check and send scheduled medication notifications
+app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
+  try {
+    console.log('🔔 [SCHEDULER] Checking for pending notifications...');
+
+    // Get all pending notifications that are due
+    const { data: pendingNotifications, error: fetchError } = await supabase
+      .from('scheduled_notifications')
+      .select('*')
+      .eq('status', 'pending')
+      .lte('scheduled_time', new Date().toISOString());
+
+    if (fetchError) {
+      throw fetchError;
+    }
+
+    if (!pendingNotifications || pendingNotifications.length === 0) {
+      console.log('✅ [SCHEDULER] No pending notifications');
+      return res.json({ 
+        success: true, 
+        message: 'No pending notifications',
+        checked: 0 
+      });
+    }
+
+    console.log(`📬 [SCHEDULER] Found ${pendingNotifications.length} notifications to send`);
+
+    let sentCount = 0;
+    let failedCount = 0;
+
+    // Process each notification
+    for (const notification of pendingNotifications) {
+      try {
+        const { senior_user_id, medication_name, id } = notification;
+
+        // Get senior user details
+        const { data: senior, error: seniorError } = await supabase
+          .from('users')
+          .select('email, firstName, lastName, timezone')
+          .eq('id', senior_user_id)
+          .single();
+
+        if (seniorError) throw seniorError;
+
+        const seniorName = `${senior.firstName || 'User'} ${senior.lastName || ''}`.trim();
+
+        // Get family connections for this senior
+        const { data: connections, error: connError } = await supabase
+          .from('family_connections')
+          .select(`
+            *,
+            family_member:family_member_user_id(email, firstName, lastName)
+          `)
+          .eq('senior_user_id', senior_user_id)
+          .eq('approved_by_senior', true);
+
+        if (connError) throw connError;
+
+        // Send notifications to all family members
+        if (connections && connections.length > 0) {
+          for (const connection of connections) {
+            try {
+              const familyEmail = connection.family_member.email;
+              const familyName = `${connection.family_member.firstName || 'Family Member'} ${connection.family_member.lastName || ''}`.trim();
+
+              // Send email notification to family member
+              const emailResult = await resend.emails.send({
+                from: 'noreply@familycare360.app',
+                to: familyEmail,
+                subject: `💊 Medication Reminder: ${seniorName}`,
+                html: `
+                  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9; border-radius: 8px;">
+                    <h2 style="color: #2ecc71; margin-bottom: 20px;">💊 Medication Reminder</h2>
+                    <p style="color: #333; font-size: 16px; line-height: 1.6;">
+                      Hi ${familyName},
+                    </p>
+                    <div style="background: white; padding: 20px; border-left: 4px solid #2ecc71; margin: 20px 0; border-radius: 4px;">
+                      <p style="margin: 0; color: #333;">
+                        <strong>${seniorName}</strong> has a scheduled medication reminder:
+                      </p>
+                      <p style="margin: 10px 0 0 0; font-size: 18px; color: #2ecc71;">
+                        <strong>${medication_name}</strong>
+                      </p>
+                    </div>
+                    <p style="color: #666; font-size: 14px;">
+                      Scheduled for: <strong>${new Date(notification.scheduled_time).toLocaleString()}</strong>
+                    </p>
+                    <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+                    <p style="color: #999; font-size: 12px;">
+                      This is an automated notification from Senior Care Companion
+                    </p>
+                  </div>
+                `,
+                reply_to: 'seniorcarecompanion360@gmail.com'
+              });
+
+              if (emailResult.error) {
+                console.error(`❌ Failed to send email to ${familyEmail}:`, emailResult.error);
+              } else {
+                console.log(`✅ Email sent to ${familyEmail}`);
+              }
+            } catch (familyError) {
+              console.error(`❌ Error notifying family member:`, familyError);
+            }
+          }
+        }
+
+        // Update notification status to sent
+        const { error: updateError } = await supabase
+          .from('scheduled_notifications')
+          .update({ 
+            status: 'sent',
+            sent_at: new Date().toISOString()
+          })
+          .eq('id', id);
+
+        if (updateError) {
+          throw updateError;
+        }
+
+        sentCount++;
+        console.log(`✅ [SCHEDULER] Notification ${id} marked as sent`);
+
+      } catch (notifError) {
+        console.error(`❌ Error processing notification:`, notifError);
+        failedCount++;
+
+        // Mark as failed
+        try {
+          await supabase
+            .from('scheduled_notifications')
+            .update({ status: 'failed' })
+            .eq('id', notification.id);
+        } catch (e) {
+          console.error('Failed to update notification status:', e);
+        }
+      }
+    }
+
+    res.json({ 
+      success: true, 
+      message: `Processed ${sentCount} notifications`,
+      sent: sentCount,
+      failed: failedCount
+    });
+
+  } catch (error) {
+    console.error('❌ [SCHEDULER] Fatal error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// Create scheduled notifications for a medication
+app.post('/api/create-scheduled-notifications', async (req, res) => {
+  try {
+    const { userId, notifications } = req.body;
+
+    if (!userId || !Array.isArray(notifications) || notifications.length === 0) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Missing userId or notifications array' 
+      });
+    }
+
+    console.log(`📬 Creating ${notifications.length} scheduled notifications for user ${userId}`);
+
+    // Insert notifications into Supabase
+    const { data, error } = await supabase
+      .from('scheduled_notifications')
+      .insert(notifications);
+
+    if (error) {
+      throw error;
+    }
+
+    res.json({ 
+      success: true, 
+      message: `Created ${notifications.length} scheduled notifications`,
+      count: notifications.length
+    });
+
+  } catch (error) {
+    console.error('❌ Error creating scheduled notifications:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});

@@ -1,17 +1,8 @@
 {
-  "version": 2,
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "builds": [
+  "crons": [
     {
-      "src": "server.js",
-      "use": "@vercel/node"
+      "path": "/api/check-and-send-scheduled-notifications",
+      "schedule": "*/5 * * * *"
     }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "server.js"
-    }
-  ],
-  "installCommand": "npm install"
+  ]
 }
