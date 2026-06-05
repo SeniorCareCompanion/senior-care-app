@@ -2,7 +2,8 @@
   "crons": [
     {
       "path": "/api/check-and-send-scheduled-notifications",
-      "schedule": "*/5 * * * *"
+      "schedule": "0 8 * * *"
     }
   ]
 }
+
