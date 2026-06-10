@@ -4,7 +4,7 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-06-07-build-001
+    VERSION: 2026-06-10-build-001
     BUILD DATE: April 15, 2026 at 20:15 UTC
     BUILD SYSTEM: Incremental build numbers (reset daily)
     
@@ -99,7 +99,7 @@
     ✅ No data migration needed
     
     ═══════════════════════════════════════════════════════════════════
-    PREVIOUS VERSION (2026-06-07-build-001 UTC):
+    PREVIOUS VERSION (2026-06-10-build-001 UTC):
     
     ✅ CRITICAL FIX: Medication reminders not triggering - initializeNotificationsPreference() now called on login
     
@@ -5024,14 +5024,18 @@
                         </button>
 
                         <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; border: 2px solid #4caf50; margin-bottom: 15px;">
-                            <div style="display: flex; align-items: center; justify-content: space-between;">
-                                <div>
-                                    <p style="margin: 0 0 5px 0; font-weight: 600; color: #2e7d32;">📱 SMS Notifications</p>
-                                    <p style="margin: 0; font-size: 13px; color: #558b2f;">Get text alerts when family members take their medications</p>
+                            <div style="display: flex; align-items: flex-start; justify-content: space-between;">
+                                <div style="flex: 1;">
+                                    <label style="display: flex; align-items: flex-start; cursor: pointer; gap: 10px;">
+                                        <input type="checkbox" id="smsNotificationToggle" style="width: 20px; height: 20px; cursor: pointer; margin-top: 2px; flex-shrink: 0;" onchange="saveSmsPreference()">
+                                        <div>
+                                            <p style="margin: 0 0 5px 0; font-weight: 600; color: #2e7d32;">📱 SMS Text Message Consent</p>
+                                            <p style="margin: 0; font-size: 13px; color: #558b2f; line-height: 1.5;">
+                                                I consent to receive SMS text messages from Senior Care Companion regarding medication reminders, family notifications, and important health updates. Message and data rates may apply. You may opt out at any time.
+                                            </p>
+                                        </div>
+                                    </label>
                                 </div>
-                                <label style="display: flex; align-items: center; cursor: pointer; margin-left: 15px;">
-                                    <input type="checkbox" id="smsNotificationToggle" style="width: 20px; height: 20px; cursor: pointer;" onchange="saveSmsPreference()">
-                                </label>
                             </div>
                         </div>
                     </div>
@@ -5103,10 +5107,10 @@
                                 Current Version
                             </p>
                             <p style="font-size: 20px; color: #38b2ac; margin: 0 0 5px 0; font-weight: 700; font-family: monospace;">
-                                2026-06-07-build-001
+                                2026-06-10-build-001
                             </p>
                             <p style="font-size: 13px; color: #718096; margin: 0;">
-                                June 07, 2026 at 15:49 PM UTC
+                                June 10, 2026 at 01:44 AM UTC
                             </p>
                         </div>
                         
