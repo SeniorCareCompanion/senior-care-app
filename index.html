@@ -4,7 +4,7 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-06-10-build-001
+    VERSION: 2026-04-15-build-004
     BUILD DATE: April 15, 2026 at 20:15 UTC
     BUILD SYSTEM: Incremental build numbers (reset daily)
     
@@ -99,7 +99,7 @@
     ✅ No data migration needed
     
     ═══════════════════════════════════════════════════════════════════
-    PREVIOUS VERSION (2026-06-10-build-001 UTC):
+    PREVIOUS VERSION (2026-04-15-build-003 UTC):
     
     ✅ CRITICAL FIX: Medication reminders not triggering - initializeNotificationsPreference() now called on login
     
@@ -2423,6 +2423,24 @@
                     <span class="password-toggle" onclick="togglePasswordVisibility('regConfirmPassword', this)">👁️</span>
                 </div>
             </div>
+
+            <!-- SMS CONSENT CHECKBOX -->
+            <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; border: 2px solid #4caf50; margin-bottom: 15px;">
+                <label style="display: flex; align-items: flex-start; cursor: pointer; gap: 10px; margin: 0;">
+                    <input type="checkbox" id="regSmsConsent" style="width: 20px; height: 20px; cursor: pointer; margin-top: 2px; flex-shrink: 0;">
+                    <div>
+                        <p style="margin: 0 0 5px 0; font-weight: 600; color: #2e7d32; font-size: 14px;">📱 SMS Text Message Consent (Optional)</p>
+                        <p style="margin: 0; font-size: 12px; color: #558b2f; line-height: 1.5;">
+                            I consent to receive SMS text messages from Senior Care Companion regarding medication reminders, family notifications, and important health updates. Message and data rates may apply. You may opt out at any time by replying STOP.
+                        </p>
+                        <p style="margin: 5px 0 0 0; font-size: 11px; color: #666;">
+                            <a href="https://seniorcarecompanion.github.io/senior-care-app/docs/privacy.html" target="_blank" style="color: #2e7d32; text-decoration: none; font-weight: 600;">Privacy Policy</a> · 
+                            <a href="https://seniorcarecompanion.github.io/senior-care-app/docs/terms.html" target="_blank" style="color: #2e7d32; text-decoration: none; font-weight: 600;">Terms of Service</a>
+                        </p>
+                    </div>
+                </label>
+            </div>
+
             <button class="btn btn-primary" onclick="register()">Create Account</button>
             <button class="btn btn-secondary" onclick="showLogin()">Back to Login</button>
         </div>
@@ -5107,10 +5125,10 @@
                                 Current Version
                             </p>
                             <p style="font-size: 20px; color: #38b2ac; margin: 0 0 5px 0; font-weight: 700; font-family: monospace;">
-                                2026-06-10-build-001
+                                2026-04-15-build-003
                             </p>
                             <p style="font-size: 13px; color: #718096; margin: 0;">
-                                June 10, 2026 at 01:44 AM UTC
+                                April 15, 2026 at 6:45 PM UTC
                             </p>
                         </div>
                         
@@ -6486,6 +6504,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             const username = document.getElementById('regUsername').value;
             const password = document.getElementById('regPassword').value;
             const confirmPassword = document.getElementById('regConfirmPassword').value;
+            const smsConsent = document.getElementById('regSmsConsent').checked; // Capture SMS consent
 
             if (!firstName || !lastName || !email || !age || !username || !password || !confirmPassword) {
                 alert('Please fill in all required fields');
@@ -6539,6 +6558,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                 email: email,
                 age: ageNum,
                 phone: phoneToStore,
+                smsNotificationsEnabled: smsConsent, // Store SMS consent from registration
                 password: password,
                 medications: [],
                 appointments: [],
@@ -6566,7 +6586,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                 await fetch('https://senior-care-backend.vercel.app/api/users', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: userId, username, email, age: ageNum, firstName, lastName, phone: phoneToStore })
+                    body: JSON.stringify({ id: userId, username, email, age: ageNum, firstName, lastName, phone: phoneToStore, smsNotificationsEnabled: smsConsent })
                 });
             } catch(e) { console.log('Backend error:', e.message); }
             
