@@ -2429,7 +2429,7 @@
                 <label style="display: flex; align-items: flex-start; cursor: pointer; gap: 10px; margin: 0;">
                     <input type="checkbox" id="regSmsConsent" style="width: 20px; height: 20px; cursor: pointer; margin-top: 2px; flex-shrink: 0;">
                     <div>
-                        <p style="margin: 0 0 5px 0; font-weight: 600; color: #2e7d32; font-size: 14px;">📱 SMS Text Message Consent (Optional)</p>
+                        <p style="margin: 0 0 5px 0; font-weight: 600; color: #2e7d32; font-size: 14px;">SMS Text Message Consent (Optional)</p>
                         <p style="margin: 0; font-size: 12px; color: #558b2f; line-height: 1.5;">
                             I consent to receive SMS text messages from Senior Care Companion regarding medication reminders, family notifications, and important health updates. Message frequency varies. Message and data rates may apply.
                         </p>
@@ -5048,7 +5048,7 @@
                                     <label style="display: flex; align-items: flex-start; cursor: pointer; gap: 10px;">
                                         <input type="checkbox" id="smsNotificationToggle" style="width: 20px; height: 20px; cursor: pointer; margin-top: 2px; flex-shrink: 0;" onchange="saveSmsPreference()">
                                         <div>
-                                            <p style="margin: 0 0 5px 0; font-weight: 600; color: #2e7d32;">📱 SMS Text Message Consent (Optional)</p>
+                                            <p style="margin: 0 0 5px 0; font-weight: 600; color: #2e7d32;">SMS Text Message Consent (Optional)</p>
                                             <p style="margin: 0; font-size: 12px; color: #558b2f; line-height: 1.5;">
                                                 I consent to receive SMS text messages from Senior Care Companion regarding medication reminders, family notifications, and important health updates. Message frequency varies. Message and data rates may apply.
                                             </p>
@@ -5134,7 +5134,7 @@
                                 2026-06-11-build-001
                             </p>
                             <p style="font-size: 13px; color: #718096; margin: 0;">
-                                June 11, 2026 at 15:48 PM UTC
+                                June 11, 2026 at 21:49 PM UTC
                             </p>
                         </div>
                         
@@ -6430,6 +6430,29 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                 users[currentUser].smsNotificationsEnabled = smsEnabled;
                 saveData('users', users);
                 console.log('SMS notification preference saved:', smsEnabled);
+                
+                // Send confirmation SMS if opting IN
+                if (smsEnabled && users[currentUser].phone) {
+                    sendSmsConfirmation(users[currentUser].phone, users[currentUser].firstName);
+                }
+            }
+        }
+
+        // Send confirmation SMS when user opts in
+        async function sendSmsConfirmation(phone, firstName) {
+            try {
+                const message = `You are now subscribed to Senior Care Companion SMS alerts. Message frequency varies. Reply HELP for help, STOP to opt-out.`;
+                await fetch('https://senior-care-backend.vercel.app/api/send-sms', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        phone: phone,
+                        message: message
+                    })
+                });
+                console.log('✅ SMS confirmation sent to:', phone);
+            } catch (error) {
+                console.error('Error sending SMS confirmation:', error);
             }
         }
 
