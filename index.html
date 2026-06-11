@@ -2401,11 +2401,6 @@
                 <input type="number" id="regAge" placeholder="Enter your age" min="0" max="150">
             </div>
             <div class="input-group">
-                <label for="regPhone">Phone Number (Optional)</label>
-                <input type="tel" id="regPhone" placeholder="+1 (303) 555-1234" autocomplete="tel">
-                <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">📱 Used for SMS medication reminders. Format: +1 (555) 123-4567</p>
-            </div>
-            <div class="input-group">
                 <label for="regUsername">Username</label>
                 <input type="text" id="regUsername" placeholder="Choose a username" autocomplete="username">
             </div>
@@ -2424,8 +2419,18 @@
                 </div>
             </div>
 
-            <!-- SMS CONSENT CHECKBOX -->
+            <!-- SMS & PHONE NUMBER SECTION (OPTIONAL - NOT REQUIRED) -->
             <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; border: 2px solid #4caf50; margin-bottom: 15px;">
+                <h3 style="margin: 0 0 15px 0; color: #2e7d32; font-size: 14px; font-weight: 600;">SMS Text Message & Phone Number (Optional - Not Required to Register)</h3>
+                
+                <!-- Phone Number Field -->
+                <div style="margin-bottom: 15px;">
+                    <label for="regPhone" style="display: block; font-weight: 600; color: #2e7d32; margin-bottom: 5px;">Phone Number (Optional)</label>
+                    <input type="tel" id="regPhone" placeholder="+1 (303) 555-1234" autocomplete="tel" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                    <p style="font-size: 12px; color: #558b2f; margin: 5px 0 0 0;">Used for SMS medication reminders. Format: +1 (555) 123-4567</p>
+                </div>
+
+                <!-- SMS Consent Checkbox -->
                 <label style="display: flex; align-items: flex-start; cursor: pointer; gap: 10px; margin: 0;">
                     <input type="checkbox" id="regSmsConsent" style="width: 20px; height: 20px; cursor: pointer; margin-top: 2px; flex-shrink: 0;">
                     <div>
@@ -5048,7 +5053,7 @@
                                     <label style="display: flex; align-items: flex-start; cursor: pointer; gap: 10px;">
                                         <input type="checkbox" id="smsNotificationToggle" style="width: 20px; height: 20px; cursor: pointer; margin-top: 2px; flex-shrink: 0;" onchange="saveSmsPreference()">
                                         <div>
-                                            <p style="margin: 0 0 5px 0; font-weight: 600; color: #2e7d32;">SMS Text Message Consent (Optional)</p>
+                                            <p style="margin: 0 0 5px 0; font-weight: 600; color: #2e7d32;">SMS Text Message Consent (Optional - Not Required to Register)</p>
                                             <p style="margin: 0; font-size: 12px; color: #558b2f; line-height: 1.5;">
                                                 I consent to receive SMS text messages from Senior Care Companion regarding medication reminders, family notifications, and important health updates. Message frequency varies. Message and data rates may apply.
                                             </p>
@@ -5134,7 +5139,7 @@
                                 2026-06-11-build-001
                             </p>
                             <p style="font-size: 13px; color: #718096; margin: 0;">
-                                June 11, 2026 at 21:49 PM UTC
+                                June 11, 2026 at 23:08 PM UTC
                             </p>
                         </div>
                         
