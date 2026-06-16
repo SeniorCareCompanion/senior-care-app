@@ -223,9 +223,13 @@ app.delete('/api/family-connections/:connectionId', async (req, res) => {
 // Create a user if they don't exist
 app.post('/api/users', async (req, res) => {
     try {
-        const { id, username, email, age, firstName, lastName, phone, timezone } = req.body;
+        const { id, username, email, age, firstName, lastName, phone, timezone, smsNotificationsEnabled, sms_consent, sms_consent_date, sms_consent_version } = req.body;
 
-        console.log(`Creating user: id=${id}, username=${username}, email=${email}, age=${age}, phone=${phone || 'not provided'}, timezone=${timezone || 'UTC'}`);
+        console.log(`Creating user: id=${id}, username=${username}, email=${email}, age=${age}, phone=${phone || 'not provided'}, sms_consent=${sms_consent || false}`);
+
+        // Capture IP address for audit trail
+        const clientIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress || 'unknown';
+        console.log(`Client IP: ${clientIp}`);
 
         // Use provided email or generate a unique one
         const userEmail = email || `${username.toLowerCase()}-${id.substring(0, 8)}@senior-care.app`;
@@ -243,8 +247,13 @@ app.post('/api/users', async (req, res) => {
                 phone: phone || null,
                 timezone: timezone || 'UTC',
                 phone_verified: false,
-                sms_reminders_enabled: true,
-                notify_family_on_med: false
+                sms_reminders_enabled: smsNotificationsEnabled || false,
+                notify_family_on_med: false,
+                // SMS Consent Audit Fields
+                sms_consent: sms_consent || false,
+                sms_consent_date: sms_consent ? (sms_consent_date || new Date().toISOString()) : null,
+                sms_consent_ip: sms_consent ? clientIp : null,
+                sms_consent_version: sms_consent ? (sms_consent_version || 'v1.0') : null
             }])
             .select();
 
