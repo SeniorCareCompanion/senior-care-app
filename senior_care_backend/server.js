@@ -1135,3 +1135,156 @@ app.use((err, req, res, next) => {
         error: 'Internal Server Error' 
     });
 });
+
+// ============================================================
+// SMS WEBHOOK HANDLERS (Inbound Messages)
+// ============================================================
+
+// Primary inbound SMS handler (STOP/HELP)
+app.post('/api/sms/inbound', async (req, res) => {
+  try {
+    const incomingMessage = req.body.Body?.trim().toUpperCase() || '';
+    const fromNumber = req.body.From || '';
+    
+    console.log(`📱 Inbound SMS from ${fromNumber}: "${incomingMessage}"`);
+    
+    let responseText = '';
+    
+    if (incomingMessage === 'STOP') {
+      responseText = 'You have been unsubscribed from Senior Care Companion SMS messages.';
+      // TODO: Mark user as opted out in database
+      console.log(`✅ STOP received from ${fromNumber}`);
+    } else if (incomingMessage === 'HELP') {
+      responseText = 'For assistance with Senior Care Companion, visit https://seniorcarecompanion.github.io/senior-care-app/ or email seniorcarecompanion360@gmail.com. Reply STOP to opt-out.';
+      console.log(`✅ HELP received from ${fromNumber}`);
+    } else if (incomingMessage === 'START' || incomingMessage === 'YES') {
+      responseText = 'You have been resubscribed to Senior Care Companion SMS messages.';
+      // TODO: Mark user as opted back in
+      console.log(`✅ START/YES received from ${fromNumber}`);
+    } else {
+      responseText = 'Thank you for your message. Reply STOP to opt-out or HELP for assistance.';
+    }
+    
+    // Send response SMS via Twilio
+    const twilio = require('twilio');
+    const client = new twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+    
+    await client.messages.create({
+      body: responseText,
+      from: req.body.To, // Send from the number message came to
+      to: fromNumber
+    });
+    
+    // Return TwiML response
+    res.set('Content-Type', 'text/xml');
+    res.send(`
+      <Response>
+        <Message>${responseText}</Message>
+      </Response>
+    `);
+    
+  } catch (error) {
+    console.error('❌ Error handling inbound SMS:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Fallback inbound SMS handler
+app.post('/api/sms/inbound-fallback', async (req, res) => {
+  console.log('⚠️ Fallback webhook called - primary may have failed');
+  // Same logic as primary
+  return app._router.stack.find(r => r.route && r.route.path === '/api/sms/inbound').handle(req, res);
+});
+
+// Delivery Status Callback
+app.post('/api/sms/status', async (req, res) => {
+  try {
+    const messageStatus = req.body.MessageStatus || 'unknown';
+    const messageSid = req.body.MessageSid || '';
+    const toNumber = req.body.To || '';
+    
+    console.log(`📊 SMS Status Update: SID=${messageSid}, Status=${messageStatus}, To=${toNumber}`);
+    
+    // Log status to database if needed
+    if (process.env.SUPABASE_URL) {
+      const { createClient } = require('@supabase/supabase-js');
+      const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+      
+      await supabase
+        .from('notification_logs')
+        .insert([{
+          type: 'sms',
+          recipient_phone: toNumber,
+          message_sid: messageSid,
+          status: messageStatus,
+          created_at: new Date().toISOString()
+        }]);
+    }
+    
+    res.json({ success: true, status: messageStatus });
+    
+  } catch (error) {
+    console.error('❌ Error logging SMS status:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================================
+// TWILIO SMS SENDING (Primary method via Messaging Service)
+// ============================================================
+
+app.post('/api/send-sms-twilio', async (req, res) => {
+  try {
+    const { phone, message } = req.body;
+
+    if (!phone || !message) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Phone number and message required' 
+      });
+    }
+
+    // Validate Twilio credentials
+    if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN || !process.env.TWILIO_MESSAGING_SERVICE_SID) {
+      return res.status(503).json({ 
+        success: false, 
+        error: 'Twilio credentials not configured' 
+      });
+    }
+
+    const twilio = require('twilio');
+    const client = new twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+
+    // Format phone number
+    let formattedPhone = phone;
+    if (!formattedPhone.startsWith('+')) {
+      formattedPhone = '+1' + phone.replace(/\D/g, '');
+    }
+
+    console.log(`📱 Sending SMS via Twilio to ${formattedPhone}: "${message}"`);
+
+    const messageSid = process.env.TWILIO_MESSAGING_SERVICE_SID;
+
+    const result = await client.messages.create({
+      messagingServiceSid: messageSid,
+      to: formattedPhone,
+      body: message
+    });
+
+    console.log(`✅ SMS sent via Twilio. SID: ${result.sid}`);
+
+    res.json({ 
+      success: true, 
+      messageSid: result.sid,
+      phone: formattedPhone,
+      status: result.status
+    });
+
+  } catch (error) {
+    console.error('❌ Twilio SMS Error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
