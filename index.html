@@ -4,7 +4,7 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-06-16-build-002
+    VERSION: 2026-06-16-build-001
     BUILD DATE: April 15, 2026 at 20:15 UTC
     BUILD SYSTEM: Incremental build numbers (reset daily)
     
@@ -99,7 +99,7 @@
     ✅ No data migration needed
     
     ═══════════════════════════════════════════════════════════════════
-    PREVIOUS VERSION (2026-06-16-build-002 UTC):
+    PREVIOUS VERSION (2026-06-16-build-001 UTC):
     
     ✅ CRITICAL FIX: Medication reminders not triggering - initializeNotificationsPreference() now called on login
     
@@ -2428,6 +2428,7 @@
                     <label for="regPhone" style="display: block; font-weight: 600; color: #2e7d32; margin-bottom: 5px;">Phone Number (Optional)</label>
                     <input type="tel" id="regPhone" placeholder="+1 (303) 555-1234" autocomplete="tel" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;" oninput="validateSmsConsent()">
                     <p style="font-size: 12px; color: #558b2f; margin: 5px 0 0 0;">Used for SMS medication reminders. Format: +1 (555) 123-4567</p>
+                    <p id="phoneFormatError" style="color: #c33; font-size: 12px; margin: 5px 0 0 0; display: none;">❌ Please enter a valid phone number in format: +1 (555) 123-4567</p>
                 </div>
 
                 <!-- SMS Consent Checkbox - REQUIRED if phone number entered -->
@@ -5136,10 +5137,10 @@
                                 Current Version
                             </p>
                             <p style="font-size: 20px; color: #38b2ac; margin: 0 0 5px 0; font-weight: 700; font-family: monospace;">
-                                2026-06-16-build-002
+                                2026-06-16-build-001
                             </p>
                             <p style="font-size: 13px; color: #718096; margin: 0;">
-                                June 16, 2026 at 21:56 PM UTC
+                                June 16, 2026 at 22:21 PM UTC
                             </p>
                         </div>
                         
@@ -6529,26 +6530,42 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             document.getElementById('registerScreen').classList.remove('hidden');
         }
 
-        // Validate SMS consent - enable checkbox only if phone number is entered
+        // Validate SMS consent - enable checkbox ONLY if phone number is valid format
         function validateSmsConsent() {
             const phoneInput = document.getElementById('regPhone').value.trim();
             const smsCheckbox = document.getElementById('regSmsConsent');
             const smsLabel = document.getElementById('smsConsentLabel');
             const smsRequired = document.getElementById('smsRequired');
+            const phoneError = document.getElementById('phoneFormatError');
             
-            if (phoneInput.length > 0) {
-                // Phone entered - enable SMS checkbox and make it required
+            // Check if phone number is valid format
+            // Accept: +1 (555) 123-4567 or variations with 10 digits after country code
+            const phoneRegex = /^\+?1?\s*\(?\d{3}\)?\s*-?\d{3}\s*-?\d{4}$/;
+            const isValidPhone = phoneRegex.test(phoneInput);
+            
+            if (phoneInput.length > 0 && isValidPhone) {
+                // Valid phone - enable SMS checkbox and make it required
                 smsCheckbox.disabled = false;
                 smsLabel.style.opacity = '1';
                 smsLabel.style.pointerEvents = 'auto';
                 smsRequired.style.display = 'inline';
-            } else {
-                // No phone - disable SMS checkbox and reset
+                if (phoneError) phoneError.style.display = 'none';
+            } else if (phoneInput.length > 0 && !isValidPhone) {
+                // Invalid phone format - disable checkbox and show error
                 smsCheckbox.disabled = true;
                 smsCheckbox.checked = false;
                 smsLabel.style.opacity = '0.5';
                 smsLabel.style.pointerEvents = 'none';
                 smsRequired.style.display = 'none';
+                if (phoneError) phoneError.style.display = 'block';
+            } else {
+                // Empty phone - disable checkbox and reset
+                smsCheckbox.disabled = true;
+                smsCheckbox.checked = false;
+                smsLabel.style.opacity = '0.5';
+                smsLabel.style.pointerEvents = 'none';
+                smsRequired.style.display = 'none';
+                if (phoneError) phoneError.style.display = 'none';
             }
         }
 
