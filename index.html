@@ -4793,11 +4793,6 @@
                         <input type="email" id="updateEmail">
                         <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">📧 Used for family notifications and account recovery</p>
                     </div>
-                    <div class="input-group">
-                        <label>Phone Number (Optional)</label>
-                        <input type="tel" id="updatePhone" placeholder="+1 (303) 555-1234">
-                        <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 0;">📱 Used for SMS medication reminders. Format: +1 (555) 123-4567</p>
-                    </div>
                     <button class="btn btn-primary" onclick="updateProfile()">Update Profile</button>
                     </div>
                 </div>
@@ -5049,24 +5044,32 @@
                         </button>
 
                         <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; border: 2px solid #4caf50; margin-bottom: 15px;">
-                            <div style="display: flex; align-items: flex-start; justify-content: space-between;">
-                                <div style="flex: 1;">
-                                    <label style="display: flex; align-items: flex-start; cursor: pointer; gap: 10px;">
-                                        <input type="checkbox" id="smsNotificationToggle" style="width: 20px; height: 20px; cursor: pointer; margin-top: 2px; flex-shrink: 0;" onchange="saveSmsPreference()">
-                                        <div>
-                                            <p style="margin: 0 0 5px 0; font-weight: 600; color: #2e7d32;">SMS Text Message Consent (Optional - Not Required to Register)</p>
-                                            <p style="margin: 0; font-size: 12px; color: #558b2f; line-height: 1.5;">
-                                                I consent to receive SMS text messages from Senior Care Companion regarding medication reminders, family notifications, and important health updates. Message frequency varies. Message and data rates may apply.
-                                            </p>
-                            <p style="margin: 5px 0 0 0; font-size: 11px; color: #666;">
-                                                <a href="https://seniorcarecompanion.github.io/senior-care-app/docs/privacy.html" target="_blank" style="color: #2e7d32; text-decoration: none; font-weight: 600;">Privacy Policy</a> · 
-                                                <a href="https://seniorcarecompanion.github.io/senior-care-app/docs/terms.html" target="_blank" style="color: #2e7d32; text-decoration: none; font-weight: 600;">Terms of Service</a> · 
-                                                Reply HELP for help or STOP to opt-out
-                                            </p>
-                                        </div>
-                                    </label>
-                                </div>
+                            <h4 style="margin: 0 0 15px 0; color: #2e7d32; font-size: 14px; font-weight: 600;">SMS Text Message & Phone Number (Optional - Not Required)</h4>
+                            
+                            <!-- Phone Number Field -->
+                            <div style="margin-bottom: 15px;">
+                                <label for="settingsPhone" style="display: block; font-weight: 600; color: #2e7d32; margin-bottom: 5px;">Phone Number (Optional)</label>
+                                <input type="tel" id="settingsPhone" placeholder="+1 (303) 555-1234" autocomplete="tel" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;" oninput="validateSettingsSmsConsent()">
+                                <p style="font-size: 12px; color: #558b2f; margin: 5px 0 0 0;">Used for SMS medication reminders. Format: +1 (555) 123-4567</p>
+                                <p id="settingsPhoneFormatError" style="color: #c33; font-size: 12px; margin: 5px 0 0 0; display: none;">❌ Please enter a valid phone number in format: +1 (555) 123-4567</p>
                             </div>
+
+                            <!-- SMS Consent Checkbox - REQUIRED if phone entered -->
+                            <label id="settingsSmsConsentLabel" style="display: flex; align-items: flex-start; cursor: pointer; gap: 10px; margin: 0; opacity: 0.5; pointer-events: none;">
+                                <input type="checkbox" id="smsNotificationToggle" style="width: 20px; height: 20px; cursor: pointer; margin-top: 2px; flex-shrink: 0; cursor: not-allowed;" onchange="saveSmsPreference()" disabled>
+                                <div>
+                                    <p style="margin: 0 0 5px 0; font-weight: 600; color: #2e7d32;">SMS Text Message Consent <span id="settingsSmsRequired" style="color: #c33; display: none;">*</span></p>
+                                    <p style="margin: 0; font-size: 12px; color: #558b2f; line-height: 1.5;">
+                                        By checking this box, I expressly consent to receive SMS text messages from Senior Care Companion regarding medication reminders, caregiver notifications, and account-related alerts at the phone number provided. Message frequency varies. Message and data rates may apply. Reply STOP to opt out and HELP for assistance. Consent is not a condition of purchase.
+                                    </p>
+                            <p style="margin: 5px 0 0 0; font-size: 11px; color: #666;">
+                                        <a href="https://seniorcarecompanion.github.io/senior-care-app/docs/privacy.html" target="_blank" style="color: #2e7d32; text-decoration: none; font-weight: 600;">Privacy Policy</a> · 
+                                        <a href="https://seniorcarecompanion.github.io/senior-care-app/docs/terms.html" target="_blank" style="color: #2e7d32; text-decoration: none; font-weight: 600;">Terms of Service</a> · 
+                                        Reply HELP for help or STOP to opt-out
+                                    </p>
+                                </div>
+                            </label>
+                            <p id="settingsSmsConsentError" style="color: #c33; font-size: 12px; margin: 10px 0 0 0; display: none;">SMS consent is required if you enter a phone number.</p>
                         </div>
                     </div>
                 </div>
@@ -5140,7 +5143,7 @@
                                 2026-06-16-build-001
                             </p>
                             <p style="font-size: 13px; color: #718096; margin: 0;">
-                                June 16, 2026 at 22:21 PM UTC
+                                June 16, 2026 at 22:38 PM UTC
                             </p>
                         </div>
                         
@@ -6431,16 +6434,41 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
         // SMS notification preference functions
         function saveSmsPreference() {
             const smsEnabled = document.getElementById('smsNotificationToggle').checked;
+            const phoneInput = document.getElementById('settingsPhone').value.trim();
             const users = loadData('users');
+            
             if (users && users[currentUser]) {
+                // Validate: If SMS enabled, phone must be valid
+                if (smsEnabled && phoneInput.length > 0) {
+                    const phoneRegex = /^\+?1?\s*\(?\d{3}\)?\s*-?\d{3}\s*-?\d{4}$/;
+                    if (!phoneRegex.test(phoneInput)) {
+                        alert('Please enter a valid phone number for SMS: +1 (555) 123-4567');
+                        return;
+                    }
+                }
+                
+                // Save phone number if provided
+                if (phoneInput.length > 0) {
+                    const phoneRegex = /^\+?1?\s*\(?\d{3}\)?\s*-?\d{3}\s*-?\d{4}$/;
+                    if (phoneRegex.test(phoneInput)) {
+                        // Format phone to standard format
+                        const cleanPhone = phoneInput.replace(/\D/g, '');
+                        users[currentUser].phone = cleanPhone;
+                    }
+                }
+                
+                // Save SMS preference
                 users[currentUser].smsNotificationsEnabled = smsEnabled;
                 saveData('users', users);
                 console.log('SMS notification preference saved:', smsEnabled);
+                console.log('Phone number saved:', users[currentUser].phone);
                 
                 // Send confirmation SMS if opting IN
                 if (smsEnabled && users[currentUser].phone) {
                     sendSmsConfirmation(users[currentUser].phone, users[currentUser].firstName);
                 }
+                
+                alert('SMS preferences updated!');
             }
         }
 
@@ -6462,15 +6490,69 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             }
         }
 
+        // Validate SMS consent in Settings - enable checkbox ONLY if phone number is valid
+        function validateSettingsSmsConsent() {
+            const phoneInput = document.getElementById('settingsPhone').value.trim();
+            const smsCheckbox = document.getElementById('smsNotificationToggle');
+            const smsLabel = document.getElementById('settingsSmsConsentLabel');
+            const smsRequired = document.getElementById('settingsSmsRequired');
+            const phoneError = document.getElementById('settingsPhoneFormatError');
+            const smsError = document.getElementById('settingsSmsConsentError');
+            
+            // Check if phone number is valid format
+            const phoneRegex = /^\+?1?\s*\(?\d{3}\)?\s*-?\d{3}\s*-?\d{4}$/;
+            const isValidPhone = phoneRegex.test(phoneInput);
+            
+            if (phoneInput.length > 0 && isValidPhone) {
+                // Valid phone - enable SMS checkbox and make it required
+                smsCheckbox.disabled = false;
+                smsLabel.style.opacity = '1';
+                smsLabel.style.pointerEvents = 'auto';
+                smsRequired.style.display = 'inline';
+                if (phoneError) phoneError.style.display = 'none';
+                if (smsError) smsError.style.display = 'none';
+            } else if (phoneInput.length > 0 && !isValidPhone) {
+                // Invalid phone format - disable checkbox and show error
+                smsCheckbox.disabled = true;
+                smsCheckbox.checked = false;
+                smsLabel.style.opacity = '0.5';
+                smsLabel.style.pointerEvents = 'none';
+                smsRequired.style.display = 'none';
+                if (phoneError) phoneError.style.display = 'block';
+                if (smsError) smsError.style.display = 'none';
+            } else {
+                // Empty phone - disable checkbox and reset
+                smsCheckbox.disabled = true;
+                smsCheckbox.checked = false;
+                smsLabel.style.opacity = '0.5';
+                smsLabel.style.pointerEvents = 'none';
+                smsRequired.style.display = 'none';
+                if (phoneError) phoneError.style.display = 'none';
+                if (smsError) smsError.style.display = 'none';
+            }
+        }
+
         function loadSmsPreference() {
             const users = loadData('users');
             if (users && users[currentUser]) {
                 const smsEnabled = users[currentUser].smsNotificationsEnabled === true;  // Must be explicitly true
+                const phone = users[currentUser].phone || '';
+                
+                // Load phone number
+                const phoneInput = document.getElementById('settingsPhone');
+                if (phoneInput) {
+                    phoneInput.value = phone;
+                }
+                
+                // Load SMS checkbox
                 const toggle = document.getElementById('smsNotificationToggle');
                 if (toggle) {
                     toggle.checked = smsEnabled;
                     console.log('SMS notification preference loaded:', smsEnabled);
                 }
+                
+                // Validate checkbox state based on phone
+                validateSettingsSmsConsent();
             }
         }
 
