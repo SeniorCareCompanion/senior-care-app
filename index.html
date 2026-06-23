@@ -4,7 +4,7 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-06-20-build-001
+    VERSION: 2026-06-23-build-001
     BUILD DATE: April 15, 2026 at 20:15 UTC
     BUILD SYSTEM: Incremental build numbers (reset daily)
     
@@ -99,7 +99,7 @@
     ✅ No data migration needed
     
     ═══════════════════════════════════════════════════════════════════
-    PREVIOUS VERSION (2026-06-20-build-001 UTC):
+    PREVIOUS VERSION (2026-06-23-build-001 UTC):
     
     ✅ CRITICAL FIX: Medication reminders not triggering - initializeNotificationsPreference() now called on login
     
@@ -5027,7 +5027,7 @@
 
                             <!-- SMS Consent Checkbox - CLEAN SEPARATION -->
                             <label id="settingsSmsConsentLabel" style="display: flex; align-items: flex-start; cursor: pointer; gap: 10px; margin: 0 0 15px 0; opacity: 0.5; pointer-events: none;">
-                                <input type="checkbox" id="smsNotificationToggle" style="width: 20px; height: 20px; cursor: pointer; margin-top: 2px; flex-shrink: 0; cursor: not-allowed;" onchange="saveSmsPreference()" disabled>
+                                <input type="checkbox" id="smsNotificationToggle" style="width: 20px; height: 20px; cursor: pointer; margin-top: 2px; flex-shrink: 0; cursor: not-allowed;" onchange="validateSettingsSmsConsent()" disabled>
                                 <div>
                                     <p style="margin: 0 0 5px 0; font-weight: 600; color: #2e7d32; font-size: 14px;">I agree to receive SMS messages <span id="settingsSmsRequired" style="color: #c33; display: none;">*</span></p>
                                     <p style="margin: 0; font-size: 12px; color: #558b2f; line-height: 1.5;">
@@ -5038,12 +5038,17 @@
                             <p id="settingsSmsConsentError" style="color: #c33; font-size: 12px; margin: 0 0 15px 0; display: none;">SMS consent is required if you enter a phone number.</p>
 
                             <!-- SEPARATE SECTION: Legal Links -->
-                            <div style="background: #f8f9fa; padding: 10px; border-radius: 6px; font-size: 12px; color: #666;">
+                            <div style="background: #f8f9fa; padding: 10px; border-radius: 6px; font-size: 12px; color: #666; margin-bottom: 15px;">
                                 <p style="margin: 0;">
                                     <a href="https://seniorcarecompanion.github.io/senior-care-app/docs/privacy.html" target="_blank" style="color: #2e7d32; text-decoration: none; font-weight: 600;">Privacy Policy</a> · 
                                     <a href="https://seniorcarecompanion.github.io/senior-care-app/docs/terms.html" target="_blank" style="color: #2e7d32; text-decoration: none; font-weight: 600;">Terms of Service</a>
                                 </p>
                             </div>
+
+                            <!-- ACTION BUTTON: Activate Alerts -->
+                            <button id="activateAlertsBtn" onclick="saveSmsPreference()" style="width: 100%; padding: 12px; background-color: #ccc; color: #fff; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: not-allowed; transition: all 0.3s ease;" disabled>
+                                Activate Alerts
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -5114,10 +5119,10 @@
                                 Current Version
                             </p>
                             <p style="font-size: 20px; color: #38b2ac; margin: 0 0 5px 0; font-weight: 700; font-family: monospace;">
-                                2026-06-20-build-001
+                                2026-06-23-build-001
                             </p>
                             <p style="font-size: 13px; color: #718096; margin: 0;">
-                                June 20, 2026 at 01:19 AM UTC
+                                June 23, 2026 at 17:45 PM UTC
                             </p>
                         </div>
                         
@@ -6442,7 +6447,11 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                     sendSmsConfirmation(users[currentUser].phone, users[currentUser].firstName);
                 }
                 
-                alert('SMS preferences updated!');
+                // Show success message
+                alert('✅ SMS alerts activated! You will receive medication reminders at ' + phoneInput);
+                
+                // Update button state
+                validateSettingsSmsConsent();
             }
         }
 
@@ -6472,10 +6481,12 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             const smsRequired = document.getElementById('settingsSmsRequired');
             const phoneError = document.getElementById('settingsPhoneFormatError');
             const smsError = document.getElementById('settingsSmsConsentError');
+            const activateBtn = document.getElementById('activateAlertsBtn');
             
             // Check if phone number is valid format
             const phoneRegex = /^\+?1?\s*\(?\d{3}\)?\s*-?\d{3}\s*-?\d{4}$/;
             const isValidPhone = phoneRegex.test(phoneInput);
+            const isConsentChecked = smsCheckbox.checked;
             
             if (phoneInput.length > 0 && isValidPhone) {
                 // Valid phone - enable SMS checkbox and make it required
@@ -6504,12 +6515,25 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                 if (phoneError) phoneError.style.display = 'none';
                 if (smsError) smsError.style.display = 'none';
             }
+            
+            // Enable/Disable Activate Alerts button
+            if (isValidPhone && isConsentChecked) {
+                // Both valid phone AND checkbox checked - ENABLE button
+                activateBtn.disabled = false;
+                activateBtn.style.backgroundColor = '#4caf50';
+                activateBtn.style.cursor = 'pointer';
+            } else {
+                // Missing either valid phone OR checkbox - DISABLE button
+                activateBtn.disabled = true;
+                activateBtn.style.backgroundColor = '#ccc';
+                activateBtn.style.cursor = 'not-allowed';
+            }
         }
 
         function loadSmsPreference() {
             const users = loadData('users');
             if (users && users[currentUser]) {
-                const smsEnabled = users[currentUser].smsNotificationsEnabled === true;  // Must be explicitly true
+                const smsEnabled = users[currentUser].smsNotificationsEnabled === true;
                 const phone = users[currentUser].phone || '';
                 
                 // Load phone number
@@ -6525,7 +6549,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                     console.log('SMS notification preference loaded:', smsEnabled);
                 }
                 
-                // Validate checkbox state based on phone
+                // Validate checkbox and button state based on loaded data
                 validateSettingsSmsConsent();
             }
         }
