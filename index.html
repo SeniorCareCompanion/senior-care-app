@@ -5025,7 +5025,22 @@
                                 <p id="settingsPhoneFormatError" style="color: #c33; font-size: 12px; margin: 5px 0 0 0; display: none;">❌ Please enter a valid phone number in format: +1 (555) 123-4567</p>
                             </div>
 
-                            <!-- SMS Consent Checkbox - CLEAN SEPARATION -->
+                            <!-- Carrier Selection -->
+                            <div style="margin-bottom: 15px;">
+                                <label for="settingsCarrier" style="display: block; font-weight: 600; color: #2e7d32; margin-bottom: 5px;">Mobile Carrier</label>
+                                <select id="settingsCarrier" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background-color: white;">
+                                    <option value="">-- Select Your Carrier --</option>
+                                    <option value="verizon">Verizon</option>
+                                    <option value="att">AT&T</option>
+                                    <option value="tmobile">T-Mobile</option>
+                                    <option value="sprint">Sprint</option>
+                                    <option value="uscellular">US Cellular</option>
+                                    <option value="virgin">Virgin Mobile</option>
+                                    <option value="boost">Boost Mobile</option>
+                                    <option value="metropcs">MetroPCS</option>
+                                </select>
+                                <p style="font-size: 12px; color: #558b2f; margin: 5px 0 0 0;">Select your mobile carrier for SMS delivery</p>
+                            </div>
                             <label id="settingsSmsConsentLabel" style="display: flex; align-items: flex-start; cursor: pointer; gap: 10px; margin: 0 0 15px 0; opacity: 0.5; pointer-events: none;">
                                 <input type="checkbox" id="smsNotificationToggle" style="width: 20px; height: 20px; cursor: pointer; margin-top: 2px; flex-shrink: 0; cursor: not-allowed;" onchange="validateSettingsSmsConsent()" disabled>
                                 <div>
@@ -5122,7 +5137,7 @@
                                 2026-06-24-build-001
                             </p>
                             <p style="font-size: 13px; color: #718096; margin: 0;">
-                                June 24, 2026 at 19:49 PM UTC
+                                June 24, 2026 at 20:08 PM UTC
                             </p>
                         </div>
                         
@@ -6414,11 +6429,22 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
         function saveSmsPreference() {
             const smsEnabled = document.getElementById('smsNotificationToggle').checked;
             const phoneInput = document.getElementById('settingsPhone').value.trim();
+            const carrierSelect = document.getElementById('settingsCarrier');
+            const carrier = carrierSelect ? carrierSelect.value : '';
             const users = loadData('users');
             
             if (users && users[currentUser]) {
-                // Validate: If SMS enabled, phone must be valid
-                if (smsEnabled && phoneInput.length > 0) {
+                // Validate: If SMS enabled, phone must be valid AND carrier selected
+                if (smsEnabled) {
+                    if (phoneInput.length === 0) {
+                        alert('Please enter a phone number to activate SMS alerts');
+                        return;
+                    }
+                    if (!carrier) {
+                        alert('Please select your mobile carrier');
+                        return;
+                    }
+                    
                     const phoneRegex = /^\+?1?\s*\(?\d{3}\)?\s*-?\d{3}\s*-?\d{4}$/;
                     if (!phoneRegex.test(phoneInput)) {
                         alert('Please enter a valid phone number for SMS: +1 (555) 123-4567');
@@ -6430,10 +6456,15 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                 if (phoneInput.length > 0) {
                     const phoneRegex = /^\+?1?\s*\(?\d{3}\)?\s*-?\d{3}\s*-?\d{4}$/;
                     if (phoneRegex.test(phoneInput)) {
-                        // Format phone to standard format
+                        // Format phone to standard format (remove all non-digits)
                         const cleanPhone = phoneInput.replace(/\D/g, '');
                         users[currentUser].phone = cleanPhone;
                     }
+                }
+                
+                // Save carrier selection
+                if (carrier) {
+                    users[currentUser].carrier = carrier;
                 }
                 
                 // Save SMS preference
@@ -6441,6 +6472,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                 saveData('users', users);
                 console.log('SMS notification preference saved:', smsEnabled);
                 console.log('Phone number saved:', users[currentUser].phone);
+                console.log('Carrier saved:', users[currentUser].carrier);
                 
                 // Send confirmation SMS if opting IN
                 if (smsEnabled && users[currentUser].phone) {
@@ -6448,7 +6480,8 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                 }
                 
                 // Show success message
-                alert('✅ SMS alerts activated! You will receive medication reminders at ' + phoneInput);
+                const carrierName = carrier ? `via ${carrier.toUpperCase()}` : '';
+                alert('✅ SMS alerts activated! You will receive medication reminders at ' + phoneInput + ' ' + carrierName);
                 
                 // Update button state
                 validateSettingsSmsConsent();
@@ -6535,11 +6568,19 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             if (users && users[currentUser]) {
                 const smsEnabled = users[currentUser].smsNotificationsEnabled === true;
                 const phone = users[currentUser].phone || '';
+                const carrier = users[currentUser].carrier || '';
                 
                 // Load phone number
                 const phoneInput = document.getElementById('settingsPhone');
                 if (phoneInput) {
                     phoneInput.value = phone;
+                }
+                
+                // Load carrier selection
+                const carrierSelect = document.getElementById('settingsCarrier');
+                if (carrierSelect) {
+                    carrierSelect.value = carrier;
+                    console.log('Carrier loaded:', carrier);
                 }
                 
                 // Load SMS checkbox
