@@ -952,7 +952,7 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
         // Get senior user details
         const { data: senior, error: seniorError } = await supabase
           .from('users')
-          .select('email, firstName, lastName, timezone')
+          .select('email, firstName, lastName, timezone, phone, sms_reminders_enabled')
           .eq('id', senior_user_id)
           .single();
 
@@ -960,6 +960,57 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
 
         const seniorName = `${senior.firstName || 'User'} ${senior.lastName || ''}`.trim();
 
+        // ===== STEP 1: SEND MEDICATION REMINDER TO SENIOR =====
+        console.log(`📱 [SCHEDULER] Sending medication reminder to senior: ${seniorName}`);
+        
+        try {
+          // Send email reminder to senior
+          const seniorEmailResult = await resend.emails.send({
+            from: 'noreply@familycare360.app',
+            to: senior.email,
+            subject: `💊 Medication Reminder: Time for ${medication_name}`,
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #fff3e0; border-radius: 8px;">
+                <h2 style="color: #e65100; margin-bottom: 20px;">⏰ Medication Reminder</h2>
+                <div style="background: white; padding: 20px; border-left: 4px solid #ff6f00; margin: 20px 0; border-radius: 4px;">
+                  <p style="margin: 0 0 10px 0; color: #333; font-size: 16px;">
+                    Hi ${senior.firstName || 'there'},
+                  </p>
+                  <p style="margin: 0; color: #333; font-size: 18px;">
+                    It's time to take your <strong style="color: #ff6f00;">${medication_name}</strong>
+                  </p>
+                  <p style="margin: 15px 0 0 0; color: #666; font-size: 14px;">
+                    Scheduled for: <strong>${new Date(notification.scheduled_time).toLocaleString()}</strong>
+                  </p>
+                </div>
+                <div style="background: #f5f5f5; padding: 15px; border-radius: 6px; margin: 20px 0;">
+                  <p style="margin: 0; color: #666; font-size: 14px;">
+                    ✅ Tap "Mark as Taken" in the app when you've taken this medication.
+                  </p>
+                </div>
+                <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+                <p style="color: #999; font-size: 12px;">
+                  This is an automated reminder from Senior Care Companion
+                </p>
+              </div>
+            `,
+            reply_to: 'seniorcarecompanion360@gmail.com'
+          });
+
+          if (seniorEmailResult.error) {
+            console.error(`❌ Failed to send email to senior ${senior.email}:`, seniorEmailResult.error);
+          } else {
+            console.log(`✅ Medication reminder email sent to senior: ${senior.email}`);
+          }
+
+          // TODO: If senior has phone + SMS enabled, also send via SMS gateway
+          // This will be implemented when SMS-via-email gateway is set up
+          
+        } catch (seniorError) {
+          console.error(`❌ Error sending reminder to senior:`, seniorError);
+        }
+
+        // ===== STEP 2: GET FAMILY CONNECTIONS & SEND FAMILY NOTIFICATIONS =====
         // Get family connections for this senior
         const { data: connections, error: connError } = await supabase
           .from('family_connections')
@@ -974,6 +1025,8 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
 
         // Send notifications to all family members
         if (connections && connections.length > 0) {
+          console.log(`📧 [SCHEDULER] Sending family notifications to ${connections.length} family members`);
+          
           for (const connection of connections) {
             try {
               const familyEmail = connection.family_member.email;
@@ -1013,7 +1066,7 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
               if (emailResult.error) {
                 console.error(`❌ Failed to send email to ${familyEmail}:`, emailResult.error);
               } else {
-                console.log(`✅ Email sent to ${familyEmail}`);
+                console.log(`✅ Family notification email sent to ${familyEmail}`);
               }
             } catch (familyError) {
               console.error(`❌ Error notifying family member:`, familyError);
