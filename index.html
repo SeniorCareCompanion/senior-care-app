@@ -5137,7 +5137,7 @@
                                 2026-07-01-build-001
                             </p>
                             <p style="font-size: 13px; color: #718096; margin: 0;">
-                                July 01, 2026 at 02:18 AM UTC
+                                July 01, 2026 at 02:51 AM UTC
                             </p>
                         </div>
                         
@@ -6467,24 +6467,51 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                     users[currentUser].carrier = carrier;
                 }
                 
-                // Save SMS preference
+                // Save SMS preference locally
                 users[currentUser].smsNotificationsEnabled = smsEnabled;
                 saveData('users', users);
-                console.log('SMS notification preference saved:', smsEnabled);
-                console.log('Phone number saved:', users[currentUser].phone);
-                console.log('Carrier saved:', users[currentUser].carrier);
+                console.log('SMS preferences saved locally');
                 
-                // Send confirmation SMS if opting IN
-                if (smsEnabled && users[currentUser].phone) {
-                    sendSmsConfirmation(users[currentUser].phone, users[currentUser].firstName);
-                }
+                // ===== SEND TO BACKEND =====
+                const userId = users[currentUser].userId;
+                const cleanPhone = phoneInput.replace(/\D/g, '');
                 
-                // Show success message
-                const carrierName = carrier ? `via ${carrier.toUpperCase()}` : '';
-                alert('✅ SMS alerts activated! You will receive medication reminders at ' + phoneInput + ' ' + carrierName);
-                
-                // Update button state
-                validateSettingsSmsConsent();
+                fetch('https://senior-care-backend.vercel.app/api/update-sms-preferences', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: userId,
+                        phone: cleanPhone || null,
+                        carrier: carrier || null,
+                        smsEnabled: smsEnabled
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('✅ SMS preferences saved to Supabase');
+                        
+                        // Send confirmation SMS if opting IN
+                        if (smsEnabled && cleanPhone) {
+                            sendSmsConfirmation(cleanPhone, users[currentUser].firstName);
+                        }
+                        
+                        // Show success message
+                        const carrierName = carrier ? `via ${carrier.toUpperCase()}` : '';
+                        alert('✅ SMS alerts activated! You will receive medication reminders at ' + phoneInput + ' ' + carrierName);
+                    } else {
+                        console.error('❌ Failed to save to database:', data.error);
+                        alert('⚠️ Preferences saved locally but failed to sync to database. Please try again.');
+                    }
+                    
+                    // Update button state
+                    validateSettingsSmsConsent();
+                })
+                .catch(error => {
+                    console.error('❌ Backend error:', error);
+                    alert('⚠️ Preferences saved locally but failed to sync to database: ' + error.message);
+                    validateSettingsSmsConsent();
+                });
             }
         }
 

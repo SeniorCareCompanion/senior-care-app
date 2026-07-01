@@ -1341,3 +1341,68 @@ app.post('/api/send-sms-twilio', async (req, res) => {
     });
   }
 });
+
+// ============================================================
+// UPDATE SMS PREFERENCES (Phone, Carrier, SMS Enabled)
+// ============================================================
+
+app.post('/api/update-sms-preferences', async (req, res) => {
+  try {
+    const { userId, phone, carrier, smsEnabled } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'User ID required' 
+      });
+    }
+
+    console.log(`📱 Updating SMS preferences for user ${userId}: phone=${phone}, carrier=${carrier}, enabled=${smsEnabled}`);
+
+    // Prepare update data
+    const updateData = {
+      sms_reminders_enabled: smsEnabled || false
+    };
+
+    // Add phone if provided
+    if (phone) {
+      // Clean phone: remove all non-digits
+      const cleanPhone = phone.replace(/\D/g, '');
+      updateData.phone = cleanPhone;
+    }
+
+    // Add carrier if provided
+    if (carrier) {
+      updateData.sms_carrier = carrier;
+    }
+
+    // Update user in Supabase
+    const { data, error } = await supabase
+      .from('users')
+      .update(updateData)
+      .eq('id', userId)
+      .select();
+
+    if (error) {
+      console.error('❌ Error updating SMS preferences:', error);
+      return res.status(400).json({ 
+        success: false, 
+        error: error.message 
+      });
+    }
+
+    console.log('✅ SMS preferences updated successfully');
+    res.json({ 
+      success: true, 
+      message: 'SMS preferences updated',
+      data: data[0]
+    });
+
+  } catch (error) {
+    console.error('❌ SMS preferences update error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
