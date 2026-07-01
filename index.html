@@ -5027,9 +5027,10 @@
 
                             <!-- Carrier Selection -->
                             <div style="margin-bottom: 15px;">
-                                <label for="settingsCarrier" style="display: block; font-weight: 600; color: #2e7d32; margin-bottom: 5px;">Mobile Carrier</label>
+                                <label for="settingsCarrier" style="display: block; font-weight: 600; color: #2e7d32; margin-bottom: 5px;">Reminder Delivery Method</label>
                                 <select id="settingsCarrier" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background-color: white;">
-                                    <option value="">-- Select Your Carrier --</option>
+                                    <option value="email-only">📧 Email Only (Recommended - Works Worldwide)</option>
+                                    <option value="">-- Or Select Your Carrier for SMS Text Messages --</option>
                                     <option value="verizon">Verizon</option>
                                     <option value="att">AT&T</option>
                                     <option value="tmobile">T-Mobile</option>
@@ -5039,7 +5040,9 @@
                                     <option value="boost">Boost Mobile</option>
                                     <option value="metropcs">MetroPCS</option>
                                 </select>
-                                <p style="font-size: 12px; color: #558b2f; margin: 5px 0 0 0;">Select your mobile carrier for SMS delivery</p>
+                                <p style="font-size: 12px; color: #558b2f; margin: 5px 0 0 0;">
+                                    ✉️ Email reminders work worldwide and are always sent. Want SMS text messages too? Select your US carrier above.
+                                </p>
                             </div>
                             <label id="settingsSmsConsentLabel" style="display: flex; align-items: flex-start; cursor: pointer; gap: 10px; margin: 0 0 15px 0; opacity: 0.5; pointer-events: none;">
                                 <input type="checkbox" id="smsNotificationToggle" style="width: 20px; height: 20px; cursor: pointer; margin-top: 2px; flex-shrink: 0; cursor: not-allowed;" onchange="validateSettingsSmsConsent()" disabled>
@@ -5137,7 +5140,7 @@
                                 2026-07-01-build-001
                             </p>
                             <p style="font-size: 13px; color: #718096; margin: 0;">
-                                July 01, 2026 at 02:51 AM UTC
+                                July 01, 2026 at 15:13 PM UTC
                             </p>
                         </div>
                         
@@ -6434,21 +6437,25 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             const users = loadData('users');
             
             if (users && users[currentUser]) {
-                // Validate: If SMS enabled, phone must be valid AND carrier selected
+                // Validate: If SMS enabled, must have either "email-only" OR a valid carrier + phone
                 if (smsEnabled) {
-                    if (phoneInput.length === 0) {
-                        alert('Please enter a phone number to activate SMS alerts');
-                        return;
-                    }
                     if (!carrier) {
-                        alert('Please select your mobile carrier');
+                        alert('Please select a delivery method: Email Only or your mobile carrier');
                         return;
                     }
                     
-                    const phoneRegex = /^\+?1?\s*\(?\d{3}\)?\s*-?\d{3}\s*-?\d{4}$/;
-                    if (!phoneRegex.test(phoneInput)) {
-                        alert('Please enter a valid phone number for SMS: +1 (555) 123-4567');
-                        return;
+                    // If they selected a carrier (not email-only), phone is required
+                    if (carrier !== 'email-only') {
+                        if (phoneInput.length === 0) {
+                            alert('Please enter a phone number to use SMS text messages');
+                            return;
+                        }
+                        
+                        const phoneRegex = /^\+?1?\s*\(?\d{3}\)?\s*-?\d{3}\s*-?\d{4}$/;
+                        if (!phoneRegex.test(phoneInput)) {
+                            alert('Please enter a valid phone number for SMS: +1 (555) 123-4567');
+                            return;
+                        }
                     }
                 }
                 
@@ -6491,14 +6498,12 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                     if (data.success) {
                         console.log('✅ SMS preferences saved to Supabase');
                         
-                        // Send confirmation SMS if opting IN
-                        if (smsEnabled && cleanPhone) {
-                            sendSmsConfirmation(cleanPhone, users[currentUser].firstName);
-                        }
-                        
                         // Show success message
-                        const carrierName = carrier ? `via ${carrier.toUpperCase()}` : '';
-                        alert('✅ SMS alerts activated! You will receive medication reminders at ' + phoneInput + ' ' + carrierName);
+                        if (carrier === 'email-only') {
+                            alert('✅ Reminders activated! You will receive medication reminders via email.');
+                        } else {
+                            alert('✅ SMS alerts activated! You will receive medication reminders via SMS and email at ' + phoneInput);
+                        }
                     } else {
                         console.error('❌ Failed to save to database:', data.error);
                         alert('⚠️ Preferences saved locally but failed to sync to database. Please try again.');

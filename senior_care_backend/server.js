@@ -952,7 +952,7 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
         // Get senior user details
         const { data: senior, error: seniorError } = await supabase
           .from('users')
-          .select('email, firstName, lastName, timezone, phone, sms_reminders_enabled')
+          .select('email, firstName, lastName, timezone, phone, sms_reminders_enabled, sms_carrier')
           .eq('id', senior_user_id)
           .single();
 
@@ -989,6 +989,17 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
                   </p>
                 </div>
                 <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+                
+                ${senior.sms_carrier === 'email-only' ? `
+                <div style="background: #f0f7ff; padding: 12px; border-radius: 6px; border-left: 3px solid #2196F3; margin: 15px 0;">
+                  <p style="margin: 0; font-size: 12px; color: #1565c0; line-height: 1.6;">
+                    💡 <strong>Tip:</strong> Want to receive medication reminders as text messages instead of email? 
+                    Open the app, go to <strong>Settings > SMS</strong>, and select your mobile carrier. 
+                    You'll get both SMS and email reminders!
+                  </p>
+                </div>
+                ` : ''}
+                
                 <p style="color: #999; font-size: 12px;">
                   This is an automated reminder from Senior Care Companion
                 </p>
@@ -1003,8 +1014,49 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
             console.log(`✅ Medication reminder email sent to senior: ${senior.email}`);
           }
 
-          // TODO: If senior has phone + SMS enabled, also send via SMS gateway
-          // This will be implemented when SMS-via-email gateway is set up
+          // ===== SEND SMS VIA EMAIL GATEWAY (if enabled and carrier is NOT email-only) =====
+          if (senior.sms_reminders_enabled && senior.phone && senior.sms_carrier && senior.sms_carrier !== 'email-only') {
+            try {
+              // Map carrier to SMS gateway domain
+              const carrierGatewayMap = {
+                'verizon': 'vtext.com',
+                'att': 'txt.att.com',
+                'tmobile': 'tmomail.net',
+                'sprint': 'messaging.sprintpcs.com',
+                'uscellular': 'email.uscc.net',
+                'virgin': 'vmobl.com',
+                'boost': 'smsd.boostmobile.com',
+                'metropcs': 'myboostmobile.com'
+              };
+
+              const gatewayDomain = carrierGatewayMap[senior.sms_carrier.toLowerCase()];
+              
+              if (gatewayDomain) {
+                const smsGatewayEmail = `${senior.phone}@${gatewayDomain}`;
+                
+                // SMS message (keep it short - 160 char limit)
+                const smsMessage = `Senior Care: Time to take your ${medication_name}. Reply HELP for info or STOP to opt out.`;
+                
+                const smsResult = await resend.emails.send({
+                  from: 'noreply@familycare360.app',
+                  to: smsGatewayEmail,
+                  subject: 'Senior Care Medication Reminder',
+                  text: smsMessage,
+                  html: `<p>${smsMessage}</p>`
+                });
+
+                if (smsResult.error) {
+                  console.error(`❌ Failed to send SMS via ${senior.sms_carrier} to ${smsGatewayEmail}:`, smsResult.error);
+                } else {
+                  console.log(`✅ SMS reminder sent via ${senior.sms_carrier} gateway to ${senior.phone}`);
+                }
+              } else {
+                console.warn(`⚠️ Unknown carrier: ${senior.sms_carrier}`);
+              }
+            } catch (smsError) {
+              console.error(`❌ Error sending SMS via gateway:`, smsError);
+            }
+          }
           
         } catch (seniorError) {
           console.error(`❌ Error sending reminder to senior:`, seniorError);
