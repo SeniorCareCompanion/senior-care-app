@@ -917,36 +917,6 @@ module.exports = app;
 // Check and send scheduled medication notifications
 app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
   try {
-    // ===== VALIDATE BEARER TOKEN =====
-    const authHeader = req.headers.authorization;
-    const cronSecret = process.env.CRON_SECRET;
-
-    if (!cronSecret) {
-      console.warn('⚠️ [SCHEDULER] CRON_SECRET not set in environment variables');
-      return res.status(500).json({ 
-        success: false, 
-        error: 'CRON_SECRET not configured' 
-      });
-    }
-
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.error('❌ [SCHEDULER] Missing or invalid Authorization header');
-      return res.status(401).json({ 
-        success: false, 
-        error: 'Unauthorized - Missing Bearer token' 
-      });
-    }
-
-    const token = authHeader.substring(7); // Remove "Bearer " prefix
-    if (token !== cronSecret) {
-      console.error('❌ [SCHEDULER] Invalid bearer token');
-      return res.status(401).json({ 
-        success: false, 
-        error: 'Unauthorized - Invalid token' 
-      });
-    }
-
-    console.log('✅ [SCHEDULER] Authorization successful');
     console.log('🔔 [SCHEDULER] Checking for pending notifications...');
 
     // Get all pending notifications that are due
