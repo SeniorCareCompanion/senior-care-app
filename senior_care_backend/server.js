@@ -982,13 +982,13 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
         // Get senior user details
         const { data: senior, error: seniorError } = await supabase
           .from('users')
-          .select('email, firstName, lastName, timezone, phone, sms_reminders_enabled, sms_carrier')
+          .select('email, first_name, last_name, timezone, phone, sms_reminders_enabled, sms_carrier')
           .eq('id', senior_user_id)
           .single();
 
         if (seniorError) throw seniorError;
 
-        const seniorName = `${senior.firstName || 'User'} ${senior.lastName || ''}`.trim();
+        const seniorName = `${senior.first_name || 'User'} ${senior.last_name || ''}`.trim();
 
         // ===== STEP 1: SEND MEDICATION REMINDER TO SENIOR =====
         console.log(`📱 [SCHEDULER] Sending medication reminder to senior: ${seniorName}`);
@@ -1004,7 +1004,7 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
                 <h2 style="color: #e65100; margin-bottom: 20px;">⏰ Medication Reminder</h2>
                 <div style="background: white; padding: 20px; border-left: 4px solid #ff6f00; margin: 20px 0; border-radius: 4px;">
                   <p style="margin: 0 0 10px 0; color: #333; font-size: 16px;">
-                    Hi ${senior.firstName || 'there'},
+                    Hi ${senior.first_name || 'there'},
                   </p>
                   <p style="margin: 0; color: #333; font-size: 18px;">
                     It's time to take your <strong style="color: #ff6f00;">${medication_name}</strong>
@@ -1098,7 +1098,7 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
           .from('family_connections')
           .select(`
             *,
-            family_member:family_member_user_id(email, firstName, lastName)
+            family_member:family_member_user_id(email, first_name, last_name)
           `)
           .eq('senior_user_id', senior_user_id)
           .eq('approved_by_senior', true);
@@ -1112,7 +1112,7 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
           for (const connection of connections) {
             try {
               const familyEmail = connection.family_member.email;
-              const familyName = `${connection.family_member.firstName || 'Family Member'} ${connection.family_member.lastName || ''}`.trim();
+              const familyName = `${connection.family_member.first_name || 'Family Member'} ${connection.family_member.last_name || ''}`.trim();
 
               // Send email notification to family member
               const emailResult = await resend.emails.send({
