@@ -6,6 +6,7 @@
 const express = require('express');
 const { createClient } = require('@supabase/supabase-js');
 const cors = require('cors');
+const { Resend } = require('resend');
 require('dotenv').config();
 
 const app = express();
@@ -949,6 +950,16 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
     console.log('✅ [SCHEDULER] Authorization successful');
     console.log('🔔 [SCHEDULER] Checking for pending notifications...');
 
+    // ===== CHECK IF RESEND IS CONFIGURED =====
+    if (!resendClient) {
+      console.error('❌ [SCHEDULER] Resend email client not initialized');
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Email service not configured',
+        message: 'RESEND_API_KEY not set in environment variables'
+      });
+    }
+
     // Get all pending notifications that are due
     const { data: pendingNotifications, error: fetchError } = await supabase
       .from('scheduled_notifications')
@@ -995,7 +1006,7 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
         
         try {
           // Send email reminder to senior
-          const seniorEmailResult = await resend.emails.send({
+          const seniorEmailResult = await resendClient.emails.send({
             from: 'noreply@familycare360.app',
             to: senior.email,
             subject: `💊 Medication Reminder: Time for ${medication_name}`,
@@ -1067,7 +1078,7 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
                 // SMS message (keep it short - 160 char limit)
                 const smsMessage = `Senior Care: Time to take your ${medication_name}. Reply HELP for info or STOP to opt out.`;
                 
-                const smsResult = await resend.emails.send({
+                const smsResult = await resendClient.emails.send({
                   from: 'noreply@familycare360.app',
                   to: smsGatewayEmail,
                   subject: 'Senior Care Medication Reminder',
@@ -1115,7 +1126,7 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
               const familyName = `${connection.family_member.first_name || 'Family Member'} ${connection.family_member.last_name || ''}`.trim();
 
               // Send email notification to family member
-              const emailResult = await resend.emails.send({
+              const emailResult = await resendClient.emails.send({
                 from: 'noreply@familycare360.app',
                 to: familyEmail,
                 subject: `💊 Medication Reminder: ${seniorName}`,
