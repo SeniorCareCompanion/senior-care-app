@@ -4,7 +4,7 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-07-07-build-001
+    VERSION: 2026-07-09-build-001
     BUILD DATE: April 15, 2026 at 20:15 UTC
     BUILD SYSTEM: Incremental build numbers (reset daily)
     
@@ -99,7 +99,7 @@
     ✅ No data migration needed
     
     ═══════════════════════════════════════════════════════════════════
-    PREVIOUS VERSION (2026-07-07-build-001 UTC):
+    PREVIOUS VERSION (2026-07-09-build-001 UTC):
     
     ✅ CRITICAL FIX: Medication reminders not triggering - initializeNotificationsPreference() now called on login
     
@@ -5015,17 +5015,19 @@
                         </button>
 
                         <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; border: 2px solid #4caf50; margin-bottom: 15px;">
-                            <h4 style="margin: 0 0 15px 0; color: #2e7d32; font-size: 14px; font-weight: 600;">SMS Text Message & Phone Number</h4>
+                            <h4 style="margin: 0 0 15px 0; color: #2e7d32; font-size: 14px; font-weight: 600;">Email Reminders</h4>
                             
-                            <!-- Phone Number Field -->
+                            <!-- COMMENTED OUT - Phone field for future SMS support
+                            
                             <div style="margin-bottom: 15px;">
                                 <label for="settingsPhone" style="display: block; font-weight: 600; color: #2e7d32; margin-bottom: 5px;">Phone Number</label>
                                 <input type="tel" id="settingsPhone" placeholder="+1 (303) 555-1234" autocomplete="tel" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;" oninput="validateSettingsSmsConsent()">
                                 <p style="font-size: 12px; color: #558b2f; margin: 5px 0 0 0;">Format: +1 (555) 123-4567</p>
                                 <p id="settingsPhoneFormatError" style="color: #c33; font-size: 12px; margin: 5px 0 0 0; display: none;">❌ Please enter a valid phone number in format: +1 (555) 123-4567</p>
                             </div>
-
-                            <!-- Carrier Selection -->
+                            -->
+                                 Keeping code for future SMS API integration
+                            
                             <div style="margin-bottom: 15px;">
                                 <label for="settingsCarrier" style="display: block; font-weight: 600; color: #2e7d32; margin-bottom: 5px;">Reminder Delivery Method</label>
                                 <select id="settingsCarrier" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background-color: white;">
@@ -5044,16 +5046,18 @@
                                     ✉️ Email reminders work worldwide and are always sent. Want SMS text messages too? Select your US carrier above.
                                 </p>
                             </div>
-                            <label id="settingsSmsConsentLabel" style="display: flex; align-items: flex-start; cursor: pointer; gap: 10px; margin: 0 0 15px 0; opacity: 0.5; pointer-events: none;">
-                                <input type="checkbox" id="smsNotificationToggle" style="width: 20px; height: 20px; cursor: pointer; margin-top: 2px; flex-shrink: 0; cursor: not-allowed;" onchange="validateSettingsSmsConsent()" disabled>
+                            -->
+                            <!-- Email Reminders Consent Checkbox - Email-Only Mode -->
+                            <label id="settingsSmsConsentLabel" style="display: flex; align-items: flex-start; cursor: pointer; gap: 10px; margin: 0 0 15px 0; opacity: 1; pointer-events: auto;">
+                                <input type="checkbox" id="smsNotificationToggle" style="width: 20px; height: 20px; cursor: pointer; margin-top: 2px; flex-shrink: 0;" onchange="validateSettingsSmsConsent()">
                                 <div>
-                                    <p style="margin: 0 0 5px 0; font-weight: 600; color: #2e7d32; font-size: 14px;">I agree to receive SMS messages <span id="settingsSmsRequired" style="color: #c33; display: none;">*</span></p>
+                                    <p style="margin: 0 0 5px 0; font-weight: 600; color: #2e7d32; font-size: 14px;">I agree to receive email medication reminders <span id="settingsSmsRequired" style="color: #c33; display: none;">*</span></p>
                                     <p style="margin: 0; font-size: 12px; color: #558b2f; line-height: 1.5;">
-                                        By checking this box, you agree to receive automated transactional text messages from Senior Care Companion at the phone number provided. Message frequency varies. Msg & data rates may apply. You can reply STOP to unsubscribe at any time or HELP for assistance.
+                                        By checking this box, you agree to receive automated email reminders from Senior Care Companion about your medications. We respect your privacy and will only send you necessary care reminders.
                                     </p>
                                 </div>
                             </label>
-                            <p id="settingsSmsConsentError" style="color: #c33; font-size: 12px; margin: 0 0 15px 0; display: none;">SMS consent is required if you enter a phone number.</p>
+                            <p id="settingsSmsConsentError" style="color: #c33; font-size: 12px; margin: 0 0 15px 0; display: none;">Email reminders are required to activate.</p>
 
                             <!-- SEPARATE SECTION: Legal Links -->
                             <div style="background: #f8f9fa; padding: 10px; border-radius: 6px; font-size: 12px; color: #666; margin-bottom: 15px;">
@@ -5063,9 +5067,9 @@
                                 </p>
                             </div>
 
-                            <!-- ACTION BUTTON: Activate Alerts -->
+                            <!-- ACTION BUTTON: Activate Email Reminders -->
                             <button id="activateAlertsBtn" onclick="saveSmsPreference()" style="width: 100%; padding: 12px; background-color: #ccc; color: #fff; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: not-allowed; transition: all 0.3s ease;" disabled>
-                                Activate Alerts
+                                Activate Email Reminders
                             </button>
                         </div>
                     </div>
@@ -5137,10 +5141,10 @@
                                 Current Version
                             </p>
                             <p style="font-size: 20px; color: #38b2ac; margin: 0 0 5px 0; font-weight: 700; font-family: monospace;">
-                                2026-07-07-build-001
+                                2026-07-09-build-001
                             </p>
                             <p style="font-size: 13px; color: #718096; margin: 0;">
-                                July 07, 2026 at 23:46 PM UTC
+                                July 09, 2026 at 20:04 PM UTC
                             </p>
                         </div>
                         
@@ -6431,79 +6435,55 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
         // SMS notification preference functions
         function saveSmsPreference() {
             const smsEnabled = document.getElementById('smsNotificationToggle').checked;
-            const phoneInput = document.getElementById('settingsPhone').value.trim();
-            const carrierSelect = document.getElementById('settingsCarrier');
-            const carrier = carrierSelect ? carrierSelect.value : '';
+            // Phone field is now optional/commented out
+            const phoneInput = document.getElementById('settingsPhone') ? document.getElementById('settingsPhone').value.trim() : '';
+            // SMS carrier always email-only (phone field commented out)
+            const carrier = 'email-only';
             const users = loadData('users');
             
             if (users && users[currentUser]) {
-                // Validate: If SMS enabled, must have either "email-only" OR a valid carrier + phone
-                if (smsEnabled) {
-                    if (!carrier) {
-                        alert('Please select a delivery method: Email Only or your mobile carrier');
-                        return;
-                    }
-                    
-                    // If they selected a carrier (not email-only), phone is required
-                    if (carrier !== 'email-only') {
-                        if (phoneInput.length === 0) {
-                            alert('Please enter a phone number to use SMS text messages');
-                            return;
-                        }
-                        
-                        const phoneRegex = /^\+?1?\s*\(?\d{3}\)?\s*-?\d{3}\s*-?\d{4}$/;
-                        if (!phoneRegex.test(phoneInput)) {
-                            alert('Please enter a valid phone number for SMS: +1 (555) 123-4567');
-                            return;
-                        }
-                    }
+                // Email-only mode - just needs consent checked
+                if (!smsEnabled) {
+                    alert('Please check the box to activate email reminders');
+                    return;
                 }
                 
-                // Save phone number if provided
-                if (phoneInput.length > 0) {
+                // Save phone number if phone field exists and has value
+                if (phoneInput && phoneInput.length > 0) {
                     const phoneRegex = /^\+?1?\s*\(?\d{3}\)?\s*-?\d{3}\s*-?\d{4}$/;
                     if (phoneRegex.test(phoneInput)) {
-                        // Format phone to standard format (remove all non-digits)
                         const cleanPhone = phoneInput.replace(/\D/g, '');
                         users[currentUser].phone = cleanPhone;
                     }
                 }
                 
-                // Save carrier selection
-                if (carrier) {
-                    users[currentUser].carrier = carrier;
-                }
+                // Always set carrier to email-only
+                users[currentUser].carrier = carrier;
                 
                 // Save SMS preference locally
                 users[currentUser].smsNotificationsEnabled = smsEnabled;
                 saveData('users', users);
-                console.log('SMS preferences saved locally');
+                console.log('Email reminder preferences saved locally');
                 
                 // ===== SEND TO BACKEND =====
                 const userId = users[currentUser].userId;
-                const cleanPhone = phoneInput.replace(/\D/g, '');
+                const cleanPhone = phoneInput ? phoneInput.replace(/\D/g, '') : null;
                 
                 fetch('https://senior-care-backend.vercel.app/api/update-sms-preferences', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         userId: userId,
-                        phone: cleanPhone || null,
-                        carrier: carrier || null,
+                        phone: cleanPhone,
+                        carrier: carrier,  // Always email-only
                         smsEnabled: smsEnabled
                     })
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        console.log('✅ SMS preferences saved to Supabase');
-                        
-                        // Show success message
-                        if (carrier === 'email-only') {
-                            alert('✅ Reminders activated! You will receive medication reminders via email.');
-                        } else {
-                            alert('✅ SMS alerts activated! You will receive medication reminders via SMS and email at ' + phoneInput);
-                        }
+                        console.log('✅ Reminder preferences saved to Supabase');
+                        alert('✅ Email reminders activated! You will receive medication reminders via email.');
                     } else {
                         console.error('❌ Failed to save to database:', data.error);
                         alert('⚠️ Preferences saved locally but failed to sync to database. Please try again.');
@@ -6538,7 +6518,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             }
         }
 
-        // Validate SMS consent in Settings - enable checkbox ONLY if phone number is valid
+        // Validate SMS consent in Settings - simplified (email-only mode)
         function validateSettingsSmsConsent() {
             const phoneInput = document.getElementById('settingsPhone').value.trim();
             const smsCheckbox = document.getElementById('smsNotificationToggle');
@@ -6548,47 +6528,24 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             const smsError = document.getElementById('settingsSmsConsentError');
             const activateBtn = document.getElementById('activateAlertsBtn');
             
-            // Check if phone number is valid format
-            const phoneRegex = /^\+?1?\s*\(?\d{3}\)?\s*-?\d{3}\s*-?\d{4}$/;
-            const isValidPhone = phoneRegex.test(phoneInput);
+            // Email-only mode: checkbox is always enabled
+            smsCheckbox.disabled = false;
+            smsLabel.style.opacity = '1';
+            smsLabel.style.pointerEvents = 'auto';
+            smsRequired.style.display = 'none';  // Not required
+            if (phoneError) phoneError.style.display = 'none';
+            if (smsError) smsError.style.display = 'none';
+            
+            // Enable/Disable Activate Alerts button - just needs checkbox checked
             const isConsentChecked = smsCheckbox.checked;
             
-            if (phoneInput.length > 0 && isValidPhone) {
-                // Valid phone - enable SMS checkbox and make it required
-                smsCheckbox.disabled = false;
-                smsLabel.style.opacity = '1';
-                smsLabel.style.pointerEvents = 'auto';
-                smsRequired.style.display = 'inline';
-                if (phoneError) phoneError.style.display = 'none';
-                if (smsError) smsError.style.display = 'none';
-            } else if (phoneInput.length > 0 && !isValidPhone) {
-                // Invalid phone format - disable checkbox and show error
-                smsCheckbox.disabled = true;
-                smsCheckbox.checked = false;
-                smsLabel.style.opacity = '0.5';
-                smsLabel.style.pointerEvents = 'none';
-                smsRequired.style.display = 'none';
-                if (phoneError) phoneError.style.display = 'block';
-                if (smsError) smsError.style.display = 'none';
-            } else {
-                // Empty phone - disable checkbox and reset
-                smsCheckbox.disabled = true;
-                smsCheckbox.checked = false;
-                smsLabel.style.opacity = '0.5';
-                smsLabel.style.pointerEvents = 'none';
-                smsRequired.style.display = 'none';
-                if (phoneError) phoneError.style.display = 'none';
-                if (smsError) smsError.style.display = 'none';
-            }
-            
-            // Enable/Disable Activate Alerts button
-            if (isValidPhone && isConsentChecked) {
-                // Both valid phone AND checkbox checked - ENABLE button
+            if (isConsentChecked) {
+                // Checkbox checked - ENABLE button
                 activateBtn.disabled = false;
                 activateBtn.style.backgroundColor = '#4caf50';
                 activateBtn.style.cursor = 'pointer';
             } else {
-                // Missing either valid phone OR checkbox - DISABLE button
+                // Checkbox unchecked - DISABLE button
                 activateBtn.disabled = true;
                 activateBtn.style.backgroundColor = '#ccc';
                 activateBtn.style.cursor = 'not-allowed';
@@ -6599,30 +6556,16 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             const users = loadData('users');
             if (users && users[currentUser]) {
                 const smsEnabled = users[currentUser].smsNotificationsEnabled === true;
-                const phone = users[currentUser].phone || '';
-                const carrier = users[currentUser].carrier || '';
+                // Carrier and phone fields are commented out - email-only mode
                 
-                // Load phone number
-                const phoneInput = document.getElementById('settingsPhone');
-                if (phoneInput) {
-                    phoneInput.value = phone;
-                }
-                
-                // Load carrier selection
-                const carrierSelect = document.getElementById('settingsCarrier');
-                if (carrierSelect) {
-                    carrierSelect.value = carrier;
-                    console.log('Carrier loaded:', carrier);
-                }
-                
-                // Load SMS checkbox
+                // Load SMS checkbox (phone field is commented out)
                 const toggle = document.getElementById('smsNotificationToggle');
                 if (toggle) {
                     toggle.checked = smsEnabled;
-                    console.log('SMS notification preference loaded:', smsEnabled);
+                    console.log('Email reminder preference loaded:', smsEnabled);
                 }
                 
-                // Validate checkbox and button state based on loaded data
+                // Validate checkbox and button state
                 validateSettingsSmsConsent();
             }
         }
