@@ -1218,16 +1218,112 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
 // Create scheduled notifications for a medication
 app.post('/api/create-scheduled-notifications', async (req, res) => {
   try {
-    const { userId, notifications } = req.body;
+    const { userId, medication, timezone } = req.body;
 
-    if (!userId || !Array.isArray(notifications) || notifications.length === 0) {
+    if (!userId || !medication || !timezone) {
       return res.status(400).json({ 
         success: false, 
-        error: 'Missing userId or notifications array' 
+        error: 'Missing userId, medication, or timezone' 
       });
     }
 
-    console.log(`📬 Creating ${notifications.length} scheduled notifications for user ${userId}`);
+    console.log(`📬 Creating scheduled notifications for ${medication.name} in timezone ${timezone}`);
+
+    // Helper: Convert local time in a timezone to UTC
+    function localTimeToUTC(year, month, day, hours, minutes, tz) {
+      // Create a date in UTC first
+      const utcDate = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
+      
+      // Get what time that UTC date is in the target timezone
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: tz,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      });
+      
+      const parts = formatter.format(utcDate).split(/[-:\s\/]/);
+      const tzYear = parseInt(parts[2]);
+      const tzMonth = parseInt(parts[0]);
+      const tzDay = parseInt(parts[1]);
+      const tzHours = parseInt(parts[3]);
+      const tzMinutes = parseInt(parts[4]);
+      
+      // Calculate offset
+      const offsetMs = utcDate.getTime() - new Date(Date.UTC(tzYear, tzMonth - 1, tzDay, tzHours, tzMinutes, 0)).getTime();
+      
+      // Now create the desired time (year, month, day, hours, minutes) and adjust for offset
+      const desiredTime = new Date(Date.UTC(year, month - 1, day, hours, minutes, 0));
+      return new Date(desiredTime.getTime() + offsetMs);
+    }
+
+    const notifications = [];
+    const today = new Date();
+    const reminderMinutes = medication.reminderMinutes || 10;
+
+    // Generate notifications for next 30 days
+    for (let daysFromNow = 0; daysFromNow < 30; daysFromNow++) {
+      const checkDate = new Date(today);
+      checkDate.setDate(checkDate.getDate() + daysFromNow);
+      
+      const year = checkDate.getFullYear();
+      const month = checkDate.getMonth() + 1;
+      const day = checkDate.getDate();
+
+      // Check if medication should be taken on this date
+      let shouldSchedule = false;
+      
+      if (medication.recurrence === 'daily') {
+        shouldSchedule = true;
+      } else if (medication.recurrence === 'specific-days' && medication.specificDays) {
+        const dayOfWeek = checkDate.getDay();
+        shouldSchedule = medication.specificDays.includes(dayOfWeek);
+      } else if (medication.recurrence === 'every-x-days' && medication.everyXDays) {
+        const startDate = new Date(medication.startDate || today);
+        const daysDiff = Math.floor((checkDate - startDate) / (1000 * 60 * 60 * 24));
+        shouldSchedule = daysDiff >= 0 && daysDiff % medication.everyXDays === 0;
+      } else if (medication.recurrence === 'weekly' && medication.weeklyDay !== undefined) {
+        shouldSchedule = checkDate.getDay() === medication.weeklyDay;
+      }
+
+      if (shouldSchedule) {
+        // Create notification for each dose time
+        for (const time of medication.times) {
+          const [hours, minutes] = time.split(':').map(Number);
+          
+          // Convert to UTC
+          const medicationTimeUTC = localTimeToUTC(year, month, day, hours, minutes, timezone);
+          
+          // Subtract reminder minutes
+          const reminderTimeUTC = new Date(medicationTimeUTC.getTime() - reminderMinutes * 60000);
+          
+          console.log(`📅 ${medication.name} at ${time} ${timezone} → UTC: ${reminderTimeUTC.toISOString()}`);
+          
+          // Only add if in the future
+          if (reminderTimeUTC > new Date()) {
+            notifications.push({
+              senior_user_id: userId,
+              medication_name: medication.name,
+              scheduled_time: reminderTimeUTC.toISOString(),
+              reminder_minutes: reminderMinutes,
+              status: 'pending'
+            });
+          }
+        }
+      }
+    }
+
+    if (notifications.length === 0) {
+      return res.json({ 
+        success: true, 
+        message: 'No future notifications to schedule',
+        notificationCount: 0
+      });
+    }
 
     // Insert notifications into Supabase
     const { data, error } = await supabase
@@ -1238,10 +1334,12 @@ app.post('/api/create-scheduled-notifications', async (req, res) => {
       throw error;
     }
 
+    console.log(`✅ Created ${notifications.length} scheduled notifications`);
+    
     res.json({ 
       success: true, 
       message: `Created ${notifications.length} scheduled notifications`,
-      count: notifications.length
+      notificationCount: notifications.length
     });
 
   } catch (error) {

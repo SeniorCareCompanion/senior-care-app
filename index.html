@@ -5144,7 +5144,7 @@
                                 2026-07-14-build-001
                             </p>
                             <p style="font-size: 13px; color: #718096; margin: 0;">
-                                July 14, 2026 at 01:20 AM UTC
+                                July 14, 2026 at 02:06 AM UTC
                             </p>
                         </div>
                         
@@ -7417,68 +7417,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                 const users = loadData('users');
                 const userTimezone = users[userId]?.timezone || 'America/Denver';
                 
-                // Calculate next 30 days of medication reminders
-                const today = new Date();
-                const notifications = [];
-                
-                for (let daysFromNow = 0; daysFromNow < 30; daysFromNow++) {
-                    const checkDate = new Date(today);
-                    checkDate.setDate(checkDate.getDate() + daysFromNow);
-                    
-                    // Check if medication should be taken on this date
-                    if (shouldMedicationBeTakenOnDate(medication, checkDate)) {
-                        // Create notification for each dose time
-                        medication.times.forEach(time => {
-                            const [hours, minutes] = time.split(':').map(Number);
-                            
-                            // ===== TIMEZONE-AWARE SCHEDULING =====
-                            // Create the correct UTC time for this medication time in the user's timezone
-                            const scheduledUTC = createUTCDateInTimezone(
-                                checkDate.getFullYear(),
-                                checkDate.getMonth() + 1,
-                                checkDate.getDate(),
-                                hours,
-                                minutes,
-                                userTimezone
-                            );
-                            
-                            // Check if date conversion was successful
-                            if (!scheduledUTC) {
-                                console.error(`❌ Failed to convert timezone for ${medication.name} at ${time}`);
-                                return;
-                            }
-                            
-                            // Calculate reminder time (before medication time)
-                            const reminderMinutes = medication.reminderMinutes || 10;
-                            const reminderTime = new Date(scheduledUTC.getTime() - reminderMinutes * 60000);
-                            
-                            console.log(`📅 Scheduling: ${medication.name} at ${time} ${userTimezone}`);
-                            console.log(`   Local: ${checkDate.toDateString()} ${time}`);
-                            console.log(`   UTC: ${scheduledUTC.toISOString()}`);
-                            
-                            // Only add if reminder is in the future
-                            if (reminderTime > new Date()) {
-                                notifications.push({
-                                    senior_user_id: userId,
-                                    medication_name: medication.name,
-                                    scheduled_time: reminderTime.toISOString(),
-                                    reminder_minutes: reminderMinutes,
-                                    status: 'pending'
-                                });
-                                console.log(`✅ Reminder scheduled for: ${reminderTime.toISOString()}`);
-                            } else {
-                                console.log(`⏭️ Skipping past reminder: ${reminderTime.toISOString()}`);
-                            }
-                        });
-                    }
-                }
-                
-                if (notifications.length === 0) {
-                    console.log('No future notifications to schedule');
-                    return;
-                }
-                
-                // Send to backend to create in Supabase
+                // Send medication + timezone to backend for conversion
                 const BACKEND_API_URL = 'https://senior-care-backend.vercel.app';
                 const response = await fetch(`${BACKEND_API_URL}/api/create-scheduled-notifications`, {
                     method: 'POST',
@@ -7487,15 +7426,26 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                     },
                     body: JSON.stringify({
                         userId: userId,
-                        notifications: notifications
+                        medication: {
+                            name: medication.name,
+                            times: medication.times,
+                            reminderMinutes: medication.reminderMinutes || 10,
+                            recurrence: medication.recurrence,
+                            specificDays: medication.specificDays,
+                            everyXDays: medication.everyXDays,
+                            startDate: medication.startDate,
+                            weeklyDay: medication.weeklyDay
+                        },
+                        timezone: userTimezone
                     })
                 });
                 
                 const result = await response.json();
                 if (result.success) {
-                    console.log(`✅ Created ${result.count} scheduled notifications`);
+                    console.log(`✅ Created ${result.notificationCount} scheduled notifications`);
                 } else {
-                    console.error('Failed to create scheduled notifications:', result.error);
+                    console.error('❌ Backend error:', result.error);
+                    alert('Error creating reminders: ' + result.error);
                 }
                 
             } catch (error) {
