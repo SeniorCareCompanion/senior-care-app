@@ -1229,12 +1229,30 @@ app.post('/api/create-scheduled-notifications', async (req, res) => {
 
     console.log(`📬 Creating scheduled notifications for ${medication.name} in timezone ${timezone}`);
 
+    // Helper: Get today's date in the specified timezone (as YYYY-MM-DD)
+    function getTodayInTimezone(tz) {
+      const now = new Date();
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: tz,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+      
+      const parts = formatter.format(now).split('/');
+      return {
+        year: parseInt(parts[2]),
+        month: parseInt(parts[0]),
+        day: parseInt(parts[1])
+      };
+    }
+
     // Helper: Convert local time in a timezone to UTC
     function localTimeToUTC(year, month, day, hours, minutes, tz) {
-      // Create a date in UTC first
-      const utcDate = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
+      // Use date-fns-tz style: create a date assuming it's in that timezone, then get UTC
+      const testDate = new Date(year, month - 1, day, hours, minutes, 0);
       
-      // Get what time that UTC date is in the target timezone
+      // Format this test date as if it's UTC
       const formatter = new Intl.DateTimeFormat('en-US', {
         timeZone: tz,
         year: 'numeric',
@@ -1246,28 +1264,28 @@ app.post('/api/create-scheduled-notifications', async (req, res) => {
         hour12: false
       });
       
-      const parts = formatter.format(utcDate).split(/[-:\s\/]/);
-      const tzYear = parseInt(parts[2]);
-      const tzMonth = parseInt(parts[0]);
-      const tzDay = parseInt(parts[1]);
-      const tzHours = parseInt(parts[3]);
-      const tzMinutes = parseInt(parts[4]);
+      const tzString = formatter.format(testDate);
+      const [m, d, y, h, min, s] = tzString.match(/(\d+)\/(\d+)\/(\d+),\s(\d+):(\d+):(\d+)/).slice(1);
       
       // Calculate offset
-      const offsetMs = utcDate.getTime() - new Date(Date.UTC(tzYear, tzMonth - 1, tzDay, tzHours, tzMinutes, 0)).getTime();
+      const tzTime = new Date(parseInt(y), parseInt(m) - 1, parseInt(d), parseInt(h), parseInt(min), parseInt(s)).getTime();
+      const offset = testDate.getTime() - tzTime;
       
-      // Now create the desired time (year, month, day, hours, minutes) and adjust for offset
-      const desiredTime = new Date(Date.UTC(year, month - 1, day, hours, minutes, 0));
-      return new Date(desiredTime.getTime() + offsetMs);
+      // Apply offset to get UTC time
+      return new Date(testDate.getTime() - offset);
     }
 
-    const notifications = [];
-    const today = new Date();
+    const reminders = [];
     const reminderMinutes = medication.reminderMinutes || 10;
+
+    // Get TODAY in user's timezone
+    const todayTz = getTodayInTimezone(timezone);
+
+    console.log(`📅 Today in ${timezone}: ${todayTz.year}-${String(todayTz.month).padStart(2, '0')}-${String(todayTz.day).padStart(2, '0')}`);
 
     // Generate notifications for next 30 days
     for (let daysFromNow = 0; daysFromNow < 30; daysFromNow++) {
-      const checkDate = new Date(today);
+      const checkDate = new Date(todayTz.year, todayTz.month - 1, todayTz.day);
       checkDate.setDate(checkDate.getDate() + daysFromNow);
       
       const year = checkDate.getFullYear();
@@ -1283,7 +1301,7 @@ app.post('/api/create-scheduled-notifications', async (req, res) => {
         const dayOfWeek = checkDate.getDay();
         shouldSchedule = medication.specificDays.includes(dayOfWeek);
       } else if (medication.recurrence === 'every-x-days' && medication.everyXDays) {
-        const startDate = new Date(medication.startDate || today);
+        const startDate = new Date(medication.startDate || new Date().toISOString().split('T')[0]);
         const daysDiff = Math.floor((checkDate - startDate) / (1000 * 60 * 60 * 24));
         shouldSchedule = daysDiff >= 0 && daysDiff % medication.everyXDays === 0;
       } else if (medication.recurrence === 'weekly' && medication.weeklyDay !== undefined) {
@@ -1301,11 +1319,12 @@ app.post('/api/create-scheduled-notifications', async (req, res) => {
           // Subtract reminder minutes
           const reminderTimeUTC = new Date(medicationTimeUTC.getTime() - reminderMinutes * 60000);
           
-          console.log(`📅 ${medication.name} at ${time} ${timezone} → UTC: ${reminderTimeUTC.toISOString()}`);
+          console.log(`📅 ${medication.name} at ${time} on ${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')} ${timezone}`);
+          console.log(`   → Reminder UTC: ${reminderTimeUTC.toISOString()}`);
           
           // Only add if in the future
           if (reminderTimeUTC > new Date()) {
-            notifications.push({
+            reminders.push({
               senior_user_id: userId,
               medication_name: medication.name,
               scheduled_time: reminderTimeUTC.toISOString(),
@@ -1317,7 +1336,7 @@ app.post('/api/create-scheduled-notifications', async (req, res) => {
       }
     }
 
-    if (notifications.length === 0) {
+    if (reminders.length === 0) {
       return res.json({ 
         success: true, 
         message: 'No future notifications to schedule',
@@ -1325,21 +1344,21 @@ app.post('/api/create-scheduled-notifications', async (req, res) => {
       });
     }
 
-    // Insert notifications into Supabase
+    // Insert into Supabase
     const { data, error } = await supabase
       .from('scheduled_notifications')
-      .insert(notifications);
+      .insert(reminders);
 
     if (error) {
       throw error;
     }
 
-    console.log(`✅ Created ${notifications.length} scheduled notifications`);
+    console.log(`✅ Created ${reminders.length} scheduled notifications`);
     
     res.json({ 
       success: true, 
-      message: `Created ${notifications.length} scheduled notifications`,
-      notificationCount: notifications.length
+      message: `Created ${reminders.length} scheduled notifications`,
+      notificationCount: reminders.length
     });
 
   } catch (error) {
