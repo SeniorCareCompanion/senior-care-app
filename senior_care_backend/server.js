@@ -1229,30 +1229,8 @@ app.post('/api/create-scheduled-notifications', async (req, res) => {
 
     console.log(`📬 Creating scheduled notifications for ${medication.name} in timezone ${timezone}`);
 
-    // Helper: Get today's date in the specified timezone (as YYYY-MM-DD)
-    function getTodayInTimezone(tz) {
-      const now = new Date();
-      const formatter = new Intl.DateTimeFormat('en-US', {
-        timeZone: tz,
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-      });
-      
-      const parts = formatter.format(now).split('/');
-      return {
-        year: parseInt(parts[2]),
-        month: parseInt(parts[0]),
-        day: parseInt(parts[1])
-      };
-    }
-
-    // Helper: Convert local time in a timezone to UTC
-    function localTimeToUTC(year, month, day, hours, minutes, tz) {
-      // Use date-fns-tz style: create a date assuming it's in that timezone, then get UTC
-      const testDate = new Date(year, month - 1, day, hours, minutes, 0);
-      
-      // Format this test date as if it's UTC
+    // Helper: Calculate timezone offset for a specific date
+    function getOffsetMs(date, tz) {
       const formatter = new Intl.DateTimeFormat('en-US', {
         timeZone: tz,
         year: 'numeric',
@@ -1264,15 +1242,49 @@ app.post('/api/create-scheduled-notifications', async (req, res) => {
         hour12: false
       });
       
-      const tzString = formatter.format(testDate);
-      const [m, d, y, h, min, s] = tzString.match(/(\d+)\/(\d+)\/(\d+),\s(\d+):(\d+):(\d+)/).slice(1);
+      const parts = formatter.formatToParts(date);
+      const tzYear = parseInt(parts.find(p => p.type === 'year').value);
+      const tzMonth = parseInt(parts.find(p => p.type === 'month').value);
+      const tzDay = parseInt(parts.find(p => p.type === 'day').value);
+      const tzHour = parseInt(parts.find(p => p.type === 'hour').value);
+      const tzMinute = parseInt(parts.find(p => p.type === 'minute').value);
+      const tzSecond = parseInt(parts.find(p => p.type === 'second').value);
       
-      // Calculate offset
-      const tzTime = new Date(parseInt(y), parseInt(m) - 1, parseInt(d), parseInt(h), parseInt(min), parseInt(s)).getTime();
-      const offset = testDate.getTime() - tzTime;
+      // This is what the UTC date looks like in the timezone
+      const tzDate = new Date(Date.UTC(tzYear, tzMonth - 1, tzDay, tzHour, tzMinute, tzSecond));
       
-      // Apply offset to get UTC time
-      return new Date(testDate.getTime() - offset);
+      // Offset = how much to ADD to UTC time to get the timezone time
+      return date.getTime() - tzDate.getTime();
+    }
+
+    // Helper: Convert a local time in a timezone to UTC
+    function localTimeToUTC(year, month, day, hours, minutes, tz) {
+      // Create a test UTC date with these values
+      const testDate = new Date(Date.UTC(year, month - 1, day, hours, minutes, 0));
+      
+      // Calculate the offset for this specific date
+      const offset = getOffsetMs(testDate, tz);
+      
+      // Apply offset to get real UTC time
+      return new Date(testDate.getTime() + offset);
+    }
+
+    // Helper: Get today's date in the specified timezone
+    function getTodayInTimezone(tz) {
+      const now = new Date();
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: tz,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+      
+      const parts = formatter.formatToParts(now);
+      return {
+        year: parseInt(parts.find(p => p.type === 'year').value),
+        month: parseInt(parts.find(p => p.type === 'month').value),
+        day: parseInt(parts.find(p => p.type === 'day').value)
+      };
     }
 
     const reminders = [];
