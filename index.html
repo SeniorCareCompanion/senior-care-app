@@ -4,7 +4,7 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-07-09-build-001
+    VERSION: 2026-07-14-build-001
     BUILD DATE: April 15, 2026 at 20:15 UTC
     BUILD SYSTEM: Incremental build numbers (reset daily)
     
@@ -99,7 +99,7 @@
     ✅ No data migration needed
     
     ═══════════════════════════════════════════════════════════════════
-    PREVIOUS VERSION (2026-07-09-build-001 UTC):
+    PREVIOUS VERSION (2026-07-14-build-001 UTC):
     
     ✅ CRITICAL FIX: Medication reminders not triggering - initializeNotificationsPreference() now called on login
     
@@ -5141,10 +5141,10 @@
                                 Current Version
                             </p>
                             <p style="font-size: 20px; color: #38b2ac; margin: 0 0 5px 0; font-weight: 700; font-family: monospace;">
-                                2026-07-09-build-001
+                                2026-07-14-build-001
                             </p>
                             <p style="font-size: 13px; color: #718096; margin: 0;">
-                                July 09, 2026 at 20:04 PM UTC
+                                July 14, 2026 at 00:11 AM UTC
                             </p>
                         </div>
                         
@@ -7349,6 +7349,41 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
         }
 
 
+        // ===== TIMEZONE CONVERSION HELPER =====
+        // Convert a local time in a specific timezone to UTC ISO string
+        function getTimezoneOffset(date, timezone) {
+            // Get what time it is in the specified timezone
+            const formatter = new Intl.DateTimeFormat('en-US', {
+                timeZone: timezone,
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+            
+            const parts = formatter.formatToParts(date);
+            // Build a UTC date string from the timezone-adjusted parts
+            const tzDateString = `${parts[6].value}-${parts[0].value}-${parts[2].value}T${parts[4].value}:${parts[8].value}:${parts[10].value}Z`;
+            const tzDate = new Date(tzDateString);
+            
+            // Return offset in minutes
+            return (date - tzDate) / 60000;
+        }
+
+        function createUTCDateInTimezone(year, month, day, hours, minutes, timezone) {
+            // Create a date in local browser time with the desired hours/minutes
+            const date = new Date(year, month - 1, day, hours, minutes, 0, 0);
+            
+            // Get the timezone offset for this date
+            const offset = getTimezoneOffset(date, timezone);
+            
+            // Adjust by offset to get the correct UTC time
+            return new Date(date.getTime() - offset * 60000);
+        }
+
         // 🔔 Create scheduled medication notifications for server-side reminders
         async function createScheduledNotifications(medication, userId) {
             try {
@@ -7372,13 +7407,24 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                         medication.times.forEach(time => {
                             const [hours, minutes] = time.split(':').map(Number);
                             
-                            // Calculate scheduled time (medication time)
-                            const medTime = new Date(checkDate);
-                            medTime.setHours(hours, minutes, 0, 0);
+                            // ===== TIMEZONE-AWARE SCHEDULING =====
+                            // Create the correct UTC time for this medication time in the user's timezone
+                            const scheduledUTC = createUTCDateInTimezone(
+                                checkDate.getFullYear(),
+                                checkDate.getMonth() + 1,
+                                checkDate.getDate(),
+                                hours,
+                                minutes,
+                                userTimezone
+                            );
                             
                             // Calculate reminder time (before medication time)
                             const reminderMinutes = medication.reminderMinutes || 10;
-                            const reminderTime = new Date(medTime.getTime() - reminderMinutes * 60000);
+                            const reminderTime = new Date(scheduledUTC.getTime() - reminderMinutes * 60000);
+                            
+                            console.log(`📅 Scheduling: ${medication.name} at ${time} ${userTimezone}`);
+                            console.log(`   Local: ${checkDate.toDateString()} ${time}`);
+                            console.log(`   UTC: ${scheduledUTC.toISOString()}`);
                             
                             // Only add if reminder is in the future
                             if (reminderTime > new Date()) {
@@ -7389,6 +7435,9 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                                     reminder_minutes: reminderMinutes,
                                     status: 'pending'
                                 });
+                                console.log(`✅ Reminder scheduled for: ${reminderTime.toISOString()}`);
+                            } else {
+                                console.log(`⏭️ Skipping past reminder: ${reminderTime.toISOString()}`);
                             }
                         });
                     }

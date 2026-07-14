@@ -1021,7 +1021,7 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
                     It's time to take your <strong style="color: #ff6f00;">${medication_name}</strong>
                   </p>
                   <p style="margin: 15px 0 0 0; color: #666; font-size: 14px;">
-                    Scheduled for: <strong>${new Date(notification.scheduled_time).toLocaleString()}</strong>
+                    Scheduled for: <strong>${new Date(notification.scheduled_time).toLocaleString('en-US', {timeZone: senior.timezone || 'America/Denver', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'})}</strong>
                   </p>
                 </div>
                 <div style="background: #f5f5f5; padding: 15px; border-radius: 6px; margin: 20px 0;">
