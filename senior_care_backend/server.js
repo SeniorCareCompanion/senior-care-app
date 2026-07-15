@@ -1075,8 +1075,17 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
               if (gatewayDomain) {
                 const smsGatewayEmail = `${senior.phone}@${gatewayDomain}`;
                 
+                // Calculate actual medication time (reminder_time + reminder_minutes)
+                const medicationTimeDate = new Date(new Date(notification.scheduled_time).getTime() + notification.reminder_minutes * 60000);
+                const medTime = medicationTimeDate.toLocaleString('en-US', {
+                  timeZone: senior.timezone || 'America/Denver',
+                  hour: 'numeric',
+                  minute: '2-digit',
+                  hour12: true
+                });
+                
                 // SMS message (keep it short - 160 char limit)
-                const smsMessage = `Senior Care: Time to take your ${medication_name}. Reply HELP for info or STOP to opt out.`;
+                const smsMessage = `Senior Care: Reminder - Take your ${medication_name} at ${medTime}. Reply HELP or STOP.`;
                 
                 const smsResult = await resendClient.emails.send({
                   from: 'noreply@familycare360.app',
