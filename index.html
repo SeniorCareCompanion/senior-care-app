@@ -4,7 +4,7 @@
     SENIOR CARE COMPANION - STANDALONE VERSION FOR IPHONE
     ═══════════════════════════════════════════════════════════════════
     
-    VERSION: 2026-07-14-build-002
+    VERSION: 2026-07-15-build-001
     BUILD DATE: April 15, 2026 at 20:15 UTC
     BUILD SYSTEM: Incremental build numbers (reset daily)
     
@@ -99,7 +99,7 @@
     ✅ No data migration needed
     
     ═══════════════════════════════════════════════════════════════════
-    PREVIOUS VERSION (2026-07-14-build-002 UTC):
+    PREVIOUS VERSION (2026-07-15-build-001 UTC):
     
     ✅ CRITICAL FIX: Medication reminders not triggering - initializeNotificationsPreference() now called on login
     
@@ -2674,12 +2674,11 @@
                     <div id="medReminderOptions" class="input-group hidden">
                         <label>Remind me (minutes before):</label>
                         <select id="medReminderMinutes" class="reminder-time-select">
-                            <option value="5">5 minutes before</option>
-                            <option value="10" selected>10 minutes before</option>
-                            <option value="15">15 minutes before</option>
+                            <option value="15" selected>15 minutes before</option>
                             <option value="30">30 minutes before</option>
                             <option value="60">1 hour before</option>
                         </select>
+                        <p style="font-size: 11px; color: #666; margin: 3px 0 0 0;">💡 Reminders check every 15 minutes</p>
                     </div>
                     <button id="addMedBtn" class="btn btn-primary" onclick="addMedication()">Add Medication</button>
                     <button id="cancelEditMedBtn" class="btn hidden" onclick="cancelEditMedication()" style="background: #95a5a6; margin-top: 10px;">Cancel Editing</button>
@@ -5141,10 +5140,10 @@
                                 Current Version
                             </p>
                             <p style="font-size: 20px; color: #38b2ac; margin: 0 0 5px 0; font-weight: 700; font-family: monospace;">
-                                2026-07-14-build-002
+                                2026-07-15-build-001
                             </p>
                             <p style="font-size: 13px; color: #718096; margin: 0;">
-                                July 14, 2026 at 02:46 AM UTC
+                                July 15, 2026 at 01:27 AM UTC
                             </p>
                         </div>
                         
@@ -7306,6 +7305,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
 
         // Medications
         // Update medication time pickers based on times per day
+        // ONLY allows 15-minute increments (0, 15, 30, 45)
         function updateMedicationTimePickers() {
             const timesPerDay = parseInt(document.getElementById('medTimesPerDay').value);
             const container = document.getElementById('medicationTimePickersContainer');
@@ -7321,13 +7321,36 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             // Clear existing time pickers
             container.innerHTML = '';
             
+            // Generate all valid times (15-minute increments)
+            const validTimes = [];
+            for (let hour = 0; hour < 24; hour++) {
+                for (let minute of [0, 15, 30, 45]) {
+                    const timeStr = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+                    const displayStr = new Date(`2000-01-01T${timeStr}`).toLocaleString('en-US', {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true
+                    });
+                    validTimes.push({ value: timeStr, display: displayStr });
+                }
+            }
+            
             // Create time pickers for each dose
             for (let i = 1; i <= timesPerDay; i++) {
                 const div = document.createElement('div');
                 div.className = 'input-group';
+                
+                let optionsHTML = '<option value="">Select time...</option>';
+                validTimes.forEach(time => {
+                    optionsHTML += `<option value="${time.value}">${time.display}</option>`;
+                });
+                
                 div.innerHTML = `
                     <label>${labels[timesPerDay][i-1]}</label>
-                    <input type="time" id="medTime${i}">
+                    <select id="medTime${i}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                        ${optionsHTML}
+                    </select>
+                    <p style="font-size: 11px; color: #666; margin: 3px 0 0 0;">⏰ Times are in 15-minute increments</p>
                 `;
                 container.appendChild(div);
             }
@@ -7612,7 +7635,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             updateMedicationTimePickers(); // Reset to 1 time picker
             document.getElementById('medRecurrence').value = 'daily';
             document.getElementById('medReminderEnabled').checked = false;
-            document.getElementById('medReminderMinutes').value = '10';
+            document.getElementById('medReminderMinutes').value = '15';
             document.getElementById('medReminderOptions').classList.add('hidden');
             document.querySelectorAll('.day-checkbox').forEach(cb => cb.checked = false);
             document.getElementById('medEveryXDays').value = '2';
@@ -7701,7 +7724,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             updateMedicationTimePickers(); // Reset to 1 time picker
             document.getElementById('medRecurrence').value = 'daily';
             document.getElementById('medReminderEnabled').checked = false;
-            document.getElementById('medReminderMinutes').value = '10';
+            document.getElementById('medReminderMinutes').value = '15';
             document.getElementById('medReminderOptions').classList.add('hidden');
             document.querySelectorAll('.day-checkbox').forEach(cb => cb.checked = false);
             document.getElementById('medEveryXDays').value = '2';

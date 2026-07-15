@@ -1227,7 +1227,25 @@ app.post('/api/create-scheduled-notifications', async (req, res) => {
       });
     }
 
-    console.log(`📬 Creating scheduled notifications for ${medication.name} in timezone ${timezone}`);
+    // Helper: Validate time is in 15-minute increments
+    function isValid15MinuteTime(timeStr) {
+      // Format: "HH:MM"
+      if (!/^\d{2}:\d{2}$/.test(timeStr)) return false;
+      
+      const minutes = parseInt(timeStr.split(':')[1]);
+      // Valid minutes: 0, 15, 30, 45
+      return [0, 15, 30, 45].includes(minutes);
+    }
+
+    // Validate all medication times
+    for (const time of medication.times) {
+      if (!isValid15MinuteTime(time)) {
+        return res.status(400).json({
+          success: false,
+          error: `Invalid time "${time}". Medications must be scheduled in 15-minute increments (00, 15, 30, 45)`
+        });
+      }
+    }
 
     // Helper: Calculate timezone offset for a specific date
     function getOffsetMs(date, tz) {
@@ -1288,7 +1306,7 @@ app.post('/api/create-scheduled-notifications', async (req, res) => {
     }
 
     const reminders = [];
-    const reminderMinutes = medication.reminderMinutes || 10;
+    const reminderMinutes = medication.reminderMinutes || 15;
 
     // Get TODAY in user's timezone
     const todayTz = getTodayInTimezone(timezone);
