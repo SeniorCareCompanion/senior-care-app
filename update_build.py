@@ -83,9 +83,10 @@ def update_build_version(filename='index.html'):
     # 5. Update Settings page App Version card
     # ════════════════════════════════════════════════════════════════
     content = re.sub(
-        r'(\d{4}-\d{2}-\d{2}-\d{4} UTC)\s*</p>\s*<p[^>]*color: #718096[^>]*>',
-        f'{new_version} UTC</p>\s*<p style="font-size: 13px; color: #718096; margin: 0;">',
-        content
+        r'\d{4}-\d{2}-\d{2}-\d{4} UTC',
+        f'{new_version} UTC',
+        content,
+        count=10  # Limit to first 10 matches to avoid over-replacing
     )
     print("  ✓ Updated Settings App Version card")
     
@@ -93,21 +94,11 @@ def update_build_version(filename='index.html'):
     # 6. Update console.log version display
     # ════════════════════════════════════════════════════════════════
     content = re.sub(
-        r"console\.log\('🏷️ CURRENT VERSION: \d{4}-\d{2}-\d{2}-\d{4} UTC'\);",
-        f"console.log('🏷️ CURRENT VERSION: {new_version} UTC');",
+        r"🏷️ CURRENT VERSION: \d{4}-\d{2}-\d{2}-\d{4} UTC",
+        f'🏷️ CURRENT VERSION: {new_version} UTC',
         content
     )
     print("  ✓ Updated console.log version")
-    
-    # ════════════════════════════════════════════════════════════════
-    # 7. Update timestamp in Settings page
-    # ════════════════════════════════════════════════════════════════
-    content = re.sub(
-        r'April \d{1,2}, \d{4} at \d{2}:\d{2} (AM|PM)',
-        f'{now.strftime("%B %d, %Y at %I:%M %p")}',
-        content
-    )
-    print("  ✓ Updated Settings timestamp")
     
     # Write the file back
     with open(filename, 'w', encoding='utf-8') as f:
