@@ -23,89 +23,39 @@ def update_build_version(filename='index.html'):
     date_str = now.strftime('%Y-%m-%d')
     time_str = now.strftime('%H%M')
     new_version = f"{date_str}-{time_str}"
-    timestamp = now.strftime('%B %d, %Y at %H:%M %p UTC')
     
     print(f"📅 Current Date: {date_str}")
     print(f"⏰ Current Time: {time_str}")
-    print(f"✅ New Version: {new_version} UTC")
-    print(f"⏰ Timestamp: {timestamp}\n")
+    print(f"✅ New Version: {new_version} UTC\n")
     
     # Find current version in header comment
     version_match = re.search(r'VERSION: (\d{4}-\d{2}-\d{2}-\d{4})', content)
     if version_match:
         old_version = version_match.group(1)
         print(f"📌 Old Version: {old_version}")
-    else:
-        print("⚠️  Warning: Could not find old VERSION in header")
     
     # ════════════════════════════════════════════════════════════════
-    # 1. Update VERSION in header comment
+    # Update ALL occurrences of YYYY-MM-DD-HHMM pattern
+    # This will catch: header, build box, cache timestamp, release notes,
+    # settings card, and console.log all at once
     # ════════════════════════════════════════════════════════════════
-    content = re.sub(
-        r'VERSION: \d{4}-\d{2}-\d{2}-\d{4}',
-        f'VERSION: {new_version}',
-        content,
-        count=1
-    )
-    print("  ✓ Updated VERSION in header comment")
     
-    # ════════════════════════════════════════════════════════════════
-    # 2. Update Build display box (┌─────┐ style)
-    # ════════════════════════════════════════════════════════════════
+    # Simple replacement: find any date-time pattern and replace it
     content = re.sub(
-        r'Build: \d{4}-\d{2}-\d{2}-\d{4} UTC',
-        f'Build: {new_version} UTC',
+        r'\d{4}-\d{2}-\d{2}-\d{4}(?= UTC)',
+        new_version,
         content
     )
-    print("  ✓ Updated Build display box")
+    print("  ✓ Updated all version occurrences")
     
-    # ════════════════════════════════════════════════════════════════
-    # 3. Update CACHE-BUSTING TIMESTAMP comment
-    # ════════════════════════════════════════════════════════════════
+    # Also update timestamps in Settings (April 15, 2026 at 6:45 PM)
+    month_day_time = now.strftime('%B %d, %Y at %I:%M %p')
     content = re.sub(
-        r'CACHE-BUSTING TIMESTAMP: \d{4}-\d{2}-\d{2}-\d{4}',
-        f'CACHE-BUSTING TIMESTAMP: {new_version}',
+        r'[A-Z][a-z]+ \d{1,2}, \d{4} at \d{1,2}:\d{2} (?:AM|PM)(?= \(auto-updated|</p>)',
+        month_day_time,
         content
     )
-    print("  ✓ Updated cache-busting timestamp")
-    
-    # ════════════════════════════════════════════════════════════════
-    # 4. Update Release Notes version heading
-    # ════════════════════════════════════════════════════════════════
-    content = re.sub(
-        r'Version \d{4}-\d{2}-\d{2}-\d{4} UTC</h4>',
-        f'Version {new_version} UTC</h4>',
-        content
-    )
-    print("  ✓ Updated Release Notes heading")
-    
-    # ════════════════════════════════════════════════════════════════
-    # 5. Update Settings page App Version card (MOST IMPORTANT)
-    # Look specifically within the settingsCard-appVersion div
-    # ════════════════════════════════════════════════════════════════
-    settings_version_pattern = (
-        r'(id="settingsCard-appVersion"[^>]*>.*?'
-        r'<p[^>]*font-family: monospace[^>]*>\s*)'
-        r'\d{4}-\d{2}-\d{2}-\d{4}'
-        r'(\s*</p>)'
-    )
-    content = re.sub(
-        settings_version_pattern,
-        r'\1' + new_version + r'\2',
-        content,
-        flags=re.DOTALL
-    )
-    print("  ✓ Updated Settings App Version card")
-    
-    # ════════════════════════════════════════════════════════════════
-    # 6. Update console.log version display
-    # ════════════════════════════════════════════════════════════════
-    content = re.sub(
-        r"🏷️ CURRENT VERSION: \d{4}-\d{2}-\d{2}-\d{4} UTC",
-        f'🏷️ CURRENT VERSION: {new_version} UTC',
-        content
-    )
-    print("  ✓ Updated console.log version")
+    print("  ✓ Updated timestamp displays")
     
     # Write the file back
     with open(filename, 'w', encoding='utf-8') as f:
