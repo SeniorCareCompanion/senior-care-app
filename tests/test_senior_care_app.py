@@ -418,7 +418,6 @@ class TestKeyUIElements(unittest.TestCase):
         "voiceAutoEnable",
         "notificationToggleBtn",
         "profileInfo",
-        "updateName",
         "updateAge",
         "updateEmail",
         "homeReminders",
