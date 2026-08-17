@@ -80,13 +80,20 @@ def update_build_version(filename='index.html'):
     print("  ✓ Updated Release Notes heading")
     
     # ════════════════════════════════════════════════════════════════
-    # 5. Update Settings page App Version card
+    # 5. Update Settings page App Version card (MOST IMPORTANT)
+    # Look specifically within the settingsCard-appVersion div
     # ════════════════════════════════════════════════════════════════
+    settings_version_pattern = (
+        r'(id="settingsCard-appVersion"[^>]*>.*?'
+        r'<p[^>]*font-family: monospace[^>]*>\s*)'
+        r'\d{4}-\d{2}-\d{2}-\d{4}'
+        r'(\s*</p>)'
+    )
     content = re.sub(
-        r'\d{4}-\d{2}-\d{2}-\d{4} UTC',
-        f'{new_version} UTC',
+        settings_version_pattern,
+        r'\1' + new_version + r'\2',
         content,
-        count=10  # Limit to first 10 matches to avoid over-replacing
+        flags=re.DOTALL
     )
     print("  ✓ Updated Settings App Version card")
     
