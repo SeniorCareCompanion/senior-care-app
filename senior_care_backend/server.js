@@ -27,6 +27,15 @@ const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // ============================================================
+// Create a SERVICE ROLE client (bypasses RLS for backend operations)
+// ============================================================
+
+const supabaseServiceRole = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
+// ============================================================
 // HEALTH CHECK ENDPOINT
 // ============================================================
 
@@ -320,7 +329,7 @@ app.post('/api/medications/mark-taken', async (req, res) => {
         const { user_id, medication_id, medication_name } = req.body;
 
         // Log the medication
-        const { data: logData, error: logError } = await supabase
+        const { data: logData, error: logError } = await supabaseServiceRole
             .from('medication_logs')
             .insert({
                 user_id: user_id,
