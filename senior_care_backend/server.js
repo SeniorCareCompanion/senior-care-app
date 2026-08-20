@@ -245,7 +245,7 @@ app.post('/api/users', async (req, res) => {
         const userEmail = email || `${username.toLowerCase()}-${id.substring(0, 8)}@senior-care.app`;
 
         // Try to insert the user
-        const { data, error } = await supabase
+        const { data, error } = await supabaseServiceRole
             .from('users')
             .insert([{ 
                 id, 
