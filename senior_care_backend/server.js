@@ -56,7 +56,7 @@ app.get('/api/family-connections/:seniorUserId', async (req, res) => {
     try {
         const { seniorUserId } = req.params;
 
-        const { data, error } = await supabase
+        const { data, error } = await supabaseServiceRole
             .from('family_connections')
             .select(`
                 *,
@@ -83,7 +83,7 @@ app.get('/api/family-connections/received/:familyMemberId', async (req, res) => 
     try {
         const { familyMemberId } = req.params;
 
-        const { data, error } = await supabase
+        const { data, error } = await supabaseServiceRole
             .from('family_connections')
             .select(`
                 *,
@@ -111,7 +111,7 @@ app.post('/api/family-connections', async (req, res) => {
         const { senior_user_id, family_member_email, family_member_username, relationship } = req.body;
 
         // Find the family member by BOTH email AND username (to handle multiple users per email)
-        const { data: familyMembers, error: findError } = await supabase
+        const { data: familyMembers, error: findError } = await supabaseServiceRole
             .from('users')
             .select('id')
             .eq('email', family_member_email)
@@ -126,7 +126,7 @@ app.post('/api/family-connections', async (req, res) => {
         const familyMember = familyMembers[0];
 
         // Create the connection
-        const { data, error } = await supabase
+        const { data, error } = await supabaseServiceRole
             .from('family_connections')
             .insert({
                 senior_user_id: senior_user_id,
@@ -156,7 +156,7 @@ app.put('/api/family-connections/:connectionId/approve', async (req, res) => {
     try {
         const { connectionId } = req.params;
 
-        const { data, error } = await supabase
+        const { data, error } = await supabaseServiceRole
             .from('family_connections')
             .update({ approved_by_senior: true })
             .eq('id', connectionId)
@@ -181,7 +181,7 @@ app.patch('/api/family-connections/:connectionId/approve', async (req, res) => {
     try {
         const { connectionId } = req.params;
 
-        const { data, error } = await supabase
+        const { data, error } = await supabaseServiceRole
             .from('family_connections')
             .update({ approved_by_senior: true })
             .eq('id', connectionId)
@@ -206,7 +206,7 @@ app.delete('/api/family-connections/:connectionId', async (req, res) => {
     try {
         const { connectionId } = req.params;
 
-        const { data, error } = await supabase
+        const { data, error } = await supabaseServiceRole
             .from('family_connections')
             .delete()
             .eq('id', connectionId)
@@ -245,7 +245,7 @@ app.post('/api/users', async (req, res) => {
         const userEmail = email || `${username.toLowerCase()}-${id.substring(0, 8)}@senior-care.app`;
 
         // Try to insert the user
-        const { data, error } = await supabaseServiceRole
+        const { data, error } = await supabaseServiceRoleServiceRole
             .from('users')
             .insert([{ 
                 id, 
@@ -303,7 +303,7 @@ app.put('/api/users/:userId/timezone', async (req, res) => {
 
         console.log(`📍 Updating timezone for user ${userId}: ${timezone}`);
 
-        const { data, error } = await supabase
+        const { data, error } = await supabaseServiceRole
             .from('users')
             .update({ timezone: timezone })
             .eq('id', userId)
@@ -329,7 +329,7 @@ app.post('/api/medications/mark-taken', async (req, res) => {
         const { user_id, medication_id, medication_name } = req.body;
 
         // Log the medication
-        const { data: logData, error: logError } = await supabaseServiceRole
+        const { data: logData, error: logError } = await supabaseServiceRoleServiceRole
             .from('medication_logs')
             .insert({
                 user_id: user_id,
@@ -366,7 +366,7 @@ app.get('/api/medications/adherence/:userId', async (req, res) => {
         const startDate = new Date();
         startDate.setDate(startDate.getDate() - parseInt(days));
 
-        const { data, error } = await supabase
+        const { data, error } = await supabaseServiceRole
             .from('medication_logs')
             .select('*')
             .eq('user_id', userId)
@@ -406,7 +406,7 @@ app.get('/api/medications/adherence/:userId', async (req, res) => {
 async function sendMedicationNotification(seniorUserId, medicationName, action) {
     try {
         // Get all family members for this senior
-        const { data: connections, error: connectError } = await supabase
+        const { data: connections, error: connectError } = await supabaseServiceRole
             .from('family_connections')
             .select('family_member_user_id')
             .eq('senior_user_id', seniorUserId)
@@ -418,7 +418,7 @@ async function sendMedicationNotification(seniorUserId, medicationName, action) 
         }
 
         // Get senior's name
-        const { data: senior } = await supabase
+        const { data: senior } = await supabaseServiceRole
             .from('users')
             .select('username')
             .eq('id', seniorUserId)
@@ -432,14 +432,14 @@ async function sendMedicationNotification(seniorUserId, medicationName, action) 
         // Log notification and send email for each family member
         for (const connection of connections || []) {
             // Get family member's email and timezone
-            const { data: familyMember } = await supabase
+            const { data: familyMember } = await supabaseServiceRole
                 .from('users')
                 .select('email, timezone')
                 .eq('id', connection.family_member_user_id)
                 .single();
 
             // Log notification to database
-            await supabase
+            await supabaseServiceRoleServiceRole
                 .from('notification_logs')
                 .insert({
                     senior_user_id: seniorUserId,
@@ -560,7 +560,7 @@ app.put('/api/notifications/:notificationId/read', async (req, res) => {
     try {
         const { notificationId } = req.params;
 
-        const { data, error } = await supabase
+        const { data, error } = await supabaseServiceRole
             .from('notification_logs')
             .update({ read_at: new Date().toISOString() })
             .eq('id', notificationId)
@@ -589,7 +589,7 @@ app.get('/api/features/:featureId', async (req, res) => {
     try {
         const { featureId } = req.params;
 
-        const { data, error } = await supabase
+        const { data, error } = await supabaseServiceRole
             .from('features')
             .select('*')
             .eq('id', featureId)
@@ -614,14 +614,14 @@ app.put('/api/features/:featureId/toggle', async (req, res) => {
         const { featureId } = req.params;
 
         // Get current state
-        const { data: current } = await supabase
+        const { data: current } = await supabaseServiceRole
             .from('features')
             .select('enabled')
             .eq('id', featureId)
             .single();
 
         // Toggle it
-        const { data, error } = await supabase
+        const { data, error } = await supabaseServiceRole
             .from('features')
             .update({ enabled: !current.enabled })
             .eq('id', featureId)
@@ -970,7 +970,7 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
     }
 
     // Get all pending notifications that are due
-    const { data: pendingNotifications, error: fetchError } = await supabase
+    const { data: pendingNotifications, error: fetchError } = await supabaseServiceRole
       .from('scheduled_notifications')
       .select('*')
       .eq('status', 'pending')
@@ -1000,7 +1000,7 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
         const { senior_user_id, medication_name, id } = notification;
 
         // Get senior user details
-        const { data: senior, error: seniorError } = await supabase
+        const { data: senior, error: seniorError } = await supabaseServiceRole
           .from('users')
           .select('email, first_name, last_name, timezone, phone, sms_reminders_enabled, sms_carrier')
           .eq('id', senior_user_id)
@@ -1123,7 +1123,7 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
 
         // ===== STEP 2: GET FAMILY CONNECTIONS & SEND FAMILY NOTIFICATIONS =====
         // Get family connections for this senior
-        const { data: connections, error: connError } = await supabase
+        const { data: connections, error: connError } = await supabaseServiceRole
           .from('family_connections')
           .select(`
             *,
@@ -1186,7 +1186,7 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
         }
 
         // Update notification status to sent
-        const { error: updateError } = await supabase
+        const { error: updateError } = await supabaseServiceRole
           .from('scheduled_notifications')
           .update({ 
             status: 'sent',
@@ -1207,7 +1207,7 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
 
         // Mark as failed
         try {
-          await supabase
+          await supabaseServiceRole
             .from('scheduled_notifications')
             .update({ status: 'failed' })
             .eq('id', notification.id);
@@ -1393,7 +1393,7 @@ app.post('/api/create-scheduled-notifications', async (req, res) => {
     }
 
     // Insert into Supabase
-    const { data, error } = await supabase
+    const { data, error } = await supabaseServiceRole
       .from('scheduled_notifications')
       .insert(reminders);
 
@@ -1521,7 +1521,7 @@ app.post('/api/sms/status', async (req, res) => {
       const { createClient } = require('@supabase/supabase-js');
       const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
       
-      await supabase
+      await supabaseServiceRole
         .from('notification_logs')
         .insert([{
           type: 'sms',
@@ -1635,7 +1635,7 @@ app.post('/api/update-sms-preferences', async (req, res) => {
     }
 
     // Update user in Supabase
-    const { data, error } = await supabase
+    const { data, error } = await supabaseServiceRole
       .from('users')
       .update(updateData)
       .eq('id', userId)
