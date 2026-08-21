@@ -245,7 +245,7 @@ app.post('/api/users', async (req, res) => {
         const userEmail = email || `${username.toLowerCase()}-${id.substring(0, 8)}@senior-care.app`;
 
         // Try to insert the user
-        const { data, error } = await supabaseServiceRoleServiceRole
+        const { data, error } = await supabaseServiceRole
             .from('users')
             .insert([{ 
                 id, 
@@ -329,7 +329,7 @@ app.post('/api/medications/mark-taken', async (req, res) => {
         const { user_id, medication_id, medication_name } = req.body;
 
         // Log the medication
-        const { data: logData, error: logError } = await supabaseServiceRoleServiceRole
+        const { data: logData, error: logError } = await supabaseServiceRole
             .from('medication_logs')
             .insert({
                 user_id: user_id,
@@ -439,7 +439,7 @@ async function sendMedicationNotification(seniorUserId, medicationName, action) 
                 .single();
 
             // Log notification to database
-            await supabaseServiceRoleServiceRole
+            await supabaseServiceRole
                 .from('notification_logs')
                 .insert({
                     senior_user_id: seniorUserId,
