@@ -26,6 +26,16 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+
+// ============================================================
+// Create a SERVICE ROLE client
+// ============================================================
+
+const supabaseServiceRole = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
 // ============================================================
 // HEALTH CHECK ENDPOINT
 // ============================================================
