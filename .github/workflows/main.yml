@@ -21,7 +21,10 @@ jobs:
     steps:
     - name: 📥 Checkout Code
       uses: actions/checkout@v4.2.0
-    
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        persist-credentials: true
+
     - name: 🐍 Set up Python
       uses: actions/setup-python@v5
       with:
