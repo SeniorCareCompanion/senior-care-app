@@ -2,6 +2,7 @@
 """
 Auto-Update Build Version Script
 Updates version timestamp to current date/time in YYYY-MM-DD-HHMM UTC format
+AND updates human-readable date descriptions
 Usage: python3 update_build.py
 """
 
@@ -11,7 +12,8 @@ from datetime import datetime
 def update_build_version(filename='index.html'):
     """
     Updates the build version in index.html to current date/time
-    Format: YYYY-MM-DD-HHMM UTC (e.g., 2026-04-15-1845 UTC)
+    Format: YYYY-MM-DD-HHMM UTC (e.g., 2026-08-24-0204 UTC)
+    Also updates human-readable dates: August 24, 2026 at 02:04 AM
     """
     
     # Read the file
@@ -48,10 +50,11 @@ def update_build_version(filename='index.html'):
     )
     print("  ✓ Updated all version occurrences")
     
-    # Also update timestamps in Settings (April 15, 2026 at 6:45 PM)
+    # Also update human-readable timestamps (August 24, 2026 at 02:04 AM)
     month_day_time = now.strftime('%B %d, %Y at %I:%M %p')
+    # Match any date pattern: Month DD, YYYY at H:MM AM/PM (handles 1-2 digit hours)
     content = re.sub(
-        r'[A-Z][a-z]+ \d{1,2}, \d{4} at \d{1,2}:\d{2} (?:AM|PM)(?= \(auto-updated|</p>)',
+        r'[A-Z][a-z]+ \d{1,2}, \d{4} at \d{1,2}:\d{2} (?:AM|PM)',
         month_day_time,
         content
     )
@@ -64,6 +67,7 @@ def update_build_version(filename='index.html'):
     print(f"\n✅ Successfully updated build version!")
     print(f"📝 File: {filename}")
     print(f"🔄 New version: {new_version} UTC")
+    print(f"📅 Human-readable: {month_day_time}")
     print(f"\n🚀 Ready to deploy!")
     
     return True
