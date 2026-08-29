@@ -7802,11 +7802,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                 return aTime.localeCompare(bTime);
             });
 
-            // Get today's date in the user's timezone (not UTC!)
-            const userTimezone = userData?.timezone || 'America/Denver';
-            const now = new Date();
-            const todayInUserTz = new Date(now.toLocaleString('en-US', { timeZone: userTimezone }));
-            const todayDate = todayInUserTz.toISOString().split('T')[0];
+            const todayDate = new Date().toISOString().split('T')[0];
             
             // Track if any medications need to be reset
             let medicationsUpdated = false;
