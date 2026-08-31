@@ -6167,7 +6167,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             // Medications
             if (userData.medications) {
                 userData.medications.forEach(med => {
-                    if (med.reminderEnabled && med.time && shouldTakeMedicationToday(med) && !wasTakenToday(med)) {
+                    if (med.reminderEnabled && med.time && shouldTakeMedicationToday(med) && !wasTakenToday(med, userData.timezone)) {
                         activeReminders.push({
                             type: '💊',
                             text: `${med.name} at ${formatTime(med.time)}`,
@@ -7292,13 +7292,18 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             return true;
         }
 
-        function wasTakenToday(med) {
+        function wasTakenToday(med, userTimezone) {
             // Handle legacy medications with old 'taken' property
             if (med.taken !== undefined && !med.takenDates) {
                 return med.taken;
             }
             
-            const todayDate = new Date().toISOString().split('T')[0];
+            // Get today's date in the user's timezone (not UTC!)
+            const tz = userTimezone || 'America/Denver';
+            const now = new Date();
+            const todayInUserTz = new Date(now.toLocaleString('en-US', { timeZone: tz }));
+            const todayDate = todayInUserTz.toISOString().split('T')[0];
+            
             return med.takenDates && med.takenDates.includes(todayDate);
         }
 
@@ -7906,9 +7911,9 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                             ${doseTrackingHTML}
                             ${scheduleInfo}
                             ${shouldTakeToday && med.timesPerDay === 1 ? `
-                                <button class="action-btn ${wasTakenToday(med) ? 'btn-success' : 'btn-info'}" 
+                                <button class="action-btn ${wasTakenToday(med, userTimezone) ? 'btn-success' : 'btn-info'}" 
                                         onclick="markMedicationTaken(${med.id})">
-                                    ${wasTakenToday(med) ? '✓ Taken Today' : 'Mark as Taken'}
+                                    ${wasTakenToday(med, userTimezone) ? '✓ Taken Today' : 'Mark as Taken'}
                                 </button>
                             ` : ''}
                             <div style="display: flex; gap: 5px; margin-top: 10px;">
@@ -11777,7 +11782,7 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
 
             // Count medications scheduled for today with breakdown
             const medsScheduledToday = (userData.medications || []).filter(med => shouldTakeMedicationToday(med));
-            const medsTakenToday = medsScheduledToday.filter(med => wasTakenToday(med)).length;
+            const medsTakenToday = medsScheduledToday.filter(med => wasTakenToday(med, userData.timezone)).length;
             const medsLeftToday = medsScheduledToday.length - medsTakenToday;
             
             const medCountText = `${medsScheduledToday.length} for today<br>` +
