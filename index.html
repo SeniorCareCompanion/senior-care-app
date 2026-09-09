@@ -8178,7 +8178,9 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             const med = users[currentUser].medications.find(m => m.id === id);
             if (!med) return;
             
-            const todayDate = new Date().toISOString().split('T')[0];
+            // Use timezone-aware date calculation (not UTC!)
+            const userTimezone = users[currentUser].timezone || 'America/Denver';
+            const todayDate = getTodayDateInTimezone(userTimezone);
             
             // Initialize arrays if needed
             if (!med.takenDates) {
@@ -8244,9 +8246,23 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             med.takenDates = med.takenDates.filter(date => date >= cutoffDate);
 
             saveData('users', users);
-            loadMedications(users[currentUser].medications, users[currentUser].timezone || 'America/Denver');
-            updateDashboard(); // Update home page dashboard
-            loadHomeReminders();
+            
+            // Force iOS Safari to re-render by using a small delay
+            // iOS Safari sometimes needs this to update the DOM properly
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            if (isIOS) {
+                // Small delay helps iOS Safari re-render
+                setTimeout(() => {
+                    loadMedications(users[currentUser].medications, userTimezone);
+                    updateDashboard();
+                    loadHomeReminders();
+                }, 100);
+            } else {
+                // Desktop browsers can render immediately
+                loadMedications(users[currentUser].medications, userTimezone);
+                updateDashboard();
+                loadHomeReminders();
+            }
         }
 
         function deleteMedication(id) {
