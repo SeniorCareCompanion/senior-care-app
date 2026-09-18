@@ -451,6 +451,184 @@ app.delete('/api/users/:userId', async (req, res) => {
     }
 });
 
+// ============================================================
+// MEDICATIONS - CRUD ENDPOINTS
+// ============================================================
+
+// Create a new medication
+app.post('/api/medications', async (req, res) => {
+    try {
+        const { userId, name, dosage, notes, timesPerDay, times, schedule, reminderMinutesBefore } = req.body;
+
+        if (!userId || !name || !times || times.length === 0) {
+            return res.status(400).json({ 
+                error: 'Missing required fields: userId, name, times' 
+            });
+        }
+
+        console.log(`📝 Creating medication: ${name} for user ${userId}`);
+
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
+        const { data, error } = await supabaseServiceRole
+            .from('medications')
+            .insert({
+                user_id: userId,
+                name: name,
+                dosage: dosage || null,
+                notes: notes || null,
+                times_per_day: timesPerDay || 1,
+                times: times,
+                schedule: schedule || 'daily',
+                reminder_minutes_before: reminderMinutesBefore || 15,
+                active: true
+            })
+            .select();
+
+        if (error) {
+            console.error('❌ Medication creation error:', error);
+            return res.status(400).json({ error: error.message });
+        }
+
+        console.log('✅ Medication created successfully:', data[0]);
+        res.json({ 
+            success: true, 
+            message: 'Medication created',
+            data: data[0]
+        });
+    } catch (error) {
+        console.error('❌ Medication creation exception:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get all medications for a user
+app.get('/api/medications/:userId', async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        console.log(`📋 Fetching medications for user ${userId}`);
+
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
+        const { data, error } = await supabaseServiceRole
+            .from('medications')
+            .select('*')
+            .eq('user_id', userId)
+            .eq('active', true)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('❌ Fetch medications error:', error);
+            return res.status(400).json({ error: error.message });
+        }
+
+        console.log(`✅ Found ${data?.length || 0} medications`);
+        res.json({ 
+            success: true, 
+            data: data || [],
+            message: `Found ${data?.length || 0} medications`
+        });
+    } catch (error) {
+        console.error('❌ Fetch medications exception:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Update a medication
+app.put('/api/medications/:medicationId', async (req, res) => {
+    try {
+        const { medicationId } = req.params;
+        const { name, dosage, notes, timesPerDay, times, schedule, reminderMinutesBefore, active } = req.body;
+
+        console.log(`✏️ Updating medication ${medicationId}`);
+
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
+        const updateData = {
+            updated_at: new Date().toISOString()
+        };
+
+        if (name !== undefined) updateData.name = name;
+        if (dosage !== undefined) updateData.dosage = dosage;
+        if (notes !== undefined) updateData.notes = notes;
+        if (timesPerDay !== undefined) updateData.times_per_day = timesPerDay;
+        if (times !== undefined) updateData.times = times;
+        if (schedule !== undefined) updateData.schedule = schedule;
+        if (reminderMinutesBefore !== undefined) updateData.reminder_minutes_before = reminderMinutesBefore;
+        if (active !== undefined) updateData.active = active;
+
+        const { data, error } = await supabaseServiceRole
+            .from('medications')
+            .update(updateData)
+            .eq('id', medicationId)
+            .select();
+
+        if (error) {
+            console.error('❌ Medication update error:', error);
+            return res.status(400).json({ error: error.message });
+        }
+
+        console.log('✅ Medication updated:', data[0]);
+        res.json({ 
+            success: true, 
+            message: 'Medication updated',
+            data: data[0]
+        });
+    } catch (error) {
+        console.error('❌ Medication update exception:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Delete a medication (soft delete - set active to false)
+app.delete('/api/medications/:medicationId', async (req, res) => {
+    try {
+        const { medicationId } = req.params;
+
+        console.log(`🗑️ Deleting medication ${medicationId}`);
+
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
+        // Soft delete - just mark as inactive
+        const { data, error } = await supabaseServiceRole
+            .from('medications')
+            .update({ 
+                active: false,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', medicationId)
+            .select();
+
+        if (error) {
+            console.error('❌ Medication delete error:', error);
+            return res.status(400).json({ error: error.message });
+        }
+
+        console.log('✅ Medication deleted (soft delete):', data[0]);
+        res.json({ 
+            success: true, 
+            message: 'Medication deleted',
+            data: data[0]
+        });
+    } catch (error) {
+        console.error('❌ Medication delete exception:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Log medication as taken
 app.post('/api/medications/mark-taken', async (req, res) => {
     try {
