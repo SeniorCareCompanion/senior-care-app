@@ -101,8 +101,14 @@ app.post('/api/family-connections', async (req, res) => {
     try {
         const { senior_user_id, family_member_email, family_member_username, relationship } = req.body;
 
+        // Use SERVICE_ROLE for all operations
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
         // Find the family member by BOTH email AND username (to handle multiple users per email)
-        const { data: familyMembers, error: findError } = await supabase
+        const { data: familyMembers, error: findError } = await supabaseServiceRole
             .from('users')
             .select('id')
             .eq('email', family_member_email)
@@ -117,7 +123,7 @@ app.post('/api/family-connections', async (req, res) => {
         const familyMember = familyMembers[0];
 
         // Create the connection
-        const { data, error } = await supabase
+        const { data, error } = await supabaseServiceRole
             .from('family_connections')
             .insert({
                 senior_user_id: senior_user_id,
@@ -147,7 +153,12 @@ app.put('/api/family-connections/:connectionId/approve', async (req, res) => {
     try {
         const { connectionId } = req.params;
 
-        const { data, error } = await supabase
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
+        const { data, error } = await supabaseServiceRole
             .from('family_connections')
             .update({ approved_by_senior: true })
             .eq('id', connectionId)
@@ -172,7 +183,12 @@ app.patch('/api/family-connections/:connectionId/approve', async (req, res) => {
     try {
         const { connectionId } = req.params;
 
-        const { data, error } = await supabase
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
+        const { data, error } = await supabaseServiceRole
             .from('family_connections')
             .update({ approved_by_senior: true })
             .eq('id', connectionId)
@@ -300,7 +316,12 @@ app.put('/api/users/:userId/timezone', async (req, res) => {
 
         console.log(`📍 Updating timezone for user ${userId}: ${timezone}`);
 
-        const { data, error } = await supabase
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
+        const { data, error } = await supabaseServiceRole
             .from('users')
             .update({ timezone: timezone })
             .eq('id', userId)
@@ -435,8 +456,13 @@ app.post('/api/medications/mark-taken', async (req, res) => {
     try {
         const { user_id, medication_id, medication_name } = req.body;
 
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
         // Log the medication
-        const { data: logData, error: logError } = await supabase
+        const { data: logData, error: logError } = await supabaseServiceRole
             .from('medication_logs')
             .insert({
                 user_id: user_id,
@@ -512,8 +538,13 @@ app.get('/api/medications/adherence/:userId', async (req, res) => {
 // Send notification to family members
 async function sendMedicationNotification(seniorUserId, medicationName, action) {
     try {
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
         // Get all family members for this senior
-        const { data: connections, error: connectError } = await supabase
+        const { data: connections, error: connectError } = await supabaseServiceRole
             .from('family_connections')
             .select('family_member_user_id')
             .eq('senior_user_id', seniorUserId)
@@ -525,7 +556,7 @@ async function sendMedicationNotification(seniorUserId, medicationName, action) 
         }
 
         // Get senior's name
-        const { data: senior } = await supabase
+        const { data: senior } = await supabaseServiceRole
             .from('users')
             .select('username')
             .eq('id', seniorUserId)
@@ -539,14 +570,14 @@ async function sendMedicationNotification(seniorUserId, medicationName, action) 
         // Log notification and send email for each family member
         for (const connection of connections || []) {
             // Get family member's email and timezone
-            const { data: familyMember } = await supabase
+            const { data: familyMember } = await supabaseServiceRole
                 .from('users')
                 .select('email, timezone')
                 .eq('id', connection.family_member_user_id)
                 .single();
 
             // Log notification to database
-            await supabase
+            await supabaseServiceRole
                 .from('notification_logs')
                 .insert({
                     senior_user_id: seniorUserId,
@@ -667,7 +698,12 @@ app.put('/api/notifications/:notificationId/read', async (req, res) => {
     try {
         const { notificationId } = req.params;
 
-        const { data, error } = await supabase
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
+        const { data, error } = await supabaseServiceRole
             .from('notification_logs')
             .update({ read_at: new Date().toISOString() })
             .eq('id', notificationId)
@@ -720,15 +756,20 @@ app.put('/api/features/:featureId/toggle', async (req, res) => {
     try {
         const { featureId } = req.params;
 
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
         // Get current state
-        const { data: current } = await supabase
+        const { data: current } = await supabaseServiceRole
             .from('features')
             .select('enabled')
             .eq('id', featureId)
             .single();
 
         // Toggle it
-        const { data, error } = await supabase
+        const { data, error } = await supabaseServiceRole
             .from('features')
             .update({ enabled: !current.enabled })
             .eq('id', featureId)
@@ -1076,8 +1117,14 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
       });
     }
 
+    // Use SERVICE_ROLE for all DB operations
+    const supabaseServiceRole = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+
     // Get all pending notifications that are due
-    const { data: pendingNotifications, error: fetchError } = await supabase
+    const { data: pendingNotifications, error: fetchError } = await supabaseServiceRole
       .from('scheduled_notifications')
       .select('*')
       .eq('status', 'pending')
@@ -1293,7 +1340,7 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
         }
 
         // Update notification status to sent
-        const { error: updateError } = await supabase
+        const { error: updateError } = await supabaseServiceRole
           .from('scheduled_notifications')
           .update({ 
             status: 'sent',
@@ -1314,7 +1361,7 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
 
         // Mark as failed
         try {
-          await supabase
+          await supabaseServiceRole
             .from('scheduled_notifications')
             .update({ status: 'failed' })
             .eq('id', notification.id);
@@ -1499,8 +1546,13 @@ app.post('/api/create-scheduled-notifications', async (req, res) => {
       });
     }
 
-    // Insert into Supabase
-    const { data, error } = await supabase
+    // Insert into Supabase using SERVICE_ROLE to bypass RLS
+    const supabaseServiceRole = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+
+    const { data, error } = await supabaseServiceRole
       .from('scheduled_notifications')
       .insert(reminders);
 
