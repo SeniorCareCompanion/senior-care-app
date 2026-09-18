@@ -235,8 +235,14 @@ app.post('/api/users', async (req, res) => {
         // Use provided email or generate a unique one
         const userEmail = email || `${username.toLowerCase()}-${id.substring(0, 8)}@senior-care.app`;
 
+        // Use SERVICE_ROLE to bypass RLS for user creation
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
         // Try to insert the user
-        const { data, error } = await supabase
+        const { data, error } = await supabaseServiceRole
             .from('users')
             .insert([{ 
                 id, 
