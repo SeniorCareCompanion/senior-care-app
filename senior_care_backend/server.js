@@ -359,45 +359,45 @@ app.delete('/api/users/:userId', async (req, res) => {
         );
 
         // Start transaction-like deletes (order matters for FK constraints)
-        
+
         // 1. Delete medication logs
         console.log(`  → Deleting medication_logs for user ${userId}`);
         const { error: medLogsError } = await supabaseServiceRole
             .from('medication_logs')
             .delete()
             .eq('user_id', userId);
-        
+
         if (medLogsError) {
             console.error('  ❌ Error deleting medication_logs:', medLogsError);
             return res.status(500).json({ error: `Failed to delete medication logs: ${medLogsError.message}` });
         }
         console.log('  ✅ Medication logs deleted');
 
-        // 2. Delete medication schedules
-        console.log(`  → Deleting medication_schedules for user ${userId}`);
-        const { error: medScheduleError } = await supabaseServiceRole
-            .from('medication_schedules')
-            .delete()
-            .eq('user_id', userId);
-        
-        if (medScheduleError) {
-            console.error('  ❌ Error deleting medication_schedules:', medScheduleError);
-            return res.status(500).json({ error: `Failed to delete medication schedules: ${medScheduleError.message}` });
-        }
-        console.log('  ✅ Medication schedules deleted');
-
-        // 3. Delete scheduled notifications
+        // 2. Delete scheduled notifications
         console.log(`  → Deleting scheduled_notifications for user ${userId}`);
         const { error: schedNotifError } = await supabaseServiceRole
             .from('scheduled_notifications')
             .delete()
             .eq('user_id', userId);
-        
+
         if (schedNotifError) {
             console.error('  ❌ Error deleting scheduled_notifications:', schedNotifError);
             return res.status(500).json({ error: `Failed to delete scheduled notifications: ${schedNotifError.message}` });
         }
         console.log('  ✅ Scheduled notifications deleted');
+
+        // 3. Delete medications
+        console.log(`  → Deleting medications for user ${userId}`);
+        const { error: medsError } = await supabaseServiceRole
+            .from('medications')
+            .delete()
+            .eq('user_id', userId);
+
+        if (medsError) {
+            console.error('  ❌ Error deleting medications:', medsError);
+            return res.status(500).json({ error: `Failed to delete medications: ${medsError.message}` });
+        }
+        console.log('  ✅ Medications deleted');
 
         // 4. Delete family connections (where user is SENIOR)
         console.log(`  → Deleting family_connections where user is senior`);
@@ -405,7 +405,7 @@ app.delete('/api/users/:userId', async (req, res) => {
             .from('family_connections')
             .delete()
             .eq('senior_user_id', userId);
-        
+
         if (familyConnError) {
             console.error('  ❌ Error deleting family_connections (senior):', familyConnError);
             return res.status(500).json({ error: `Failed to delete family connections: ${familyConnError.message}` });
@@ -418,7 +418,7 @@ app.delete('/api/users/:userId', async (req, res) => {
             .from('family_connections')
             .delete()
             .eq('family_member_user_id', userId);
-        
+
         if (familyConnError2) {
             console.error('  ❌ Error deleting family_connections (family_member):', familyConnError2);
             return res.status(500).json({ error: `Failed to delete family connections: ${familyConnError2.message}` });
@@ -431,7 +431,7 @@ app.delete('/api/users/:userId', async (req, res) => {
             .from('users')
             .delete()
             .eq('id', userId);
-        
+
         if (userError) {
             console.error('  ❌ Error deleting user:', userError);
             return res.status(500).json({ error: `Failed to delete user: ${userError.message}` });
