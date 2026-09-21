@@ -460,42 +460,50 @@ app.post('/api/medications', async (req, res) => {
     try {
         const { userId, name, dosage, notes, timesPerDay, times, schedule, reminderMinutesBefore } = req.body;
 
+        console.log(`📝 Creating medication: ${name} for user ${userId}`);
+        console.log(`   userId type: ${typeof userId}, length: ${userId?.length}`);
+        console.log(`   Request body:`, JSON.stringify(req.body, null, 2));
+
         if (!userId || !name || !times || times.length === 0) {
-            return res.status(400).json({ 
-                error: 'Missing required fields: userId, name, times' 
+            return res.status(400).json({
+                error: 'Missing required fields: userId, name, times'
             });
         }
-
-        console.log(`📝 Creating medication: ${name} for user ${userId}`);
 
         const supabaseServiceRole = createClient(
             process.env.SUPABASE_URL,
             process.env.SUPABASE_SERVICE_ROLE_KEY
         );
 
+        const insertPayload = {
+            user_id: userId,
+            name: name,
+            dosage: dosage || null,
+            notes: notes || null,
+            times_per_day: timesPerDay || 1,
+            times: times,
+            schedule: schedule || 'daily',
+            reminder_minutes_before: reminderMinutesBefore || 15,
+            active: true
+        };
+
+        console.log(`   Insert payload:`, JSON.stringify(insertPayload, null, 2));
+
         const { data, error } = await supabaseServiceRole
             .from('medications')
-            .insert({
-                user_id: userId,
-                name: name,
-                dosage: dosage || null,
-                notes: notes || null,
-                times_per_day: timesPerDay || 1,
-                times: times,
-                schedule: schedule || 'daily',
-                reminder_minutes_before: reminderMinutesBefore || 15,
-                active: true
-            })
+            .insert(insertPayload)
             .select();
 
         if (error) {
             console.error('❌ Medication creation error:', error);
+            console.error('   Error code:', error.code);
+            console.error('   Error details:', error.details);
             return res.status(400).json({ error: error.message });
         }
 
-        console.log('✅ Medication created successfully:', data[0]);
-        res.json({ 
-            success: true, 
+        console.log('✅ Medication created successfully:', JSON.stringify(data[0], null, 2));
+        res.json({
+            success: true,
             message: 'Medication created',
             data: data[0]
         });
@@ -511,12 +519,34 @@ app.get('/api/medications/:userId', async (req, res) => {
         const { userId } = req.params;
 
         console.log(`📋 Fetching medications for user ${userId}`);
+        console.log(`   Request received at: ${new Date().toISOString()}`);
+        console.log(`   userId type: ${typeof userId}, length: ${userId?.length}`);
 
         const supabaseServiceRole = createClient(
             process.env.SUPABASE_URL,
             process.env.SUPABASE_SERVICE_ROLE_KEY
         );
 
+        // First, get ALL medications for this user (no active filter) to debug
+        console.log(`   🔍 Querying ALL medications (including inactive) for debugging...`);
+        const { data: allMeds, error: allError } = await supabaseServiceRole
+            .from('medications')
+            .select('*')
+            .eq('user_id', userId);
+
+        if (allError) {
+            console.error(`   ❌ Error fetching ALL medications:`, allError);
+        } else {
+            console.log(`   📊 Total medications in DB (any status): ${allMeds?.length || 0}`);
+            if (allMeds && allMeds.length > 0) {
+                allMeds.forEach((med, idx) => {
+                    console.log(`      [${idx}] ID: ${med.id}, active: ${med.active}, name: ${med.name}`);
+                });
+            }
+        }
+
+        // Now get only ACTIVE medications
+        console.log(`   🔍 Querying ACTIVE medications only...`);
         const { data, error } = await supabaseServiceRole
             .from('medications')
             .select('*')
@@ -526,14 +556,28 @@ app.get('/api/medications/:userId', async (req, res) => {
 
         if (error) {
             console.error('❌ Fetch medications error:', error);
+            console.error('   Error code:', error.code);
+            console.error('   Error details:', error.details);
             return res.status(400).json({ error: error.message });
         }
 
-        console.log(`✅ Found ${data?.length || 0} medications`);
-        res.json({ 
-            success: true, 
+        console.log(`✅ Found ${data?.length || 0} ACTIVE medications`);
+        if (data && data.length > 0) {
+            data.forEach((med, idx) => {
+                console.log(`   [${idx}] ${med.name} (${med.dosage}) - Times: ${med.times?.join(', ')}`);
+            });
+        }
+
+        res.json({
+            success: true,
             data: data || [],
-            message: `Found ${data?.length || 0} medications`
+            message: `Found ${data?.length || 0} medications`,
+            debug: {
+                userId,
+                requestTime: new Date().toISOString(),
+                totalInDB: allMeds?.length || 0,
+                activeCount: data?.length || 0
+            }
         });
     } catch (error) {
         console.error('❌ Fetch medications exception:', error);
