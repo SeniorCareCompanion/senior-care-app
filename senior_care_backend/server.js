@@ -378,7 +378,7 @@ app.delete('/api/users/:userId', async (req, res) => {
         const { error: schedNotifError } = await supabaseServiceRole
             .from('scheduled_notifications')
             .delete()
-            .eq('user_id', userId);
+            .eq('senior_user_id', userId);
 
         if (schedNotifError) {
             console.error('  ❌ Error deleting scheduled_notifications:', schedNotifError);
