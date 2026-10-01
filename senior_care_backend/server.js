@@ -27,7 +27,7 @@ const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // ============================================================
-// HEALTH CHECK ENDPOINT
+// HEALTH CHECK ENDPOINTS
 // ============================================================
 
 app.get('/api/health', (req, res) => {

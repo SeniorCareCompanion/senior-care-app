@@ -115,7 +115,7 @@
     ```
     ┌─────────────────────────────────────┐
     │ 🧪 BETA TESTING VERSION            │
-    │ Build: 2026-09-22-1555 UTC         │
+    │ Build: 2026-09-22-1524 UTC         │
     │ Found a bug? Email Bug Report      │
     └─────────────────────────────────────┘
     ```
@@ -214,7 +214,7 @@
     User requested email instead of phone number to avoid 
     unwanted texts if credentials leaked. Smart security decision!
     
-    📝 PREVIOUS VERSION (2026-09-22-1555 UTC):
+    📝 PREVIOUS VERSION (2026-09-22-1524 UTC):
     
     🐛 BUG FIXES FROM BETA TESTING:
     
@@ -323,7 +323,7 @@
     4. Click "▼ Common Tasks"
     5. EXPECTED: See Shower, Brush Teeth, etc. ✅
     
-    📝 PREVIOUS VERSION (2026-09-22-1555 UTC):
+    📝 PREVIOUS VERSION (2026-09-22-1524 UTC):
     
     🎉 NEW FEATURE: HELPFUL DROPDOWNS IN 3 SECTIONS!
     
@@ -479,7 +479,7 @@
     ✅ Implemented for Appointments, Activities, and Tasks
     ⏭️ Skipped Medications (too many specific drug names)
     
-    📝 PREVIOUS VERSION (2026-09-22-1555 UTC):
+    📝 PREVIOUS VERSION (2026-09-22-1524 UTC):
     
     🍎 iOS SAFARI FIX - BILLS DROPDOWN NOW WORKS ON iPHONE!
     
@@ -575,7 +575,7 @@
     - Inconsistent behavior across iOS versions
     - Custom dropdown = reliable cross-platform
     
-    📝 PREVIOUS VERSION (2026-09-22-1555 UTC):
+    📝 PREVIOUS VERSION (2026-09-22-1524 UTC):
     
     🎉 BETA TESTER FEEDBACK IMPLEMENTED!
     
@@ -697,7 +697,7 @@
     - Faster bill entry with suggestions
     - All fixes work without backend server!
     
-    📝 PREVIOUS VERSION (2026-09-22-1555 UTC):
+    📝 PREVIOUS VERSION (2026-09-22-1524 UTC):
     
     ✨ NEW FEATURE: EXPANDABLE TODAY'S REMINDERS
     
@@ -785,7 +785,7 @@
     ✅ One-click access
     ✅ Collapse back to keep home clean
     
-    📝 PREVIOUS VERSION (2026-09-22-1555 UTC):
+    📝 PREVIOUS VERSION (2026-09-22-1524 UTC):
     
     ✨ NEW FEATURE: EXPANDABLE TODAY'S REMINDERS
     
@@ -866,7 +866,7 @@
     ✅ One-click access
     ✅ Collapse back to keep home clean
     
-    📝 PREVIOUS VERSION (2026-09-22-1555 UTC):
+    📝 PREVIOUS VERSION (2026-09-22-1524 UTC):
     
     🐛 CRITICAL BUGS FIXED - iOS VOICE & NOTIFICATIONS
     
@@ -995,7 +995,7 @@
     ✅ Clear documentation of iOS limitations
     ✅ Users understand expected behavior
     
-    📝 PREVIOUS VERSION (2026-09-22-1555 UTC):
+    📝 PREVIOUS VERSION (2026-09-22-1524 UTC):
     
     🐛 BUG FIXED: ONE-TIME ACTIVITY DATE FIELD
     
@@ -1046,7 +1046,7 @@
     ✅ All other recurrence types still work correctly
     ✅ No regression - all functionality preserved
     
-    📝 PREVIOUS VERSION (2026-09-22-1555 UTC):
+    📝 PREVIOUS VERSION (2026-09-22-1524 UTC):
     
     🚨 CRITICAL FIX: AI SEARCH DISABLED (COMING SOON)
     
@@ -1099,7 +1099,7 @@
     - Can use Manual Entry immediately
     - No confusion or broken functionality
     
-    📝 PREVIOUS VERSION (2026-09-22-1555 UTC):
+    📝 PREVIOUS VERSION (2026-09-22-1524 UTC):
     
     📚 HELP DOCUMENTATION ADDED FOR AI SEARCH:
     
@@ -1142,7 +1142,7 @@
     - When AI might not work
     - How to fall back to manual entry
     
-    📝 PREVIOUS VERSION (2026-09-22-1555 UTC):
+    📝 PREVIOUS VERSION (2026-09-22-1524 UTC):
     
     🤖 MAJOR NEW FEATURE: AI ACTIVITY SEARCH - PHASE 1!
     
@@ -1214,7 +1214,7 @@
     Form auto-fills: All fields populated correctly!
     User reviews and saves: Done! ✅
     
-    📝 PREVIOUS VERSION (2026-09-22-1555 UTC):
+    📝 PREVIOUS VERSION (2026-09-22-1524 UTC):
     - First time warning auto-hides after setup
     - Exact iPhone installation steps
     - Account loss prevention
@@ -2310,17 +2310,14 @@
         <!-- Forgot Password Screen -->
         <div id="forgotPasswordScreen" class="register-screen hidden">
             <div class="logo-emoji">🔑</div>
-            <h1>Reset Password</h1>
-            <p style="text-align: center; color: #666; margin-bottom: 20px;">Enter your username and email to reset your password</p>
-            <div class="input-group">
-                <label for="forgotUsername">Username</label>
-                <input type="text" id="forgotUsername" placeholder="Enter your username">
-            </div>
+            <h1>Reset Your Password</h1>
+            <p style="text-align: center; color: #666; margin-bottom: 20px;">Enter the email address associated with your account</p>
             <div class="input-group">
                 <label for="forgotEmail">Email Address</label>
-                <input type="email" id="forgotEmail" placeholder="Enter your email">
+                <input type="email" id="forgotEmail" placeholder="Enter your email address" autocomplete="email">
             </div>
-            <button class="btn btn-primary" onclick="verifyForgotPassword()">Verify & Reset</button>
+            <p style="text-align: center; color: #999; font-size: 12px; margin: 15px 0;">We'll send you a link to reset your password. The link will expire in 24 hours.</p>
+            <button class="btn btn-primary" onclick="verifyForgotPassword()">Send Reset Email</button>
             <button class="btn btn-secondary" onclick="showLogin()">Back to Login</button>
         </div>
 
@@ -2328,7 +2325,11 @@
         <div id="resetPasswordScreen" class="register-screen hidden">
             <div class="logo-emoji">🔐</div>
             <h1>Set New Password</h1>
-            <p style="text-align: center; color: #666; margin-bottom: 20px;">Create a new password for your account</p>
+            <p style="text-align: center; color: #666; margin-bottom: 20px;">Check your email for the reset link, then create a new password below</p>
+            <div class="input-group">
+                <label for="resetEmail">Email Address</label>
+                <input type="email" id="resetEmail" placeholder="Enter your email address" autocomplete="email">
+            </div>
             <div class="input-group">
                 <label for="resetNewPassword">New Password</label>
                 <div style="position: relative;">
@@ -5166,10 +5167,10 @@
                                 Current Version
                             </p>
                             <p style="font-size: 20px; color: #38b2ac; margin: 0 0 5px 0; font-weight: 700; font-family: monospace;">
-                                2026-09-22-1555 UTC
+                                2026-09-22-1524 UTC
                             </p>
                             <p style="font-size: 13px; color: #718096; margin: 0;">
-                                September 22, 2026 at 03:55 PM
+                                September 22, 2026 at 03:24 PM
                             </p>
                         </div>
                         
@@ -5242,10 +5243,10 @@
                         <!-- Latest Version -->
                         <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 6px solid #48bb78; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                                <h4 style="margin: 0; color: #667eea; font-size: 16px; font-weight: 700;">Version 2026-09-22-1555 UTC</h4>
+                                <h4 style="margin: 0; color: #667eea; font-size: 16px; font-weight: 700;">Version 2026-09-22-1524 UTC</h4>
                                 <span style="background: #48bb78; color: white; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: 700; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">✅ LATEST ✅</span>
                             </div>
-                            <p style="margin: 0 0 10px 0; font-size: 14px; color: #48bb78; font-weight: 600;">September 22, 2026 at 03:55 PM (CURRENT VERSION)</p>
+                            <p style="margin: 0 0 10px 0; font-size: 14px; color: #48bb78; font-weight: 600;">September 22, 2026 at 03:24 PM (CURRENT VERSION)</p>
                             <div style="line-height: 1.8;">
                                 <p style="margin: 10px 0 5px 0; font-weight: 600; font-size: 14px; color: #667eea;">🚨 EMERGENCY: Login Functionality Restored</p>
                                 <ul style="margin: 5px 0; padding-left: 20px; font-size: 14px;">
@@ -5260,8 +5261,8 @@
 
                         <!-- Previous Updates -->
                         <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
-                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-09-22-1555 UTC</h4>
-                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">September 22, 2026 at 03:55 PM</p>
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-09-22-1524 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">September 22, 2026 at 03:24 PM</p>
                             <div style="line-height: 1.6; font-size: 13px;">
                                 <p style="margin: 5px 0; font-weight: 600;">🔧 About This App Regression + Release Notes Fix</p>
                                 <ul style="margin: 5px 0; padding-left: 20px;">
@@ -5272,8 +5273,8 @@
                             </div>
                         </div>
                         <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
-                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-09-22-1555 UTC</h4>
-                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">September 22, 2026 at 03:55 PM</p>
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-09-22-1524 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">September 22, 2026 at 03:24 PM</p>
                             <div style="line-height: 1.6; font-size: 13px;">
                                 <p style="margin: 5px 0; font-weight: 600;">🔧 Bugfix: Initial About This App Content Bleeding</p>
                                 <ul style="margin: 5px 0; padding-left: 20px;">
@@ -5284,8 +5285,8 @@
                             </div>
                         </div>
                         <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
-                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-09-22-1555 UTC</h4>
-                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">September 22, 2026 at 03:55 PM</p>
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-09-22-1524 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">September 22, 2026 at 03:24 PM</p>
                             <div style="line-height: 1.6; font-size: 13px;">
                                 <p style="margin: 5px 0; font-weight: 600;">✨ Feature: Senior-Friendly Logout Confirmation</p>
                                 <ul style="margin: 5px 0; padding-left: 20px;">
@@ -5297,8 +5298,8 @@
                         </div>
 
                         <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
-                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-09-22-1555 UTC</h4>
-                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">September 22, 2026 at 03:55 PM</p>
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-09-22-1524 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">September 22, 2026 at 03:24 PM</p>
                             <div style="line-height: 1.6; font-size: 13px;">
                                 <p style="margin: 5px 0; font-weight: 600;">🐛 Bugfix: Enable Notifications Button + Enhanced Debugging</p>
                                 <ul style="margin: 5px 0; padding-left: 20px;">
@@ -5310,8 +5311,8 @@
                         </div>
 
                         <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #cbd5e0;">
-                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-09-22-1555 UTC</h4>
-                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">September 22, 2026 at 03:55 PM</p>
+                            <h4 style="margin: 0 0 5px 0; color: #2d3748;">Version 2026-09-22-1524 UTC</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096;">September 22, 2026 at 03:24 PM</p>
                             <div style="line-height: 1.6; font-size: 13px;">
                                 <p style="margin: 5px 0; font-weight: 600;">🐛 Bugfix: Logout Content Bleeding + Orphaned Release Notes</p>
                                 <ul style="margin: 5px 0; padding-left: 20px;">
@@ -5500,8 +5501,8 @@
         // VERSION CHECK - Log current version on page load
         console.log('🏷️ ═══════════════════════════════════════════════');
         console.log('🏷️ SENIOR CARE COMPANION VERSION CHECK');
-        console.log('🏷️ CURRENT VERSION: 2026-09-22-1555 UTC');
-        console.log('🏷️ BUILD: September 22, 2026 at 03:55 PM');  
+        console.log('🏷️ CURRENT VERSION: 2026-09-22-1524 UTC');
+        console.log('🏷️ BUILD: September 22, 2026 at 03:24 PM');  
         console.log('🏷️ STATUS: Latest version loaded successfully - LOGIN RESTORED');
         console.log('🏷️ ═══════════════════════════════════════════════');
         
@@ -6837,61 +6838,114 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             }
         }
 
-        function login() {
-            const username = document.getElementById('loginUsername').value;
+        async function login() {
+            const emailOrUsername = document.getElementById('loginUsername').value;
             const password = document.getElementById('loginPassword').value;
 
-            if (!username || !password) {
-                alert('Please enter username and password');
+            if (!emailOrUsername || !password) {
+                alert('Please enter email/username and password');
                 return;
             }
 
-            const users = loadData('users') || {};
-            
-            if (!users[username] || users[username].password !== password) {
-                alert('Invalid username or password');
-                return;
-            }
+            // Try backend authentication first (Supabase Auth)
+            try {
+                console.log(`🔐 Attempting backend login for: ${emailOrUsername}`);
 
-            currentUser = username;
-            
-            // Persist session to localStorage to survive page reloads/sleep
-            localStorage.setItem('currentUser', username);
-            
-            // Mark that app has been successfully installed/setup
-            localStorage.setItem('appInstalled', 'true');
-            
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('mainApp').classList.remove('hidden');
-            document.getElementById('userName').textContent = users[username].name;
-            
-            // Show floating help button (now that user is logged in)
-            document.getElementById('floatingHelpBtn').classList.remove('hidden');
-            
-            // Initialize voice button
-            const voiceBtn = document.getElementById('voiceToggleBtn');
-            if (voiceBtn) {
-                voiceBtn.textContent = '🔇 Voice OFF';
-                voiceBtn.classList.add('btn-primary');
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: emailOrUsername,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    console.log(`❌ Backend login failed: ${data.error}`);
+                    // Fall back to localStorage check for local testing
+                    console.log(`📱 Falling back to localStorage authentication...`);
+
+                    const users = loadData('users') || {};
+                    if (!users[emailOrUsername] || users[emailOrUsername].password !== password) {
+                        alert('❌ Invalid email/username or password');
+                        return;
+                    }
+
+                    // Local login fallback
+                    currentUser = emailOrUsername;
+                    localStorage.setItem('currentUser', emailOrUsername);
+                    localStorage.setItem('appInstalled', 'true');
+
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    document.getElementById('mainApp').classList.remove('hidden');
+                    document.getElementById('userName').textContent = users[emailOrUsername].name;
+
+                    document.getElementById('floatingHelpBtn').classList.remove('hidden');
+
+                    const voiceBtn = document.getElementById('voiceToggleBtn');
+                    if (voiceBtn) {
+                        voiceBtn.textContent = '🔇 Voice OFF';
+                        voiceBtn.classList.add('btn-primary');
+                    }
+
+                    loadAllData();
+                    loadVoicePreference();
+                    initializeNotificationsPreference();
+                    initializeNotifications();
+                    speak(`Welcome back, ${users[emailOrUsername].name}`);
+                    startReminderChecker();
+                    captureAndSaveTimezone(users[emailOrUsername].userId);
+
+                    setTimeout(() => {
+                        checkBackupReminder();
+                    }, 3000);
+                    return;
+                }
+
+                // Backend authentication successful
+                console.log(`✅ Backend login successful for: ${emailOrUsername}`);
+                const userData = data.user;
+
+                currentUser = userData.id;
+                currentUserData = userData;
+
+                // Persist session to localStorage
+                localStorage.setItem('currentUser', userData.id);
+                localStorage.setItem('currentUserData', JSON.stringify(userData));
+                localStorage.setItem('appInstalled', 'true');
+
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                document.getElementById('userName').textContent = userData.first_name || userData.username || 'User';
+
+                document.getElementById('floatingHelpBtn').classList.remove('hidden');
+
+                const voiceBtn = document.getElementById('voiceToggleBtn');
+                if (voiceBtn) {
+                    voiceBtn.textContent = '🔇 Voice OFF';
+                    voiceBtn.classList.add('btn-primary');
+                }
+
+                loadAllData();
+                loadVoicePreference();
+                initializeNotificationsPreference();
+                initializeNotifications();
+                speak(`Welcome back, ${userData.first_name || userData.username || 'there'}`);
+                startReminderChecker();
+                captureAndSaveTimezone(userData.id);
+
+                setTimeout(() => {
+                    checkBackupReminder();
+                }, 3000);
+
+            } catch (error) {
+                console.error('❌ Login error:', error);
+                alert(`Login error: ${error.message}`);
             }
-            
-            loadAllData();
-            loadVoicePreference(); // Load user's voice preference
-            initializeNotificationsPreference(); // Load user's saved notification preference
-            initializeNotifications(); // Initialize notification system
-            speak(`Welcome back, ${users[username].name}`);
-            startReminderChecker(); // Start checking for reminders
-            
-            // Capture and save user's timezone
-            captureAndSaveTimezone(users[username].userId);
-            
-            // Check if we should show "Add to Home Screen" modal
-            // checkAndShowAddToHomeModal(); // Commented out for Build 003
-            
-            // Check if backup reminder is due (after a short delay to let app load)
-            setTimeout(() => {
-                checkBackupReminder();
-            }, 3000);
         }
 
         // Main logout function - goes through confirmation for user safety
@@ -7031,39 +7085,77 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             document.getElementById('resetPasswordScreen').classList.add('hidden');
         }
 
-        function verifyForgotPassword() {
-            const username = document.getElementById('forgotUsername').value;
+        async function verifyForgotPassword() {
             const email = document.getElementById('forgotEmail').value;
 
-            if (!username || !email) {
-                alert('Please enter both username and email');
+            if (!email) {
+                alert('Please enter your email address');
                 return;
             }
 
-            const users = loadData('users') || {};
-            
-            // Check if username exists
-            if (!users[username]) {
-                alert('Username not found');
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Please enter a valid email address');
                 return;
             }
 
-            // Check if email matches
-            if (users[username].email !== email) {
-                alert('Email does not match our records');
-                return;
-            }
+            try {
+                console.log(`🔑 Sending password reset email to: ${email}`);
 
-            // Username and email verified! Allow password reset
-            resetUsername = username;
-            document.getElementById('forgotPasswordScreen').classList.add('hidden');
-            document.getElementById('resetPasswordScreen').classList.remove('hidden');
-            speak('Identity verified. Please set a new password.');
+                // Show loading state
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '⏳ Sending...';
+                btn.disabled = true;
+
+                const response = await fetch('/api/forgot-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email: email })
+                });
+
+                const data = await response.json();
+
+                btn.textContent = originalText;
+                btn.disabled = false;
+
+                if (!response.ok) {
+                    console.error(`❌ Forgot password error: ${data.error}`);
+                    alert(`Error: ${data.error}`);
+                    return;
+                }
+
+                console.log(`✅ Password reset email sent to: ${email}`);
+
+                // Store email for use in reset password screen
+                sessionStorage.setItem('resetEmail', email);
+
+                // Show success message
+                alert('✅ Password reset email sent!\n\nPlease check your email for a link to reset your password.\n\nThe link will expire in 24 hours.');
+                speak('Password reset email sent. Please check your email.');
+
+                // Move to reset password screen
+                document.getElementById('forgotPasswordScreen').classList.add('hidden');
+                document.getElementById('resetPasswordScreen').classList.remove('hidden');
+
+                // Pre-fill the email on the reset screen
+                document.getElementById('resetEmail').value = email;
+
+            } catch (error) {
+                console.error('❌ Forgot password error:', error);
+                alert(`Error: ${error.message}`);
+                event.target.disabled = false;
+                event.target.textContent = 'Verify & Reset';
+            }
         }
 
-        function completePasswordReset() {
+        async function completePasswordReset() {
             const newPassword = document.getElementById('resetNewPassword').value;
             const confirmPassword = document.getElementById('resetConfirmPassword').value;
+            const email = document.getElementById('resetEmail').value;
 
             if (!newPassword || !confirmPassword) {
                 alert('Please fill in both password fields');
@@ -7075,29 +7167,67 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                 return;
             }
 
-            if (newPassword.length < 4) {
-                alert('Password must be at least 4 characters');
+            if (newPassword.length < 6) {
+                alert('Password must be at least 6 characters');
                 return;
             }
 
-            // Update password
-            const users = loadData('users');
-            users[resetUsername].password = newPassword;
-            saveData('users', users);
+            if (!email) {
+                alert('Email is required. Please go back and enter your email.');
+                return;
+            }
 
-            // Clear fields
-            document.getElementById('forgotUsername').value = '';
-            document.getElementById('forgotEmail').value = '';
-            document.getElementById('resetNewPassword').value = '';
-            document.getElementById('resetConfirmPassword').value = '';
-            resetUsername = null;
+            try {
+                console.log(`🔑 Resetting password for: ${email}`);
 
-            // Show login screen
-            document.getElementById('resetPasswordScreen').classList.add('hidden');
-            document.getElementById('loginScreen').classList.remove('hidden');
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '⏳ Resetting...';
+                btn.disabled = true;
 
-            alert('✅ Password reset successfully!\n\nYou can now login with your new password.');
-            speak('Password reset successfully');
+                const response = await fetch('/api/reset-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: newPassword
+                    })
+                });
+
+                const data = await response.json();
+
+                btn.textContent = originalText;
+                btn.disabled = false;
+
+                if (!response.ok) {
+                    console.error(`❌ Reset password error: ${data.error}`);
+                    alert(`Error: ${data.error || 'Failed to reset password'}`);
+                    return;
+                }
+
+                console.log(`✅ Password reset successful`);
+
+                // Clear fields
+                document.getElementById('resetEmail').value = '';
+                document.getElementById('resetNewPassword').value = '';
+                document.getElementById('resetConfirmPassword').value = '';
+                document.getElementById('forgotEmail').value = '';
+
+                // Show login screen
+                document.getElementById('resetPasswordScreen').classList.add('hidden');
+                document.getElementById('loginScreen').classList.remove('hidden');
+
+                alert('✅ Password reset successfully!\n\nYou can now login with your new password.');
+                speak('Password reset successfully');
+
+            } catch (error) {
+                console.error('❌ Password reset error:', error);
+                alert(`Error: ${error.message}`);
+                event.target.disabled = false;
+                event.target.textContent = 'Set New Password';
+            }
         }
 
         // Change Password in Profile
