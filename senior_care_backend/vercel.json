@@ -12,12 +12,13 @@
       "dest": "server.js"
     }
   ],
-  "env": {
-    "SUPABASE_URL": "@supabase_url",
-    "SUPABASE_KEY": "@supabase_key",
-    "SUPABASE_SERVICE_ROLE_KEY": "@supabase_service_role_key",
-    "RESEND_API_KEY": "@resend_api_key",
-    "FRONTEND_URL": "https://seniorcarecompanion.github.io/senior-care-app/"
-  },
   "crons": []
 }
+
+
+
+
+
+
+
+
