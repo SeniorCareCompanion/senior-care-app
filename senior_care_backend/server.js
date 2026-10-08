@@ -257,8 +257,12 @@ app.post('/api/login', async (req, res) => {
       process.env.SUPABASE_SERVICE_ROLE_KEY
     );
 
-    // Get user from auth.users table
-    const { data: { user: authUser }, error: authError } = await supabaseServiceRole.auth.admin.getUserByEmail(email);
+    // Get user from auth.users table by querying directly
+    const { data: authUser, error: authError } = await supabaseServiceRole
+      .from('auth.users')
+      .select('id, encrypted_password, email')
+      .eq('email', email)
+      .single();
 
     if (authError || !authUser) {
       console.log(`❌ User not found: ${email}`);
@@ -356,8 +360,12 @@ app.post('/api/forgot-password', async (req, res) => {
       process.env.SUPABASE_SERVICE_ROLE_KEY
     );
 
-    // Check if user exists
-    const { data: { user: authUser }, error: checkError } = await supabaseServiceRole.auth.admin.getUserByEmail(email);
+    // Check if user exists by querying auth.users table directly
+    const { data: authUser, error: checkError } = await supabaseServiceRole
+      .from('auth.users')
+      .select('id, email')
+      .eq('email', email)
+      .single();
 
     if (checkError || !authUser) {
       // Don't reveal if email exists - security best practice
@@ -485,7 +493,11 @@ app.post('/api/reset-password', async (req, res) => {
     );
 
     // Get user by email
-    const { data: { user: authUser }, error: getUserError } = await supabaseServiceRole.auth.admin.getUserByEmail(email);
+    const { data: authUser, error: getUserError } = await supabaseServiceRole
+      .from('auth.users')
+      .select('id, email')
+      .eq('email', email)
+      .single();
 
     if (getUserError || !authUser) {
       // Security: Don't reveal if email exists
