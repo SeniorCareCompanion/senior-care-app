@@ -27,7 +27,7 @@ const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // ============================================================
-// HEALTH CHECK ENDPOINTS
+// HEALTH CHECK ENDPOINT
 // ============================================================
 
 app.get('/api/health', (req, res) => {
@@ -231,6 +231,295 @@ app.delete('/api/family-connections/:connectionId', async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
+});
+
+// ============================================================
+// AUTHENTICATION ENDPOINTS
+// ============================================================
+
+// Login - Authenticate against Supabase Auth
+app.post('/api/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        error: 'Email and password required'
+      });
+    }
+
+    console.log(`🔐 Login attempt for: ${email}`);
+
+    // Use SERVICE_ROLE to access auth.users
+    const supabaseServiceRole = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+
+    // Get user from auth.users table
+    const { data: { user: authUser }, error: authError } = await supabaseServiceRole.auth.admin.getUserByEmail(email);
+
+    if (authError || !authUser) {
+      console.log(`❌ User not found: ${email}`);
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid email or password'
+      });
+    }
+
+    console.log(`✅ Auth user found: ${authUser.id}`);
+
+    // Verify password using bcrypt
+    const bcrypt = require('bcrypt');
+
+    // authUser.encrypted_password is the bcrypt hash from Supabase
+    const isPasswordValid = await bcrypt.compare(password, authUser.encrypted_password);
+
+    if (!isPasswordValid) {
+      console.log(`❌ Invalid password for: ${email}`);
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid email or password'
+      });
+    }
+
+    console.log(`✅ Password verified for: ${email}`);
+
+    // Get custom user data from users table
+    const { data: userData, error: userError } = await supabaseServiceRole
+      .from('users')
+      .select('*')
+      .eq('id', authUser.id)
+      .single();
+
+    if (userError) {
+      console.log(`⚠️ Custom user data not found, creating minimal profile`);
+      // User exists in auth but not in custom table - create entry
+      const { data: newUser } = await supabaseServiceRole
+        .from('users')
+        .insert({
+          id: authUser.id,
+          email: authUser.email,
+          username: authUser.email.split('@')[0],
+          timezone: 'UTC'
+        })
+        .select()
+        .single();
+
+      console.log(`✅ Login successful for: ${email}`);
+      return res.json({
+        success: true,
+        user: newUser || {
+          id: authUser.id,
+          email: authUser.email,
+          username: authUser.email.split('@')[0],
+          timezone: 'UTC'
+        },
+        message: 'Login successful'
+      });
+    }
+
+    console.log(`✅ Login successful for: ${email}`);
+    res.json({
+      success: true,
+      user: userData,
+      message: 'Login successful'
+    });
+
+  } catch (error) {
+    console.error('❌ Login error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Forgot Password - Send reset link via email
+app.post('/api/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        error: 'Email required'
+      });
+    }
+
+    console.log(`🔑 Forgot password request for: ${email}`);
+
+    // Use SERVICE_ROLE to generate reset link
+    const supabaseServiceRole = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+
+    // Check if user exists
+    const { data: { user: authUser }, error: checkError } = await supabaseServiceRole.auth.admin.getUserByEmail(email);
+
+    if (checkError || !authUser) {
+      // Don't reveal if email exists - security best practice
+      console.log(`⚠️ Email not found in auth.users: ${email}`);
+      return res.json({
+        success: true,
+        message: 'If that email exists, you will receive password reset instructions'
+      });
+    }
+
+    // Generate password reset link
+    const { data, error } = await supabaseServiceRole.auth.admin.generateLink({
+      type: 'recovery',
+      email: email,
+      options: {
+        redirectTo: `${process.env.FRONTEND_URL || 'https://seniorcarecompanion.github.io/senior-care-app/'}`
+      }
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    console.log(`✅ Reset link generated for: ${email}`);
+    console.log(`   Reset link: ${data.properties.recovery_link}`);
+
+    // Send reset link via email using Resend
+    if (resendClient) {
+      try {
+        const resetLink = data.properties.recovery_link;
+
+        const emailResult = await resendClient.emails.send({
+          from: 'Senior Care Companion <noreply@familycare360.app>',
+          to: email,
+          subject: '🔐 Reset Your Senior Care Companion Password',
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9; border-radius: 8px;">
+              <h2 style="color: #333; margin-bottom: 20px;">Reset Your Password</h2>
+
+              <p style="color: #666; font-size: 16px; line-height: 1.6;">
+                We received a request to reset the password for your Senior Care Companion account.
+              </p>
+
+              <div style="background: white; padding: 20px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #2196F3;">
+                <p style="margin: 0 0 15px 0; color: #333;">
+                  Click the button below to reset your password. This link will expire in 24 hours.
+                </p>
+                <a href="${resetLink}" style="display: inline-block; padding: 12px 30px; background: #2196F3; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">
+                  Reset Password
+                </a>
+              </div>
+
+              <p style="color: #666; font-size: 14px;">
+                Or copy and paste this link in your browser:
+              </p>
+              <p style="background: #f0f0f0; padding: 10px; border-radius: 4px; word-break: break-all; font-size: 12px; color: #333;">
+                ${resetLink}
+              </p>
+
+              <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+
+              <p style="color: #999; font-size: 12px;">
+                If you didn't request a password reset, please ignore this email. Your password won't change until you click the link above.
+              </p>
+
+              <p style="color: #999; font-size: 12px;">
+                Senior Care Companion Support<br>
+                seniorcarecompanion360@gmail.com
+              </p>
+            </div>
+          `,
+          reply_to: 'seniorcarecompanion360@gmail.com'
+        });
+
+        if (emailResult.error) {
+          console.error(`⚠️ Failed to send reset email: ${emailResult.error}`);
+        } else {
+          console.log(`✅ Reset email sent to: ${email}`);
+        }
+      } catch (emailError) {
+        console.error(`⚠️ Error sending reset email:`, emailError);
+      }
+    } else {
+      console.warn(`⚠️ Resend email service not configured - reset link not emailed`);
+    }
+
+    res.json({
+      success: true,
+      message: 'If that email exists, you will receive password reset instructions'
+    });
+
+  } catch (error) {
+    console.error('❌ Forgot password error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Reset Password - Called after user enters new password
+app.post('/api/reset-password', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        error: 'Email and password required'
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        error: 'Password must be at least 6 characters'
+      });
+    }
+
+    console.log(`🔑 Password reset requested for: ${email}`);
+
+    const supabaseServiceRole = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+
+    // Get user by email
+    const { data: { user: authUser }, error: getUserError } = await supabaseServiceRole.auth.admin.getUserByEmail(email);
+
+    if (getUserError || !authUser) {
+      // Security: Don't reveal if email exists
+      console.log(`⚠️ User not found: ${email}`);
+      return res.json({
+        success: true,
+        message: 'If that email exists, password was reset'
+      });
+    }
+
+    // Update password using admin API
+    const { data: updatedUser, error: updateError } = await supabaseServiceRole.auth.admin.updateUserById(
+      authUser.id,
+      { password: password }
+    );
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    console.log(`✅ Password reset successful for: ${email}`);
+
+    res.json({
+      success: true,
+      message: 'Password reset successful. You can now login with your new password.'
+    });
+
+  } catch (error) {
+    console.error('❌ Password reset error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
 });
 
 // ============================================================
