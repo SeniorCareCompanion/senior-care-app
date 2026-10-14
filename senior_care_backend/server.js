@@ -282,80 +282,53 @@ app.post('/api/login', async (req, res) => {
       }
     }
 
-    // Get user from auth.users table by email
-    const { data: authUser, error: authError } = await supabaseServiceRole
-      .from('auth.users')
-      .select('id, encrypted_password, email')
-      .eq('email', authUserEmail)
-      .single();
+    // Verify password using Supabase Auth signInWithPassword
+    console.log(`🔑 Verifying password with Supabase Auth for: ${authUserEmail}`);
 
-    if (authError || !authUser) {
-      console.log(`❌ User not found: ${authUserEmail}`);
+    // Create a regular Supabase client (not service role) to use signInWithPassword
+    const supabaseAuth = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_KEY
+    );
+
+    const { data: signInData, error: signInError } = await supabaseAuth.auth.signInWithPassword({
+      email: authUserEmail,
+      password: password
+    });
+
+    if (signInError || !signInData.user) {
+      console.log(`❌ Authentication failed for: ${authUserEmail} - ${signInError?.message}`);
       return res.status(401).json({
         success: false,
         error: 'Invalid email/username or password'
       });
     }
 
-    console.log(`✅ Auth user found: ${authUser.id}`);
-
-    // Verify password using bcrypt
-    const bcrypt = require('bcrypt');
-
-    // authUser.encrypted_password is the bcrypt hash from Supabase
-    console.log(`🔑 Attempting password verification for user: ${authUserEmail}`);
-    console.log(`🔑 Password provided length: ${password.length}`);
-    console.log(`🔑 Hash exists: ${!!authUser.encrypted_password}`);
-
-    const isPasswordValid = await bcrypt.compare(password, authUser.encrypted_password);
-
-    console.log(`🔑 Password verification result: ${isPasswordValid}`);
-
-    if (!isPasswordValid) {
-      console.log(`❌ Invalid password for: ${authUserEmail}`);
-      return res.status(401).json({
-        success: false,
-        error: 'Invalid email/username or password'
-      });
-    }
-
-    console.log(`✅ Password verified for: ${authUserEmail}`);
+    const userId = signInData.user.id;
+    console.log(`✅ Password verified for: ${authUserEmail}, userId: ${userId}`);
 
     // Get custom user data from users table
     const { data: userData, error: userError } = await supabaseServiceRole
       .from('users')
       .select('*')
-      .eq('id', authUser.id)
+      .eq('id', userId)
       .single();
 
     if (userError) {
-      console.log(`⚠️ Custom user data not found, creating minimal profile`);
-      // User exists in auth but not in custom table - create entry
-      const { data: newUser } = await supabaseServiceRole
-        .from('users')
-        .insert({
-          id: authUser.id,
-          email: authUser.email,
-          username: authUser.email.split('@')[0],
-          timezone: 'UTC'
-        })
-        .select()
-        .single();
-
-      console.log(`✅ Login successful for: ${email}`);
+      console.log(`⚠️ Custom user data not found, returning auth info only`);
       return res.json({
         success: true,
-        user: newUser || {
-          id: authUser.id,
-          email: authUser.email,
-          username: authUser.email.split('@')[0],
+        user: {
+          id: userId,
+          email: authUserEmail,
+          username: email.includes('@') ? email.split('@')[0] : email,
           timezone: 'UTC'
         },
         message: 'Login successful'
       });
     }
 
-    console.log(`✅ Login successful for: ${email}`);
+    console.log(`✅ Login successful for: ${authUserEmail}`);
     res.json({
       success: true,
       user: userData,
