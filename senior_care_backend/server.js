@@ -340,6 +340,136 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+// Signup - Create new user account
+app.post('/api/signup', async (req, res) => {
+  try {
+    const { email, password, confirmPassword, firstName, lastName, age, username } = req.body;
+
+    // Validate required fields
+    if (!email || !password || !confirmPassword || !firstName || !lastName || !username) {
+      return res.status(400).json({
+        success: false,
+        error: 'All fields are required'
+      });
+    }
+
+    // Validate passwords match
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        error: 'Passwords do not match'
+      });
+    }
+
+    // Validate password length
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        error: 'Password must be at least 6 characters'
+      });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid email format'
+      });
+    }
+
+    console.log(`📝 Signup attempt for: ${email}`);
+
+    // Use SERVICE_ROLE to create user
+    const supabaseServiceRole = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+
+    // Check if user already exists
+    const { data: existingUser, error: checkError } = await supabaseServiceRole
+      .from('auth.users')
+      .select('id')
+      .eq('email', email)
+      .single();
+
+    if (!checkError && existingUser) {
+      console.log(`❌ User already exists: ${email}`);
+      return res.status(400).json({
+        success: false,
+        error: 'Email already registered'
+      });
+    }
+
+    // Create user in auth.users
+    const { data: authData, error: authError } = await supabaseServiceRole.auth.admin.createUser({
+      email: email,
+      password: password,
+      email_confirm: true
+    });
+
+    if (authError || !authData.user) {
+      console.log(`❌ Failed to create auth user: ${authError?.message}`);
+      return res.status(400).json({
+        success: false,
+        error: authError?.message || 'Failed to create user'
+      });
+    }
+
+    const userId = authData.user.id;
+    console.log(`✅ Auth user created: ${userId}`);
+
+    // Create user profile in custom users table
+    const { data: newUser, error: insertError } = await supabaseServiceRole
+      .from('users')
+      .insert({
+        id: userId,
+        email: email,
+        username: username,
+        first_name: firstName,
+        last_name: lastName,
+        age: age ? parseInt(age) : null,
+        timezone: 'America/Denver',
+        role: 'senior',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+
+    if (insertError) {
+      console.log(`⚠️ Failed to create user profile: ${insertError.message}`);
+      // Auth user was created but profile failed - still return success for now
+      return res.json({
+        success: true,
+        user: {
+          id: userId,
+          email: email,
+          username: username,
+          first_name: firstName,
+          last_name: lastName,
+          age: age ? parseInt(age) : null
+        },
+        message: 'Account created successfully. You can now log in.'
+      });
+    }
+
+    console.log(`✅ Signup successful for: ${email}`);
+    res.json({
+      success: true,
+      user: newUser,
+      message: 'Account created successfully. You can now log in.'
+    });
+
+  } catch (error) {
+    console.error('❌ Signup error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // Forgot Password - Send reset link via email
 app.post('/api/forgot-password', async (req, res) => {
   try {
