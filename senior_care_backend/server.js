@@ -303,17 +303,23 @@ app.post('/api/login', async (req, res) => {
     const bcrypt = require('bcrypt');
 
     // authUser.encrypted_password is the bcrypt hash from Supabase
+    console.log(`🔑 Attempting password verification for user: ${authUserEmail}`);
+    console.log(`🔑 Password provided length: ${password.length}`);
+    console.log(`🔑 Hash exists: ${!!authUser.encrypted_password}`);
+
     const isPasswordValid = await bcrypt.compare(password, authUser.encrypted_password);
 
+    console.log(`🔑 Password verification result: ${isPasswordValid}`);
+
     if (!isPasswordValid) {
-      console.log(`❌ Invalid password for: ${email}`);
+      console.log(`❌ Invalid password for: ${authUserEmail}`);
       return res.status(401).json({
         success: false,
-        error: 'Invalid email or password'
+        error: 'Invalid email/username or password'
       });
     }
 
-    console.log(`✅ Password verified for: ${email}`);
+    console.log(`✅ Password verified for: ${authUserEmail}`);
 
     // Get custom user data from users table
     const { data: userData, error: userError } = await supabaseServiceRole
