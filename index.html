@@ -11919,12 +11919,16 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
         // Delete Account - Confirm and delete
         async function confirmDeleteAccount() {
             console.log('🗑️ confirmDeleteAccount() called');
-            const users = loadData('users');
             const emailInput = document.getElementById('deleteConfirmEmail');
-            const userEmail = users[currentUser]?.email;
+
+            // Get user email from currentUserData (set during backend login)
+            const currentUserDataStr = localStorage.getItem('currentUserData');
+            const currentUserObj = currentUserDataStr ? JSON.parse(currentUserDataStr) : null;
+            const userEmail = currentUserObj?.email;
 
             console.log('📧 User email on file:', userEmail);
             console.log('📧 Email input value:', emailInput?.value);
+            console.log('📧 currentUserData available:', !!currentUserObj);
 
             if (!emailInput.value) {
                 console.warn('⚠️ Email input is empty');
@@ -11950,7 +11954,7 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
 
             try {
                 // Call backend to delete account and all associated data
-                const userId = users[currentUser].userId;
+                const userId = currentUserObj?.id || currentUser;
                 console.log('🔗 Calling delete API for user:', userId);
                 const response = await fetch(`${BACKEND_API_URL}/api/users/${userId}`, {
                     method: 'DELETE',
