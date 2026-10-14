@@ -257,18 +257,43 @@ app.post('/api/login', async (req, res) => {
       process.env.SUPABASE_SERVICE_ROLE_KEY
     );
 
-    // Get user from auth.users table by querying directly
+    // First, check if input is email or username
+    // If it contains @, treat as email. Otherwise, look up username in users table
+    let authUserEmail = email;
+
+    if (!email.includes('@')) {
+      // Input is a username - look it up in custom users table
+      console.log(`🔍 Looking up username: ${email}`);
+      const { data: userRecord } = await supabaseServiceRole
+        .from('users')
+        .select('email')
+        .eq('username', email)
+        .single();
+
+      if (userRecord && userRecord.email) {
+        authUserEmail = userRecord.email;
+        console.log(`✅ Username resolved to email: ${authUserEmail}`);
+      } else {
+        console.log(`❌ Username not found: ${email}`);
+        return res.status(401).json({
+          success: false,
+          error: 'Invalid email/username or password'
+        });
+      }
+    }
+
+    // Get user from auth.users table by email
     const { data: authUser, error: authError } = await supabaseServiceRole
       .from('auth.users')
       .select('id, encrypted_password, email')
-      .eq('email', email)
+      .eq('email', authUserEmail)
       .single();
 
     if (authError || !authUser) {
-      console.log(`❌ User not found: ${email}`);
+      console.log(`❌ User not found: ${authUserEmail}`);
       return res.status(401).json({
         success: false,
-        error: 'Invalid email or password'
+        error: 'Invalid email/username or password'
       });
     }
 
