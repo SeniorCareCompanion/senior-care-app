@@ -344,87 +344,68 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// Signup - Create new user account
+// Signup - Create login account + profile. Rolls back on failure, never reports false success.
 app.post('/api/signup', async (req, res) => {
   try {
     const { email, password, confirmPassword, firstName, lastName, age, username } = req.body;
 
-    // Validate required fields
     if (!email || !password || !confirmPassword || !firstName || !lastName || !username) {
-      return res.status(400).json({
-        success: false,
-        error: 'All fields are required'
-      });
+      return res.status(400).json({ success: false, error: 'All fields are required' });
     }
-
-    // Validate passwords match
     if (password !== confirmPassword) {
-      return res.status(400).json({
-        success: false,
-        error: 'Passwords do not match'
-      });
+      return res.status(400).json({ success: false, error: 'Passwords do not match' });
     }
-
-    // Validate password length
     if (password.length < 6) {
-      return res.status(400).json({
-        success: false,
-        error: 'Password must be at least 6 characters'
-      });
+      return res.status(400).json({ success: false, error: 'Password must be at least 6 characters' });
     }
-
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return res.status(400).json({
-        success: false,
-        error: 'Invalid email format'
-      });
+      return res.status(400).json({ success: false, error: 'Invalid email format' });
     }
 
     console.log(`📝 Signup attempt for: ${email}`);
 
-    // Use SERVICE_ROLE to create user
-    const supabaseServiceRole = createClient(
-      process.env.SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-    );
+    const admin = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
-    // Check if user already exists
-    const { data: existingUser, error: checkError } = await supabaseServiceRole
-      .from('auth.users')
-      .select('id')
-      .eq('email', email)
-      .single();
-
-    if (!checkError && existingUser) {
-      console.log(`❌ User already exists: ${email}`);
-      return res.status(400).json({
-        success: false,
-        error: 'Email already registered'
-      });
+    // 1. Make sure the username and email aren't already in the profile table
+    const { data: takenUsername } = await admin.from('users').select('id').eq('username', username).maybeSingle();
+    if (takenUsername) {
+      return res.status(400).json({ success: false, error: 'Username already taken' });
+    }
+    const { data: takenEmail } = await admin.from('users').select('id').eq('email', email).maybeSingle();
+    if (takenEmail) {
+      return res.status(400).json({ success: false, error: 'Email already registered' });
     }
 
-    // Create user in auth.users
-    const { data: authData, error: authError } = await supabaseServiceRole.auth.admin.createUser({
+    // 2. Create the login account
+    let userId;
+    let createdNewLogin = false;
+    const { data: authData, error: authError } = await admin.auth.admin.createUser({
       email: email,
       password: password,
       email_confirm: true
     });
 
-    if (authError || !authData.user) {
+    if (authData?.user) {
+      userId = authData.user.id;
+      createdNewLogin = true;
+    } else if (authError && /already.*registered/i.test(authError.message)) {
+      // A login account exists but has no profile (left over from a failed signup).
+      // Only adopt it if the password typed here is the one that already works.
+      const anon = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+      const { data: check, error: checkError } = await anon.auth.signInWithPassword({ email, password });
+      if (checkError || !check?.user) {
+        return res.status(400).json({ success: false, error: 'Email already registered' });
+      }
+      userId = check.user.id;
+      console.log(`♻️ Adopting leftover login account for: ${email}`);
+    } else {
       console.log(`❌ Failed to create auth user: ${authError?.message}`);
-      return res.status(400).json({
-        success: false,
-        error: authError?.message || 'Failed to create user'
-      });
+      return res.status(400).json({ success: false, error: authError?.message || 'Failed to create user' });
     }
 
-    const userId = authData.user.id;
-    console.log(`✅ Auth user created: ${userId}`);
-
-    // Create user profile in custom users table
-    const { data: newUser, error: insertError } = await supabaseServiceRole
+    // 3. Create the profile row. If this fails, remove the new login so the user can retry.
+    const { data: newUser, error: insertError } = await admin
       .from('users')
       .insert({
         id: userId,
@@ -442,20 +423,11 @@ app.post('/api/signup', async (req, res) => {
       .single();
 
     if (insertError) {
-      console.log(`⚠️ Failed to create user profile: ${insertError.message}`);
-      // Auth user was created but profile failed - still return success for now
-      return res.json({
-        success: true,
-        user: {
-          id: userId,
-          email: email,
-          username: username,
-          first_name: firstName,
-          last_name: lastName,
-          age: age ? parseInt(age) : null
-        },
-        message: 'Account created successfully. You can now log in.'
-      });
+      console.log(`❌ Failed to create user profile: ${insertError.message}`);
+      if (createdNewLogin) {
+        await admin.auth.admin.deleteUser(userId);
+      }
+      return res.status(500).json({ success: false, error: `Could not save profile: ${insertError.message}` });
     }
 
     console.log(`✅ Signup successful for: ${email}`);
@@ -467,10 +439,7 @@ app.post('/api/signup', async (req, res) => {
 
   } catch (error) {
     console.error('❌ Signup error:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message
-    });
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
@@ -872,6 +841,15 @@ app.delete('/api/users/:userId', async (req, res) => {
             return res.status(500).json({ error: `Failed to delete user: ${userError.message}` });
         }
         console.log('  ✅ User record deleted');
+
+        // 7. Delete the login account so the email can be used again
+        const { error: authDeleteError } = await supabaseServiceRole.auth.admin.deleteUser(userId);
+        if (authDeleteError) {
+            console.error('  ❌ Error deleting login account:', authDeleteError);
+            return res.status(500).json({ error: `Profile deleted but login could not be removed: ${authDeleteError.message}` });
+        }
+        console.log('  ✅ Login account deleted');
+
 
         console.log(`✅ ACCOUNT COMPLETELY DELETED: User ${userId}`);
         
