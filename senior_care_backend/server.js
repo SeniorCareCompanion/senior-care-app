@@ -897,6 +897,11 @@ app.post('/api/medications', async (req, res) => {
             times: times,
             schedule: schedule || 'daily',
             reminder_minutes_before: reminderMinutesBefore || 15,
+            specific_days: req.body.specificDays || null,
+            every_x_days: req.body.everyXDays || null,
+            start_date: req.body.startDate || null,
+            weekly_day: req.body.weeklyDay ?? null,
+            reminder_enabled: req.body.reminderEnabled !== false,
             active: true
         };
 
@@ -1023,6 +1028,11 @@ app.put('/api/medications/:medicationId', async (req, res) => {
         if (schedule !== undefined) updateData.schedule = schedule;
         if (reminderMinutesBefore !== undefined) updateData.reminder_minutes_before = reminderMinutesBefore;
         if (active !== undefined) updateData.active = active;
+        if (req.body.specificDays !== undefined) updateData.specific_days = req.body.specificDays || null;
+        if (req.body.everyXDays !== undefined) updateData.every_x_days = req.body.everyXDays || null;
+        if (req.body.startDate !== undefined) updateData.start_date = req.body.startDate || null;
+        if (req.body.weeklyDay !== undefined) updateData.weekly_day = req.body.weeklyDay ?? null;
+        if (req.body.reminderEnabled !== undefined) updateData.reminder_enabled = req.body.reminderEnabled !== false;
 
         const { data, error } = await supabaseServiceRole
             .from('medications')
