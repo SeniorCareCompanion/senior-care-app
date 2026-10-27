@@ -7627,6 +7627,13 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             }
         }
 
+        // Build the 15-minute time dropdown as soon as the page loads (it used to appear only after changing "Times Per Day")
+        window.addEventListener('DOMContentLoaded', () => {
+            if (document.getElementById('medicationTimePickersContainer')) {
+                updateMedicationTimePickers();
+            }
+        });
+
         function updateRecurrenceOptions() {
             const recurrence = document.getElementById('medRecurrence').value;
             document.getElementById('specificDaysContainer').classList.add('hidden');
