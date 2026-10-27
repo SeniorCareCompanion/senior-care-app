@@ -1799,7 +1799,7 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
         const { senior_user_id, medication_name, id } = notification;
 
         // Get senior user details
-        const { data: senior, error: seniorError } = await supabase
+        const { data: senior, error: seniorError } = await supabaseServiceRole
           .from('users')
           .select('email, first_name, last_name, timezone, phone, sms_reminders_enabled, sms_carrier')
           .eq('id', senior_user_id)
@@ -1922,7 +1922,7 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
 
         // ===== STEP 2: GET FAMILY CONNECTIONS & SEND FAMILY NOTIFICATIONS =====
         // Get family connections for this senior
-        const { data: connections, error: connError } = await supabase
+        const { data: connections, error: connError } = await supabaseServiceRole
           .from('family_connections')
           .select(`
             *,
