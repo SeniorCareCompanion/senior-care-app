@@ -482,12 +482,12 @@ app.post('/api/forgot-password', async (req, res) => {
     }
 
     console.log(`✅ Reset link generated for: ${email}`);
-    console.log(`   Reset link: ${data.properties.recovery_link}`);
+    console.log(`   Reset link: ${data.properties.action_link}`);
 
     // Send reset link via email using Resend
     if (resendClient) {
       try {
-        const resetLink = data.properties.recovery_link;
+        const resetLink = data.properties.action_link;
 
         const emailResult = await resendClient.emails.send({
           from: 'Senior Care Companion <noreply@familycare360.app>',
