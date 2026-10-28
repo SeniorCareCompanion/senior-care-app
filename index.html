@@ -15259,6 +15259,14 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                 }
             }
             
+            // Reset link was already used or expired: Supabase sends an error in the URL instead of a token
+            if (window.location.hash.includes('error_code=otp_expired') || window.location.hash.includes('error=access_denied')) {
+                history.replaceState(null, '', window.location.pathname);
+                alert('This reset link has expired or was already used. Please request a new one.');
+                showForgotPassword();
+                return;
+            }
+
             // Came from a password reset email? Show the new-password screen instead of the login.
             if (window.location.hash.includes('type=recovery') && window.location.hash.includes('access_token=')) {
                 const hashParams = new URLSearchParams(window.location.hash.substring(1));
