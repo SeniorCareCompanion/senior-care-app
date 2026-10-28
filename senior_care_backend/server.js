@@ -612,6 +612,59 @@ app.post('/api/reset-password', async (req, res) => {
   }
 });
 
+// Change Password - logged-in user changes their own password
+app.post('/api/change-password', async (req, res) => {
+  try {
+    const { userId, currentPassword, newPassword } = req.body;
+
+    if (!userId || !currentPassword || !newPassword) {
+      return res.status(400).json({ success: false, error: 'All fields are required' });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ success: false, error: 'Password must be at least 6 characters' });
+    }
+
+    const admin = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+    const { data: profile, error: profileError } = await admin
+      .from('users')
+      .select('email')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (profileError || !profile?.email) {
+      return res.status(404).json({ success: false, error: 'Account not found' });
+    }
+
+    // Check the current password against Supabase Auth
+    const anon = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+    const { error: signInError } = await anon.auth.signInWithPassword({
+      email: profile.email,
+      password: currentPassword
+    });
+
+    if (signInError) {
+      return res.status(401).json({ success: false, error: 'Current password is incorrect' });
+    }
+
+    const { error: updateError } = await admin.auth.admin.updateUserById(userId, {
+      password: newPassword
+    });
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    console.log(`✅ Password changed for user ${userId}`);
+    res.json({ success: true, message: 'Password changed successfully' });
+
+  } catch (error) {
+    console.error('❌ Change password error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // ============================================================
 // MEDICATION TRACKING ENDPOINTS
 // ============================================================
