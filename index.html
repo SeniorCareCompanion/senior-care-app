@@ -7176,6 +7176,19 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
             }
         }
 
+        // Token from the password reset email link (one-time, used to set the new password)
+        let pendingRecoveryToken = null;
+
+        function showResetPasswordFromLink() {
+            ['loginScreen', 'registerScreen', 'forgotPasswordScreen', 'mainApp'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+            const emailField = document.getElementById('resetEmail');
+            if (emailField) emailField.style.display = 'none';
+            document.getElementById('resetPasswordScreen').classList.remove('hidden');
+        }
+
         async function completePasswordReset() {
             const newPassword = document.getElementById('resetNewPassword').value;
             const confirmPassword = document.getElementById('resetConfirmPassword').value;
@@ -7196,8 +7209,8 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                 return;
             }
 
-            if (!email) {
-                alert('Email is required. Please go back and enter your email.');
+            if (!pendingRecoveryToken) {
+                alert('This reset link has expired or was already used. Please request a new one.');
                 return;
             }
 
@@ -7215,7 +7228,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        email: email,
+                        accessToken: pendingRecoveryToken,
                         password: newPassword
                     })
                 });
@@ -7232,6 +7245,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                 }
 
                 console.log(`✅ Password reset successful`);
+                pendingRecoveryToken = null;
 
                 // Clear fields
                 document.getElementById('resetEmail').value = '';
@@ -15245,6 +15259,15 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                 }
             }
             
+            // Came from a password reset email? Show the new-password screen instead of the login.
+            if (window.location.hash.includes('type=recovery') && window.location.hash.includes('access_token=')) {
+                const hashParams = new URLSearchParams(window.location.hash.substring(1));
+                pendingRecoveryToken = hashParams.get('access_token');
+                history.replaceState(null, '', window.location.pathname);
+                showResetPasswordFromLink();
+                return;
+            }
+
             const sessionRestored = restoreSession();
             if (sessionRestored) {
                 console.log('✅ User automatically logged in from saved session');

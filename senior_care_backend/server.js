@@ -463,22 +463,6 @@ app.post('/api/forgot-password', async (req, res) => {
       process.env.SUPABASE_SERVICE_ROLE_KEY
     );
 
-    // Check if user exists by querying auth.users table directly
-    const { data: authUser, error: checkError } = await supabaseServiceRole
-      .from('auth.users')
-      .select('id, email')
-      .eq('email', email)
-      .single();
-
-    if (checkError || !authUser) {
-      // Don't reveal if email exists - security best practice
-      console.log(`⚠️ Email not found in auth.users: ${email}`);
-      return res.json({
-        success: true,
-        message: 'If that email exists, you will receive password reset instructions'
-      });
-    }
-
     // Generate password reset link
     const { data, error } = await supabaseServiceRole.auth.admin.generateLink({
       type: 'recovery',
@@ -489,7 +473,12 @@ app.post('/api/forgot-password', async (req, res) => {
     });
 
     if (error) {
-      throw error;
+      // Usually means no account has this email. Answer the same way so people can't tell.
+      console.log(`⚠️ Reset link not generated for ${email}: ${error.message}`);
+      return res.json({
+        success: true,
+        message: 'If that email exists, you will receive password reset instructions'
+      });
     }
 
     console.log(`✅ Reset link generated for: ${email}`);
@@ -569,15 +558,15 @@ app.post('/api/forgot-password', async (req, res) => {
   }
 });
 
-// Reset Password - Called after user enters new password
+// Reset Password - Requires the one-time token from the emailed reset link
 app.post('/api/reset-password', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { accessToken, password } = req.body;
 
-    if (!email || !password) {
+    if (!accessToken || !password) {
       return res.status(400).json({
         success: false,
-        error: 'Email and password required'
+        error: 'Reset link is missing or invalid. Please request a new one.'
       });
     }
 
@@ -588,41 +577,27 @@ app.post('/api/reset-password', async (req, res) => {
       });
     }
 
-    console.log(`🔑 Password reset requested for: ${email}`);
+    // Ask Supabase who this token belongs to. This proves the person opened the emailed link.
+    const anon = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+    const { data: tokenUser, error: tokenError } = await anon.auth.getUser(accessToken);
 
-    const supabaseServiceRole = createClient(
-      process.env.SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-    );
-
-    // Get user by email
-    const { data: authUser, error: getUserError } = await supabaseServiceRole
-      .from('auth.users')
-      .select('id, email')
-      .eq('email', email)
-      .single();
-
-    if (getUserError || !authUser) {
-      // Security: Don't reveal if email exists
-      console.log(`⚠️ User not found: ${email}`);
-      return res.json({
-        success: true,
-        message: 'If that email exists, password was reset'
+    if (tokenError || !tokenUser?.user) {
+      return res.status(400).json({
+        success: false,
+        error: 'This reset link has expired or was already used. Please request a new one.'
       });
     }
 
-    // Update password using admin API
-    const { data: updatedUser, error: updateError } = await supabaseServiceRole.auth.admin.updateUserById(
-      authUser.id,
-      { password: password }
-    );
+    const admin = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+    const { error: updateError } = await admin.auth.admin.updateUserById(tokenUser.user.id, {
+      password: password
+    });
 
     if (updateError) {
       throw updateError;
     }
 
-    console.log(`✅ Password reset successful for: ${email}`);
-
+    console.log(`✅ Password reset successful for user ${tokenUser.user.id}`);
     res.json({
       success: true,
       message: 'Password reset successful. You can now login with your new password.'
