@@ -1146,6 +1146,39 @@ app.put('/api/medications/:medicationId', async (req, res) => {
 });
 
 // Delete a medication (soft delete - set active to false)
+// Un-log a dose (used when someone clears a checkmark)
+app.delete('/api/medications/mark-taken', async (req, res) => {
+  try {
+    const { user_id, medication_id, dose_date, dose_time } = req.body;
+
+    if (!user_id || !medication_id || !dose_date || !dose_time) {
+      return res.status(400).json({ success: false, error: 'user_id, medication_id, dose_date and dose_time are required' });
+    }
+
+    const supabaseServiceRole = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+
+    const { error } = await supabaseServiceRole
+      .from('medication_logs')
+      .delete()
+      .eq('user_id', user_id)
+      .eq('medication_id', String(medication_id))
+      .eq('dose_date', dose_date)
+      .eq('dose_time', dose_time);
+
+    if (error) {
+      return res.status(400).json({ success: false, error: error.message });
+    }
+
+    res.json({ success: true, message: 'Dose un-logged' });
+  } catch (error) {
+    console.error('❌ Un-log dose error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 app.delete('/api/medications/:medicationId', async (req, res) => {
     try {
         const { medicationId } = req.params;
@@ -1184,43 +1217,100 @@ app.delete('/api/medications/:medicationId', async (req, res) => {
     }
 });
 
-// Log medication as taken
+// Log one dose as taken (also notifies approved family members)
 app.post('/api/medications/mark-taken', async (req, res) => {
-    try {
-        const { user_id, medication_id, medication_name } = req.body;
+  try {
+    const { user_id, medication_id, medication_name, dose_date, dose_time } = req.body;
 
-        const supabaseServiceRole = createClient(
-            process.env.SUPABASE_URL,
-            process.env.SUPABASE_SERVICE_ROLE_KEY
-        );
-
-        // Log the medication
-        const { data: logData, error: logError } = await supabaseServiceRole
-            .from('medication_logs')
-            .insert({
-                user_id: user_id,
-                medication_id: medication_id,
-                medication_name: medication_name,
-                taken_time: new Date().toISOString(),
-                status: 'taken'
-            })
-            .select();
-
-        if (logError) {
-            return res.status(400).json({ error: logError.message });
-        }
-
-        // Always send notifications to approved family members
-        await sendMedicationNotification(user_id, medication_name, 'taken');
-
-        res.json({ 
-            success: true, 
-            data: logData[0],
-            message: 'Medication marked as taken and family notified'
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+    if (!user_id || !medication_id || !dose_date || !dose_time) {
+      return res.status(400).json({ success: false, error: 'user_id, medication_id, dose_date and dose_time are required' });
     }
+
+    const supabaseServiceRole = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+
+    // Don't log the same dose twice
+    const { data: existing, error: existingError } = await supabaseServiceRole
+      .from('medication_logs')
+      .select('id')
+      .eq('user_id', user_id)
+      .eq('medication_id', String(medication_id))
+      .eq('dose_date', dose_date)
+      .eq('dose_time', dose_time)
+      .maybeSingle();
+
+    if (existingError) {
+      return res.status(400).json({ success: false, error: existingError.message });
+    }
+
+    if (existing) {
+      return res.json({ success: true, message: 'Dose was already logged', data: existing });
+    }
+
+    const { data: logData, error: logError } = await supabaseServiceRole
+      .from('medication_logs')
+      .insert({
+        user_id: user_id,
+        medication_id: String(medication_id),
+        medication_name: medication_name,
+        taken_time: new Date().toISOString(),
+        status: 'taken',
+        dose_date: dose_date,
+        dose_time: dose_time
+      })
+      .select();
+
+    if (logError) {
+      return res.status(400).json({ success: false, error: logError.message });
+    }
+
+    // Notify approved family members
+    await sendMedicationNotification(user_id, medication_name, 'taken');
+
+    res.json({
+      success: true,
+      data: logData[0],
+      message: 'Dose logged and family notified'
+    });
+  } catch (error) {
+    console.error('❌ Mark taken error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get the doses taken on one date (YYYY-MM-DD) for a user
+app.get('/api/medications/taken/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { date } = req.query;
+
+    if (!date) {
+      return res.status(400).json({ success: false, error: 'date is required (YYYY-MM-DD)' });
+    }
+
+    const supabaseServiceRole = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+
+    const { data, error } = await supabaseServiceRole
+      .from('medication_logs')
+      .select('medication_id, dose_time, taken_time')
+      .eq('user_id', userId)
+      .eq('dose_date', date)
+      .eq('status', 'taken');
+
+    if (error) {
+      return res.status(400).json({ success: false, error: error.message });
+    }
+
+    res.json({ success: true, data: data || [] });
+  } catch (error) {
+    console.error('❌ Fetch taken doses error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
 });
 
 // Get medication adherence for a senior

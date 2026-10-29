@@ -5514,6 +5514,73 @@
         /**
          * Send medication taken event to backend
          */
+        // Record one dose as taken on the server, so it survives logout and notifies family
+        async function logDoseOnServer(med, doseTime, doseDate) {
+            try {
+                const response = await fetch(`${BACKEND_API_URL}/api/medications/mark-taken`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: currentUser,
+                        medication_id: String(med.databaseId || med.id),
+                        medication_name: med.name,
+                        dose_date: doseDate,
+                        dose_time: doseTime
+                    })
+                });
+                if (!response.ok) {
+                    console.error('❌ Dose not saved to server:', await response.text());
+                    alert('This dose could not be saved to the server. Please check your connection and try again.');
+                }
+            } catch (error) {
+                console.error('❌ Dose not saved to server:', error);
+                alert('This dose could not be saved to the server. Please check your connection and try again.');
+            }
+        }
+
+        // Remove one dose from the server when its checkmark is cleared
+        async function unlogDoseOnServer(med, doseTime, doseDate) {
+            try {
+                await fetch(`${BACKEND_API_URL}/api/medications/mark-taken`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: currentUser,
+                        medication_id: String(med.databaseId || med.id),
+                        dose_date: doseDate,
+                        dose_time: doseTime
+                    })
+                });
+            } catch (error) {
+                console.error('❌ Could not un-log dose on server:', error);
+            }
+        }
+
+        // Set today's checkmarks from the server's dose logs
+        async function applyTodayLogs(meds, userId) {
+            try {
+                const tz = ensureLocalUserRecord({ id: userId })[userId]?.timezone || 'America/Denver';
+                const todayDate = getTodayDateInTimezone(tz);
+                const response = await fetch(`${BACKEND_API_URL}/api/medications/taken/${userId}?date=${todayDate}`);
+                if (!response.ok) return meds;
+                const result = await response.json();
+                const logs = result.data || [];
+                meds.forEach(med => {
+                    const medId = String(med.databaseId || med.id);
+                    med.takenTimes = logs.filter(l => l.medication_id === medId).map(l => l.dose_time);
+                    med.lastTakenDate = todayDate;
+                    if (med.takenTimes.length >= (med.timesPerDay || 1)) {
+                        if (!med.takenDates) med.takenDates = [];
+                        if (!med.takenDates.includes(todayDate)) med.takenDates.push(todayDate);
+                    }
+                });
+                return meds;
+            } catch (error) {
+                console.error('❌ Could not load today\'s dose logs:', error);
+                return meds;
+            }
+        }
+
         async function sendMedicationToBackend(medicationName, doseTime, username) {
             try {
                 let users = ensureLocalUserRecord({ id: currentUser });
@@ -8126,7 +8193,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                 console.log('✅ Medications loaded from database:', result.data);
                 
                 // Convert database format to app format
-                return (result.data || []).map(med => {
+                const loaded = (result.data || []).map(med => {
                     const times = Array.isArray(med.times) && med.times.length > 0 ? med.times : ['08:00'];
                     return {
                         id: med.id,
@@ -8147,6 +8214,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                         databaseId: med.id
                     };
                 });
+                return await applyTodayLogs(loaded, userId);
             } catch (error) {
                 console.error('❌ Error loading medications from database:', error);
                 return [];
@@ -8775,10 +8843,10 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                             med.takenDates.push(todayDate);
                         }
                         speak(`Marked ${formatTime(doseTime)} dose of ${med.name} as taken. All doses complete for today!`);
-                        sendMedicationToBackend(med.name, doseTime, currentUser);
+                        logDoseOnServer(med, doseTime, todayDate);
                     } else {
                         speak(`Marked ${formatTime(doseTime)} dose of ${med.name} as taken`);
-                        sendMedicationToBackend(med.name, doseTime, currentUser);
+                        logDoseOnServer(med, doseTime, todayDate);
                     }
                 } else {
                     speak(`${formatTime(doseTime)} dose of ${med.name} was already marked as taken`);
@@ -8788,6 +8856,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                 if (med.takenDates.includes(todayDate)) {
                     // Remove today's date and clear taken times
                     med.takenDates = med.takenDates.filter(date => date !== todayDate);
+                    med.times.forEach(time => unlogDoseOnServer(med, time, todayDate));
                     med.takenTimes = [];
                     speak('Medication marked as not taken today');
                 } else {
@@ -8797,7 +8866,7 @@ Button Text: ${btn ? btn.textContent : 'Not Found'}`);
                     med.lastTakenDate = todayDate;
                     speak('Medication marked as taken today');
                     // Send to backend for notifications
-                    sendMedicationToBackend(med.name, med.times[0], currentUser);
+                    med.times.forEach(time => logDoseOnServer(med, time, todayDate));
                 }
             }
 
