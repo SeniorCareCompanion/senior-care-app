@@ -12212,7 +12212,7 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
         window.showTopSection = showTopSection;
 
 
-        function updateProfile() {
+        async function updateProfile() {
             const firstName = document.getElementById('updateFirstName').value;
             const lastName = document.getElementById('updateLastName').value;
             const age = document.getElementById('updateAge').value;
@@ -12240,6 +12240,31 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
                     return;
                 }
                 phoneToStore = phoneDigits;
+            }
+
+            // Save to the server first, so family notifications and password reset use the new details
+            try {
+                const response = await fetch(`${BACKEND_API_URL}/api/users/${currentUser}/profile`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        firstName: firstName,
+                        lastName: lastName,
+                        age: age,
+                        email: email,
+                        phone: phoneToStore
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    alert(data.error || 'Could not update profile');
+                    return;
+                }
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+                return;
             }
 
             let users = ensureLocalUserRecord({ id: currentUser });

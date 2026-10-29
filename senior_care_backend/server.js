@@ -665,6 +665,66 @@ app.post('/api/change-password', async (req, res) => {
   }
 });
 
+// Update Profile - logged-in user saves their own details to the server
+app.put('/api/users/:userId/profile', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { firstName, lastName, age, email, phone } = req.body;
+
+    if (!firstName || !lastName || !email) {
+      return res.status(400).json({ success: false, error: 'First name, last name and email are required' });
+    }
+
+    const admin = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+    const { data: current, error: currentError } = await admin
+      .from('users')
+      .select('email')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (currentError || !current) {
+      return res.status(404).json({ success: false, error: 'Account not found' });
+    }
+
+    // If the email changed, change the login email too
+    if (email.toLowerCase() !== (current.email || '').toLowerCase()) {
+      const { error: authEmailError } = await admin.auth.admin.updateUserById(userId, {
+        email: email,
+        email_confirm: true
+      });
+      if (authEmailError) {
+        return res.status(400).json({ success: false, error: `Could not change email: ${authEmailError.message}` });
+      }
+    }
+
+    const { data: updated, error: updateError } = await admin
+      .from('users')
+      .update({
+        first_name: firstName,
+        last_name: lastName,
+        age: age ? parseInt(age) : null,
+        email: email,
+        phone: phone || null,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (updateError) {
+      return res.status(400).json({ success: false, error: updateError.message });
+    }
+
+    console.log(`✅ Profile updated for user ${userId}`);
+    res.json({ success: true, user: updated });
+
+  } catch (error) {
+    console.error('❌ Profile update error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // ============================================================
 // MEDICATION TRACKING ENDPOINTS
 // ============================================================
