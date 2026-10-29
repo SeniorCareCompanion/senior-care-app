@@ -12217,7 +12217,9 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
             const lastName = document.getElementById('updateLastName').value;
             const age = document.getElementById('updateAge').value;
             const email = document.getElementById('updateEmail').value;
-            const phone = document.getElementById('updatePhone').value.trim(); // Optional
+            const phoneField = document.getElementById('updatePhone');
+            // The profile form has no phone box, so keep the phone already on the account
+            const phone = phoneField ? phoneField.value.trim() : (ensureLocalUserRecord({ id: currentUser })[currentUser].phone || ''); // Optional
 
             if (!firstName || !lastName || !age || !email) {
                 alert('Please fill in all required fields');
