@@ -47,7 +47,11 @@ app.get('/api/family-connections/:seniorUserId', async (req, res) => {
     try {
         const { seniorUserId } = req.params;
 
-        const { data, error } = await supabase
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+        const { data, error } = await supabaseServiceRole
             .from('family_connections')
             .select(`
                 *,
@@ -74,7 +78,11 @@ app.get('/api/family-connections/received/:familyMemberId', async (req, res) => 
     try {
         const { familyMemberId } = req.params;
 
-        const { data, error } = await supabase
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+        const { data, error } = await supabaseServiceRole
             .from('family_connections')
             .select(`
                 *,
@@ -213,7 +221,11 @@ app.delete('/api/family-connections/:connectionId', async (req, res) => {
     try {
         const { connectionId } = req.params;
 
-        const { data, error } = await supabase
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+        const { data, error } = await supabaseServiceRole
             .from('family_connections')
             .delete()
             .eq('id', connectionId)
