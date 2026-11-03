@@ -1,0 +1,2660 @@
+// ============================================================
+// SENIOR CARE COMPANION - BACKEND API SERVER
+// Family Notifications & Medication Tracking
+// ============================================================
+
+const express = require('express');
+const { createClient } = require('@supabase/supabase-js');
+const cors = require('cors');
+const { Resend } = require('resend');
+require('dotenv').config();
+
+const app = express();
+
+// ============================================================
+// MIDDLEWARE
+// ============================================================
+
+app.use(cors());
+app.use(express.json());
+
+// ============================================================
+// SUPABASE CLIENT
+// ============================================================
+
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// ============================================================
+// HEALTH CHECK ENDPOINT
+// ============================================================
+
+app.get('/api/health', (req, res) => {
+    res.json({ 
+        status: 'healthy', 
+        message: 'Senior Care Companion API is running!',
+        timestamp: new Date().toISOString()
+    });
+});
+
+// ============================================================
+// FAMILY CONNECTIONS ENDPOINTS
+// ============================================================
+
+// Get all family connections for a senior (connections they sent)
+app.get('/api/family-connections/:seniorUserId', async (req, res) => {
+    try {
+        const { seniorUserId } = req.params;
+
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+        const { data, error } = await supabaseServiceRole
+            .from('family_connections')
+            .select(`
+                *,
+                family_member:family_member_user_id(email, username)
+            `)
+            .eq('senior_user_id', seniorUserId);
+
+        if (error) {
+            return res.status(400).json({ error: error.message });
+        }
+
+        res.json({ 
+            success: true, 
+            data: data,
+            message: `Found ${data.length} family connections`
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get all family connections received by a family member (invitations they received)
+app.get('/api/family-connections/received/:familyMemberId', async (req, res) => {
+    try {
+        const { familyMemberId } = req.params;
+
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+        const { data, error } = await supabaseServiceRole
+            .from('family_connections')
+            .select(`
+                *,
+                senior:senior_user_id(id, email, username)
+            `)
+            .eq('family_member_user_id', familyMemberId);
+
+        if (error) {
+            return res.status(400).json({ error: error.message });
+        }
+
+        res.json({ 
+            success: true, 
+            data: data,
+            message: `Found ${data.length} pending invitations`
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Create a family connection (invite)
+app.post('/api/family-connections', async (req, res) => {
+    try {
+        const { senior_user_id, family_member_email, family_member_username, relationship } = req.body;
+
+        // Use SERVICE_ROLE for all operations
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
+        // Find the family member by BOTH email AND username (to handle multiple users per email)
+        const { data: familyMembers, error: findError } = await supabaseServiceRole
+            .from('users')
+            .select('id')
+            .eq('email', family_member_email)
+            .eq('username', family_member_username);
+
+        if (findError || !familyMembers || familyMembers.length === 0) {
+            return res.status(400).json({ 
+                error: 'Family member not found. Please check the email and username are correct.' 
+            });
+        }
+
+        const familyMember = familyMembers[0];
+
+        // Create the connection
+        const { data, error } = await supabaseServiceRole
+            .from('family_connections')
+            .insert({
+                senior_user_id: senior_user_id,
+                family_member_user_id: familyMember.id,
+                relationship: relationship,
+                permission_level: 'notifications_only',
+                approved_by_senior: false
+            })
+            .select();
+
+        if (error) {
+            return res.status(400).json({ error: error.message });
+        }
+
+        res.json({ 
+            success: true, 
+            data: data[0],
+            message: 'Family connection invitation created'
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Approve a family connection
+app.put('/api/family-connections/:connectionId/approve', async (req, res) => {
+    try {
+        const { connectionId } = req.params;
+
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
+        const { data, error } = await supabaseServiceRole
+            .from('family_connections')
+            .update({ approved_by_senior: true })
+            .eq('id', connectionId)
+            .select();
+
+        if (error) {
+            return res.status(400).json({ error: error.message });
+        }
+
+        res.json({ 
+            success: true, 
+            data: data[0],
+            message: 'Family connection approved'
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Approve a family connection (PATCH endpoint for frontend compatibility)
+app.patch('/api/family-connections/:connectionId/approve', async (req, res) => {
+    try {
+        const { connectionId } = req.params;
+
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
+        const { data, error } = await supabaseServiceRole
+            .from('family_connections')
+            .update({ approved_by_senior: true })
+            .eq('id', connectionId)
+            .select();
+
+        if (error) {
+            return res.status(400).json({ error: error.message });
+        }
+
+        res.json({ 
+            success: true, 
+            data: data[0],
+            message: 'Family connection approved'
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Delete/Reject a family connection
+app.delete('/api/family-connections/:connectionId', async (req, res) => {
+    try {
+        const { connectionId } = req.params;
+
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+        const { data, error } = await supabaseServiceRole
+            .from('family_connections')
+            .delete()
+            .eq('id', connectionId)
+            .select();
+
+        if (error) {
+            return res.status(400).json({ error: error.message });
+        }
+
+        res.json({ 
+            success: true, 
+            data: data[0],
+            message: 'Family connection declined'
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ============================================================
+// AUTHENTICATION ENDPOINTS
+// ============================================================
+
+// Login - Authenticate against Supabase Auth
+app.post('/api/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        error: 'Email and password required'
+      });
+    }
+
+    console.log(`🔐 Login attempt for: ${email}`);
+
+    // Use SERVICE_ROLE to access auth.users
+    const supabaseServiceRole = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+
+    // First, check if input is email or username
+    // If it contains @, treat as email. Otherwise, look up username in users table
+    let authUserEmail = email;
+
+    if (!email.includes('@')) {
+      // Input is a username - look it up in custom users table
+      console.log(`🔍 Looking up username: ${email}`);
+      const { data: userRecord } = await supabaseServiceRole
+        .from('users')
+        .select('email')
+        .eq('username', email)
+        .single();
+
+      if (userRecord && userRecord.email) {
+        authUserEmail = userRecord.email;
+        console.log(`✅ Username resolved to email: ${authUserEmail}`);
+      } else {
+        console.log(`❌ Username not found: ${email}`);
+        return res.status(401).json({
+          success: false,
+          error: 'Invalid email/username or password'
+        });
+      }
+    }
+
+    // Verify password using Supabase Auth signInWithPassword
+    console.log(`🔑 Verifying password with Supabase Auth for: ${authUserEmail}`);
+
+    // Create a regular Supabase client (not service role) to use signInWithPassword
+    const supabaseAuth = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_KEY
+    );
+
+    const { data: signInData, error: signInError } = await supabaseAuth.auth.signInWithPassword({
+      email: authUserEmail,
+      password: password
+    });
+
+    if (signInError || !signInData.user) {
+      console.log(`❌ Authentication failed for: ${authUserEmail} - ${signInError?.message}`);
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid email/username or password'
+      });
+    }
+
+    const userId = signInData.user.id;
+    console.log(`✅ Password verified for: ${authUserEmail}, userId: ${userId}`);
+
+    // Get custom user data from users table
+    const { data: userData, error: userError } = await supabaseServiceRole
+      .from('users')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if (userError) {
+      console.log(`⚠️ Custom user data not found, returning auth info only`);
+      return res.json({
+        success: true,
+        user: {
+          id: userId,
+          email: authUserEmail,
+          username: email.includes('@') ? email.split('@')[0] : email,
+          timezone: 'UTC'
+        },
+        message: 'Login successful'
+      });
+    }
+
+    console.log(`✅ Login successful for: ${authUserEmail}`);
+    res.json({
+      success: true,
+      user: userData,
+      message: 'Login successful'
+    });
+
+  } catch (error) {
+    console.error('❌ Login error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Signup - Create login account + profile. Rolls back on failure, never reports false success.
+app.post('/api/signup', async (req, res) => {
+  try {
+    const { email, password, confirmPassword, firstName, lastName, age, username } = req.body;
+
+    if (!email || !password || !confirmPassword || !firstName || !lastName || !username) {
+      return res.status(400).json({ success: false, error: 'All fields are required' });
+    }
+    if (password !== confirmPassword) {
+      return res.status(400).json({ success: false, error: 'Passwords do not match' });
+    }
+    if (password.length < 6) {
+      return res.status(400).json({ success: false, error: 'Password must be at least 6 characters' });
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ success: false, error: 'Invalid email format' });
+    }
+
+    console.log(`📝 Signup attempt for: ${email}`);
+
+    const admin = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+    // 1. Make sure the username and email aren't already in the profile table
+    const { data: takenUsername } = await admin.from('users').select('id').eq('username', username).maybeSingle();
+    if (takenUsername) {
+      return res.status(400).json({ success: false, error: 'Username already taken' });
+    }
+    const { data: takenEmail } = await admin.from('users').select('id').eq('email', email).maybeSingle();
+    if (takenEmail) {
+      return res.status(400).json({ success: false, error: 'Email already registered' });
+    }
+
+    // 2. Create the login account
+    let userId;
+    let createdNewLogin = false;
+    const { data: authData, error: authError } = await admin.auth.admin.createUser({
+      email: email,
+      password: password,
+      email_confirm: true
+    });
+
+    if (authData?.user) {
+      userId = authData.user.id;
+      createdNewLogin = true;
+    } else if (authError && /already.*registered/i.test(authError.message)) {
+      // A login account exists but has no profile (left over from a failed signup).
+      // Only adopt it if the password typed here is the one that already works.
+      const anon = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+      const { data: check, error: checkError } = await anon.auth.signInWithPassword({ email, password });
+      if (checkError || !check?.user) {
+        return res.status(400).json({ success: false, error: 'Email already registered' });
+      }
+      userId = check.user.id;
+      console.log(`♻️ Adopting leftover login account for: ${email}`);
+    } else {
+      console.log(`❌ Failed to create auth user: ${authError?.message}`);
+      return res.status(400).json({ success: false, error: authError?.message || 'Failed to create user' });
+    }
+
+    // 3. Create the profile row. If this fails, remove the new login so the user can retry.
+    const { data: newUser, error: insertError } = await admin
+      .from('users')
+      .insert({
+        id: userId,
+        email: email,
+        username: username,
+        first_name: firstName,
+        last_name: lastName,
+        age: age ? parseInt(age) : null,
+        timezone: 'America/Denver',
+        role: 'senior',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+
+    if (insertError) {
+      console.log(`❌ Failed to create user profile: ${insertError.message}`);
+      if (createdNewLogin) {
+        await admin.auth.admin.deleteUser(userId);
+      }
+      return res.status(500).json({ success: false, error: `Could not save profile: ${insertError.message}` });
+    }
+
+    console.log(`✅ Signup successful for: ${email}`);
+    res.json({
+      success: true,
+      user: newUser,
+      message: 'Account created successfully. You can now log in.'
+    });
+
+  } catch (error) {
+    console.error('❌ Signup error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Forgot Password - Send reset link via email
+app.post('/api/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        error: 'Email required'
+      });
+    }
+
+    console.log(`🔑 Forgot password request for: ${email}`);
+
+    // Use SERVICE_ROLE to generate reset link
+    const supabaseServiceRole = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+
+    // Generate password reset link
+    const { data, error } = await supabaseServiceRole.auth.admin.generateLink({
+      type: 'recovery',
+      email: email,
+      options: {
+        redirectTo: `${process.env.FRONTEND_URL || 'https://seniorcarecompanion.github.io/senior-care-app/'}`
+      }
+    });
+
+    if (error) {
+      // Usually means no account has this email. Answer the same way so people can't tell.
+      console.log(`⚠️ Reset link not generated for ${email}: ${error.message}`);
+      return res.json({
+        success: true,
+        message: 'If that email exists, you will receive password reset instructions'
+      });
+    }
+
+    console.log(`✅ Reset link generated for: ${email}`);
+    console.log(`   Reset link: ${data.properties.action_link}`);
+
+    // Send reset link via email using Resend
+    if (resendClient) {
+      try {
+        const resetLink = data.properties.action_link;
+
+        const emailResult = await resendClient.emails.send({
+          from: 'Senior Care Companion <noreply@familycare360.app>',
+          to: email,
+          subject: '🔐 Reset Your Senior Care Companion Password',
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9; border-radius: 8px;">
+              <h2 style="color: #333; margin-bottom: 20px;">Reset Your Password</h2>
+
+              <p style="color: #666; font-size: 16px; line-height: 1.6;">
+                We received a request to reset the password for your Senior Care Companion account.
+              </p>
+
+              <div style="background: white; padding: 20px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #2196F3;">
+                <p style="margin: 0 0 15px 0; color: #333;">
+                  Click the button below to reset your password. This link will expire in 24 hours.
+                </p>
+                <a href="${resetLink}" style="display: inline-block; padding: 12px 30px; background: #2196F3; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">
+                  Reset Password
+                </a>
+              </div>
+
+              <p style="color: #666; font-size: 14px;">
+                Or copy and paste this link in your browser:
+              </p>
+              <p style="background: #f0f0f0; padding: 10px; border-radius: 4px; word-break: break-all; font-size: 12px; color: #333;">
+                ${resetLink}
+              </p>
+
+              <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+
+              <p style="color: #999; font-size: 12px;">
+                If you didn't request a password reset, please ignore this email. Your password won't change until you click the link above.
+              </p>
+
+              <p style="color: #999; font-size: 12px;">
+                Senior Care Companion Support<br>
+                seniorcarecompanion360@gmail.com
+              </p>
+            </div>
+          `,
+          reply_to: 'seniorcarecompanion360@gmail.com'
+        });
+
+        if (emailResult.error) {
+          console.error(`⚠️ Failed to send reset email: ${emailResult.error}`);
+        } else {
+          console.log(`✅ Reset email sent to: ${email}`);
+        }
+      } catch (emailError) {
+        console.error(`⚠️ Error sending reset email:`, emailError);
+      }
+    } else {
+      console.warn(`⚠️ Resend email service not configured - reset link not emailed`);
+    }
+
+    res.json({
+      success: true,
+      message: 'If that email exists, you will receive password reset instructions'
+    });
+
+  } catch (error) {
+    console.error('❌ Forgot password error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Reset Password - Requires the one-time token from the emailed reset link
+app.post('/api/reset-password', async (req, res) => {
+  try {
+    const { accessToken, password } = req.body;
+
+    if (!accessToken || !password) {
+      return res.status(400).json({
+        success: false,
+        error: 'Reset link is missing or invalid. Please request a new one.'
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        error: 'Password must be at least 6 characters'
+      });
+    }
+
+    // Ask Supabase who this token belongs to. This proves the person opened the emailed link.
+    const anon = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+    const { data: tokenUser, error: tokenError } = await anon.auth.getUser(accessToken);
+
+    if (tokenError || !tokenUser?.user) {
+      return res.status(400).json({
+        success: false,
+        error: 'This reset link has expired or was already used. Please request a new one.'
+      });
+    }
+
+    const admin = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+    const { error: updateError } = await admin.auth.admin.updateUserById(tokenUser.user.id, {
+      password: password
+    });
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    console.log(`✅ Password reset successful for user ${tokenUser.user.id}`);
+    res.json({
+      success: true,
+      message: 'Password reset successful. You can now login with your new password.'
+    });
+
+  } catch (error) {
+    console.error('❌ Password reset error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Change Password - logged-in user changes their own password
+app.post('/api/change-password', async (req, res) => {
+  try {
+    const { userId, currentPassword, newPassword } = req.body;
+
+    if (!userId || !currentPassword || !newPassword) {
+      return res.status(400).json({ success: false, error: 'All fields are required' });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ success: false, error: 'Password must be at least 6 characters' });
+    }
+
+    const admin = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+    const { data: profile, error: profileError } = await admin
+      .from('users')
+      .select('email')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (profileError || !profile?.email) {
+      return res.status(404).json({ success: false, error: 'Account not found' });
+    }
+
+    // Check the current password against Supabase Auth
+    const anon = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+    const { error: signInError } = await anon.auth.signInWithPassword({
+      email: profile.email,
+      password: currentPassword
+    });
+
+    if (signInError) {
+      return res.status(401).json({ success: false, error: 'Current password is incorrect' });
+    }
+
+    const { error: updateError } = await admin.auth.admin.updateUserById(userId, {
+      password: newPassword
+    });
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    console.log(`✅ Password changed for user ${userId}`);
+    res.json({ success: true, message: 'Password changed successfully' });
+
+  } catch (error) {
+    console.error('❌ Change password error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Update Profile - logged-in user saves their own details to the server
+app.put('/api/users/:userId/profile', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { firstName, lastName, age, email, phone } = req.body;
+
+    if (!firstName || !lastName || !email) {
+      return res.status(400).json({ success: false, error: 'First name, last name and email are required' });
+    }
+
+    const admin = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+    const { data: current, error: currentError } = await admin
+      .from('users')
+      .select('email')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (currentError || !current) {
+      return res.status(404).json({ success: false, error: 'Account not found' });
+    }
+
+    // If the email changed, change the login email too
+    if (email.toLowerCase() !== (current.email || '').toLowerCase()) {
+      const { error: authEmailError } = await admin.auth.admin.updateUserById(userId, {
+        email: email,
+        email_confirm: true
+      });
+      if (authEmailError) {
+        return res.status(400).json({ success: false, error: `Could not change email: ${authEmailError.message}` });
+      }
+    }
+
+    const { data: updated, error: updateError } = await admin
+      .from('users')
+      .update({
+        first_name: firstName,
+        last_name: lastName,
+        age: age ? parseInt(age) : null,
+        email: email,
+        phone: phone || null,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (updateError) {
+      return res.status(400).json({ success: false, error: updateError.message });
+    }
+
+    console.log(`✅ Profile updated for user ${userId}`);
+    res.json({ success: true, user: updated });
+
+  } catch (error) {
+    console.error('❌ Profile update error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ============================================================
+// MEDICATION TRACKING ENDPOINTS
+// ============================================================
+
+// Create a user if they don't exist
+app.post('/api/users', async (req, res) => {
+    try {
+        const { id, username, email, age, firstName, lastName, phone, timezone, smsNotificationsEnabled, sms_consent, sms_consent_date, sms_consent_version } = req.body;
+
+        console.log(`Creating user: id=${id}, username=${username}, email=${email}, age=${age}, phone=${phone || 'not provided'}, sms_consent=${sms_consent || false}`);
+
+        // Capture IP address for audit trail
+        const clientIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress || 'unknown';
+        console.log(`Client IP: ${clientIp}`);
+
+        // Use provided email or generate a unique one
+        const userEmail = email || `${username.toLowerCase()}-${id.substring(0, 8)}@senior-care.app`;
+
+        // Use SERVICE_ROLE to bypass RLS for user creation
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
+        // Try to insert the user
+        const { data, error } = await supabaseServiceRole
+            .from('users')
+            .insert([{ 
+                id, 
+                username,
+                email: userEmail,
+                age: age || null,
+                first_name: firstName || null,
+                last_name: lastName || null,
+                phone: phone || null,
+                timezone: timezone || 'UTC',
+                phone_verified: false,
+                sms_reminders_enabled: smsNotificationsEnabled || false,
+                notify_family_on_med: false,
+                // SMS Consent Audit Fields
+                sms_consent: sms_consent || false,
+                sms_consent_date: sms_consent ? (sms_consent_date || new Date().toISOString()) : null,
+                sms_consent_ip: sms_consent ? clientIp : null,
+                sms_consent_version: sms_consent ? (sms_consent_version || 'v1.0') : null
+            }])
+            .select();
+
+        if (error) {
+            console.error('User creation error:', error);
+            // User might already exist, that's ok - just return success
+            if (error.code === '23505') { // Unique constraint violation
+                return res.json({ 
+                    message: 'User already exists',
+                    id: id
+                });
+            }
+            return res.status(400).json({ error: error.message });
+        }
+
+        console.log('User created successfully:', data);
+        res.json({ 
+            success: true, 
+            message: 'User created successfully',
+            data: data[0]
+        });
+    } catch (error) {
+        console.error('User creation exception:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Update user's timezone
+app.put('/api/users/:userId/timezone', async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const { timezone } = req.body;
+
+        if (!timezone) {
+            return res.status(400).json({ error: 'Timezone required' });
+        }
+
+        console.log(`📍 Updating timezone for user ${userId}: ${timezone}`);
+
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
+        const { data, error } = await supabaseServiceRole
+            .from('users')
+            .update({ timezone: timezone })
+            .eq('id', userId)
+            .select();
+
+        if (error) {
+            return res.status(400).json({ error: error.message });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Timezone updated',
+            data: data[0]
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ============================================================
+// DELETE USER ACCOUNT - CASCADE DELETE ALL RELATED DATA
+// ============================================================
+
+// Delete user and ALL associated data
+app.delete('/api/users/:userId', async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        console.log(`🗑️ DELETING ACCOUNT: User ${userId}`);
+
+        // Use SERVICE_ROLE to bypass RLS for cascade delete
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
+        // Start transaction-like deletes (order matters for FK constraints)
+
+        // 1. Delete medication logs
+        console.log(`  → Deleting medication_logs for user ${userId}`);
+        const { error: medLogsError } = await supabaseServiceRole
+            .from('medication_logs')
+            .delete()
+            .eq('user_id', userId);
+
+        if (medLogsError) {
+            console.error('  ❌ Error deleting medication_logs:', medLogsError);
+            return res.status(500).json({ error: `Failed to delete medication logs: ${medLogsError.message}` });
+        }
+        console.log('  ✅ Medication logs deleted');
+
+        // 2. Delete scheduled notifications
+        console.log(`  → Deleting scheduled_notifications for user ${userId}`);
+        const { error: schedNotifError } = await supabaseServiceRole
+            .from('scheduled_notifications')
+            .delete()
+            .eq('senior_user_id', userId);
+
+        if (schedNotifError) {
+            console.error('  ❌ Error deleting scheduled_notifications:', schedNotifError);
+            return res.status(500).json({ error: `Failed to delete scheduled notifications: ${schedNotifError.message}` });
+        }
+        console.log('  ✅ Scheduled notifications deleted');
+
+        // 3. Delete medications
+        console.log(`  → Deleting medications for user ${userId}`);
+        const { error: medsError } = await supabaseServiceRole
+            .from('medications')
+            .delete()
+            .eq('user_id', userId);
+
+        if (medsError) {
+            console.error('  ❌ Error deleting medications:', medsError);
+            return res.status(500).json({ error: `Failed to delete medications: ${medsError.message}` });
+        }
+        console.log('  ✅ Medications deleted');
+
+        // 4. Delete family connections (where user is SENIOR)
+        console.log(`  → Deleting family_connections where user is senior`);
+        const { error: familyConnError } = await supabaseServiceRole
+            .from('family_connections')
+            .delete()
+            .eq('senior_user_id', userId);
+
+        if (familyConnError) {
+            console.error('  ❌ Error deleting family_connections (senior):', familyConnError);
+            return res.status(500).json({ error: `Failed to delete family connections: ${familyConnError.message}` });
+        }
+        console.log('  ✅ Family connections (senior) deleted');
+
+        // 5. Delete family connections (where user is FAMILY MEMBER)
+        console.log(`  → Deleting family_connections where user is family member`);
+        const { error: familyConnError2 } = await supabaseServiceRole
+            .from('family_connections')
+            .delete()
+            .eq('family_member_user_id', userId);
+
+        if (familyConnError2) {
+            console.error('  ❌ Error deleting family_connections (family_member):', familyConnError2);
+            return res.status(500).json({ error: `Failed to delete family connections: ${familyConnError2.message}` });
+        }
+        console.log('  ✅ Family connections (family member) deleted');
+
+        // 6. Delete user record
+        console.log(`  → Deleting user record`);
+        const { error: userError } = await supabaseServiceRole
+            .from('users')
+            .delete()
+            .eq('id', userId);
+
+        if (userError) {
+            console.error('  ❌ Error deleting user:', userError);
+            return res.status(500).json({ error: `Failed to delete user: ${userError.message}` });
+        }
+        console.log('  ✅ User record deleted');
+
+        // 7. Delete the login account so the email can be used again
+        const { error: authDeleteError } = await supabaseServiceRole.auth.admin.deleteUser(userId);
+        if (authDeleteError) {
+            console.error('  ❌ Error deleting login account:', authDeleteError);
+            return res.status(500).json({ error: `Profile deleted but login could not be removed: ${authDeleteError.message}` });
+        }
+        console.log('  ✅ Login account deleted');
+
+
+        console.log(`✅ ACCOUNT COMPLETELY DELETED: User ${userId}`);
+        
+        res.json({ 
+            success: true, 
+            message: 'Account and all associated data permanently deleted'
+        });
+
+    } catch (error) {
+        console.error('❌ Account deletion exception:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ============================================================
+// MEDICATIONS - CRUD ENDPOINTS
+// ============================================================
+
+// Create a new medication
+app.post('/api/medications', async (req, res) => {
+    try {
+        const { userId, name, dosage, notes, timesPerDay, times, schedule, reminderMinutesBefore } = req.body;
+
+        console.log(`📝 Creating medication: ${name} for user ${userId}`);
+        console.log(`   userId type: ${typeof userId}, length: ${userId?.length}`);
+        console.log(`   Request body:`, JSON.stringify(req.body, null, 2));
+
+        if (!userId || !name || !times || times.length === 0) {
+            return res.status(400).json({
+                error: 'Missing required fields: userId, name, times'
+            });
+        }
+
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
+        const insertPayload = {
+            user_id: userId,
+            name: name,
+            dosage: dosage || null,
+            notes: notes || null,
+            times_per_day: timesPerDay || 1,
+            times: times,
+            schedule: schedule || 'daily',
+            reminder_minutes_before: reminderMinutesBefore || 15,
+            specific_days: req.body.specificDays || null,
+            every_x_days: req.body.everyXDays || null,
+            start_date: req.body.startDate || null,
+            weekly_day: req.body.weeklyDay ?? null,
+            reminder_enabled: req.body.reminderEnabled !== false,
+            active: true
+        };
+
+        console.log(`   Insert payload:`, JSON.stringify(insertPayload, null, 2));
+
+        const { data, error } = await supabaseServiceRole
+            .from('medications')
+            .insert(insertPayload)
+            .select();
+
+        if (error) {
+            console.error('❌ Medication creation error:', error);
+            console.error('   Error code:', error.code);
+            console.error('   Error details:', error.details);
+            return res.status(400).json({ error: error.message });
+        }
+
+        console.log('✅ Medication created successfully:', JSON.stringify(data[0], null, 2));
+        res.json({
+            success: true,
+            message: 'Medication created',
+            data: data[0]
+        });
+    } catch (error) {
+        console.error('❌ Medication creation exception:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get all medications for a user
+app.get('/api/medications/:userId', async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        console.log(`📋 Fetching medications for user ${userId}`);
+        console.log(`   Request received at: ${new Date().toISOString()}`);
+        console.log(`   userId type: ${typeof userId}, length: ${userId?.length}`);
+
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
+        // First, get ALL medications for this user (no active filter) to debug
+        console.log(`   🔍 Querying ALL medications (including inactive) for debugging...`);
+        const { data: allMeds, error: allError } = await supabaseServiceRole
+            .from('medications')
+            .select('*')
+            .eq('user_id', userId);
+
+        if (allError) {
+            console.error(`   ❌ Error fetching ALL medications:`, allError);
+        } else {
+            console.log(`   📊 Total medications in DB (any status): ${allMeds?.length || 0}`);
+            if (allMeds && allMeds.length > 0) {
+                allMeds.forEach((med, idx) => {
+                    console.log(`      [${idx}] ID: ${med.id}, active: ${med.active}, name: ${med.name}`);
+                });
+            }
+        }
+
+        // Now get only ACTIVE medications
+        console.log(`   🔍 Querying ACTIVE medications only...`);
+        const { data, error } = await supabaseServiceRole
+            .from('medications')
+            .select('*')
+            .eq('user_id', userId)
+            .eq('active', true)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('❌ Fetch medications error:', error);
+            console.error('   Error code:', error.code);
+            console.error('   Error details:', error.details);
+            return res.status(400).json({ error: error.message });
+        }
+
+        console.log(`✅ Found ${data?.length || 0} ACTIVE medications`);
+        if (data && data.length > 0) {
+            data.forEach((med, idx) => {
+                console.log(`   [${idx}] ${med.name} (${med.dosage}) - Times: ${med.times?.join(', ')}`);
+            });
+        }
+
+        res.json({
+            success: true,
+            data: data || [],
+            message: `Found ${data?.length || 0} medications`,
+            debug: {
+                userId,
+                requestTime: new Date().toISOString(),
+                totalInDB: allMeds?.length || 0,
+                activeCount: data?.length || 0
+            }
+        });
+    } catch (error) {
+        console.error('❌ Fetch medications exception:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Update a medication
+app.put('/api/medications/:medicationId', async (req, res) => {
+    try {
+        const { medicationId } = req.params;
+        const { name, dosage, notes, timesPerDay, times, schedule, reminderMinutesBefore, active } = req.body;
+
+        console.log(`✏️ Updating medication ${medicationId}`);
+
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
+        const updateData = {
+            updated_at: new Date().toISOString()
+        };
+
+        if (name !== undefined) updateData.name = name;
+        if (dosage !== undefined) updateData.dosage = dosage;
+        if (notes !== undefined) updateData.notes = notes;
+        if (timesPerDay !== undefined) updateData.times_per_day = timesPerDay;
+        if (times !== undefined) updateData.times = times;
+        if (schedule !== undefined) updateData.schedule = schedule;
+        if (reminderMinutesBefore !== undefined) updateData.reminder_minutes_before = reminderMinutesBefore;
+        if (active !== undefined) updateData.active = active;
+        if (req.body.specificDays !== undefined) updateData.specific_days = req.body.specificDays || null;
+        if (req.body.everyXDays !== undefined) updateData.every_x_days = req.body.everyXDays || null;
+        if (req.body.startDate !== undefined) updateData.start_date = req.body.startDate || null;
+        if (req.body.weeklyDay !== undefined) updateData.weekly_day = req.body.weeklyDay ?? null;
+        if (req.body.reminderEnabled !== undefined) updateData.reminder_enabled = req.body.reminderEnabled !== false;
+
+        const { data, error } = await supabaseServiceRole
+            .from('medications')
+            .update(updateData)
+            .eq('id', medicationId)
+            .select();
+
+        if (error) {
+            console.error('❌ Medication update error:', error);
+            return res.status(400).json({ error: error.message });
+        }
+
+        console.log('✅ Medication updated:', data[0]);
+        res.json({ 
+            success: true, 
+            message: 'Medication updated',
+            data: data[0]
+        });
+    } catch (error) {
+        console.error('❌ Medication update exception:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Delete a medication (soft delete - set active to false)
+// Un-log a dose (used when someone clears a checkmark)
+app.delete('/api/medications/mark-taken', async (req, res) => {
+  try {
+    const { user_id, medication_id, dose_date, dose_time } = req.body;
+
+    if (!user_id || !medication_id || !dose_date || !dose_time) {
+      return res.status(400).json({ success: false, error: 'user_id, medication_id, dose_date and dose_time are required' });
+    }
+
+    const supabaseServiceRole = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+
+    const { error } = await supabaseServiceRole
+      .from('medication_logs')
+      .delete()
+      .eq('user_id', user_id)
+      .eq('medication_id', String(medication_id))
+      .eq('dose_date', dose_date)
+      .eq('dose_time', dose_time);
+
+    if (error) {
+      return res.status(400).json({ success: false, error: error.message });
+    }
+
+    res.json({ success: true, message: 'Dose un-logged' });
+  } catch (error) {
+    console.error('❌ Un-log dose error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.delete('/api/medications/:medicationId', async (req, res) => {
+    try {
+        const { medicationId } = req.params;
+
+        console.log(`🗑️ Deleting medication ${medicationId}`);
+
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
+        // Soft delete - just mark as inactive
+        const { data, error } = await supabaseServiceRole
+            .from('medications')
+            .update({ 
+                active: false,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', medicationId)
+            .select();
+
+        if (error) {
+            console.error('❌ Medication delete error:', error);
+            return res.status(400).json({ error: error.message });
+        }
+
+        console.log('✅ Medication deleted (soft delete):', data[0]);
+        res.json({ 
+            success: true, 
+            message: 'Medication deleted',
+            data: data[0]
+        });
+    } catch (error) {
+        console.error('❌ Medication delete exception:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Log one dose as taken (also notifies approved family members)
+app.post('/api/medications/mark-taken', async (req, res) => {
+  try {
+    const { user_id, medication_id, medication_name, dose_date, dose_time } = req.body;
+
+    if (!user_id || !medication_id || !dose_date || !dose_time) {
+      return res.status(400).json({ success: false, error: 'user_id, medication_id, dose_date and dose_time are required' });
+    }
+
+    const supabaseServiceRole = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+
+    // Don't log the same dose twice
+    const { data: existing, error: existingError } = await supabaseServiceRole
+      .from('medication_logs')
+      .select('id')
+      .eq('user_id', user_id)
+      .eq('medication_id', String(medication_id))
+      .eq('dose_date', dose_date)
+      .eq('dose_time', dose_time)
+      .maybeSingle();
+
+    if (existingError) {
+      return res.status(400).json({ success: false, error: existingError.message });
+    }
+
+    if (existing) {
+      return res.json({ success: true, message: 'Dose was already logged', data: existing });
+    }
+
+    const { data: logData, error: logError } = await supabaseServiceRole
+      .from('medication_logs')
+      .insert({
+        user_id: user_id,
+        medication_id: String(medication_id),
+        medication_name: medication_name,
+        taken_time: new Date().toISOString(),
+        status: 'taken',
+        dose_date: dose_date,
+        dose_time: dose_time
+      })
+      .select();
+
+    if (logError) {
+      return res.status(400).json({ success: false, error: logError.message });
+    }
+
+    // Notify approved family members
+    await sendMedicationNotification(user_id, medication_name, 'taken');
+
+    res.json({
+      success: true,
+      data: logData[0],
+      message: 'Dose logged and family notified'
+    });
+  } catch (error) {
+    console.error('❌ Mark taken error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get the doses taken on one date (YYYY-MM-DD) for a user
+app.get('/api/medications/taken/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { date } = req.query;
+
+    if (!date) {
+      return res.status(400).json({ success: false, error: 'date is required (YYYY-MM-DD)' });
+    }
+
+    const supabaseServiceRole = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+
+    const { data, error } = await supabaseServiceRole
+      .from('medication_logs')
+      .select('medication_id, dose_time, taken_time')
+      .eq('user_id', userId)
+      .eq('dose_date', date)
+      .eq('status', 'taken');
+
+    if (error) {
+      return res.status(400).json({ success: false, error: error.message });
+    }
+
+    res.json({ success: true, data: data || [] });
+  } catch (error) {
+    console.error('❌ Fetch taken doses error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get medication adherence for a senior
+app.get('/api/medications/adherence/:userId', async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const { days = 7 } = req.query; // Default to last 7 days
+
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - parseInt(days));
+
+        const { data, error } = await supabase
+            .from('medication_logs')
+            .select('*')
+            .eq('user_id', userId)
+            .gte('created_at', startDate.toISOString());
+
+        if (error) {
+            return res.status(400).json({ error: error.message });
+        }
+
+        // Calculate stats
+        const total = data.length;
+        const taken = data.filter(log => log.status === 'taken').length;
+        const missed = data.filter(log => log.status === 'missed').length;
+        const adherenceRate = total > 0 ? ((taken / total) * 100).toFixed(1) : 0;
+
+        res.json({ 
+            success: true, 
+            data: {
+                period_days: parseInt(days),
+                total_medications: total,
+                taken: taken,
+                missed: missed,
+                adherence_rate: `${adherenceRate}%`,
+                logs: data
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ============================================================
+// NOTIFICATION ENDPOINTS
+// ============================================================
+
+// Send notification to family members
+async function sendMedicationNotification(seniorUserId, medicationName, action) {
+    try {
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
+        // Get all family members for this senior
+        const { data: connections, error: connectError } = await supabaseServiceRole
+            .from('family_connections')
+            .select('family_member_user_id')
+            .eq('senior_user_id', seniorUserId)
+            .eq('approved_by_senior', true);
+
+        if (connectError) {
+            console.error('Error fetching family connections:', connectError);
+            return;
+        }
+
+        // Get senior's name
+        const { data: senior } = await supabaseServiceRole
+            .from('users')
+            .select('username')
+            .eq('id', seniorUserId)
+            .single();
+
+        const seniorName = senior?.username || 'A senior';
+        const message = action === 'taken' 
+            ? `${seniorName} just took their ${medicationName}`
+            : `${seniorName} missed their ${medicationName}`;
+
+        // Log notification and send email for each family member
+        for (const connection of connections || []) {
+            // Get family member's email and timezone
+            const { data: familyMember } = await supabaseServiceRole
+                .from('users')
+                .select('email, timezone')
+                .eq('id', connection.family_member_user_id)
+                .single();
+
+            // Log notification to database
+            await supabaseServiceRole
+                .from('notification_logs')
+                .insert({
+                    senior_user_id: seniorUserId,
+                    family_member_user_id: connection.family_member_user_id,
+                    notification_type: `medication_${action}`,
+                    medication_id: medicationName,
+                    message: message
+                });
+
+            // Send email notification if service available
+            if (resendClient && familyMember?.email) {
+                try {
+                    const emailSubject = action === 'taken' 
+                        ? `✅ ${seniorName} took their ${medicationName}`
+                        : `⚠️ ${seniorName} missed their ${medicationName}`;
+
+                    const familyTimezone = familyMember?.timezone || 'UTC';
+                    const now = new Date();
+                    let formattedTime = 'Unknown time';
+                    
+                    try {
+                        const options = {
+                            year: 'numeric',
+                            month: 'numeric',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit',
+                            hour12: true,
+                            timeZone: familyTimezone
+                        };
+                        formattedTime = new Intl.DateTimeFormat('en-US', options).format(now);
+                    } catch (timeError) {
+                        formattedTime = now.toLocaleString();
+                    }
+                    
+                    const emailHtml = `
+                        <h2>${message}</h2>
+                        <p>Medication: <strong>${medicationName}</strong></p>
+                        <p>Time: ${formattedTime}</p>
+                        <hr>
+                        <p style="color: #666; font-size: 12px;">Family Care 360</p>
+                    `;
+
+                    await resendClient.emails.send({
+                        from: 'Family Care 360 <noreply@familycare360.app>',
+                        to: familyMember.email,
+                        subject: emailSubject,
+                        html: emailHtml,
+                        reply_to: 'support@familycare360.app'
+                    });
+
+                    console.log(`📧 Email sent to ${familyMember.email} for ${medicationName}`);
+                } catch (emailError) {
+                    console.error(`⚠️ Failed to send email to ${familyMember?.email}:`, emailError.message);
+                }
+            }
+        }
+
+        console.log(`✅ Notifications sent for: ${medicationName}`);
+    } catch (error) {
+        console.error('Error sending notifications:', error);
+    }
+}
+
+// Get notifications for a family member
+app.get('/api/notifications/:familyMemberId', async (req, res) => {
+    try {
+        const { familyMemberId } = req.params;
+        const { limit = 10, unread = false } = req.query;
+
+        let query = supabase
+            .from('notification_logs')
+            .select(`
+                *,
+                senior:senior_user_id(username, email)
+            `)
+            .eq('family_member_user_id', familyMemberId)
+            .order('sent_at', { ascending: false })
+            .limit(parseInt(limit));
+
+        if (unread === 'true') {
+            query = query.is('read_at', null);
+        }
+
+        const { data, error } = await query;
+
+        if (error) {
+            return res.status(400).json({ error: error.message });
+        }
+
+        // Ensure all timestamps have Z appended (UTC indicator)
+        const fixedData = data.map(notification => {
+            if (notification.sent_at && !notification.sent_at.endsWith('Z')) {
+                notification.sent_at = notification.sent_at + 'Z';
+            }
+            if (notification.created_at && !notification.created_at.endsWith('Z')) {
+                notification.created_at = notification.created_at + 'Z';
+            }
+            if (notification.read_at && !notification.read_at.endsWith('Z')) {
+                notification.read_at = notification.read_at + 'Z';
+            }
+            return notification;
+        });
+
+        res.json({ 
+            success: true, 
+            data: fixedData,
+            count: fixedData.length
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Mark notification as read
+app.put('/api/notifications/:notificationId/read', async (req, res) => {
+    try {
+        const { notificationId } = req.params;
+
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
+        const { data, error } = await supabaseServiceRole
+            .from('notification_logs')
+            .update({ read_at: new Date().toISOString() })
+            .eq('id', notificationId)
+            .select();
+
+        if (error) {
+            return res.status(400).json({ error: error.message });
+        }
+
+        res.json({ 
+            success: true, 
+            data: data[0],
+            message: 'Notification marked as read'
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ============================================================
+// FEATURE TOGGLE ENDPOINTS
+// ============================================================
+
+// Get feature status
+app.get('/api/features/:featureId', async (req, res) => {
+    try {
+        const { featureId } = req.params;
+
+        const { data, error } = await supabase
+            .from('features')
+            .select('*')
+            .eq('id', featureId)
+            .single();
+
+        if (error) {
+            return res.status(400).json({ error: error.message });
+        }
+
+        res.json({ 
+            success: true, 
+            data: data
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Toggle feature (admin only - for testing)
+app.put('/api/features/:featureId/toggle', async (req, res) => {
+    try {
+        const { featureId } = req.params;
+
+        const supabaseServiceRole = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
+        // Get current state
+        const { data: current } = await supabaseServiceRole
+            .from('features')
+            .select('enabled')
+            .eq('id', featureId)
+            .single();
+
+        // Toggle it
+        const { data, error } = await supabaseServiceRole
+            .from('features')
+            .update({ enabled: !current.enabled })
+            .eq('id', featureId)
+            .select();
+
+        if (error) {
+            return res.status(400).json({ error: error.message });
+        }
+
+        res.json({ 
+            success: true, 
+            data: data[0],
+            message: `Feature ${featureId} is now ${data[0].enabled ? 'ENABLED' : 'DISABLED'}`
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ============================================================
+// SMS NOTIFICATIONS via AWS SNS
+// ============================================================
+
+let sns = null;
+
+// Only initialize AWS SNS if credentials are provided
+if (process.env.SENIOR_CARE_AWS_ACCESS_KEY && process.env.SENIOR_CARE_AWS_SECRET_ACCESS_KEY) {
+  try {
+    const AWS = require('aws-sdk');
+    
+    // Configure AWS (using Vercel-safe environment variable names)
+    AWS.config.update({
+      accessKeyId: process.env.SENIOR_CARE_AWS_ACCESS_KEY,
+      secretAccessKey: process.env.SENIOR_CARE_AWS_SECRET_ACCESS_KEY,
+      region: process.env.SENIOR_CARE_AWS_REGION || 'us-east-1'
+    });
+    
+    sns = new AWS.SNS();
+    console.log('✅ AWS SNS initialized successfully');
+    console.log('   Region:', process.env.SENIOR_CARE_AWS_REGION || 'us-east-1');
+  } catch (error) {
+    console.error('⚠️ AWS SNS initialization failed:', error.message);
+    console.log('ℹ️ SMS notifications will be unavailable');
+  }
+} else {
+  console.log('ℹ️ AWS credentials not configured. SMS notifications disabled.');
+  console.log('   AWS_ACCESS_KEY present:', !!process.env.SENIOR_CARE_AWS_ACCESS_KEY);
+  console.log('   AWS_SECRET_KEY present:', !!process.env.SENIOR_CARE_AWS_SECRET_ACCESS_KEY);
+}
+
+// Send SMS notification
+app.post('/api/send-sms', async (req, res) => {
+  try {
+    // Check if SNS is initialized
+    if (!sns) {
+      return res.status(503).json({ 
+        success: false, 
+        error: 'SMS service not configured. AWS credentials missing.' 
+      });
+    }
+
+    const { phoneNumber, message } = req.body;
+
+    // Validate inputs
+    if (!phoneNumber || !message) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Phone number and message required' 
+      });
+    }
+
+    // Format phone number (ensure +1 prefix for US numbers)
+    let formattedNumber = phoneNumber;
+    if (!formattedNumber.startsWith('+')) {
+      formattedNumber = '+1' + phoneNumber.replace(/\D/g, '');
+    }
+
+    console.log(`📱 Sending SMS to ${formattedNumber}: ${message}`);
+
+    // Send via SNS
+    const result = await sns.publish({
+      Message: message,
+      PhoneNumber: formattedNumber
+    }).promise();
+
+    console.log(`✅ SMS sent successfully. MessageId: ${result.MessageId}`);
+
+    res.json({ 
+      success: true, 
+      messageId: result.MessageId,
+      phoneNumber: formattedNumber
+    });
+
+  } catch (error) {
+    console.error('❌ SMS Error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// Test SMS endpoint (for testing)
+app.post('/api/test-sms', async (req, res) => {
+  try {
+    // Check if SNS is initialized
+    if (!sns) {
+      return res.status(503).json({ 
+        success: false, 
+        error: 'SMS service not configured. AWS credentials missing.' 
+      });
+    }
+
+    const { phoneNumber } = req.body;
+
+    if (!phoneNumber) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Phone number required' 
+      });
+    }
+
+    const testMessage = '✅ Test SMS from Senior Care Companion. Notifications are working!';
+
+    const result = await sns.publish({
+      Message: testMessage,
+      PhoneNumber: phoneNumber.startsWith('+') ? phoneNumber : '+1' + phoneNumber.replace(/\D/g, '')
+    }).promise();
+
+    res.json({ 
+      success: true, 
+      message: 'Test SMS sent!',
+      messageId: result.MessageId
+    });
+
+  } catch (error) {
+    console.error('❌ Test SMS Error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// ============================================================
+// EMAIL NOTIFICATIONS via RESEND
+// ============================================================
+
+let resendClient = null;
+
+// Only initialize Resend if API key is provided
+if (process.env.RESEND_API_KEY) {
+  try {
+    const resend = require('resend');
+    resendClient = new resend.Resend(process.env.RESEND_API_KEY);
+    console.log('✅ Resend email client initialized successfully');
+  } catch (error) {
+    console.error('⚠️ Resend initialization failed:', error.message);
+    console.log('ℹ️ Email notifications will be unavailable');
+  }
+} else {
+  console.log('ℹ️ Resend API key not configured. Email notifications disabled.');
+}
+
+// Send email notification
+app.post('/api/send-email', async (req, res) => {
+  try {
+    // Check if Resend is initialized
+    if (!resendClient) {
+      return res.status(503).json({ 
+        success: false, 
+        error: 'Email service not configured. Resend API key missing.' 
+      });
+    }
+
+    const { email, subject, message, html } = req.body;
+
+    // Validate inputs
+    if (!email || !subject || (!message && !html)) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Email, subject, and message (or html) required' 
+      });
+    }
+
+    console.log(`📧 Sending email to ${email}: ${subject}`);
+
+    // Send via Resend
+    const result = await resendClient.emails.send({
+      from: 'Senior Care Companion <onboarding@resend.dev>',
+      to: email,
+      subject: subject,
+      html: html || `<p>${message}</p>`,
+      reply_to: 'support@seniorcare.com'
+    });
+
+    if (result.error) {
+      throw result.error;
+    }
+
+    console.log(`✅ Email sent successfully. MessageId: ${result.data.id}`);
+
+    res.json({ 
+      success: true, 
+      messageId: result.data.id,
+      email: email
+    });
+
+  } catch (error) {
+    console.error('❌ Email Error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// Test email endpoint
+app.post('/api/test-email', async (req, res) => {
+  try {
+    // Check if Resend is initialized
+    if (!resendClient) {
+      return res.status(503).json({ 
+        success: false, 
+        error: 'Email service not configured. Resend API key missing.' 
+      });
+    }
+
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Email required' 
+      });
+    }
+
+    const result = await resendClient.emails.send({
+      from: 'Senior Care Companion <onboarding@resend.dev>',
+      to: email,
+      subject: '✅ Senior Care Companion - Email Test',
+      html: `
+        <h2>Email Notifications Working!</h2>
+        <p>This is a test email from Senior Care Companion.</p>
+        <p>When family members are invited, they'll receive emails like this when medications are logged.</p>
+        <hr>
+        <p style="color: #666; font-size: 12px;">Senior Care Companion</p>
+      `,
+      reply_to: 'support@seniorcare.com'
+    });
+
+    if (result.error) {
+      throw result.error;
+    }
+
+    res.json({ 
+      success: true, 
+      message: 'Test email sent!',
+      messageId: result.data.id
+    });
+
+  } catch (error) {
+    console.error('❌ Test Email Error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// ============================================================
+// ERROR HANDLING
+// ============================================================
+
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Something went wrong!' });
+});
+
+// ============================================================
+// START SERVER
+// ============================================================
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log(`
+    ╔════════════════════════════════════════════════════════╗
+    ║  🏥 SENIOR CARE COMPANION - BACKEND API                ║
+    ║  ✅ Server running on port ${PORT}                        ║
+    ║  📍 http://localhost:${PORT}                               ║
+    ║  🔗 Health check: http://localhost:${PORT}/api/health     ║
+    ╚════════════════════════════════════════════════════════╝
+    `);
+});
+
+module.exports = app;
+
+// ============================================================
+// SCHEDULED NOTIFICATIONS - Server-Side Scheduler
+// ============================================================
+
+// Check and send scheduled medication notifications
+app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
+  try {
+    // ===== VALIDATE BEARER TOKEN =====
+    const authHeader = req.headers.authorization;
+    const cronSecret = process.env.CRON_SECRET;
+
+    if (!cronSecret) {
+      console.warn('⚠️ [SCHEDULER] CRON_SECRET not set in environment variables');
+      return res.status(500).json({ 
+        success: false, 
+        error: 'CRON_SECRET not configured' 
+      });
+    }
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.error('❌ [SCHEDULER] Missing or invalid Authorization header');
+      return res.status(401).json({ 
+        success: false, 
+        error: 'Unauthorized - Missing Bearer token' 
+      });
+    }
+
+    const token = authHeader.substring(7); // Remove "Bearer " prefix
+    if (token !== cronSecret) {
+      console.error('❌ [SCHEDULER] Invalid bearer token');
+      return res.status(401).json({ 
+        success: false, 
+        error: 'Unauthorized - Invalid token' 
+      });
+    }
+
+    console.log('✅ [SCHEDULER] Authorization successful');
+    console.log('🔔 [SCHEDULER] Checking for pending notifications...');
+
+    // ===== CHECK IF RESEND IS CONFIGURED =====
+    if (!resendClient) {
+      console.error('❌ [SCHEDULER] Resend email client not initialized');
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Email service not configured',
+        message: 'RESEND_API_KEY not set in environment variables'
+      });
+    }
+
+    // Use SERVICE_ROLE for all DB operations
+    const supabaseServiceRole = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+
+    // Get all pending notifications that are due
+    const { data: pendingNotifications, error: fetchError } = await supabaseServiceRole
+      .from('scheduled_notifications')
+      .select('*')
+      .eq('status', 'pending')
+      .lte('scheduled_time', new Date().toISOString());
+
+    if (fetchError) {
+      throw fetchError;
+    }
+
+    if (!pendingNotifications || pendingNotifications.length === 0) {
+      console.log('✅ [SCHEDULER] No pending notifications');
+      return res.json({ 
+        success: true, 
+        message: 'No pending notifications',
+        checked: 0 
+      });
+    }
+
+    console.log(`📬 [SCHEDULER] Found ${pendingNotifications.length} notifications to send`);
+
+    let sentCount = 0;
+    let failedCount = 0;
+
+    // Process each notification
+    for (const notification of pendingNotifications) {
+      try {
+        const { senior_user_id, medication_name, id } = notification;
+
+        // Get senior user details
+        const { data: senior, error: seniorError } = await supabaseServiceRole
+          .from('users')
+          .select('email, first_name, last_name, timezone, phone, sms_reminders_enabled, sms_carrier')
+          .eq('id', senior_user_id)
+          .single();
+
+        if (seniorError) throw seniorError;
+
+        const seniorName = `${senior.first_name || 'User'} ${senior.last_name || ''}`.trim();
+
+        // ===== STEP 1: SEND MEDICATION REMINDER TO SENIOR =====
+        console.log(`📱 [SCHEDULER] Sending medication reminder to senior: ${seniorName}`);
+        
+        try {
+          // Send email reminder to senior
+          const seniorEmailResult = await resendClient.emails.send({
+            from: 'noreply@familycare360.app',
+            to: senior.email,
+            subject: `💊 Medication Reminder: Time for ${medication_name}`,
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #fff3e0; border-radius: 8px;">
+                <h2 style="color: #e65100; margin-bottom: 20px;">⏰ Medication Reminder</h2>
+                <div style="background: white; padding: 20px; border-left: 4px solid #ff6f00; margin: 20px 0; border-radius: 4px;">
+                  <p style="margin: 0 0 10px 0; color: #333; font-size: 16px;">
+                    Hi ${senior.first_name || 'there'},
+                  </p>
+                  <p style="margin: 0; color: #333; font-size: 18px;">
+                    It's time to take your <strong style="color: #ff6f00;">${medication_name}</strong>
+                  </p>
+                  <p style="margin: 15px 0 0 0; color: #666; font-size: 14px;">
+                    Scheduled for: <strong>${new Date(new Date(notification.scheduled_time).getTime() + notification.reminder_minutes * 60000).toLocaleString('en-US', {timeZone: senior.timezone || 'America/Denver', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'})}</strong>
+                  </p>
+                </div>
+                <div style="background: #f5f5f5; padding: 15px; border-radius: 6px; margin: 20px 0;">
+                  <p style="margin: 0; color: #666; font-size: 14px;">
+                    ✅ Tap "Mark as Taken" in the app when you've taken this medication.
+                  </p>
+                </div>
+                <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+                
+                ${senior.sms_carrier === 'email-only' ? `
+                <div style="background: #f0f7ff; padding: 12px; border-radius: 6px; border-left: 3px solid #2196F3; margin: 15px 0;">
+                  <p style="margin: 0; font-size: 12px; color: #1565c0; line-height: 1.6;">
+                    💡 <strong>Tip:</strong> Want to receive medication reminders as text messages instead of email? 
+                    Open the app, go to <strong>Settings > SMS</strong>, and select your mobile carrier. 
+                    You'll get both SMS and email reminders!
+                  </p>
+                </div>
+                ` : ''}
+                
+                <p style="color: #999; font-size: 12px;">
+                  This is an automated reminder from Senior Care Companion
+                </p>
+              </div>
+            `,
+            reply_to: 'seniorcarecompanion360@gmail.com'
+          });
+
+          if (seniorEmailResult.error) {
+            console.error(`❌ Failed to send email to senior ${senior.email}:`, seniorEmailResult.error);
+          } else {
+            console.log(`✅ Medication reminder email sent to senior: ${senior.email}`);
+          }
+
+          // ===== SEND SMS VIA EMAIL GATEWAY (if enabled and carrier is NOT email-only) =====
+          if (senior.sms_reminders_enabled && senior.phone && senior.sms_carrier && senior.sms_carrier !== 'email-only') {
+            try {
+              // Map carrier to SMS gateway domain
+              const carrierGatewayMap = {
+                'verizon': 'vtext.com',
+                'att': 'txt.att.com',
+                'tmobile': 'tmomail.net',
+                'sprint': 'messaging.sprintpcs.com',
+                'uscellular': 'email.uscc.net',
+                'virgin': 'vmobl.com',
+                'boost': 'smsd.boostmobile.com',
+                'metropcs': 'myboostmobile.com'
+              };
+
+              const gatewayDomain = carrierGatewayMap[senior.sms_carrier.toLowerCase()];
+              
+              if (gatewayDomain) {
+                const smsGatewayEmail = `${senior.phone}@${gatewayDomain}`;
+                
+                // Calculate actual medication time (reminder_time + reminder_minutes)
+                const medicationTimeDate = new Date(new Date(notification.scheduled_time).getTime() + notification.reminder_minutes * 60000);
+                const medTime = medicationTimeDate.toLocaleString('en-US', {
+                  timeZone: senior.timezone || 'America/Denver',
+                  hour: 'numeric',
+                  minute: '2-digit',
+                  hour12: true
+                });
+                
+                // SMS message (keep it short - 160 char limit)
+                const smsMessage = `Senior Care: Reminder - Take your ${medication_name} at ${medTime}. Reply HELP or STOP.`;
+                
+                const smsResult = await resendClient.emails.send({
+                  from: 'noreply@familycare360.app',
+                  to: smsGatewayEmail,
+                  subject: 'Senior Care Medication Reminder',
+                  text: smsMessage,
+                  html: `<p>${smsMessage}</p>`
+                });
+
+                if (smsResult.error) {
+                  console.error(`❌ Failed to send SMS via ${senior.sms_carrier} to ${smsGatewayEmail}:`, smsResult.error);
+                } else {
+                  console.log(`✅ SMS reminder sent via ${senior.sms_carrier} gateway to ${senior.phone}`);
+                }
+              } else {
+                console.warn(`⚠️ Unknown carrier: ${senior.sms_carrier}`);
+              }
+            } catch (smsError) {
+              console.error(`❌ Error sending SMS via gateway:`, smsError);
+            }
+          }
+          
+        } catch (seniorError) {
+          console.error(`❌ Error sending reminder to senior:`, seniorError);
+        }
+
+        // ===== STEP 2: GET FAMILY CONNECTIONS & SEND FAMILY NOTIFICATIONS =====
+        // Get family connections for this senior
+        const { data: connections, error: connError } = await supabaseServiceRole
+          .from('family_connections')
+          .select(`
+            *,
+            family_member:family_member_user_id(email, first_name, last_name)
+          `)
+          .eq('senior_user_id', senior_user_id)
+          .eq('approved_by_senior', true);
+
+        if (connError) throw connError;
+
+        // Send notifications to all family members
+        if (connections && connections.length > 0) {
+          console.log(`📧 [SCHEDULER] Sending family notifications to ${connections.length} family members`);
+          
+          for (const connection of connections) {
+            try {
+              const familyEmail = connection.family_member.email;
+              const familyName = `${connection.family_member.first_name || 'Family Member'} ${connection.family_member.last_name || ''}`.trim();
+
+              // Send email notification to family member
+              const emailResult = await resendClient.emails.send({
+                from: 'noreply@familycare360.app',
+                to: familyEmail,
+                subject: `💊 Medication Reminder: ${seniorName}`,
+                html: `
+                  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9; border-radius: 8px;">
+                    <h2 style="color: #2ecc71; margin-bottom: 20px;">💊 Medication Reminder</h2>
+                    <p style="color: #333; font-size: 16px; line-height: 1.6;">
+                      Hi ${familyName},
+                    </p>
+                    <div style="background: white; padding: 20px; border-left: 4px solid #2ecc71; margin: 20px 0; border-radius: 4px;">
+                      <p style="margin: 0; color: #333;">
+                        <strong>${seniorName}</strong> has a scheduled medication reminder:
+                      </p>
+                      <p style="margin: 10px 0 0 0; font-size: 18px; color: #2ecc71;">
+                        <strong>${medication_name}</strong>
+                      </p>
+                    </div>
+                    <p style="color: #666; font-size: 14px;">
+                      Scheduled for: <strong>${new Date(notification.scheduled_time).toLocaleString('en-US', {timeZone: senior.timezone || 'America/Denver', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'})}</strong>
+                    </p>
+                    <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+                    <p style="color: #999; font-size: 12px;">
+                      This is an automated notification from Senior Care Companion
+                    </p>
+                  </div>
+                `,
+                reply_to: 'seniorcarecompanion360@gmail.com'
+              });
+
+              if (emailResult.error) {
+                console.error(`❌ Failed to send email to ${familyEmail}:`, emailResult.error);
+              } else {
+                console.log(`✅ Family notification email sent to ${familyEmail}`);
+              }
+            } catch (familyError) {
+              console.error(`❌ Error notifying family member:`, familyError);
+            }
+          }
+        }
+
+        // Update notification status to sent
+        const { error: updateError } = await supabaseServiceRole
+          .from('scheduled_notifications')
+          .update({ 
+            status: 'sent',
+            sent_at: new Date().toISOString()
+          })
+          .eq('id', id);
+
+        if (updateError) {
+          throw updateError;
+        }
+
+        sentCount++;
+        console.log(`✅ [SCHEDULER] Notification ${id} marked as sent`);
+
+      } catch (notifError) {
+        console.error(`❌ Error processing notification:`, notifError);
+        failedCount++;
+
+        // Mark as failed
+        try {
+          await supabaseServiceRole
+            .from('scheduled_notifications')
+            .update({ status: 'failed' })
+            .eq('id', notification.id);
+        } catch (e) {
+          console.error('Failed to update notification status:', e);
+        }
+      }
+    }
+
+    res.json({ 
+      success: true, 
+      message: `Processed ${sentCount} notifications`,
+      sent: sentCount,
+      failed: failedCount
+    });
+
+  } catch (error) {
+    console.error('❌ [SCHEDULER] Fatal error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// Create scheduled notifications for a medication
+app.post('/api/create-scheduled-notifications', async (req, res) => {
+  try {
+    const { userId, medication, timezone } = req.body;
+
+    if (!userId || !medication || !timezone) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Missing userId, medication, or timezone' 
+      });
+    }
+
+    // Helper: Validate time is in 15-minute increments
+    function isValid15MinuteTime(timeStr) {
+      // Format: "HH:MM"
+      if (!/^\d{2}:\d{2}$/.test(timeStr)) return false;
+      
+      const minutes = parseInt(timeStr.split(':')[1]);
+      // Valid minutes: 0, 15, 30, 45
+      return [0, 15, 30, 45].includes(minutes);
+    }
+
+    // Validate all medication times
+    for (const time of medication.times) {
+      if (!isValid15MinuteTime(time)) {
+        return res.status(400).json({
+          success: false,
+          error: `Invalid time "${time}". Medications must be scheduled in 15-minute increments (00, 15, 30, 45)`
+        });
+      }
+    }
+
+    // Helper: Calculate timezone offset for a specific date
+    function getOffsetMs(date, tz) {
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: tz,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      });
+      
+      const parts = formatter.formatToParts(date);
+      const tzYear = parseInt(parts.find(p => p.type === 'year').value);
+      const tzMonth = parseInt(parts.find(p => p.type === 'month').value);
+      const tzDay = parseInt(parts.find(p => p.type === 'day').value);
+      const tzHour = parseInt(parts.find(p => p.type === 'hour').value);
+      const tzMinute = parseInt(parts.find(p => p.type === 'minute').value);
+      const tzSecond = parseInt(parts.find(p => p.type === 'second').value);
+      
+      // This is what the UTC date looks like in the timezone
+      const tzDate = new Date(Date.UTC(tzYear, tzMonth - 1, tzDay, tzHour, tzMinute, tzSecond));
+      
+      // Offset = how much to ADD to UTC time to get the timezone time
+      return date.getTime() - tzDate.getTime();
+    }
+
+    // Helper: Convert a local time in a timezone to UTC
+    function localTimeToUTC(year, month, day, hours, minutes, tz) {
+      // Create a test UTC date with these values
+      const testDate = new Date(Date.UTC(year, month - 1, day, hours, minutes, 0));
+      
+      // Calculate the offset for this specific date
+      const offset = getOffsetMs(testDate, tz);
+      
+      // Apply offset to get real UTC time
+      return new Date(testDate.getTime() + offset);
+    }
+
+    // Helper: Get today's date in the specified timezone
+    function getTodayInTimezone(tz) {
+      const now = new Date();
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: tz,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+      
+      const parts = formatter.formatToParts(now);
+      return {
+        year: parseInt(parts.find(p => p.type === 'year').value),
+        month: parseInt(parts.find(p => p.type === 'month').value),
+        day: parseInt(parts.find(p => p.type === 'day').value)
+      };
+    }
+
+    const reminders = [];
+    const reminderMinutes = medication.reminderMinutes || 15;
+
+    // Get TODAY in user's timezone
+    const todayTz = getTodayInTimezone(timezone);
+
+    console.log(`📅 Today in ${timezone}: ${todayTz.year}-${String(todayTz.month).padStart(2, '0')}-${String(todayTz.day).padStart(2, '0')}`);
+
+    // Generate notifications for next 30 days
+    for (let daysFromNow = 0; daysFromNow < 30; daysFromNow++) {
+      const checkDate = new Date(todayTz.year, todayTz.month - 1, todayTz.day);
+      checkDate.setDate(checkDate.getDate() + daysFromNow);
+      
+      const year = checkDate.getFullYear();
+      const month = checkDate.getMonth() + 1;
+      const day = checkDate.getDate();
+
+      // Check if medication should be taken on this date
+      let shouldSchedule = false;
+      
+      if (medication.recurrence === 'daily') {
+        shouldSchedule = true;
+      } else if (medication.recurrence === 'specific-days' && medication.specificDays) {
+        const dayOfWeek = checkDate.getDay();
+        shouldSchedule = medication.specificDays.includes(dayOfWeek);
+      } else if (medication.recurrence === 'every-x-days' && medication.everyXDays) {
+        const startDate = new Date(medication.startDate || new Date().toISOString().split('T')[0]);
+        const daysDiff = Math.floor((checkDate - startDate) / (1000 * 60 * 60 * 24));
+        shouldSchedule = daysDiff >= 0 && daysDiff % medication.everyXDays === 0;
+      } else if (medication.recurrence === 'weekly' && medication.weeklyDay !== undefined) {
+        shouldSchedule = checkDate.getDay() === medication.weeklyDay;
+      }
+
+      if (shouldSchedule) {
+        // Create notification for each dose time
+        for (const time of medication.times) {
+          const [hours, minutes] = time.split(':').map(Number);
+          
+          // Convert to UTC
+          const medicationTimeUTC = localTimeToUTC(year, month, day, hours, minutes, timezone);
+          
+          // Subtract reminder minutes
+          const reminderTimeUTC = new Date(medicationTimeUTC.getTime() - reminderMinutes * 60000);
+          
+          console.log(`📅 ${medication.name} at ${time} on ${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')} ${timezone}`);
+          console.log(`   → Reminder UTC: ${reminderTimeUTC.toISOString()}`);
+          
+          // Only add if in the future
+          if (reminderTimeUTC > new Date()) {
+            reminders.push({
+              senior_user_id: userId,
+              medication_name: medication.name,
+              scheduled_time: reminderTimeUTC.toISOString(),
+              reminder_minutes: reminderMinutes,
+              status: 'pending'
+            });
+          }
+        }
+      }
+    }
+
+    if (reminders.length === 0) {
+      return res.json({ 
+        success: true, 
+        message: 'No future notifications to schedule',
+        notificationCount: 0
+      });
+    }
+
+    // Insert into Supabase using SERVICE_ROLE to bypass RLS
+    const supabaseServiceRole = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+
+    const { data, error } = await supabaseServiceRole
+      .from('scheduled_notifications')
+      .insert(reminders);
+
+    if (error) {
+      throw error;
+    }
+
+    console.log(`✅ Created ${reminders.length} scheduled notifications`);
+    
+    res.json({ 
+      success: true, 
+      message: `Created ${reminders.length} scheduled notifications`,
+      notificationCount: reminders.length
+    });
+
+  } catch (error) {
+    console.error('❌ Error creating scheduled notifications:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// ============================================================
+// ERROR HANDLING MIDDLEWARE
+// ============================================================
+
+app.use((err, req, res, next) => {
+    console.error('❌ Server Error:', err.stack);
+    res.status(500).json({ 
+        success: false,
+        error: 'Internal Server Error' 
+    });
+});
+
+// ============================================================
+// START SERVER
+// ============================================================
+
+
+// ============================================================
+// ERROR HANDLING MIDDLEWARE
+// ============================================================
+
+app.use((err, req, res, next) => {
+    console.error('❌ Server Error:', err.stack);
+    res.status(500).json({ 
+        success: false,
+        error: 'Internal Server Error' 
+    });
+});
+
+// ============================================================
+// SMS WEBHOOK HANDLERS (Inbound Messages)
+// ============================================================
+
+// Primary inbound SMS handler (STOP/HELP)
+app.post('/api/sms/inbound', async (req, res) => {
+  try {
+    const incomingMessage = req.body.Body?.trim().toUpperCase() || '';
+    const fromNumber = req.body.From || '';
+    
+    console.log(`📱 Inbound SMS from ${fromNumber}: "${incomingMessage}"`);
+    
+    let responseText = '';
+    
+    if (incomingMessage === 'STOP') {
+      responseText = 'You have been unsubscribed from Senior Care Companion SMS messages.';
+      // TODO: Mark user as opted out in database
+      console.log(`✅ STOP received from ${fromNumber}`);
+    } else if (incomingMessage === 'HELP') {
+      responseText = 'For assistance with Senior Care Companion, visit https://seniorcarecompanion.github.io/senior-care-app/ or email seniorcarecompanion360@gmail.com. Reply STOP to opt-out.';
+      console.log(`✅ HELP received from ${fromNumber}`);
+    } else if (incomingMessage === 'START' || incomingMessage === 'YES') {
+      responseText = 'You have been resubscribed to Senior Care Companion SMS messages.';
+      // TODO: Mark user as opted back in
+      console.log(`✅ START/YES received from ${fromNumber}`);
+    } else {
+      responseText = 'Thank you for your message. Reply STOP to opt-out or HELP for assistance.';
+    }
+    
+    // Send response SMS via Twilio
+    const twilio = require('twilio');
+    const client = new twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+    
+    await client.messages.create({
+      body: responseText,
+      from: req.body.To, // Send from the number message came to
+      to: fromNumber
+    });
+    
+    // Return TwiML response
+    res.set('Content-Type', 'text/xml');
+    res.send(`
+      <Response>
+        <Message>${responseText}</Message>
+      </Response>
+    `);
+    
+  } catch (error) {
+    console.error('❌ Error handling inbound SMS:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Fallback inbound SMS handler
+app.post('/api/sms/inbound-fallback', async (req, res) => {
+  console.log('⚠️ Fallback webhook called - primary may have failed');
+  // Same logic as primary
+  return app._router.stack.find(r => r.route && r.route.path === '/api/sms/inbound').handle(req, res);
+});
+
+// Delivery Status Callback
+app.post('/api/sms/status', async (req, res) => {
+  try {
+    const messageStatus = req.body.MessageStatus || 'unknown';
+    const messageSid = req.body.MessageSid || '';
+    const toNumber = req.body.To || '';
+    
+    console.log(`📊 SMS Status Update: SID=${messageSid}, Status=${messageStatus}, To=${toNumber}`);
+    
+    // Log status to database if needed
+    if (process.env.SUPABASE_URL) {
+      const { createClient } = require('@supabase/supabase-js');
+      const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+      
+      await supabase
+        .from('notification_logs')
+        .insert([{
+          type: 'sms',
+          recipient_phone: toNumber,
+          message_sid: messageSid,
+          status: messageStatus,
+          created_at: new Date().toISOString()
+        }]);
+    }
+    
+    res.json({ success: true, status: messageStatus });
+    
+  } catch (error) {
+    console.error('❌ Error logging SMS status:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================================
+// TWILIO SMS SENDING (Primary method via Messaging Service)
+// ============================================================
+
+app.post('/api/send-sms-twilio', async (req, res) => {
+  try {
+    const { phone, message } = req.body;
+
+    if (!phone || !message) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Phone number and message required' 
+      });
+    }
+
+    // Validate Twilio credentials
+    if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN || !process.env.TWILIO_MESSAGING_SERVICE_SID) {
+      return res.status(503).json({ 
+        success: false, 
+        error: 'Twilio credentials not configured' 
+      });
+    }
+
+    const twilio = require('twilio');
+    const client = new twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+
+    // Format phone number
+    let formattedPhone = phone;
+    if (!formattedPhone.startsWith('+')) {
+      formattedPhone = '+1' + phone.replace(/\D/g, '');
+    }
+
+    console.log(`📱 Sending SMS via Twilio to ${formattedPhone}: "${message}"`);
+
+    const messageSid = process.env.TWILIO_MESSAGING_SERVICE_SID;
+
+    const result = await client.messages.create({
+      messagingServiceSid: messageSid,
+      to: formattedPhone,
+      body: message
+    });
+
+    console.log(`✅ SMS sent via Twilio. SID: ${result.sid}`);
+
+    res.json({ 
+      success: true, 
+      messageSid: result.sid,
+      phone: formattedPhone,
+      status: result.status
+    });
+
+  } catch (error) {
+    console.error('❌ Twilio SMS Error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// ============================================================
+// UPDATE SMS PREFERENCES (Phone, Carrier, SMS Enabled)
+// ============================================================
+
+app.post('/api/update-sms-preferences', async (req, res) => {
+  try {
+    const { userId, phone, carrier, smsEnabled } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'User ID required' 
+      });
+    }
+
+    console.log(`📱 Updating SMS preferences for user ${userId}: phone=${phone}, carrier=${carrier}, enabled=${smsEnabled}`);
+
+    // Prepare update data
+    const updateData = {
+      sms_reminders_enabled: smsEnabled || false
+    };
+
+    // Add phone if provided
+    if (phone) {
+      // Clean phone: remove all non-digits
+      const cleanPhone = phone.replace(/\D/g, '');
+      updateData.phone = cleanPhone;
+    }
+
+    // Add carrier if provided
+    if (carrier) {
+      updateData.sms_carrier = carrier;
+    }
+
+    // Update user in Supabase
+    const { data, error } = await supabase
+      .from('users')
+      .update(updateData)
+      .eq('id', userId)
+      .select();
+
+    if (error) {
+      console.error('❌ Error updating SMS preferences:', error);
+      return res.status(400).json({ 
+        success: false, 
+        error: error.message 
+      });
+    }
+
+    console.log('✅ SMS preferences updated successfully');
+    res.json({ 
+      success: true, 
+      message: 'SMS preferences updated',
+      data: data[0]
+    });
+
+  } catch (error) {
+    console.error('❌ SMS preferences update error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
