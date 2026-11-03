@@ -1908,6 +1908,75 @@ module.exports = app;
 // ============================================================
 
 // Check and send scheduled medication notifications
+// ===== MISSED DOSE CHECK =====
+// A dose counts as missed if it has no "taken" log this long after its scheduled time
+const MISSED_DOSE_GRACE_MINUTES = 60;
+
+async function checkMissedDoses(supabaseServiceRole) {
+  const now = new Date();
+  const earliest = new Date(now.getTime() - 26 * 60 * 60 * 1000).toISOString();
+
+  // Reminder rows from roughly the last day that haven't been checked for a missed dose yet
+  const { data: rows, error } = await supabaseServiceRole
+    .from('scheduled_notifications')
+    .select('id, senior_user_id, medication_name, scheduled_time, reminder_minutes, dose_date, dose_time')
+    .is('missed_checked_at', null)
+    .not('dose_date', 'is', null)
+    .gte('scheduled_time', earliest)
+    .lte('scheduled_time', now.toISOString());
+
+  if (error) throw error;
+  if (!rows || rows.length === 0) return;
+
+  // Group reminder rows by dose, so duplicate rows give one alert
+  const doses = new Map();
+  for (const row of rows) {
+    const doseDue = new Date(new Date(row.scheduled_time).getTime() + (row.reminder_minutes || 0) * 60000);
+    // Only check doses whose grace period has passed
+    if (doseDue.getTime() + MISSED_DOSE_GRACE_MINUTES * 60000 > now.getTime()) continue;
+
+    const key = [row.senior_user_id, row.medication_name, row.dose_date, row.dose_time].join('|');
+    if (!doses.has(key)) {
+      doses.set(key, { ...row, rowIds: [] });
+    }
+    doses.get(key).rowIds.push(row.id);
+  }
+
+  for (const dose of doses.values()) {
+    // Was this dose logged as taken?
+    const { data: logs, error: logError } = await supabaseServiceRole
+      .from('medication_logs')
+      .select('id')
+      .eq('user_id', dose.senior_user_id)
+      .eq('medication_name', dose.medication_name)
+      .eq('dose_date', dose.dose_date)
+      .eq('dose_time', dose.dose_time)
+      .eq('status', 'taken')
+      .limit(1);
+
+    if (logError) {
+      console.error('❌ [MISSED] Could not check logs:', logError.message);
+      continue; // leave unchecked so the next run tries again
+    }
+
+    const wasTaken = logs && logs.length > 0;
+    if (!wasTaken) {
+      console.log(`⚠️ [MISSED] ${dose.medication_name} at ${dose.dose_time} on ${dose.dose_date} was not taken`);
+      await sendMedicationNotification(dose.senior_user_id, dose.medication_name, 'missed');
+    }
+
+    // Mark these rows so this dose is not checked again
+    const { error: markError } = await supabaseServiceRole
+      .from('scheduled_notifications')
+      .update({ missed_checked_at: now.toISOString() })
+      .in('id', dose.rowIds);
+
+    if (markError) {
+      console.error('❌ [MISSED] Could not mark dose as checked:', markError.message);
+    }
+  }
+}
+
 app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
   try {
     // ===== VALIDATE BEARER TOKEN =====
@@ -1957,6 +2026,13 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
       process.env.SUPABASE_URL,
       process.env.SUPABASE_SERVICE_ROLE_KEY
     );
+
+    // Check for missed doses (errors here must not stop reminders)
+    try {
+      await checkMissedDoses(supabaseServiceRole);
+    } catch (missedError) {
+      console.error('❌ [MISSED] Missed-dose check failed:', missedError.message);
+    }
 
     // Get all pending notifications that are due
     const { data: pendingNotifications, error: fetchError } = await supabaseServiceRole
@@ -2366,7 +2442,9 @@ app.post('/api/create-scheduled-notifications', async (req, res) => {
               medication_name: medication.name,
               scheduled_time: reminderTimeUTC.toISOString(),
               reminder_minutes: reminderMinutes,
-              status: 'pending'
+              status: 'pending',
+              dose_date: `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`,
+              dose_time: time
             });
           }
         }
@@ -2386,6 +2464,17 @@ app.post('/api/create-scheduled-notifications', async (req, res) => {
       process.env.SUPABASE_URL,
       process.env.SUPABASE_SERVICE_ROLE_KEY
     );
+
+    // Replace older pending reminders for this medication so they don't double up
+    const { error: clearError } = await supabaseServiceRole
+      .from('scheduled_notifications')
+      .delete()
+      .eq('senior_user_id', userId)
+      .eq('medication_name', medication.name)
+      .eq('status', 'pending');
+    if (clearError) {
+      console.error('⚠️ Could not clear old pending reminders:', clearError.message);
+    }
 
     const { data, error } = await supabaseServiceRole
       .from('scheduled_notifications')
