@@ -1908,6 +1908,36 @@ module.exports = app;
 // ============================================================
 
 // Check and send scheduled medication notifications
+// ===== DATA RETENTION CLEANUP =====
+// Sent/failed reminders are kept 7 days; dose and notification history is kept 90 days
+const REMINDER_RETENTION_DAYS = 7;
+const HISTORY_RETENTION_DAYS = 90;
+
+async function cleanupOldData(supabaseServiceRole) {
+  const now = Date.now();
+  const reminderCutoff = new Date(now - REMINDER_RETENTION_DAYS * 86400000).toISOString();
+  const historyCutoff = new Date(now - HISTORY_RETENTION_DAYS * 86400000).toISOString();
+
+  const { error: remindersError } = await supabaseServiceRole
+    .from('scheduled_notifications')
+    .delete()
+    .in('status', ['sent', 'failed'])
+    .lt('scheduled_time', reminderCutoff);
+  if (remindersError) console.error('❌ [CLEANUP] Reminders:', remindersError.message);
+
+  const { error: logsError } = await supabaseServiceRole
+    .from('medication_logs')
+    .delete()
+    .lt('created_at', historyCutoff);
+  if (logsError) console.error('❌ [CLEANUP] Dose logs:', logsError.message);
+
+  const { error: notesError } = await supabaseServiceRole
+    .from('notification_logs')
+    .delete()
+    .lt('sent_at', historyCutoff);
+  if (notesError) console.error('❌ [CLEANUP] Notification logs:', notesError.message);
+}
+
 // ===== MISSED DOSE CHECK =====
 // A dose counts as missed if it has no "taken" log this long after its scheduled time
 const MISSED_DOSE_GRACE_MINUTES = 60;
@@ -2026,6 +2056,13 @@ app.post('/api/check-and-send-scheduled-notifications', async (req, res) => {
       process.env.SUPABASE_URL,
       process.env.SUPABASE_SERVICE_ROLE_KEY
     );
+
+    // Remove old history (errors here must not stop reminders)
+    try {
+      await cleanupOldData(supabaseServiceRole);
+    } catch (cleanupError) {
+      console.error('❌ [CLEANUP] Cleanup failed:', cleanupError.message);
+    }
 
     // Check for missed doses (errors here must not stop reminders)
     try {
